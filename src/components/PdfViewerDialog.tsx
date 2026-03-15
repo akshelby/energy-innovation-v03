@@ -16,17 +16,18 @@ export default function PdfViewerDialog({ open, onOpenChange, src }: PdfViewerDi
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl w-[95vw] h-[85vh] p-0 overflow-hidden">
+      <DialogContent className="max-w-4xl w-[95vw] h-[85vh] p-0 overflow-hidden [&>button]:top-3 [&>button]:right-3 [&>button]:z-20 [&>button]:bg-background [&>button]:rounded-full [&>button]:border [&>button]:border-border [&>button]:p-1.5 [&>button]:shadow-sm">
         <div className="flex flex-col h-full">
-          <div className="flex items-center justify-end p-2 border-b border-border bg-muted/30">
+          <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-muted/30">
+            <span className="text-sm font-medium text-foreground">PDF Document</span>
             <Button
               variant="outline"
               size="sm"
               asChild
-              className="rounded-full"
+              className="mr-8"
             >
-              <a href={src} target="_blank" rel="noopener noreferrer">
-                <Download className="w-4 h-4 mr-1" />
+              <a href={src} download target="_blank" rel="noopener noreferrer">
+                <Download className="w-4 h-4 mr-1.5" />
                 Download
               </a>
             </Button>
