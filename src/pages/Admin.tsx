@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import {
   Lock, Trash2, Save, RefreshCw, Database, FileText, MessageSquare,
-  LogOut, Image, Upload, Plus, Package, Briefcase, GripVertical, List,
+  LogOut, Image, Upload, Plus, Package, Briefcase, GripVertical, List, Palette,
 } from "lucide-react";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
 
@@ -163,7 +163,7 @@ const emptyService: ServiceItem = {
   tag_en: "", tag_ar: "", image_url: null, pdf_url: null, icon: "Wrench", sort_order: 0,
 };
 
-type TabKey = "leads" | "content" | "products" | "services" | "menu-items" | "images";
+type TabKey = "leads" | "content" | "products" | "services" | "menu-items" | "images" | "branding";
 
 const emptyMenuChild: MenuChildItem = {
   category_key: "cat.fire", name_en: "", name_ar: "", pdf_url: null, sort_order: 0,
@@ -198,6 +198,12 @@ export default function Admin() {
   const [files, setFiles] = useState<StorageFile[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Branding state
+  const [brandName, setBrandName] = useState("Energy Innovation");
+  const [brandLogoUrl, setBrandLogoUrl] = useState("");
+  const brandLogoRef = useRef<HTMLInputElement>(null);
+  const [brandLogoUploading, setBrandLogoUploading] = useState(false);
   const productImageRef = useRef<HTMLInputElement>(null);
   const productPdfRef = useRef<HTMLInputElement>(null);
   const serviceImageRef = useRef<HTMLInputElement>(null);
@@ -268,6 +274,22 @@ export default function Admin() {
     finally { setLoading(false); }
   }, [storedPassword, selectedFolder]);
 
+  const fetchBranding = useCallback(async () => {
+    // Load brand name from site_content
+    try {
+      const data = await apiCall("content", "GET", storedPassword);
+      const brandEntry = data.find((d: ContentItem) => d.content_key === "brand.name");
+      if (brandEntry) setBrandName(brandEntry.value_en);
+    } catch { /* ignore */ }
+    // Load logo URL
+    const logoPublicUrl = `${STORAGE_BASE}/images/branding/logo`;
+    try {
+      const res = await fetch(logoPublicUrl, { method: "HEAD" });
+      if (res.ok) setBrandLogoUrl(logoPublicUrl + "?t=" + Date.now());
+      else setBrandLogoUrl("");
+    } catch { setBrandLogoUrl(""); }
+  }, [storedPassword]);
+
   useEffect(() => {
     if (authenticated) {
       if (activeTab === "leads") fetchLeads();
@@ -275,9 +297,10 @@ export default function Admin() {
       else if (activeTab === "products") fetchProducts();
       else if (activeTab === "services") fetchServices();
       else if (activeTab === "menu-items") fetchMenuItems();
+      else if (activeTab === "branding") fetchBranding();
       else fetchFiles();
     }
-  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchProducts, fetchServices, fetchMenuItems, fetchFiles]);
+  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchProducts, fetchServices, fetchMenuItems, fetchFiles, fetchBranding]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -590,6 +613,7 @@ export default function Admin() {
         {/* Tabs */}
         <div className="flex gap-2 mb-8 flex-wrap">
           {([
+            { key: "branding" as TabKey, icon: Palette, label: "Branding" },
             { key: "leads" as TabKey, icon: MessageSquare, label: `Leads (${leads.length})` },
             { key: "content" as TabKey, icon: FileText, label: "Site Content" },
             { key: "products" as TabKey, icon: Package, label: `Products (${products.length})` },
@@ -602,6 +626,95 @@ export default function Admin() {
             </Button>
           ))}
         </div>
+
+        {/* ─── Branding Tab ──────── */}
+        {activeTab === "branding" && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-foreground">Branding</h2>
+              <Button variant="outline" size="sm" onClick={fetchBranding} disabled={loading} className="rounded-xl">
+                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
+              </Button>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Logo Upload */}
+              <div className="bg-card border border-border rounded-2xl p-6">
+                <h3 className="font-semibold text-foreground mb-4">Company Logo</h3>
+                <p className="text-sm text-muted-foreground mb-4">Upload your logo (PNG, JPG, SVG). It will appear in the header and footer.</p>
+                
+                {brandLogoUrl && (
+                  <div className="mb-4 p-4 bg-secondary rounded-xl flex items-center justify-center">
+                    <img src={brandLogoUrl} alt="Current logo" className="max-h-20 w-auto object-contain" />
+                  </div>
+                )}
+                
+                <input
+                  ref={brandLogoRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    setBrandLogoUploading(true);
+                    try {
+                      // Upload as branding/logo (no extension, upsert)
+                      const base64 = await fileToBase64(file);
+                      await apiCall("upload", "POST", storedPassword, {
+                        bucket: "images",
+                        filePath: "branding/logo",
+                        base64,
+                        contentType: file.type,
+                      });
+                      toast.success("Logo uploaded! Refresh the main site to see changes.");
+                      fetchBranding();
+                    } catch (err: any) { toast.error(err.message); }
+                    finally { setBrandLogoUploading(false); }
+                  }}
+                />
+                <Button
+                  onClick={() => brandLogoRef.current?.click()}
+                  disabled={brandLogoUploading}
+                  className="gradient-accent text-accent-foreground rounded-xl border-0"
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  {brandLogoUploading ? "Uploading..." : brandLogoUrl ? "Replace Logo" : "Upload Logo"}
+                </Button>
+              </div>
+
+              {/* Business Name */}
+              <div className="bg-card border border-border rounded-2xl p-6">
+                <h3 className="font-semibold text-foreground mb-4">Business Name</h3>
+                <p className="text-sm text-muted-foreground mb-4">This name appears in the footer copyright and page metadata.</p>
+                
+                <div className="space-y-3">
+                  <Input
+                    value={brandName}
+                    onChange={(e) => setBrandName(e.target.value)}
+                    placeholder="Your business name"
+                    className="rounded-xl"
+                  />
+                  <Button
+                    onClick={async () => {
+                      try {
+                        await apiCall("content", "POST", storedPassword, {
+                          content_key: "brand.name",
+                          value_en: brandName,
+                          value_ar: brandName,
+                        });
+                        toast.success("Business name saved! Refresh the main site to see changes.");
+                      } catch (err: any) { toast.error(err.message); }
+                    }}
+                    className="gradient-accent text-accent-foreground rounded-xl border-0"
+                  >
+                    <Save className="w-4 h-4 mr-2" />Save Name
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ─── Leads Tab ──────── */}
         {activeTab === "leads" && (

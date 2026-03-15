@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Menu, X, ChevronDown, ChevronRight, Sun, Moon } from "lucide-react";
-import logo from "@/assets/logo.jpeg";
+
 import { Button } from "@/components/ui/button";
+import { useBranding } from "@/contexts/BrandingContext";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
 import { supabase } from "@/integrations/supabase/client";
-
 interface ProductItem {
   id: string;
   category_key: string;
@@ -21,6 +21,7 @@ const CATEGORY_ORDER = ["cat.fire", "cat.roller", "cat.oil", "cat.hvac", "cat.lo
 export default function Header() {
   const { t, language, setLanguage, isRTL } = useLanguage();
   const { theme, toggleTheme } = useTheme();
+  const { logoUrl, brandName } = useBranding();
   const [scrolled, setScrolled] = useState(false);
   const [pastHero, setPastHero] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -117,7 +118,7 @@ export default function Header() {
         <div className="flex items-center justify-between px-4 md:px-6 py-3">
           {/* Logo */}
           <a href="#home" onClick={() => scrollToSection("#home")} className="flex items-center gap-2 shrink-0">
-            <img src={logo} alt="Energy Innovation" className="h-10 w-auto object-contain" />
+            <img src={logoUrl} alt={brandName} className="h-10 w-auto object-contain" />
           </a>
 
           {/* Desktop Nav */}

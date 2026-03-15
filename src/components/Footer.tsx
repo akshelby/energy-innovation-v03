@@ -1,9 +1,10 @@
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Mail, Phone, MapPin } from "lucide-react";
-import logo from "@/assets/logo.jpeg";
+import { useBranding } from "@/contexts/BrandingContext";
 
 export default function Footer() {
   const { t } = useLanguage();
+  const { logoUrl, brandName } = useBranding();
 
   const quickLinks = [
     { label: t("nav.home"), href: "#home" },
@@ -32,7 +33,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <img src={logo} alt="Energy Innovation" className="h-10 w-auto object-contain brightness-0 invert" />
+              <img src={logoUrl} alt={brandName} className="h-10 w-auto object-contain brightness-0 invert" />
             </div>
             <p className="text-primary-foreground/60 text-sm leading-relaxed">
               {t("footer.desc")}
@@ -95,7 +96,7 @@ export default function Footer() {
 
         <div className="border-t border-primary-foreground/10 pt-8 text-center">
           <p className="text-sm text-primary-foreground/40">
-            © {new Date().getFullYear()} Energy Innovation. {t("footer.rights")}
+            © {new Date().getFullYear()} {brandName}. {t("footer.rights")}
           </p>
         </div>
       </div>
