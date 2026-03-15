@@ -86,29 +86,6 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Stats Card */}
-      <div className="absolute bottom-6 right-6 md:bottom-10 md:right-10 z-10 animate-fade-in-up" style={{ animationDelay: "0.6s" }}>
-        <div className="glass rounded-2xl p-5 shadow-lg border border-border/30 w-56">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full gradient-accent flex items-center justify-center">
-              <Shield className="w-5 h-5 text-accent-foreground" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">{t("hero.safety")}</p>
-              <p className="text-lg font-bold text-foreground">100%</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full gradient-primary flex items-center justify-center">
-              <Globe className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">{t("hero.support")}</p>
-              <p className="text-lg font-bold text-foreground">24/7</p>
-            </div>
-          </div>
-        </div>
-      </div>
     </section>
   );
 }
