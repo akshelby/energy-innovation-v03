@@ -90,15 +90,28 @@ export default function ContactSection() {
               />
             </div>
           </div>
-          <div>
-            <label className="text-sm font-medium text-foreground mb-2 block">{t("contact.company")}</label>
-            <Input
-              value={form.company}
-              onChange={(e) => setForm({ ...form, company: e.target.value })}
-              placeholder={t("contact.company")}
-              maxLength={100}
-              className="rounded-xl"
-            />
+          <div className="grid sm:grid-cols-2 gap-5">
+            <div>
+              <label className="text-sm font-medium text-foreground mb-2 block">{t("contact.phone")}</label>
+              <Input
+                type="tel"
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                placeholder="+966 5X XXX XXXX"
+                maxLength={20}
+                className="rounded-xl"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground mb-2 block">{t("contact.company")}</label>
+              <Input
+                value={form.company}
+                onChange={(e) => setForm({ ...form, company: e.target.value })}
+                placeholder={t("contact.company")}
+                maxLength={100}
+                className="rounded-xl"
+              />
+            </div>
           </div>
           <div>
             <label className="text-sm font-medium text-foreground mb-2 block">{t("contact.message")}</label>
