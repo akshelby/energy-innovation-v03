@@ -12,6 +12,7 @@ import { Send } from "lucide-react";
 const contactSchema = z.object({
   name: z.string().trim().min(1, "Name required").max(100),
   email: z.string().trim().email("Invalid email").max(255),
+  phone: z.string().trim().max(20).optional().or(z.literal("")),
   company: z.string().trim().max(100).optional().or(z.literal("")),
   message: z.string().trim().min(1, "Message required").max(1000),
 });
@@ -20,7 +21,7 @@ export default function ContactSection() {
   const { t } = useLanguage();
   const ref = useScrollReveal();
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", company: "", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", company: "", message: "" });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,13 +36,14 @@ export default function ContactSection() {
       const { error } = await supabase.from("leads").insert({
         name: parsed.data.name,
         email: parsed.data.email,
+        phone: parsed.data.phone || null,
         company: parsed.data.company || null,
         message: parsed.data.message,
-      });
+      } as any);
 
       if (error) throw error;
       toast.success(t("contact.success"));
-      setForm({ name: "", email: "", company: "", message: "" });
+      setForm({ name: "", email: "", phone: "", company: "", message: "" });
     } catch {
       toast.error(t("contact.error"));
     } finally {
@@ -88,15 +90,28 @@ export default function ContactSection() {
               />
             </div>
           </div>
-          <div>
-            <label className="text-sm font-medium text-foreground mb-2 block">{t("contact.company")}</label>
-            <Input
-              value={form.company}
-              onChange={(e) => setForm({ ...form, company: e.target.value })}
-              placeholder={t("contact.company")}
-              maxLength={100}
-              className="rounded-xl"
-            />
+          <div className="grid sm:grid-cols-2 gap-5">
+            <div>
+              <label className="text-sm font-medium text-foreground mb-2 block">{t("contact.phone")}</label>
+              <Input
+                type="tel"
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                placeholder="+966 5X XXX XXXX"
+                maxLength={20}
+                className="rounded-xl"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground mb-2 block">{t("contact.company")}</label>
+              <Input
+                value={form.company}
+                onChange={(e) => setForm({ ...form, company: e.target.value })}
+                placeholder={t("contact.company")}
+                maxLength={100}
+                className="rounded-xl"
+              />
+            </div>
           </div>
           <div>
             <label className="text-sm font-medium text-foreground mb-2 block">{t("contact.message")}</label>
