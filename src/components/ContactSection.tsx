@@ -19,10 +19,30 @@ const contactSchema = z.object({
 });
 
 export default function ContactSection() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const ref = useScrollReveal();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", company: "", message: "" });
+  const [contactInfo, setContactInfo] = useState({ phone: "", email: "", address: "" });
+
+  useEffect(() => {
+    const fetchContactInfo = async () => {
+      const { data } = await supabase
+        .from("site_content")
+        .select("content_key, value_en, value_ar")
+        .in("content_key", ["contact_phone", "contact_email", "contact_address"]);
+      if (data) {
+        const map: Record<string, { en: string; ar: string }> = {};
+        data.forEach((r) => { map[r.content_key] = { en: r.value_en, ar: r.value_ar }; });
+        setContactInfo({
+          phone: map.contact_phone?.[language] || "",
+          email: map.contact_email?.[language] || "",
+          address: map.contact_address?.[language] || "",
+        });
+      }
+    };
+    fetchContactInfo();
+  }, [language]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
