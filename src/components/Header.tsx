@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Menu, X, ChevronDown, ChevronRight, Sun, Moon } from "lucide-react";
-import logo from "@/assets/logo.jpeg";
+
 import { Button } from "@/components/ui/button";
 import { useBranding } from "@/contexts/BrandingContext";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
