@@ -91,7 +91,7 @@ export default function PhoneInput({ value, onChange }: PhoneInputProps) {
         onClick={() => setOpen(!open)}
         className="flex items-center gap-1.5 px-3 rounded-l-xl border border-r-0 border-input bg-secondary/50 hover:bg-secondary transition-colors shrink-0"
       >
-        <span className="text-lg">{selected.flag}</span>
+        <FlagImg iso={selected.iso} />
         <span className="text-sm text-muted-foreground">{selected.code}</span>
         <ChevronDown className="w-3 h-3 text-muted-foreground" />
       </button>
