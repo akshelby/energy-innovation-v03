@@ -288,6 +288,8 @@ export default function Header() {
           </div>
         </div>
       )}
+
+      <PdfViewerDialog open={pdfOpen} onOpenChange={setPdfOpen} src={pdfSrc} />
     </>
   );
 }
