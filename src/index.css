@@ -131,7 +131,7 @@
   }
 
   .dark .glass {
-    background: hsla(213, 39%, 10%, 0.5);
+    background: hsla(213, 39%, 10%, 0.2);
   }
 
   .dark .text-gradient {
