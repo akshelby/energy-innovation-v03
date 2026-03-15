@@ -97,7 +97,7 @@ export default function Header() {
                   className="px-3 py-2 text-[15px] font-medium text-white drop-shadow-md hover:text-accent transition-colors rounded-full hover:bg-white/10 flex items-center gap-1"
                 >
                   {item.label}
-                  {item.hasDropdown && <ChevronDown className="w-3 h-3" />}
+                  {item.hasDropdown && <ChevronDown className="w-3.5 h-3.5" />}
                 </button>
 
                 {/* Mega Menu Dropdown */}
