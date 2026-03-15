@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 type Language = "en" | "ar";
 
@@ -212,6 +213,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>("en");
+  const [dynamicContent, setDynamicContent] = useState<Record<string, { en: string; ar: string }>>({});
 
   const isRTL = language === "ar";
 
@@ -220,9 +222,32 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     document.documentElement.lang = language;
   }, [language, isRTL]);
 
-  const t = (key: string): string => {
+  // Fetch dynamic content from Supabase
+  useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        const { data } = await supabase.from("site_content").select("content_key, value_en, value_ar");
+        if (data && data.length > 0) {
+          const contentMap: Record<string, { en: string; ar: string }> = {};
+          data.forEach((item: any) => {
+            contentMap[item.content_key] = { en: item.value_en, ar: item.value_ar };
+          });
+          setDynamicContent(contentMap);
+        }
+      } catch {
+        // Silently fall back to hardcoded translations
+      }
+    };
+    fetchContent();
+  }, []);
+
+  const t = useCallback((key: string): string => {
+    // Dynamic content takes priority
+    if (dynamicContent[key]) {
+      return dynamicContent[key][language] || translations[language][key] || key;
+    }
     return translations[language][key] || key;
-  };
+  }, [language, dynamicContent]);
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t, isRTL }}>
