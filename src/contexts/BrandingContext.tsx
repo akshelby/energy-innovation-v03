@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import defaultLogo from "@/assets/logo.jpeg";
+import defaultLogo from "@/assets/logo.png";
 
 interface BrandingContextType {
   logoUrl: string;
