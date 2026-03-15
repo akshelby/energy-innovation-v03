@@ -283,6 +283,7 @@ export default function Admin() {
     e.preventDefault();
     try {
       await apiCall("leads", "GET", password);
+      sessionStorage.setItem("admin_pw", password);
       setAuthenticated(true);
       toast.success("Logged in successfully");
     } catch { toast.error("Invalid password"); }
