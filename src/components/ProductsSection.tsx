@@ -1,26 +1,49 @@
+import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { Flame, DoorOpen, Droplets, Wind, Truck, Shield } from "lucide-react";
+import { getProductImageUrl } from "@/lib/storage";
 
-import productFire from "@/assets/product-fire.jpg";
-import productRoller from "@/assets/product-roller.jpg";
-import productOil from "@/assets/product-oil.jpg";
-import productHvac from "@/assets/product-hvac.jpg";
-import productLoading from "@/assets/product-loading.jpg";
-import productLouvers from "@/assets/product-louvers.jpg";
+// Local fallbacks
+import productFireLocal from "@/assets/product-fire.jpg";
+import productRollerLocal from "@/assets/product-roller.jpg";
+import productOilLocal from "@/assets/product-oil.jpg";
+import productHvacLocal from "@/assets/product-hvac.jpg";
+import productLoadingLocal from "@/assets/product-loading.jpg";
+import productLouversLocal from "@/assets/product-louvers.jpg";
+
+const localImages: Record<string, string> = {
+  "product-fire": productFireLocal,
+  "product-roller": productRollerLocal,
+  "product-oil": productOilLocal,
+  "product-hvac": productHvacLocal,
+  "product-loading": productLoadingLocal,
+  "product-louvers": productLouversLocal,
+};
 
 const products = [
-  { key: "products.fire", descKey: "products.fire.desc", icon: Flame, image: productFire },
-  { key: "products.roller", descKey: "products.roller.desc", icon: DoorOpen, image: productRoller },
-  { key: "products.oil", descKey: "products.oil.desc", icon: Droplets, image: productOil },
-  { key: "products.hvac", descKey: "products.hvac.desc", icon: Wind, image: productHvac },
-  { key: "products.loading", descKey: "products.loading.desc", icon: Truck, image: productLoading },
-  { key: "products.louvers", descKey: "products.louvers.desc", icon: Shield, image: productLouvers },
+  { key: "products.fire", descKey: "products.fire.desc", icon: Flame, imageKey: "product-fire" },
+  { key: "products.roller", descKey: "products.roller.desc", icon: DoorOpen, imageKey: "product-roller" },
+  { key: "products.oil", descKey: "products.oil.desc", icon: Droplets, imageKey: "product-oil" },
+  { key: "products.hvac", descKey: "products.hvac.desc", icon: Wind, imageKey: "product-hvac" },
+  { key: "products.loading", descKey: "products.loading.desc", icon: Truck, imageKey: "product-loading" },
+  { key: "products.louvers", descKey: "products.louvers.desc", icon: Shield, imageKey: "product-louvers" },
 ];
 
 export default function ProductsSection() {
   const { t } = useLanguage();
   const ref = useScrollReveal();
+  const [useSupabase, setUseSupabase] = useState(true);
+
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => setUseSupabase(true);
+    img.onerror = () => setUseSupabase(false);
+    img.src = getProductImageUrl("product-fire");
+  }, []);
+
+  const getImage = (imageKey: string) =>
+    useSupabase ? getProductImageUrl(imageKey) : localImages[imageKey];
 
   return (
     <section id="products" className="py-24 px-6 bg-secondary/30" ref={ref}>
@@ -47,7 +70,7 @@ export default function ProductsSection() {
               >
                 <div className="relative h-48 overflow-hidden">
                   <img
-                    src={product.image}
+                    src={getImage(product.imageKey)}
                     alt={t(product.key)}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     loading="lazy"

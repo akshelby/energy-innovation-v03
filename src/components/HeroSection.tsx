@@ -2,24 +2,40 @@ import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import hero1 from "@/assets/hero-1.jpg";
-import hero2 from "@/assets/hero-2.jpg";
-import hero3 from "@/assets/hero-3.jpg";
-import hero4 from "@/assets/hero-4.jpg";
-import hero5 from "@/assets/hero-5.jpg";
+import { getHeroImageUrl } from "@/lib/storage";
 
-const images = [hero1, hero2, hero3, hero4, hero5];
+// Fallback local imports in case Supabase images aren't uploaded yet
+import hero1Local from "@/assets/hero-1.jpg";
+import hero2Local from "@/assets/hero-2.jpg";
+import hero3Local from "@/assets/hero-3.jpg";
+import hero4Local from "@/assets/hero-4.jpg";
+import hero5Local from "@/assets/hero-5.jpg";
+
+const localImages = [hero1Local, hero2Local, hero3Local, hero4Local, hero5Local];
 
 export default function HeroSection() {
   const { t } = useLanguage();
   const [current, setCurrent] = useState(0);
+  const [useSupabase, setUseSupabase] = useState(true);
+
+  // Check if Supabase images are available
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => setUseSupabase(true);
+    img.onerror = () => setUseSupabase(false);
+    img.src = getHeroImageUrl(0);
+  }, []);
+
+  const images = useSupabase
+    ? Array.from({ length: 5 }, (_, i) => getHeroImageUrl(i))
+    : localImages;
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrent((prev) => (prev + 1) % images.length);
     }, 6000);
     return () => clearInterval(interval);
-  }, [current]);
+  }, [current, images.length]);
 
   const prev = () => setCurrent((c) => (c - 1 + images.length) % images.length);
   const next = () => setCurrent((c) => (c + 1) % images.length);
@@ -30,7 +46,6 @@ export default function HeroSection() {
 
   return (
     <section id="home" className="relative h-screen w-full overflow-hidden">
-      {/* Background Images */}
       {images.map((img, i) => (
         <div
           key={i}
@@ -47,10 +62,8 @@ export default function HeroSection() {
         </div>
       ))}
 
-      {/* Dark overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
 
-      {/* Prev / Next Buttons */}
       <button
         onClick={prev}
         className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors"
@@ -66,7 +79,6 @@ export default function HeroSection() {
         <ChevronRight className="w-5 h-5" />
       </button>
 
-      {/* Content */}
       <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-primary-foreground max-w-4xl leading-tight animate-fade-in-up drop-shadow-lg">
           {t("hero.headline")}
@@ -90,7 +102,6 @@ export default function HeroSection() {
           </Button>
         </div>
 
-        {/* Slide indicators */}
         <div className="absolute bottom-24 md:bottom-20 flex gap-2">
           {images.map((_, i) => (
             <button
@@ -104,7 +115,6 @@ export default function HeroSection() {
           ))}
         </div>
       </div>
-
     </section>
   );
 }
