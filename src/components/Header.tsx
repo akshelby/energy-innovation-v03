@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { useBranding } from "@/contexts/BrandingContext";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
 import { supabase } from "@/integrations/supabase/client";
-
 interface ProductItem {
   id: string;
   category_key: string;
