@@ -33,7 +33,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <img src={logo} alt="Energy Innovation" className="h-10 w-auto object-contain brightness-0 invert" />
+              <img src={logoUrl} alt={brandName} className="h-10 w-auto object-contain brightness-0 invert" />
             </div>
             <p className="text-primary-foreground/60 text-sm leading-relaxed">
               {t("footer.desc")}
