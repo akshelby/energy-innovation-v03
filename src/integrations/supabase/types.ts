@@ -44,6 +44,96 @@ export type Database = {
         }
         Relationships: []
       }
+      products: {
+        Row: {
+          created_at: string
+          description_ar: string
+          description_en: string
+          icon: string
+          id: string
+          image_url: string | null
+          name_ar: string
+          name_en: string
+          pdf_url: string | null
+          sort_order: number
+          tag_ar: string
+          tag_en: string
+        }
+        Insert: {
+          created_at?: string
+          description_ar?: string
+          description_en?: string
+          icon?: string
+          id?: string
+          image_url?: string | null
+          name_ar?: string
+          name_en?: string
+          pdf_url?: string | null
+          sort_order?: number
+          tag_ar?: string
+          tag_en?: string
+        }
+        Update: {
+          created_at?: string
+          description_ar?: string
+          description_en?: string
+          icon?: string
+          id?: string
+          image_url?: string | null
+          name_ar?: string
+          name_en?: string
+          pdf_url?: string | null
+          sort_order?: number
+          tag_ar?: string
+          tag_en?: string
+        }
+        Relationships: []
+      }
+      services: {
+        Row: {
+          created_at: string
+          description_ar: string
+          description_en: string
+          icon: string
+          id: string
+          image_url: string | null
+          name_ar: string
+          name_en: string
+          pdf_url: string | null
+          sort_order: number
+          tag_ar: string
+          tag_en: string
+        }
+        Insert: {
+          created_at?: string
+          description_ar?: string
+          description_en?: string
+          icon?: string
+          id?: string
+          image_url?: string | null
+          name_ar?: string
+          name_en?: string
+          pdf_url?: string | null
+          sort_order?: number
+          tag_ar?: string
+          tag_en?: string
+        }
+        Update: {
+          created_at?: string
+          description_ar?: string
+          description_en?: string
+          icon?: string
+          id?: string
+          image_url?: string | null
+          name_ar?: string
+          name_en?: string
+          pdf_url?: string | null
+          sort_order?: number
+          tag_ar?: string
+          tag_en?: string
+        }
+        Relationships: []
+      }
       site_content: {
         Row: {
           content_key: string

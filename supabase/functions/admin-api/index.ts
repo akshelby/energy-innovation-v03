@@ -104,6 +104,62 @@ Deno.serve(async (req) => {
       return json({ success: true, count: entries.length });
     }
 
+    // PRODUCTS CRUD
+    if (path === "products") {
+      if (method === "GET") {
+        const { data, error } = await supabase
+          .from("products")
+          .select("*")
+          .order("sort_order", { ascending: true });
+        if (error) throw error;
+        return json(data);
+      }
+      if (method === "POST") {
+        const body = await req.json();
+        const { data, error } = await supabase
+          .from("products")
+          .upsert(body, { onConflict: "id" })
+          .select()
+          .single();
+        if (error) throw error;
+        return json(data);
+      }
+      if (method === "DELETE") {
+        const { id } = await req.json();
+        const { error } = await supabase.from("products").delete().eq("id", id);
+        if (error) throw error;
+        return json({ success: true });
+      }
+    }
+
+    // SERVICES CRUD
+    if (path === "services") {
+      if (method === "GET") {
+        const { data, error } = await supabase
+          .from("services")
+          .select("*")
+          .order("sort_order", { ascending: true });
+        if (error) throw error;
+        return json(data);
+      }
+      if (method === "POST") {
+        const body = await req.json();
+        const { data, error } = await supabase
+          .from("services")
+          .upsert(body, { onConflict: "id" })
+          .select()
+          .single();
+        if (error) throw error;
+        return json(data);
+      }
+      if (method === "DELETE") {
+        const { id } = await req.json();
+        const { error } = await supabase.from("services").delete().eq("id", id);
+        if (error) throw error;
+        return json({ success: true });
+      }
+    }
+
     // STORAGE - List files in a bucket/folder
     if (path === "files") {
       if (method === "GET") {
