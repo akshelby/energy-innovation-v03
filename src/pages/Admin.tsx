@@ -1,12 +1,13 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Lock, Trash2, Save, RefreshCw, Database, FileText, MessageSquare, LogOut } from "lucide-react";
+import { Lock, Trash2, Save, RefreshCw, Database, FileText, MessageSquare, LogOut, Image, Upload } from "lucide-react";
 
 const PROJECT_ID = import.meta.env.VITE_SUPABASE_PROJECT_ID;
 const FUNCTION_URL = `https://${PROJECT_ID}.supabase.co/functions/v1/admin-api`;
+const STORAGE_BASE = `https://${PROJECT_ID}.supabase.co/storage/v1/object/public`;
 
 interface Lead {
   id: string;
@@ -23,6 +24,12 @@ interface ContentItem {
   value_en: string;
   value_ar: string;
   updated_at: string;
+}
+
+interface StorageFile {
+  name: string;
+  id: string;
+  metadata?: { mimetype?: string; size?: number };
 }
 
 // Default content for seeding
@@ -62,6 +69,12 @@ const defaultContent: { content_key: string; value_en: string; value_ar: string 
   { content_key: "footer.address", value_en: "Industrial District, Building 7", value_ar: "المنطقة الصناعية، مبنى 7" },
 ];
 
+const IMAGE_FOLDERS = [
+  { label: "Hero Images", bucket: "images", folder: "hero" },
+  { label: "Product Images", bucket: "images", folder: "products" },
+  { label: "PDFs", bucket: "pdfs", folder: "" },
+];
+
 async function apiCall(path: string, method: string, password: string, body?: unknown) {
   const res = await fetch(`${FUNCTION_URL}/${path}`, {
     method,
@@ -76,14 +89,33 @@ async function apiCall(path: string, method: string, password: string, body?: un
   return data;
 }
 
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      // Remove data URL prefix
+      resolve(result.split(",")[1]);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 export default function Admin() {
   const [password, setPassword] = useState("");
   const [authenticated, setAuthenticated] = useState(false);
-  const [activeTab, setActiveTab] = useState<"leads" | "content">("leads");
+  const [activeTab, setActiveTab] = useState<"leads" | "content" | "images">("leads");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [content, setContent] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [editedContent, setEditedContent] = useState<Record<string, { value_en: string; value_ar: string }>>({});
+
+  // Images state
+  const [selectedFolder, setSelectedFolder] = useState(IMAGE_FOLDERS[0]);
+  const [files, setFiles] = useState<StorageFile[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const storedPassword = authenticated ? password : "";
 
@@ -116,12 +148,30 @@ export default function Admin() {
     }
   }, [storedPassword]);
 
+  const fetchFiles = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await apiCall(
+        `files?bucket=${selectedFolder.bucket}&folder=${selectedFolder.folder}`,
+        "GET",
+        storedPassword
+      );
+      // Filter out folder placeholders
+      setFiles(data.filter((f: StorageFile) => f.name !== ".emptyFolderPlaceholder"));
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [storedPassword, selectedFolder]);
+
   useEffect(() => {
     if (authenticated) {
       if (activeTab === "leads") fetchLeads();
-      else fetchContent();
+      else if (activeTab === "content") fetchContent();
+      else fetchFiles();
     }
-  }, [authenticated, activeTab, fetchLeads, fetchContent]);
+  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchFiles]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -180,6 +230,55 @@ export default function Admin() {
     }));
   };
 
+  const handleUploadFiles = async (fileList: FileList) => {
+    setUploading(true);
+    try {
+      for (const file of Array.from(fileList)) {
+        const base64 = await fileToBase64(file);
+        const filePath = selectedFolder.folder
+          ? `${selectedFolder.folder}/${file.name}`
+          : file.name;
+        await apiCall("upload", "POST", storedPassword, {
+          bucket: selectedFolder.bucket,
+          filePath,
+          base64,
+          contentType: file.type,
+        });
+      }
+      toast.success(`Uploaded ${fileList.length} file(s)`);
+      fetchFiles();
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDeleteFile = async (fileName: string) => {
+    try {
+      const path = selectedFolder.folder
+        ? `${selectedFolder.folder}/${fileName}`
+        : fileName;
+      await apiCall("files", "DELETE", storedPassword, {
+        bucket: selectedFolder.bucket,
+        paths: [path],
+      });
+      setFiles((prev) => prev.filter((f) => f.name !== fileName));
+      toast.success("File deleted");
+    } catch (e: any) {
+      toast.error(e.message);
+    }
+  };
+
+  const getPublicUrl = (fileName: string) => {
+    const path = selectedFolder.folder
+      ? `${selectedFolder.folder}/${fileName}`
+      : fileName;
+    return `${STORAGE_BASE}/${selectedFolder.bucket}/${path}`;
+  };
+
+  const isImage = (name: string) => /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(name);
+
   if (!authenticated) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center px-6">
@@ -230,7 +329,7 @@ export default function Admin() {
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Tabs */}
-        <div className="flex gap-2 mb-8">
+        <div className="flex gap-2 mb-8 flex-wrap">
           <Button
             variant={activeTab === "leads" ? "default" : "outline"}
             onClick={() => setActiveTab("leads")}
@@ -246,6 +345,14 @@ export default function Admin() {
           >
             <FileText className="w-4 h-4 mr-2" />
             Site Content
+          </Button>
+          <Button
+            variant={activeTab === "images" ? "default" : "outline"}
+            onClick={() => setActiveTab("images")}
+            className="rounded-xl"
+          >
+            <Image className="w-4 h-4 mr-2" />
+            Files & Images
           </Button>
         </div>
 
@@ -375,6 +482,100 @@ export default function Admin() {
                           />
                         )}
                       </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Images Tab */}
+        {activeTab === "images" && (
+          <div>
+            <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+              <div className="flex items-center gap-3">
+                <h2 className="text-lg font-semibold text-foreground">Files & Images</h2>
+                <div className="flex gap-1">
+                  {IMAGE_FOLDERS.map((folder) => (
+                    <Button
+                      key={`${folder.bucket}-${folder.folder}`}
+                      variant={selectedFolder === folder ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setSelectedFolder(folder)}
+                      className="rounded-xl text-xs"
+                    >
+                      {folder.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  className="hidden"
+                  accept={selectedFolder.bucket === "pdfs" ? ".pdf" : "image/*,.pdf"}
+                  onChange={(e) => e.target.files && handleUploadFiles(e.target.files)}
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="rounded-xl"
+                >
+                  <Upload className={`w-4 h-4 mr-2 ${uploading ? "animate-spin" : ""}`} />
+                  {uploading ? "Uploading..." : "Upload"}
+                </Button>
+                <Button variant="outline" size="sm" onClick={fetchFiles} disabled={loading} className="rounded-xl">
+                  <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+                  Refresh
+                </Button>
+              </div>
+            </div>
+
+            <p className="text-xs text-muted-foreground mb-4">
+              Upload images to <span className="font-mono bg-secondary px-1.5 py-0.5 rounded text-secondary-foreground">{selectedFolder.bucket}/{selectedFolder.folder}</span>.
+              {selectedFolder.folder === "hero" && " Name files hero-1.jpg through hero-5.jpg for the homepage slider."}
+              {selectedFolder.folder === "products" && " Name files product-fire.jpg, product-roller.jpg, etc. for product cards."}
+            </p>
+
+            {files.length === 0 ? (
+              <div className="text-center py-16 text-muted-foreground">
+                <Image className="w-12 h-12 mx-auto mb-4 opacity-30" />
+                <p>No files in this folder yet. Upload some!</p>
+              </div>
+            ) : (
+              <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {files.map((file) => (
+                  <div key={file.id || file.name} className="bg-card border border-border rounded-2xl overflow-hidden group">
+                    {isImage(file.name) ? (
+                      <div className="aspect-video bg-muted">
+                        <img
+                          src={getPublicUrl(file.name)}
+                          alt={file.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="aspect-video bg-muted flex items-center justify-center">
+                        <FileText className="w-10 h-10 text-muted-foreground/40" />
+                      </div>
+                    )}
+                    <div className="p-3 flex items-center justify-between">
+                      <span className="text-xs text-foreground truncate flex-1" title={file.name}>
+                        {file.name}
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteFile(file.name)}
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-lg shrink-0 h-7 w-7 p-0"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
                     </div>
                   </div>
                 ))}
