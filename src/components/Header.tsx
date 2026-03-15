@@ -66,6 +66,33 @@ export default function Header() {
   };
 
   useEffect(() => {
+    let isActive = true;
+
+    const resolvePdfSources = async () => {
+      const entries = await Promise.all(
+        Object.entries(itemPdfSources).map(async ([key, { remote, fallback }]) => {
+          try {
+            const response = await fetch(remote, { method: "HEAD" });
+            return [key, response.ok ? remote : fallback] as const;
+          } catch {
+            return [key, fallback] as const;
+          }
+        }),
+      );
+
+      if (isActive) {
+        setResolvedPdfMap(Object.fromEntries(entries) as Record<string, string>);
+      }
+    };
+
+    void resolvePdfSources();
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
+  useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
       setPastHero(window.scrollY > window.innerHeight - 100);
