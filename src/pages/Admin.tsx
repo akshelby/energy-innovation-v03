@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import {
   Lock, Trash2, Save, RefreshCw, Database, FileText, MessageSquare,
-  LogOut, Image, Upload, Plus, Package, Briefcase, GripVertical,
+  LogOut, Image, Upload, Plus, Package, Briefcase, GripVertical, List,
 } from "lucide-react";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
 
@@ -63,6 +63,23 @@ interface ServiceItem {
   icon: string;
   sort_order: number;
 }
+
+interface MenuChildItem {
+  id?: string;
+  category_key: string;
+  name_en: string;
+  name_ar: string;
+  pdf_url: string | null;
+  sort_order: number;
+}
+
+const CATEGORY_OPTIONS = [
+  { key: "cat.fire", label: "Fire & Smoke Safety Systems" },
+  { key: "cat.roller", label: "Roller Shutters & Doors" },
+  { key: "cat.oil", label: "Oil & Gas Industry Equipment" },
+  { key: "cat.hvac", label: "HVAC & Ventilation Solutions" },
+  { key: "cat.loading", label: "Loading Bay & Material Handling" },
+];
 
 const ICON_OPTIONS = [
   "Flame", "DoorOpen", "Droplets", "Wind", "Truck", "Shield",
@@ -146,7 +163,11 @@ const emptyService: ServiceItem = {
   tag_en: "", tag_ar: "", image_url: null, pdf_url: null, icon: "Wrench", sort_order: 0,
 };
 
-type TabKey = "leads" | "content" | "products" | "services" | "images";
+type TabKey = "leads" | "content" | "products" | "services" | "menu-items" | "images";
+
+const emptyMenuChild: MenuChildItem = {
+  category_key: "cat.fire", name_en: "", name_ar: "", pdf_url: null, sort_order: 0,
+};
 
 export default function Admin() {
   const [password, setPassword] = useState("");
@@ -162,6 +183,11 @@ export default function Admin() {
   const [services, setServices] = useState<(ServiceItem & { id: string })[]>([]);
   const [editingProduct, setEditingProduct] = useState<ProductItem | null>(null);
   const [editingService, setEditingService] = useState<ServiceItem | null>(null);
+
+  // Menu Items state
+  const [menuItems, setMenuItems] = useState<(MenuChildItem & { id: string })[]>([]);
+  const [editingMenuItem, setEditingMenuItem] = useState<MenuChildItem | null>(null);
+  const menuItemPdfRef = useRef<HTMLInputElement>(null);
 
   // PDF preview
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState("");
@@ -220,6 +246,15 @@ export default function Admin() {
     finally { setLoading(false); }
   }, [storedPassword]);
 
+  const fetchMenuItems = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await apiCall("product-items", "GET", storedPassword);
+      setMenuItems(data);
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  }, [storedPassword]);
+
   const fetchFiles = useCallback(async () => {
     setLoading(true);
     try {
@@ -239,9 +274,10 @@ export default function Admin() {
       else if (activeTab === "content") fetchContent();
       else if (activeTab === "products") fetchProducts();
       else if (activeTab === "services") fetchServices();
+      else if (activeTab === "menu-items") fetchMenuItems();
       else fetchFiles();
     }
-  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchProducts, fetchServices, fetchFiles]);
+  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchProducts, fetchServices, fetchMenuItems, fetchFiles]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -323,6 +359,26 @@ export default function Admin() {
       await apiCall("services", "DELETE", storedPassword, { id });
       setServices((prev) => prev.filter((s) => s.id !== id));
       toast.success("Service deleted");
+    } catch (e: any) { toast.error(e.message); }
+  };
+
+  // Menu Items CRUD
+  const handleSaveMenuItem = async (item: MenuChildItem) => {
+    try {
+      setLoading(true);
+      await apiCall("product-items", "POST", storedPassword, item);
+      toast.success("Menu item saved");
+      setEditingMenuItem(null);
+      fetchMenuItems();
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  };
+
+  const handleDeleteMenuItem = async (id: string) => {
+    try {
+      await apiCall("product-items", "DELETE", storedPassword, { id });
+      setMenuItems((prev) => prev.filter((m) => m.id !== id));
+      toast.success("Menu item deleted");
     } catch (e: any) { toast.error(e.message); }
   };
 
@@ -537,6 +593,7 @@ export default function Admin() {
             { key: "content" as TabKey, icon: FileText, label: "Site Content" },
             { key: "products" as TabKey, icon: Package, label: `Products (${products.length})` },
             { key: "services" as TabKey, icon: Briefcase, label: `Services (${services.length})` },
+            { key: "menu-items" as TabKey, icon: List, label: `Menu Items (${menuItems.length})` },
             { key: "images" as TabKey, icon: Image, label: "Files & Images" },
           ]).map((tab) => (
             <Button key={tab.key} variant={activeTab === tab.key ? "default" : "outline"} onClick={() => setActiveTab(tab.key)} className="rounded-xl">
@@ -755,6 +812,143 @@ export default function Admin() {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ─── Menu Items Tab ─────── */}
+        {activeTab === "menu-items" && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-lg font-semibold text-foreground">Menu Items</h2>
+                <p className="text-xs text-muted-foreground mt-1">
+                  These are the child items shown in the Products mega menu. Each item can have its own PDF document.
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" onClick={() => setEditingMenuItem({ ...emptyMenuChild, sort_order: menuItems.length })} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                  <Plus className="w-4 h-4 mr-2" />Add Item
+                </Button>
+                <Button variant="outline" size="sm" onClick={fetchMenuItems} disabled={loading} className="rounded-xl">
+                  <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
+                </Button>
+              </div>
+            </div>
+
+            {/* Editor */}
+            {editingMenuItem && (
+              <div className="bg-card border border-border rounded-2xl p-6 space-y-4 mb-6">
+                <h3 className="font-semibold text-foreground">{editingMenuItem.id ? "Edit" : "New"} Menu Item</h3>
+                
+                {/* Category */}
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Category</label>
+                  <select
+                    value={editingMenuItem.category_key}
+                    onChange={(e) => setEditingMenuItem({ ...editingMenuItem, category_key: e.target.value })}
+                    className="w-full h-10 rounded-xl border border-input bg-background px-3 text-sm"
+                  >
+                    {CATEGORY_OPTIONS.map((cat) => (
+                      <option key={cat.key} value={cat.key}>{cat.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Names */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Name (EN)</label>
+                    <Input value={editingMenuItem.name_en} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, name_en: e.target.value })} placeholder="e.g. Fire Curtains" className="rounded-xl" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Name (AR)</label>
+                    <Input value={editingMenuItem.name_ar} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, name_ar: e.target.value })} placeholder="e.g. ستائر الحريق" className="rounded-xl" dir="rtl" />
+                  </div>
+                </div>
+
+                {/* PDF & Sort Order */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">PDF Document</label>
+                    <div className="flex items-center gap-2">
+                      <Input value={editingMenuItem.pdf_url || ""} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, pdf_url: e.target.value || null })} placeholder="PDF URL or upload" className="rounded-xl flex-1" />
+                      <input ref={menuItemPdfRef} type="file" accept=".pdf" className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleFormFileUpload(file, "pdfs", "", (url) => setEditingMenuItem({ ...editingMenuItem!, pdf_url: url }));
+                        }}
+                      />
+                      <Button variant="outline" size="sm" onClick={() => menuItemPdfRef.current?.click()} disabled={uploading} className="rounded-xl shrink-0">
+                        <Upload className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    {editingMenuItem.pdf_url && (
+                      <button
+                        onClick={() => { setPdfPreviewUrl(editingMenuItem.pdf_url!); setPdfPreviewOpen(true); }}
+                        className="mt-2 text-xs text-primary underline"
+                      >
+                        Preview PDF
+                      </button>
+                    )}
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Sort Order</label>
+                    <Input type="number" value={editingMenuItem.sort_order} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, sort_order: parseInt(e.target.value) || 0 })} className="rounded-xl" />
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-2 pt-2">
+                  <Button onClick={() => handleSaveMenuItem(editingMenuItem)} disabled={loading} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                    <Save className="w-4 h-4 mr-2" />Save
+                  </Button>
+                  <Button variant="outline" onClick={() => setEditingMenuItem(null)} className="rounded-xl">Cancel</Button>
+                </div>
+              </div>
+            )}
+
+            {/* List grouped by category */}
+            {menuItems.length === 0 && !editingMenuItem ? (
+              <div className="text-center py-16 text-muted-foreground">
+                <List className="w-12 h-12 mx-auto mb-4 opacity-30" /><p>No menu items yet.</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {CATEGORY_OPTIONS.map((cat) => {
+                  const items = menuItems.filter((m) => m.category_key === cat.key);
+                  if (items.length === 0) return null;
+                  return (
+                    <div key={cat.key}>
+                      <h3 className="text-sm font-bold uppercase tracking-wider text-accent mb-3">{cat.label}</h3>
+                      <div className="space-y-2">
+                        {items.sort((a, b) => a.sort_order - b.sort_order).map((m) => (
+                          <div key={m.id} className="bg-card border border-border rounded-xl p-3 flex items-center gap-3">
+                            <GripVertical className="w-4 h-4 text-muted-foreground shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium text-foreground text-sm">{m.name_en}</span>
+                                <span className="text-xs text-muted-foreground">/ {m.name_ar}</span>
+                                {m.pdf_url ? (
+                                  <span className="text-[10px] bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 px-2 py-0.5 rounded-full font-medium">PDF ✓</span>
+                                ) : (
+                                  <span className="text-[10px] bg-muted text-muted-foreground px-2 py-0.5 rounded-full">No PDF</span>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex gap-1 shrink-0">
+                              <Button variant="outline" size="sm" onClick={() => setEditingMenuItem({ ...m })} className="rounded-xl text-xs h-7">Edit</Button>
+                              <Button variant="ghost" size="sm" onClick={() => handleDeleteMenuItem(m.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl h-7 w-7 p-0">
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

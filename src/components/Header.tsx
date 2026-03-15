@@ -4,39 +4,18 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { Menu, X, ChevronDown, ChevronRight, Leaf, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
+import { supabase } from "@/integrations/supabase/client";
 
+interface ProductItem {
+  id: string;
+  category_key: string;
+  name_en: string;
+  name_ar: string;
+  pdf_url: string | null;
+  sort_order: number;
+}
 
-// Map product item keys to PDF paths (Supabase Storage with local fallback)
-const STORAGE_URL = "https://xemoqcukwjcmnzqcdrey.supabase.co/storage/v1/object/public/pdfs";
-const itemPdfSources: Record<string, { remote: string; fallback: string }> = {
-  "item.fireCurtains": {
-    remote: `${STORAGE_URL}/Energy-BACHFIRE_E_120.pdf`,
-    fallback: "/pdfs/Energy-BACHFIRE_E_120.pdf",
-  },
-};
-
-const productCategories = [
-  {
-    key: "cat.fire",
-    items: ["item.fireCurtains", "item.smokeCurtains"],
-  },
-  {
-    key: "cat.roller",
-    items: ["item.industrial", "item.residential", "item.garage", "item.highSpeed", "item.steel", "item.louvers"],
-  },
-  {
-    key: "cat.oil",
-    items: ["item.well", "item.sensors", "item.spare"],
-  },
-  {
-    key: "cat.hvac",
-    items: ["item.ventilators", "item.exhaust", "item.vav", "item.dampers"],
-  },
-  {
-    key: "cat.loading",
-    items: ["item.dockLevelers", "item.dockShelters"],
-  },
-];
+const CATEGORY_ORDER = ["cat.fire", "cat.roller", "cat.oil", "cat.hvac", "cat.loading"];
 
 export default function Header() {
   const { t, language, setLanguage, isRTL } = useLanguage();
@@ -48,49 +27,39 @@ export default function Header() {
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
   const [pdfOpen, setPdfOpen] = useState(false);
   const [pdfSrc, setPdfSrc] = useState("");
-  const [resolvedPdfMap, setResolvedPdfMap] = useState<Record<string, string>>({});
+  const [productItems, setProductItems] = useState<ProductItem[]>([]);
 
-  const handleItemClick = (itemKey: string) => {
-    const pdfPath = resolvedPdfMap[itemKey] ?? itemPdfSources[itemKey]?.fallback;
+  // Fetch product items from Supabase
+  useEffect(() => {
+    supabase
+      .from("product_items")
+      .select("*")
+      .order("category_key")
+      .order("sort_order")
+      .then(({ data }) => {
+        if (data && data.length > 0) setProductItems(data as ProductItem[]);
+      });
+  }, []);
 
-    if (pdfPath) {
-      setPdfSrc(pdfPath);
+  // Group items by category
+  const categoriesWithItems = CATEGORY_ORDER
+    .map((key) => ({
+      key,
+      items: productItems.filter((item) => item.category_key === key),
+    }))
+    .filter((cat) => cat.items.length > 0);
+
+  const handleItemClick = (item: ProductItem) => {
+    if (item.pdf_url) {
+      setPdfSrc(item.pdf_url);
       setPdfOpen(true);
       setProductsOpen(false);
       setMobileOpen(false);
       setMobileProductsOpen(false);
       return;
     }
-
     scrollToSection("#products");
   };
-
-  useEffect(() => {
-    let isActive = true;
-
-    const resolvePdfSources = async () => {
-      const entries = await Promise.all(
-        Object.entries(itemPdfSources).map(async ([key, { remote, fallback }]) => {
-          try {
-            const response = await fetch(remote, { method: "HEAD" });
-            return [key, response.ok ? remote : fallback] as const;
-          } catch {
-            return [key, fallback] as const;
-          }
-        }),
-      );
-
-      if (isActive) {
-        setResolvedPdfMap(Object.fromEntries(entries) as Record<string, string>);
-      }
-    };
-
-    void resolvePdfSources();
-
-    return () => {
-      isActive = false;
-    };
-  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -125,10 +94,15 @@ export default function Header() {
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Text color: white on hero, foreground (black in light mode) after hero
   const textColor = pastHero ? "text-foreground" : "text-white";
   const borderColor = pastHero ? "border-border" : "border-white/30";
   const hoverBg = pastHero ? "hover:bg-secondary/50" : "hover:bg-white/10";
+
+  const isAr = language === "ar";
+
+  // Split categories into rows for mega menu
+  const row1 = categoriesWithItems.slice(0, 3);
+  const row2 = categoriesWithItems.slice(3);
 
   return (
     <>
@@ -166,57 +140,59 @@ export default function Header() {
                 </button>
 
                 {/* Mega Menu Dropdown */}
-                {item.hasDropdown && productsOpen && (
+                {item.hasDropdown && productsOpen && categoriesWithItems.length > 0 && (
                   <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2" style={{ width: "750px" }}>
                     <div className="bg-card rounded-2xl shadow-xl border border-border p-6 animate-slide-down">
-                      {/* Row 1: first 3 categories */}
-                      <div className="grid grid-cols-3 gap-x-8 gap-y-6">
-                        {productCategories.slice(0, 3).map((cat) => (
-                          <div key={cat.key}>
-                            <h4 className="text-xs font-bold uppercase tracking-wider text-accent mb-3">
-                              {t(cat.key)}
-                            </h4>
-                            <ul className="space-y-1.5">
-                              {cat.items.map((itemKey) => (
-                                <li key={itemKey}>
-                                  <button
-                                    type="button"
-                                    onClick={(e) => { e.preventDefault(); handleItemClick(itemKey); }}
-                                    className="text-sm text-muted-foreground hover:text-red-500 transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer"
-                                  >
-                                    <ChevronRight className={`w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity ${isRTL ? 'rotate-180' : ''}`} />
-                                    {t(itemKey)}
-                                  </button>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        ))}
-                      </div>
-                      {/* Row 2: remaining categories */}
-                      <div className="grid grid-cols-3 gap-x-8 mt-6">
-                        {productCategories.slice(3).map((cat) => (
-                          <div key={cat.key}>
-                            <h4 className="text-xs font-bold uppercase tracking-wider text-accent mb-3">
-                              {t(cat.key)}
-                            </h4>
-                            <ul className="space-y-1.5">
-                              {cat.items.map((itemKey) => (
-                                <li key={itemKey}>
-                                  <button
-                                    type="button"
-                                    onClick={(e) => { e.preventDefault(); handleItemClick(itemKey); }}
-                                    className="text-sm text-muted-foreground hover:text-red-500 transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer"
-                                  >
-                                    <ChevronRight className={`w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity ${isRTL ? 'rotate-180' : ''}`} />
-                                    {t(itemKey)}
-                                  </button>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        ))}
-                      </div>
+                      {row1.length > 0 && (
+                        <div className="grid grid-cols-3 gap-x-8 gap-y-6">
+                          {row1.map((cat) => (
+                            <div key={cat.key}>
+                              <h4 className="text-xs font-bold uppercase tracking-wider text-accent mb-3">
+                                {t(cat.key)}
+                              </h4>
+                              <ul className="space-y-1.5">
+                                {cat.items.map((pi) => (
+                                  <li key={pi.id}>
+                                    <button
+                                      type="button"
+                                      onClick={(e) => { e.preventDefault(); handleItemClick(pi); }}
+                                      className="text-sm text-muted-foreground hover:text-red-500 transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer"
+                                    >
+                                      <ChevronRight className={`w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity ${isRTL ? 'rotate-180' : ''}`} />
+                                      {isAr ? pi.name_ar : pi.name_en}
+                                    </button>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {row2.length > 0 && (
+                        <div className="grid grid-cols-3 gap-x-8 mt-6">
+                          {row2.map((cat) => (
+                            <div key={cat.key}>
+                              <h4 className="text-xs font-bold uppercase tracking-wider text-accent mb-3">
+                                {t(cat.key)}
+                              </h4>
+                              <ul className="space-y-1.5">
+                                {cat.items.map((pi) => (
+                                  <li key={pi.id}>
+                                    <button
+                                      type="button"
+                                      onClick={(e) => { e.preventDefault(); handleItemClick(pi); }}
+                                      className="text-sm text-muted-foreground hover:text-red-500 transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer"
+                                    >
+                                      <ChevronRight className={`w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity ${isRTL ? 'rotate-180' : ''}`} />
+                                      {isAr ? pi.name_ar : pi.name_en}
+                                    </button>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -226,7 +202,6 @@ export default function Header() {
 
           {/* Right side */}
           <div className="flex items-center gap-1.5">
-            {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
               className={`p-2 rounded-full border ${borderColor} ${textColor} ${hoverBg} transition-colors duration-300`}
@@ -235,7 +210,6 @@ export default function Header() {
               {theme === "light" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
             </button>
 
-            {/* Language Toggle */}
             <button
               onClick={() => setLanguage(language === "en" ? "ar" : "en")}
               className={`px-3 py-1.5 text-sm font-semibold rounded-full border ${borderColor} ${textColor} ${hoverBg} transition-colors duration-300`}
@@ -243,7 +217,6 @@ export default function Header() {
               {language === "en" ? "عربي" : "EN"}
             </button>
 
-            {/* Contact Button - Desktop */}
             <Button
               onClick={() => scrollToSection("#contact")}
               className="hidden md:inline-flex gradient-accent text-accent-foreground rounded-full px-5 text-[15px] font-semibold transition-all border-0"
@@ -251,7 +224,6 @@ export default function Header() {
               {t("nav.contact")}
             </Button>
 
-            {/* Mobile Menu Toggle */}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
               className={`md:hidden p-2 rounded-full ${textColor} ${hoverBg} transition-colors duration-300`}
@@ -281,18 +253,18 @@ export default function Header() {
                       </button>
                       {mobileProductsOpen && (
                         <div className="ml-4 mt-1 space-y-3 pb-2">
-                          {productCategories.map((cat) => (
+                          {categoriesWithItems.map((cat) => (
                             <div key={cat.key}>
                               <h4 className="text-xs font-bold uppercase tracking-wider text-accent px-4 mb-1">
                                 {t(cat.key)}
                               </h4>
-                              {cat.items.map((itemKey) => (
+                              {cat.items.map((pi) => (
                                 <button
-                                  key={itemKey}
-                                  onClick={() => handleItemClick(itemKey)}
+                                  key={pi.id}
+                                  onClick={() => handleItemClick(pi)}
                                   className="w-full text-start px-4 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
                                 >
-                                  {t(itemKey)}
+                                  {isAr ? pi.name_ar : pi.name_en}
                                 </button>
                               ))}
                             </div>

@@ -160,6 +160,35 @@ Deno.serve(async (req) => {
       }
     }
 
+    // PRODUCT ITEMS (menu children) CRUD
+    if (path === "product-items") {
+      if (method === "GET") {
+        const { data, error } = await supabase
+          .from("product_items")
+          .select("*")
+          .order("category_key")
+          .order("sort_order", { ascending: true });
+        if (error) throw error;
+        return json(data);
+      }
+      if (method === "POST") {
+        const body = await req.json();
+        const { data, error } = await supabase
+          .from("product_items")
+          .upsert(body, { onConflict: "id" })
+          .select()
+          .single();
+        if (error) throw error;
+        return json(data);
+      }
+      if (method === "DELETE") {
+        const { id } = await req.json();
+        const { error } = await supabase.from("product_items").delete().eq("id", id);
+        if (error) throw error;
+        return json({ success: true });
+      }
+    }
+
     // STORAGE - List files in a bucket/folder
     if (path === "files") {
       if (method === "GET") {
