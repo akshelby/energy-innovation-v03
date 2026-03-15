@@ -58,7 +58,7 @@ export default function HeroSection() {
         <div className="mt-8 flex flex-wrap gap-4 justify-center animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
           <Button
             onClick={() => scrollTo("#products")}
-            className="gradient-accent text-accent-foreground rounded-full px-8 py-6 text-base font-semibold hover:scale-105 transition-transform border-0"
+            className="gradient-accent text-accent-foreground rounded-full px-8 py-6 text-base font-semibold transition-all border-0"
           >
             {t("hero.explore")}
           </Button>
