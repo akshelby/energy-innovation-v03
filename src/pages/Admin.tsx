@@ -593,6 +593,7 @@ export default function Admin() {
             { key: "content" as TabKey, icon: FileText, label: "Site Content" },
             { key: "products" as TabKey, icon: Package, label: `Products (${products.length})` },
             { key: "services" as TabKey, icon: Briefcase, label: `Services (${services.length})` },
+            { key: "menu-items" as TabKey, icon: List, label: `Menu Items (${menuItems.length})` },
             { key: "images" as TabKey, icon: Image, label: "Files & Images" },
           ]).map((tab) => (
             <Button key={tab.key} variant={activeTab === tab.key ? "default" : "outline"} onClick={() => setActiveTab(tab.key)} className="rounded-xl">
