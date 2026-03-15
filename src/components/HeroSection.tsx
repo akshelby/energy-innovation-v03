@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
-import { Shield, Globe } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import hero1 from "@/assets/hero-1.jpg";
 import hero2 from "@/assets/hero-2.jpg";
 import hero3 from "@/assets/hero-3.jpg";
@@ -19,7 +19,10 @@ export default function HeroSection() {
       setCurrent((prev) => (prev + 1) % images.length);
     }, 6000);
     return () => clearInterval(interval);
-  }, []);
+  }, [current]);
+
+  const prev = () => setCurrent((c) => (c - 1 + images.length) % images.length);
+  const next = () => setCurrent((c) => (c + 1) % images.length);
 
   const scrollTo = (id: string) => {
     document.querySelector(id)?.scrollIntoView({ behavior: "smooth" });
@@ -46,6 +49,22 @@ export default function HeroSection() {
 
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
+
+      {/* Prev / Next Buttons */}
+      <button
+        onClick={prev}
+        className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors"
+        aria-label="Previous slide"
+      >
+        <ChevronLeft className="w-5 h-5" />
+      </button>
+      <button
+        onClick={next}
+        className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors"
+        aria-label="Next slide"
+      >
+        <ChevronRight className="w-5 h-5" />
+      </button>
 
       {/* Content */}
       <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
