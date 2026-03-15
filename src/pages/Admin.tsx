@@ -246,6 +246,15 @@ export default function Admin() {
     finally { setLoading(false); }
   }, [storedPassword]);
 
+  const fetchMenuItems = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await apiCall("product-items", "GET", storedPassword);
+      setMenuItems(data);
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  }, [storedPassword]);
+
   const fetchFiles = useCallback(async () => {
     setLoading(true);
     try {
@@ -265,9 +274,10 @@ export default function Admin() {
       else if (activeTab === "content") fetchContent();
       else if (activeTab === "products") fetchProducts();
       else if (activeTab === "services") fetchServices();
+      else if (activeTab === "menu-items") fetchMenuItems();
       else fetchFiles();
     }
-  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchProducts, fetchServices, fetchFiles]);
+  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchProducts, fetchServices, fetchMenuItems, fetchFiles]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
