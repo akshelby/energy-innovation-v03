@@ -148,7 +148,7 @@ export default function Header() {
             {/* Language Toggle */}
             <button
               onClick={() => setLanguage(language === "en" ? "ar" : "en")}
-              className="px-3 py-1.5 text-xs font-semibold rounded-full border border-border hover:bg-secondary transition-colors"
+              className="px-3 py-1.5 text-sm font-semibold rounded-full border border-white/30 text-white hover:bg-white/10 transition-colors"
             >
               {language === "en" ? "عربي" : "EN"}
             </button>
