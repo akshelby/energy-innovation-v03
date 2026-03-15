@@ -21,7 +21,7 @@ export default function ContactSection() {
   const { t } = useLanguage();
   const ref = useScrollReveal();
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", company: "", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", company: "", message: "" });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
