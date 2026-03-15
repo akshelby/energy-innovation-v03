@@ -9,8 +9,8 @@ interface PdfViewerDialogProps {
 }
 
 export default function PdfViewerDialog({ open, onOpenChange, src }: PdfViewerDialogProps) {
-  // Use Google Docs viewer for reliable cross-origin PDF rendering
-  const viewerUrl = src
+  const embeddedPdfUrl = src ? `${src}#toolbar=1&navpanes=0&view=FitH` : "";
+  const googleViewerUrl = src
     ? `https://docs.google.com/gview?url=${encodeURIComponent(src)}&embedded=true`
     : "";
 
@@ -20,12 +20,7 @@ export default function PdfViewerDialog({ open, onOpenChange, src }: PdfViewerDi
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-muted/30">
             <span className="text-sm font-medium text-foreground">PDF Document</span>
-            <Button
-              variant="outline"
-              size="sm"
-              asChild
-              className="mr-8"
-            >
+            <Button variant="outline" size="sm" asChild className="mr-8">
               <a href={src} download target="_blank" rel="noopener noreferrer">
                 <Download className="w-4 h-4 mr-1.5" />
                 Download
@@ -33,11 +28,9 @@ export default function PdfViewerDialog({ open, onOpenChange, src }: PdfViewerDi
             </Button>
           </div>
           {src && (
-            <iframe
-              src={viewerUrl}
-              className="w-full flex-1 border-0"
-              title="PDF Viewer"
-            />
+            <object data={embeddedPdfUrl} type="application/pdf" className="w-full flex-1">
+              <iframe src={googleViewerUrl} className="w-full h-full border-0" title="PDF Viewer" />
+            </object>
           )}
         </div>
       </DialogContent>
