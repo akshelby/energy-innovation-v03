@@ -2,37 +2,46 @@ import { useState, useRef, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 
 const countries = [
-  { code: "+966", flag: "🇸🇦", name: "Saudi Arabia" },
-  { code: "+971", flag: "🇦🇪", name: "UAE" },
-  { code: "+974", flag: "🇶🇦", name: "Qatar" },
-  { code: "+973", flag: "🇧🇭", name: "Bahrain" },
-  { code: "+968", flag: "🇴🇲", name: "Oman" },
-  { code: "+965", flag: "🇰🇼", name: "Kuwait" },
-  { code: "+962", flag: "🇯🇴", name: "Jordan" },
-  { code: "+961", flag: "🇱🇧", name: "Lebanon" },
-  { code: "+964", flag: "🇮🇶", name: "Iraq" },
-  { code: "+20", flag: "🇪🇬", name: "Egypt" },
-  { code: "+212", flag: "🇲🇦", name: "Morocco" },
-  { code: "+216", flag: "🇹🇳", name: "Tunisia" },
-  { code: "+91", flag: "🇮🇳", name: "India" },
-  { code: "+92", flag: "🇵🇰", name: "Pakistan" },
-  { code: "+44", flag: "🇬🇧", name: "United Kingdom" },
-  { code: "+1", flag: "🇺🇸", name: "United States" },
-  { code: "+49", flag: "🇩🇪", name: "Germany" },
-  { code: "+33", flag: "🇫🇷", name: "France" },
-  { code: "+86", flag: "🇨🇳", name: "China" },
-  { code: "+81", flag: "🇯🇵", name: "Japan" },
-  { code: "+82", flag: "🇰🇷", name: "South Korea" },
-  { code: "+90", flag: "🇹🇷", name: "Turkey" },
-  { code: "+234", flag: "🇳🇬", name: "Nigeria" },
-  { code: "+27", flag: "🇿🇦", name: "South Africa" },
-  { code: "+55", flag: "🇧🇷", name: "Brazil" },
-  { code: "+52", flag: "🇲🇽", name: "Mexico" },
-  { code: "+61", flag: "🇦🇺", name: "Australia" },
-  { code: "+7", flag: "🇷🇺", name: "Russia" },
-  { code: "+39", flag: "🇮🇹", name: "Italy" },
-  { code: "+34", flag: "🇪🇸", name: "Spain" },
+  { code: "+966", iso: "sa", name: "Saudi Arabia" },
+  { code: "+971", iso: "ae", name: "UAE" },
+  { code: "+974", iso: "qa", name: "Qatar" },
+  { code: "+973", iso: "bh", name: "Bahrain" },
+  { code: "+968", iso: "om", name: "Oman" },
+  { code: "+965", iso: "kw", name: "Kuwait" },
+  { code: "+962", iso: "jo", name: "Jordan" },
+  { code: "+961", iso: "lb", name: "Lebanon" },
+  { code: "+964", iso: "iq", name: "Iraq" },
+  { code: "+20", iso: "eg", name: "Egypt" },
+  { code: "+212", iso: "ma", name: "Morocco" },
+  { code: "+216", iso: "tn", name: "Tunisia" },
+  { code: "+91", iso: "in", name: "India" },
+  { code: "+92", iso: "pk", name: "Pakistan" },
+  { code: "+44", iso: "gb", name: "United Kingdom" },
+  { code: "+1", iso: "us", name: "United States" },
+  { code: "+49", iso: "de", name: "Germany" },
+  { code: "+33", iso: "fr", name: "France" },
+  { code: "+86", iso: "cn", name: "China" },
+  { code: "+81", iso: "jp", name: "Japan" },
+  { code: "+82", iso: "kr", name: "South Korea" },
+  { code: "+90", iso: "tr", name: "Turkey" },
+  { code: "+234", iso: "ng", name: "Nigeria" },
+  { code: "+27", iso: "za", name: "South Africa" },
+  { code: "+55", iso: "br", name: "Brazil" },
+  { code: "+52", iso: "mx", name: "Mexico" },
+  { code: "+61", iso: "au", name: "Australia" },
+  { code: "+7", iso: "ru", name: "Russia" },
+  { code: "+39", iso: "it", name: "Italy" },
+  { code: "+34", iso: "es", name: "Spain" },
 ];
+
+const FlagImg = ({ iso, className = "" }: { iso: string; className?: string }) => (
+  <img
+    src={`https://flagcdn.com/w40/${iso}.png`}
+    alt={iso}
+    className={`inline-block rounded-sm object-cover ${className}`}
+    style={{ width: 20, height: 15 }}
+  />
+);
 
 interface PhoneInputProps {
   value: string;
