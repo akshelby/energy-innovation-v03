@@ -170,8 +170,8 @@ const emptyMenuChild: MenuChildItem = {
 };
 
 export default function Admin() {
-  const [password, setPassword] = useState("");
-  const [authenticated, setAuthenticated] = useState(false);
+  const [password, setPassword] = useState(() => sessionStorage.getItem("admin_pw") || "");
+  const [authenticated, setAuthenticated] = useState(() => !!sessionStorage.getItem("admin_pw"));
   const [activeTab, setActiveTab] = useState<TabKey>("leads");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [content, setContent] = useState<ContentItem[]>([]);
@@ -283,6 +283,7 @@ export default function Admin() {
     e.preventDefault();
     try {
       await apiCall("leads", "GET", password);
+      sessionStorage.setItem("admin_pw", password);
       setAuthenticated(true);
       toast.success("Logged in successfully");
     } catch { toast.error("Invalid password"); }
@@ -579,7 +580,7 @@ export default function Admin() {
       <header className="border-b border-border bg-card px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <h1 className="text-xl font-bold text-foreground">Mivora Admin</h1>
-          <Button variant="outline" size="sm" onClick={() => { setAuthenticated(false); setPassword(""); }} className="rounded-xl">
+          <Button variant="outline" size="sm" onClick={() => { sessionStorage.removeItem("admin_pw"); setAuthenticated(false); setPassword(""); }} className="rounded-xl">
             <LogOut className="w-4 h-4 mr-2" />Logout
           </Button>
         </div>
