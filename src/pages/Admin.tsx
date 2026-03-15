@@ -817,6 +817,143 @@ export default function Admin() {
           </div>
         )}
 
+        {/* ─── Menu Items Tab ─────── */}
+        {activeTab === "menu-items" && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-lg font-semibold text-foreground">Menu Items</h2>
+                <p className="text-xs text-muted-foreground mt-1">
+                  These are the child items shown in the Products mega menu. Each item can have its own PDF document.
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" onClick={() => setEditingMenuItem({ ...emptyMenuChild, sort_order: menuItems.length })} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                  <Plus className="w-4 h-4 mr-2" />Add Item
+                </Button>
+                <Button variant="outline" size="sm" onClick={fetchMenuItems} disabled={loading} className="rounded-xl">
+                  <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
+                </Button>
+              </div>
+            </div>
+
+            {/* Editor */}
+            {editingMenuItem && (
+              <div className="bg-card border border-border rounded-2xl p-6 space-y-4 mb-6">
+                <h3 className="font-semibold text-foreground">{editingMenuItem.id ? "Edit" : "New"} Menu Item</h3>
+                
+                {/* Category */}
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Category</label>
+                  <select
+                    value={editingMenuItem.category_key}
+                    onChange={(e) => setEditingMenuItem({ ...editingMenuItem, category_key: e.target.value })}
+                    className="w-full h-10 rounded-xl border border-input bg-background px-3 text-sm"
+                  >
+                    {CATEGORY_OPTIONS.map((cat) => (
+                      <option key={cat.key} value={cat.key}>{cat.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Names */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Name (EN)</label>
+                    <Input value={editingMenuItem.name_en} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, name_en: e.target.value })} placeholder="e.g. Fire Curtains" className="rounded-xl" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Name (AR)</label>
+                    <Input value={editingMenuItem.name_ar} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, name_ar: e.target.value })} placeholder="e.g. ستائر الحريق" className="rounded-xl" dir="rtl" />
+                  </div>
+                </div>
+
+                {/* PDF & Sort Order */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">PDF Document</label>
+                    <div className="flex items-center gap-2">
+                      <Input value={editingMenuItem.pdf_url || ""} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, pdf_url: e.target.value || null })} placeholder="PDF URL or upload" className="rounded-xl flex-1" />
+                      <input ref={menuItemPdfRef} type="file" accept=".pdf" className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleFormFileUpload(file, "pdfs", "", (url) => setEditingMenuItem({ ...editingMenuItem!, pdf_url: url }));
+                        }}
+                      />
+                      <Button variant="outline" size="sm" onClick={() => menuItemPdfRef.current?.click()} disabled={uploading} className="rounded-xl shrink-0">
+                        <Upload className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    {editingMenuItem.pdf_url && (
+                      <button
+                        onClick={() => { setPdfPreviewUrl(editingMenuItem.pdf_url!); setPdfPreviewOpen(true); }}
+                        className="mt-2 text-xs text-primary underline"
+                      >
+                        Preview PDF
+                      </button>
+                    )}
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Sort Order</label>
+                    <Input type="number" value={editingMenuItem.sort_order} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, sort_order: parseInt(e.target.value) || 0 })} className="rounded-xl" />
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-2 pt-2">
+                  <Button onClick={() => handleSaveMenuItem(editingMenuItem)} disabled={loading} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                    <Save className="w-4 h-4 mr-2" />Save
+                  </Button>
+                  <Button variant="outline" onClick={() => setEditingMenuItem(null)} className="rounded-xl">Cancel</Button>
+                </div>
+              </div>
+            )}
+
+            {/* List grouped by category */}
+            {menuItems.length === 0 && !editingMenuItem ? (
+              <div className="text-center py-16 text-muted-foreground">
+                <List className="w-12 h-12 mx-auto mb-4 opacity-30" /><p>No menu items yet.</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {CATEGORY_OPTIONS.map((cat) => {
+                  const items = menuItems.filter((m) => m.category_key === cat.key);
+                  if (items.length === 0) return null;
+                  return (
+                    <div key={cat.key}>
+                      <h3 className="text-sm font-bold uppercase tracking-wider text-accent mb-3">{cat.label}</h3>
+                      <div className="space-y-2">
+                        {items.sort((a, b) => a.sort_order - b.sort_order).map((m) => (
+                          <div key={m.id} className="bg-card border border-border rounded-xl p-3 flex items-center gap-3">
+                            <GripVertical className="w-4 h-4 text-muted-foreground shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium text-foreground text-sm">{m.name_en}</span>
+                                <span className="text-xs text-muted-foreground">/ {m.name_ar}</span>
+                                {m.pdf_url ? (
+                                  <span className="text-[10px] bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 px-2 py-0.5 rounded-full font-medium">PDF ✓</span>
+                                ) : (
+                                  <span className="text-[10px] bg-muted text-muted-foreground px-2 py-0.5 rounded-full">No PDF</span>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex gap-1 shrink-0">
+                              <Button variant="outline" size="sm" onClick={() => setEditingMenuItem({ ...m })} className="rounded-xl text-xs h-7">Edit</Button>
+                              <Button variant="ghost" size="sm" onClick={() => handleDeleteMenuItem(m.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl h-7 w-7 p-0">
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* ─── Images Tab ─────── */}
         {activeTab === "images" && (
           <div>
