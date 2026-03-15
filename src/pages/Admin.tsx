@@ -274,6 +274,22 @@ export default function Admin() {
     finally { setLoading(false); }
   }, [storedPassword, selectedFolder]);
 
+  const fetchBranding = useCallback(async () => {
+    // Load brand name from site_content
+    try {
+      const data = await apiCall("content", "GET", storedPassword);
+      const brandEntry = data.find((d: ContentItem) => d.content_key === "brand.name");
+      if (brandEntry) setBrandName(brandEntry.value_en);
+    } catch { /* ignore */ }
+    // Load logo URL
+    const logoPublicUrl = `${STORAGE_BASE}/images/branding/logo`;
+    try {
+      const res = await fetch(logoPublicUrl, { method: "HEAD" });
+      if (res.ok) setBrandLogoUrl(logoPublicUrl + "?t=" + Date.now());
+      else setBrandLogoUrl("");
+    } catch { setBrandLogoUrl(""); }
+  }, [storedPassword]);
+
   useEffect(() => {
     if (authenticated) {
       if (activeTab === "leads") fetchLeads();
@@ -281,9 +297,10 @@ export default function Admin() {
       else if (activeTab === "products") fetchProducts();
       else if (activeTab === "services") fetchServices();
       else if (activeTab === "menu-items") fetchMenuItems();
+      else if (activeTab === "branding") fetchBranding();
       else fetchFiles();
     }
-  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchProducts, fetchServices, fetchMenuItems, fetchFiles]);
+  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchProducts, fetchServices, fetchMenuItems, fetchFiles, fetchBranding]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
