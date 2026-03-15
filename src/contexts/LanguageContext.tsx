@@ -71,6 +71,7 @@ const translations: Record<Language, Record<string, string>> = {
     "contact.desc": "Ready to upgrade your industrial infrastructure? Send us a message and our team will respond within 24 hours.",
     "contact.name": "Full Name",
     "contact.email": "Email Address",
+    "contact.phone": "Phone Number",
     "contact.company": "Company (Optional)",
     "contact.message": "Your Message",
     "contact.send": "Send Message",
