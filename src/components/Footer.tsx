@@ -96,7 +96,7 @@ export default function Footer() {
 
         <div className="border-t border-primary-foreground/10 pt-8 text-center">
           <p className="text-sm text-primary-foreground/40">
-            © {new Date().getFullYear()} Energy Innovation. {t("footer.rights")}
+            © {new Date().getFullYear()} {brandName}. {t("footer.rights")}
           </p>
         </div>
       </div>

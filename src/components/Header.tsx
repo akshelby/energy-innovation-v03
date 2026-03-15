@@ -118,7 +118,7 @@ export default function Header() {
         <div className="flex items-center justify-between px-4 md:px-6 py-3">
           {/* Logo */}
           <a href="#home" onClick={() => scrollToSection("#home")} className="flex items-center gap-2 shrink-0">
-            <img src={logo} alt="Energy Innovation" className="h-10 w-auto object-contain" />
+            <img src={logoUrl} alt={brandName} className="h-10 w-auto object-contain" />
           </a>
 
           {/* Desktop Nav */}
