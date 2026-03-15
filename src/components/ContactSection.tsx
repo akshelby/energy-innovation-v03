@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Send } from "lucide-react";
+import PhoneInput from "@/components/PhoneInput";
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, "Name required").max(100),
