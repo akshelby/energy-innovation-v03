@@ -129,7 +129,7 @@ export default function PhoneInput({ value, onChange }: PhoneInputProps) {
                   selected.code === country.code ? "bg-accent/10 text-accent" : "text-foreground"
                 }`}
               >
-                <span className="text-lg">{country.flag}</span>
+                <FlagImg iso={country.iso} />
                 <span className="flex-1 text-left">{country.name}</span>
                 <span className="text-muted-foreground">{country.code}</span>
               </button>
