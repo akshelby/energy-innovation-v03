@@ -65,7 +65,7 @@ export default function HeroSection() {
           <Button
             onClick={() => scrollTo("#contact")}
             variant="outline"
-            className="rounded-full px-8 py-6 text-base font-semibold border-2 border-white text-white bg-white/10 backdrop-blur-sm hover:bg-white/20 hover:text-white"
+            className="rounded-full px-8 py-6 text-base font-semibold border-2 border-white text-white bg-white/10 backdrop-blur-sm hover:border-red-500 hover:bg-white/20 hover:text-white transition-all duration-500"
           >
             {t("hero.contact")}
           </Button>
