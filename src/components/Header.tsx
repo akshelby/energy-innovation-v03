@@ -80,8 +80,8 @@ export default function Header() {
             <div className="w-8 h-8 rounded-full gradient-accent flex items-center justify-center">
               <Leaf className="w-4 h-4 text-accent-foreground" />
             </div>
-            <span className="text-lg font-bold text-foreground">
-              Mivora<span className="text-xs align-super text-muted-foreground">™</span>
+            <span className="text-xl font-bold text-white drop-shadow-md">
+              Mivora<span className="text-xs align-super text-white/70">™</span>
             </span>
           </a>
 
