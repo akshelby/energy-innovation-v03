@@ -125,13 +125,13 @@
   }
 
   .glass {
-    background: hsla(0, 0%, 100%, 0.2);
+    background: hsla(0, 0%, 100%, 0.05);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
   }
 
   .dark .glass {
-    background: hsla(213, 39%, 10%, 0.2);
+    background: hsla(213, 39%, 10%, 0.05);
   }
 
   .dark .text-gradient {
