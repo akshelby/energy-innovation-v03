@@ -3,7 +3,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Menu, X, ChevronDown, ChevronRight, Leaf, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import PdfViewerDialog from "@/components/PdfViewerDialog";
+
 
 // Map product item keys to PDF paths
 const itemPdfMap: Record<string, string> = {
