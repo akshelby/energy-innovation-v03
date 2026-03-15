@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Send } from "lucide-react";
+import PhoneInput from "@/components/PhoneInput";
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, "Name required").max(100),
@@ -93,13 +94,9 @@ export default function ContactSection() {
           <div className="grid sm:grid-cols-2 gap-5">
             <div>
               <label className="text-sm font-medium text-foreground mb-2 block">{t("contact.phone")}</label>
-              <Input
-                type="tel"
+              <PhoneInput
                 value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                placeholder="+966 5X XXX XXXX"
-                maxLength={20}
-                className="rounded-xl"
+                onChange={(val) => setForm({ ...form, phone: val })}
               />
             </div>
             <div>
