@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Menu, X, ChevronDown, ChevronRight, Leaf, Sun, Moon } from "lucide-react";
+import { Menu, X, ChevronDown, ChevronRight, Sun, Moon } from "lucide-react";
+import logo from "@/assets/logo.jpeg";
 import { Button } from "@/components/ui/button";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
 import { supabase } from "@/integrations/supabase/client";
@@ -116,12 +117,7 @@ export default function Header() {
         <div className="flex items-center justify-between px-4 md:px-6 py-3">
           {/* Logo */}
           <a href="#home" onClick={() => scrollToSection("#home")} className="flex items-center gap-2 shrink-0">
-            <div className="w-9 h-9 rounded-full gradient-accent flex items-center justify-center">
-              <Leaf className="w-5 h-5 text-accent-foreground" />
-            </div>
-            <span className={`text-xl font-bold ${textColor} transition-colors duration-300`}>
-              Mivora<span className={`text-xs align-super ${pastHero ? "text-muted-foreground" : "text-white/70"}`}>™</span>
-            </span>
+            <img src={logo} alt="Energy Innovation" className="h-10 w-auto object-contain" />
           </a>
 
           {/* Desktop Nav */}
