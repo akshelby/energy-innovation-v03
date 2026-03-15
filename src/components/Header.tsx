@@ -6,10 +6,13 @@ import { Button } from "@/components/ui/button";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
 
 
-// Map product item keys to PDF paths (Supabase Storage)
+// Map product item keys to PDF paths (Supabase Storage with local fallback)
 const STORAGE_URL = "https://xemoqcukwjcmnzqcdrey.supabase.co/storage/v1/object/public/pdfs";
-const itemPdfMap: Record<string, string> = {
-  "item.fireCurtains": `${STORAGE_URL}/Energy-BACHFIRE_E_120.pdf`,
+const itemPdfSources: Record<string, { remote: string; fallback: string }> = {
+  "item.fireCurtains": {
+    remote: `${STORAGE_URL}/Energy-BACHFIRE_E_120.pdf`,
+    fallback: "/pdfs/Energy-BACHFIRE_E_120.pdf",
+  },
 };
 
 const productCategories = [
@@ -45,9 +48,10 @@ export default function Header() {
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
   const [pdfOpen, setPdfOpen] = useState(false);
   const [pdfSrc, setPdfSrc] = useState("");
+  const [resolvedPdfMap, setResolvedPdfMap] = useState<Record<string, string>>({});
 
   const handleItemClick = (itemKey: string) => {
-    const pdfPath = itemPdfMap[itemKey];
+    const pdfPath = resolvedPdfMap[itemKey] ?? itemPdfSources[itemKey]?.fallback;
 
     if (pdfPath) {
       setPdfSrc(pdfPath);
