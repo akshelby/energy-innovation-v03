@@ -84,7 +84,7 @@ export default function Header() {
           </a>
 
           {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-1">
             {navItems.map((item) => (
               <div key={item.href} className="relative"
                 onMouseEnter={() => item.hasDropdown && setProductsOpen(true)}
