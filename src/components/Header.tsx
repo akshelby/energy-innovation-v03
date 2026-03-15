@@ -173,7 +173,7 @@ export default function Header() {
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="md:hidden p-2 rounded-full text-white hover:bg-white/10 transition-colors"
+              className={`md:hidden p-2 rounded-full ${textColor} ${hoverBg} transition-colors duration-300`}
             >
               {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
