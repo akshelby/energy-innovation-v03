@@ -198,6 +198,12 @@ export default function Admin() {
   const [files, setFiles] = useState<StorageFile[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Branding state
+  const [brandName, setBrandName] = useState("Energy Innovation");
+  const [brandLogoUrl, setBrandLogoUrl] = useState("");
+  const brandLogoRef = useRef<HTMLInputElement>(null);
+  const [brandLogoUploading, setBrandLogoUploading] = useState(false);
   const productImageRef = useRef<HTMLInputElement>(null);
   const productPdfRef = useRef<HTMLInputElement>(null);
   const serviceImageRef = useRef<HTMLInputElement>(null);
