@@ -199,8 +199,8 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* Right side - absolute positioned */}
-          <div className={`absolute ${isRTL ? 'left-4' : 'right-4'} flex items-center gap-1.5`}>
+          {/* Right side */}
+          <div className="flex items-center gap-1.5">
             <button
               onClick={toggleTheme}
               className={`p-2 rounded-full border ${borderColor} ${textColor} ${hoverBg} transition-colors duration-300`}
