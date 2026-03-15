@@ -170,8 +170,8 @@ const emptyMenuChild: MenuChildItem = {
 };
 
 export default function Admin() {
-  const [password, setPassword] = useState("");
-  const [authenticated, setAuthenticated] = useState(false);
+  const [password, setPassword] = useState(() => sessionStorage.getItem("admin_pw") || "");
+  const [authenticated, setAuthenticated] = useState(() => !!sessionStorage.getItem("admin_pw"));
   const [activeTab, setActiveTab] = useState<TabKey>("leads");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [content, setContent] = useState<ContentItem[]>([]);
