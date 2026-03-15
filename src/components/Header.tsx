@@ -252,7 +252,7 @@ export default function Header() {
                               {cat.items.map((itemKey) => (
                                 <button
                                   key={itemKey}
-                                  onClick={() => scrollToSection("#products")}
+                                  onClick={() => handleItemClick(itemKey)}
                                   className="w-full text-start px-4 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
                                 >
                                   {t(itemKey)}
