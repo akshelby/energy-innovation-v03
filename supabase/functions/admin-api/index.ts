@@ -104,6 +104,48 @@ Deno.serve(async (req) => {
       return json({ success: true, count: entries.length });
     }
 
+    // STORAGE - List files in a bucket/folder
+    if (path === "files") {
+      if (method === "GET") {
+        const bucket = url.searchParams.get("bucket") || "images";
+        const folder = url.searchParams.get("folder") || "";
+        const { data, error } = await supabase.storage
+          .from(bucket)
+          .list(folder, { limit: 100, sortBy: { column: "name", order: "asc" } });
+        if (error) throw error;
+        return json(data);
+      }
+      if (method === "DELETE") {
+        const { bucket, paths } = await req.json();
+        const { error } = await supabase.storage.from(bucket).remove(paths);
+        if (error) throw error;
+        return json({ success: true });
+      }
+    }
+
+    // STORAGE - Upload file (base64 encoded)
+    if (path === "upload" && method === "POST") {
+      const { bucket, filePath, base64, contentType } = await req.json();
+      
+      // Decode base64 to Uint8Array
+      const binaryStr = atob(base64);
+      const bytes = new Uint8Array(binaryStr.length);
+      for (let i = 0; i < binaryStr.length; i++) {
+        bytes[i] = binaryStr.charCodeAt(i);
+      }
+
+      const { error } = await supabase.storage
+        .from(bucket)
+        .upload(filePath, bytes, {
+          contentType,
+          upsert: true,
+        });
+      if (error) throw error;
+      
+      const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(filePath);
+      return json({ success: true, url: urlData.publicUrl });
+    }
+
     return json({ error: "Not found" }, 404);
   } catch (err) {
     return json({ error: err.message }, 500);
