@@ -596,6 +596,7 @@ export default function Admin() {
         {/* Tabs */}
         <div className="flex gap-2 mb-8 flex-wrap">
           {([
+            { key: "branding" as TabKey, icon: Palette, label: "Branding" },
             { key: "leads" as TabKey, icon: MessageSquare, label: `Leads (${leads.length})` },
             { key: "content" as TabKey, icon: FileText, label: "Site Content" },
             { key: "products" as TabKey, icon: Package, label: `Products (${products.length})` },
