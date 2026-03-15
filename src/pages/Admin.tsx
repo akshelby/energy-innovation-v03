@@ -64,6 +64,23 @@ interface ServiceItem {
   sort_order: number;
 }
 
+interface MenuChildItem {
+  id?: string;
+  category_key: string;
+  name_en: string;
+  name_ar: string;
+  pdf_url: string | null;
+  sort_order: number;
+}
+
+const CATEGORY_OPTIONS = [
+  { key: "cat.fire", label: "Fire & Smoke Safety Systems" },
+  { key: "cat.roller", label: "Roller Shutters & Doors" },
+  { key: "cat.oil", label: "Oil & Gas Industry Equipment" },
+  { key: "cat.hvac", label: "HVAC & Ventilation Solutions" },
+  { key: "cat.loading", label: "Loading Bay & Material Handling" },
+];
+
 const ICON_OPTIONS = [
   "Flame", "DoorOpen", "Droplets", "Wind", "Truck", "Shield",
   "PenTool", "Wrench", "Settings", "MessageSquare", "Zap", "Factory",
