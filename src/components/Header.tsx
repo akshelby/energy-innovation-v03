@@ -29,6 +29,7 @@ const productCategories = [
 
 export default function Header() {
   const { t, language, setLanguage, isRTL } = useLanguage();
+  const { theme, toggleTheme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
