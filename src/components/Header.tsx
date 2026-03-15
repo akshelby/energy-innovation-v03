@@ -142,14 +142,14 @@ export default function Header() {
                             <ul className="space-y-1.5">
                               {cat.items.map((itemKey) => (
                                 <li key={itemKey}>
-                                  <a
-                                    href="#products"
-                                    onClick={(e) => { e.preventDefault(); scrollToSection("#products"); }}
-                                    className="text-sm text-muted-foreground hover:text-red-500 transition-colors flex items-center gap-1 group"
+                                  <button
+                                    type="button"
+                                    onClick={(e) => { e.preventDefault(); handleItemClick(itemKey); }}
+                                    className="text-sm text-muted-foreground hover:text-red-500 transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer"
                                   >
                                     <ChevronRight className={`w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity ${isRTL ? 'rotate-180' : ''}`} />
                                     {t(itemKey)}
-                                  </a>
+                                  </button>
                                 </li>
                               ))}
                             </ul>
