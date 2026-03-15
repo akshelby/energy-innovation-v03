@@ -83,7 +83,7 @@ const translations: Record<Language, Record<string, string>> = {
     "footer.products": "Product Categories",
     "footer.contactInfo": "Contact Info",
     "footer.rights": "All rights reserved.",
-    "footer.email": "info@mivora.com",
+    "footer.email": "info@energyinnovation.com",
     "footer.phone": "+1 (555) 000-0000",
     "footer.address": "Industrial District, Building 7",
     // Product categories
@@ -183,7 +183,7 @@ const translations: Record<Language, Record<string, string>> = {
     "footer.products": "فئات المنتجات",
     "footer.contactInfo": "معلومات الاتصال",
     "footer.rights": "جميع الحقوق محفوظة.",
-    "footer.email": "info@mivora.com",
+    "footer.email": "info@energyinnovation.com",
     "footer.phone": "+1 (555) 000-0000",
     "footer.address": "المنطقة الصناعية، مبنى 7",
     "cat.fire": "أنظمة السلامة من الحريق والدخان",
