@@ -69,6 +69,11 @@ export default function Header() {
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
+  // Text color: white on hero, foreground (black in light mode) after hero
+  const textColor = pastHero ? "text-foreground" : "text-white";
+  const borderColor = pastHero ? "border-border" : "border-white/30";
+  const hoverBg = pastHero ? "hover:bg-secondary/50" : "hover:bg-white/10";
+
   return (
     <>
       <header
@@ -84,8 +89,8 @@ export default function Header() {
             <div className="w-9 h-9 rounded-full gradient-accent flex items-center justify-center">
               <Leaf className="w-5 h-5 text-accent-foreground" />
             </div>
-            <span className="text-xl font-bold text-white drop-shadow-md">
-              Mivora<span className="text-xs align-super text-white/70">™</span>
+            <span className={`text-xl font-bold ${textColor} transition-colors duration-300`}>
+              Mivora<span className={`text-xs align-super ${pastHero ? "text-muted-foreground" : "text-white/70"}`}>™</span>
             </span>
           </a>
 
@@ -98,7 +103,7 @@ export default function Header() {
               >
                 <button
                   onClick={() => scrollToSection(item.href)}
-                  className="px-3 py-2 text-[15px] font-medium text-white drop-shadow-md hover:text-white transition-colors flex items-center gap-1 relative after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-0 hover:after:w-3/4 after:h-[3px] after:bg-red-500 after:transition-all after:duration-500"
+                  className={`px-3 py-2 text-[15px] font-medium ${textColor} transition-colors duration-300 flex items-center gap-1 relative after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-0 hover:after:w-3/4 after:h-[3px] after:bg-red-500 after:transition-all after:duration-500`}
                 >
                   {item.label}
                   {item.hasDropdown && <ChevronDown className="w-3.5 h-3.5" />}
