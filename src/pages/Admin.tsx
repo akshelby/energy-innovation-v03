@@ -579,7 +579,7 @@ export default function Admin() {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <h1 className="text-xl font-bold text-foreground">Mivora Admin</h1>
+          <h1 className="text-xl font-bold text-foreground">Energy Innovation Admin</h1>
           <Button variant="outline" size="sm" onClick={() => { sessionStorage.removeItem("admin_pw"); setAuthenticated(false); setPassword(""); }} className="rounded-xl">
             <LogOut className="w-4 h-4 mr-2" />Logout
           </Button>
