@@ -184,6 +184,11 @@ export default function Admin() {
   const [editingProduct, setEditingProduct] = useState<ProductItem | null>(null);
   const [editingService, setEditingService] = useState<ServiceItem | null>(null);
 
+  // Menu Items state
+  const [menuItems, setMenuItems] = useState<(MenuChildItem & { id: string })[]>([]);
+  const [editingMenuItem, setEditingMenuItem] = useState<MenuChildItem | null>(null);
+  const menuItemPdfRef = useRef<HTMLInputElement>(null);
+
   // PDF preview
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState("");
   const [pdfPreviewOpen, setPdfPreviewOpen] = useState(false);
