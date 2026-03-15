@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Menu, X, ChevronDown, ChevronRight, Leaf } from "lucide-react";
+import { useTheme } from "@/contexts/ThemeContext";
+import { Menu, X, ChevronDown, ChevronRight, Leaf, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const productCategories = [
@@ -28,6 +29,7 @@ const productCategories = [
 
 export default function Header() {
   const { t, language, setLanguage, isRTL } = useLanguage();
+  const { theme, toggleTheme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
@@ -133,7 +135,16 @@ export default function Header() {
           </nav>
 
           {/* Right side */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-full border border-border hover:bg-secondary transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+            </button>
+
             {/* Language Toggle */}
             <button
               onClick={() => setLanguage(language === "en" ? "ar" : "en")}

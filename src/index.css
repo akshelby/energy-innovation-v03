@@ -127,6 +127,17 @@
     -webkit-backdrop-filter: blur(20px);
   }
 
+  .dark .glass {
+    background: hsla(213, 39%, 10%, 0.8);
+  }
+
+  .dark .text-gradient {
+    background: linear-gradient(135deg, hsl(210, 40%, 80%) 0%, hsl(var(--eco-green-light)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
   .text-gradient {
     background: linear-gradient(135deg, hsl(var(--navy)) 0%, hsl(var(--eco-green)) 100%);
     -webkit-background-clip: text;
