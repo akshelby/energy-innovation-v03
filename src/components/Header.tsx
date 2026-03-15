@@ -3,6 +3,12 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Menu, X, ChevronDown, ChevronRight, Leaf, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+
+// Map product item keys to PDF paths
+const itemPdfMap: Record<string, string> = {
+  "item.fireCurtains": "/pdfs/Energy-BACHFIRE_E_120.pdf",
+};
 
 const productCategories = [
   {
