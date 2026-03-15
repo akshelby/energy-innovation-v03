@@ -77,8 +77,8 @@ export default function Header() {
         <div className="flex items-center justify-between px-4 md:px-6 py-3">
           {/* Logo */}
           <a href="#home" onClick={() => scrollToSection("#home")} className="flex items-center gap-2 shrink-0">
-            <div className="w-8 h-8 rounded-full gradient-accent flex items-center justify-center">
-              <Leaf className="w-4 h-4 text-accent-foreground" />
+            <div className="w-9 h-9 rounded-full gradient-accent flex items-center justify-center">
+              <Leaf className="w-5 h-5 text-accent-foreground" />
             </div>
             <span className="text-xl font-bold text-white drop-shadow-md">
               Mivora<span className="text-xs align-super text-white/70">™</span>
