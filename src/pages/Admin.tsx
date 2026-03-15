@@ -362,6 +362,26 @@ export default function Admin() {
     } catch (e: any) { toast.error(e.message); }
   };
 
+  // Menu Items CRUD
+  const handleSaveMenuItem = async (item: MenuChildItem) => {
+    try {
+      setLoading(true);
+      await apiCall("product-items", "POST", storedPassword, item);
+      toast.success("Menu item saved");
+      setEditingMenuItem(null);
+      fetchMenuItems();
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  };
+
+  const handleDeleteMenuItem = async (id: string) => {
+    try {
+      await apiCall("product-items", "DELETE", storedPassword, { id });
+      setMenuItems((prev) => prev.filter((m) => m.id !== id));
+      toast.success("Menu item deleted");
+    } catch (e: any) { toast.error(e.message); }
+  };
+
   // File uploads for images tab
   const handleUploadFiles = async (fileList: FileList) => {
     setUploading(true);
