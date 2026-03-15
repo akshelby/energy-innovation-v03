@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Menu, X, ChevronDown, ChevronRight, Leaf } from "lucide-react";
+import { useTheme } from "@/contexts/ThemeContext";
+import { Menu, X, ChevronDown, ChevronRight, Leaf, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const productCategories = [
