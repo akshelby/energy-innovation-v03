@@ -111,10 +111,35 @@ export default function Header() {
 
                 {/* Mega Menu Dropdown */}
                 {item.hasDropdown && productsOpen && (
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2" style={{ width: "680px" }}>
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2" style={{ width: "750px" }}>
                     <div className="bg-card rounded-2xl shadow-xl border border-border p-6 animate-slide-down">
-                      <div className="grid grid-cols-3 gap-6">
-                        {productCategories.map((cat) => (
+                      {/* Row 1: first 3 categories */}
+                      <div className="grid grid-cols-3 gap-x-8 gap-y-6">
+                        {productCategories.slice(0, 3).map((cat) => (
+                          <div key={cat.key}>
+                            <h4 className="text-xs font-bold uppercase tracking-wider text-accent mb-3">
+                              {t(cat.key)}
+                            </h4>
+                            <ul className="space-y-1.5">
+                              {cat.items.map((itemKey) => (
+                                <li key={itemKey}>
+                                  <a
+                                    href="#products"
+                                    onClick={(e) => { e.preventDefault(); scrollToSection("#products"); }}
+                                    className="text-sm text-muted-foreground hover:text-red-500 transition-colors flex items-center gap-1 group"
+                                  >
+                                    <ChevronRight className={`w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity ${isRTL ? 'rotate-180' : ''}`} />
+                                    {t(itemKey)}
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                      {/* Row 2: remaining categories */}
+                      <div className="grid grid-cols-3 gap-x-8 mt-6">
+                        {productCategories.slice(3).map((cat) => (
                           <div key={cat.key}>
                             <h4 className="text-xs font-bold uppercase tracking-wider text-accent mb-3">
                               {t(cat.key)}
