@@ -3,7 +3,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Menu, X, ChevronDown, ChevronRight, Leaf, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import PdfViewerDialog from "@/components/PdfViewerDialog";
+
 
 // Map product item keys to PDF paths
 const itemPdfMap: Record<string, string> = {
@@ -41,13 +41,10 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
-  const [pdfOpen, setPdfOpen] = useState(false);
-  const [pdfSrc, setPdfSrc] = useState("");
 
   const handleItemClick = (itemKey: string) => {
     if (itemPdfMap[itemKey]) {
-      setPdfSrc(itemPdfMap[itemKey]);
-      setPdfOpen(true);
+      window.open(itemPdfMap[itemKey], "_blank");
       setProductsOpen(false);
       setMobileOpen(false);
     } else {
@@ -283,8 +280,6 @@ export default function Header() {
           </div>
         </div>
       )}
-
-      <PdfViewerDialog open={pdfOpen} onOpenChange={setPdfOpen} src={pdfSrc} />
     </>
   );
 }
