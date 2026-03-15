@@ -68,7 +68,7 @@ export default function Header() {
   return (
     <>
       <header
-        className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-6xl transition-all duration-300 rounded-full ${
+        className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-6xl transition-all duration-300 rounded-xl ${
           scrolled
             ? "glass shadow-lg border border-border/50"
             : "glass shadow-md border border-border/30"
