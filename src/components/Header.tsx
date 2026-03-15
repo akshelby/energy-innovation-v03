@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
 
 
-// Map product item keys to PDF paths
+// Map product item keys to PDF paths (Supabase Storage)
+const STORAGE_URL = "https://xemoqcukwjcmnzqcdrey.supabase.co/storage/v1/object/public/pdfs";
 const itemPdfMap: Record<string, string> = {
-  "item.fireCurtains": "/pdfs/Energy-BACHFIRE_E_120.pdf",
+  "item.fireCurtains": `${STORAGE_URL}/Energy-BACHFIRE_E_120.pdf`,
 };
 
 const productCategories = [
