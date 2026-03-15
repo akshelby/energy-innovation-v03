@@ -3,7 +3,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Menu, X, ChevronDown, ChevronRight, Leaf, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import PdfViewerDialog from "@/components/PdfViewerDialog";
 
 // Map product item keys to PDF paths
 const itemPdfMap: Record<string, string> = {
@@ -284,16 +284,7 @@ export default function Header() {
         </div>
       )}
 
-      {/* PDF Viewer Dialog */}
-      <Dialog open={pdfOpen} onOpenChange={setPdfOpen}>
-        <DialogContent className="max-w-4xl w-[95vw] h-[85vh] p-0 overflow-hidden">
-          <iframe
-            src={pdfSrc}
-            className="w-full h-full border-0"
-            title="PDF Viewer"
-          />
-        </DialogContent>
-      </Dialog>
+      <PdfViewerDialog open={pdfOpen} onOpenChange={setPdfOpen} src={pdfSrc} />
     </>
   );
 }
