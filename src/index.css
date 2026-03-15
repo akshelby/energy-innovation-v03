@@ -122,6 +122,11 @@
 
   .gradient-accent {
     background: linear-gradient(135deg, hsl(var(--eco-green)) 0%, hsl(var(--eco-green-light)) 100%);
+    transition: background 0.3s ease;
+  }
+
+  .gradient-accent:hover {
+    background: hsl(0, 72%, 51%);
   }
 
   .glass {
