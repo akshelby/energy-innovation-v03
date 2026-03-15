@@ -1,6 +1,6 @@
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Mail, Phone, MapPin } from "lucide-react";
-import logo from "@/assets/logo.jpeg";
+import { useBranding } from "@/contexts/BrandingContext";
 
 export default function Footer() {
   const { t } = useLanguage();
