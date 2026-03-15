@@ -43,7 +43,7 @@ export default function ContactSection() {
 
       if (error) throw error;
       toast.success(t("contact.success"));
-      setForm({ name: "", email: "", company: "", message: "" });
+      setForm({ name: "", email: "", phone: "", company: "", message: "" });
     } catch {
       toast.error(t("contact.error"));
     } finally {
