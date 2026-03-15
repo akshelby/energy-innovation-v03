@@ -125,7 +125,7 @@ export default function Header() {
                                   <a
                                     href="#products"
                                     onClick={(e) => { e.preventDefault(); scrollToSection("#products"); }}
-                                    className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 group"
+                                    className="text-sm text-muted-foreground hover:text-red-500 transition-colors flex items-center gap-1 group"
                                   >
                                     <ChevronRight className={`w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity ${isRTL ? 'rotate-180' : ''}`} />
                                     {t(itemKey)}
