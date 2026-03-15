@@ -36,9 +36,10 @@ export default function ContactSection() {
       const { error } = await supabase.from("leads").insert({
         name: parsed.data.name,
         email: parsed.data.email,
+        phone: parsed.data.phone || null,
         company: parsed.data.company || null,
         message: parsed.data.message,
-      });
+      } as any);
 
       if (error) throw error;
       toast.success(t("contact.success"));
