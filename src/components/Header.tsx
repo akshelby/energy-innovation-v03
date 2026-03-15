@@ -42,15 +42,22 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
+  const [pdfOpen, setPdfOpen] = useState(false);
+  const [pdfSrc, setPdfSrc] = useState("");
 
   const handleItemClick = (itemKey: string) => {
-    if (itemPdfMap[itemKey]) {
-      window.open(itemPdfMap[itemKey], "_blank");
+    const pdfPath = itemPdfMap[itemKey];
+
+    if (pdfPath) {
+      setPdfSrc(pdfPath);
+      setPdfOpen(true);
       setProductsOpen(false);
       setMobileOpen(false);
-    } else {
-      scrollToSection("#products");
+      setMobileProductsOpen(false);
+      return;
     }
+
+    scrollToSection("#products");
   };
 
   useEffect(() => {
