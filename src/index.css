@@ -126,7 +126,7 @@
   }
 
   .gradient-accent:hover {
-    background: hsl(0, 72%, 51%);
+    background: hsl(0, 72%, 51%) !important;
   }
 
   .glass {
