@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import hero1 from "@/assets/hero-1.jpg";
 import hero2 from "@/assets/hero-2.jpg";
@@ -13,8 +12,10 @@ const heroImages = [hero1, hero2, hero3, hero4, hero5];
 const HeroSection = () => {
   const { t, direction } = useLanguage();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    setIsVisible(true);
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroImages.length);
     }, 6000);
@@ -24,25 +25,22 @@ const HeroSection = () => {
   return (
     <section className="relative h-screen w-full overflow-hidden">
       {/* Background Slider */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentSlide}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 1.2 }}
-          className="absolute inset-0"
+      {heroImages.map((img, idx) => (
+        <div
+          key={idx}
+          className={`absolute inset-0 transition-opacity duration-1000 ${
+            idx === currentSlide ? "opacity-100" : "opacity-0"
+          }`}
         >
-          <motion.img
-            src={heroImages[currentSlide]}
+          <img
+            src={img}
             alt=""
-            className="w-full h-full object-cover"
-            initial={{ scale: 1 }}
-            animate={{ scale: 1.1 }}
-            transition={{ duration: 8, ease: "easeOut" }}
+            className={`w-full h-full object-cover ${
+              idx === currentSlide ? "animate-hero-zoom" : ""
+            }`}
           />
-        </motion.div>
-      </AnimatePresence>
+        </div>
+      ))}
 
       {/* Dark Overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-foreground/60 via-foreground/40 to-foreground/70" />
@@ -50,41 +48,37 @@ const HeroSection = () => {
       {/* Content */}
       <div className="relative z-10 h-full flex flex-col justify-center px-6 md:px-16 lg:px-24">
         <div className="max-w-3xl">
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight text-primary-foreground"
+          <h1
+            className={`text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight text-primary-foreground transition-all duration-700 delay-300 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
           >
             {t("heroHeadline")}
-          </motion.h1>
+          </h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="mt-6 text-base md:text-lg text-primary-foreground/80 max-w-xl leading-relaxed"
+          <p
+            className={`mt-6 text-base md:text-lg text-primary-foreground/80 max-w-xl leading-relaxed transition-all duration-700 delay-500 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+            }`}
           >
             {t("heroSubtext")}
-          </motion.p>
+          </p>
 
-          <motion.a
+          <a
             href="#contact"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.9 }}
-            className="inline-flex items-center mt-8 px-8 py-3.5 rounded-pill bg-gradient-eco text-secondary-foreground text-sm font-semibold shimmer hover:scale-105 transition-transform shadow-lg"
+            className={`inline-flex items-center mt-8 px-8 py-3.5 rounded-pill bg-gradient-eco text-secondary-foreground text-sm font-semibold shimmer hover:scale-105 transition-all duration-700 delay-700 shadow-lg ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+            }`}
           >
             {t("getGreenQuote")}
-          </motion.a>
+          </a>
         </div>
 
         {/* Case Study Card */}
-        <motion.div
-          initial={{ opacity: 0, x: direction === "rtl" ? -40 : 40, y: 20 }}
-          animate={{ opacity: 1, x: 0, y: 0 }}
-          transition={{ duration: 0.8, delay: 1.2 }}
-          className={`absolute bottom-16 md:bottom-20 ${direction === "rtl" ? "left-6 md:left-16" : "right-6 md:right-16"} w-72 md:w-80 bg-card rounded-xl shadow-2xl overflow-hidden border border-border`}
+        <div
+          className={`absolute bottom-16 md:bottom-20 ${direction === "rtl" ? "left-6 md:left-16" : "right-6 md:right-16"} w-72 md:w-80 bg-card rounded-xl shadow-2xl overflow-hidden border border-border transition-all duration-700 delay-1000 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          }`}
         >
           <div className="relative">
             <img
@@ -111,7 +105,7 @@ const HeroSection = () => {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Slide Indicators */}
         <div className="absolute bottom-6 start-6 md:start-16 flex gap-2">

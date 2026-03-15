@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown, ChevronRight, Leaf, Globe } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { megaMenuCategories } from "@/data/megaMenuData";
@@ -49,52 +48,41 @@ const Header = () => {
             <button className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
               {t("products")}
               <ChevronDown
-                className={`h-4 w-4 transition-transform ${isMegaOpen ? "rotate-180" : ""}`}
+                className={`h-4 w-4 transition-transform duration-200 ${isMegaOpen ? "rotate-180" : ""}`}
               />
             </button>
 
             {/* Mega Menu Dropdown */}
-            <AnimatePresence>
-              {isMegaOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 8 }}
-                  transition={{ duration: 0.2 }}
-                  className={`absolute top-full ${direction === "rtl" ? "right-0" : "left-0"} mt-2 w-[700px] bg-card rounded-lg shadow-2xl border border-border p-6 grid grid-cols-2 gap-6`}
-                >
-                  {megaMenuCategories.map((cat, catIdx) => (
-                    <motion.div
-                      key={cat.titleKey}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: catIdx * 0.05 }}
-                    >
-                      <h3 className="text-sm font-bold text-foreground mb-2">
-                        {t(cat.titleKey)}
-                      </h3>
-                      <ul className="space-y-1">
-                        {cat.items.map((item) => (
-                          <li key={item.titleKey}>
-                            <a
-                              href="#"
-                              className="group flex flex-col px-3 py-2 rounded-md hover:bg-muted transition-colors"
-                            >
-                              <span className="text-sm font-medium text-foreground/90 group-hover:text-foreground">
-                                {t(item.titleKey)}
-                              </span>
-                              <span className="text-xs text-muted-foreground">
-                                {t(item.descKey)}
-                              </span>
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    </motion.div>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {isMegaOpen && (
+              <div
+                className={`absolute top-full ${direction === "rtl" ? "right-0" : "left-0"} mt-2 w-[700px] bg-card rounded-lg shadow-2xl border border-border p-6 grid grid-cols-2 gap-6 animate-fade-in`}
+              >
+                {megaMenuCategories.map((cat) => (
+                  <div key={cat.titleKey}>
+                    <h3 className="text-sm font-bold text-foreground mb-2">
+                      {t(cat.titleKey)}
+                    </h3>
+                    <ul className="space-y-1">
+                      {cat.items.map((item) => (
+                        <li key={item.titleKey}>
+                          <a
+                            href="#"
+                            className="group flex flex-col px-3 py-2 rounded-md hover:bg-muted transition-colors"
+                          >
+                            <span className="text-sm font-medium text-foreground/90 group-hover:text-foreground">
+                              {t(item.titleKey)}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              {t(item.descKey)}
+                            </span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {navLinks.slice(1).map((link) => (
@@ -110,7 +98,6 @@ const Header = () => {
 
         {/* Right Section */}
         <div className="flex items-center gap-2">
-          {/* Language Toggle */}
           <button
             onClick={toggleLanguage}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-pill text-xs font-medium text-foreground/70 hover:text-foreground hover:bg-muted transition-colors"
@@ -120,7 +107,6 @@ const Header = () => {
             {language === "en" ? "عربي" : "EN"}
           </button>
 
-          {/* CTA Button */}
           <a
             href="#contact"
             className="hidden md:inline-flex items-center px-6 py-2.5 rounded-pill bg-gradient-eco text-secondary-foreground text-sm font-semibold shimmer hover:scale-105 transition-transform shadow-md"
@@ -128,7 +114,6 @@ const Header = () => {
             {t("contactUs")}
           </a>
 
-          {/* Mobile Menu Toggle */}
           <button
             className="lg:hidden p-2 text-foreground"
             onClick={() => setIsMobileOpen(!isMobileOpen)}
@@ -140,139 +125,113 @@ const Header = () => {
       </nav>
 
       {/* Mobile Drawer */}
-      <AnimatePresence>
-        {isMobileOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-foreground/20 backdrop-blur-sm z-40"
-              onClick={() => setIsMobileOpen(false)}
-            />
-            <motion.div
-              initial={{ x: direction === "rtl" ? "-100%" : "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: direction === "rtl" ? "-100%" : "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className={`fixed top-0 ${direction === "rtl" ? "left-0" : "right-0"} h-full w-80 bg-card shadow-2xl z-50 overflow-y-auto`}
-            >
-              <div className="p-6">
-                <div className="flex justify-between items-center mb-8">
-                  <span className="text-lg font-bold text-foreground">Mivora™</span>
-                  <button onClick={() => setIsMobileOpen(false)} aria-label="Close menu">
-                    <X className="h-5 w-5 text-foreground" />
-                  </button>
-                </div>
-
-                <div className="space-y-1">
-                  {navLinks.slice(0, 1).map((link) => (
-                    <a
-                      key={link.key}
-                      href={link.href}
-                      className="block px-4 py-3 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-muted rounded-lg transition-colors"
-                      onClick={() => setIsMobileOpen(false)}
-                    >
-                      {t(link.key)}
-                    </a>
-                  ))}
-
-                  {/* Products Accordion */}
-                  <div>
-                    <button
-                      onClick={() =>
-                        setOpenAccordion(openAccordion === "products" ? null : "products")
-                      }
-                      className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-muted rounded-lg transition-colors"
-                    >
-                      {t("products")}
-                      <ChevronDown
-                        className={`h-4 w-4 transition-transform ${
-                          openAccordion === "products" ? "rotate-180" : ""
-                        }`}
-                      />
-                    </button>
-                    <AnimatePresence>
-                      {openAccordion === "products" && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.2 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="ps-4 space-y-2 py-2">
-                            {megaMenuCategories.map((cat) => (
-                              <div key={cat.titleKey}>
-                                <button
-                                  onClick={() =>
-                                    setOpenAccordion(
-                                      openAccordion === cat.titleKey ? "products" : cat.titleKey
-                                    )
-                                  }
-                                  className="w-full flex items-center justify-between px-3 py-2 text-xs font-bold text-foreground hover:bg-muted rounded-md"
-                                >
-                                  {t(cat.titleKey)}
-                                  <ChevronRight
-                                    className={`h-3 w-3 transition-transform ${
-                                      openAccordion === cat.titleKey ? "rotate-90" : ""
-                                    }`}
-                                  />
-                                </button>
-                                <AnimatePresence>
-                                  {openAccordion === cat.titleKey && (
-                                    <motion.ul
-                                      initial={{ height: 0, opacity: 0 }}
-                                      animate={{ height: "auto", opacity: 1 }}
-                                      exit={{ height: 0, opacity: 0 }}
-                                      className="overflow-hidden ps-4 space-y-1 py-1"
-                                    >
-                                      {cat.items.map((item) => (
-                                        <li key={item.titleKey}>
-                                          <a
-                                            href="#"
-                                            className="block px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                                            onClick={() => setIsMobileOpen(false)}
-                                          >
-                                            {t(item.titleKey)}
-                                          </a>
-                                        </li>
-                                      ))}
-                                    </motion.ul>
-                                  )}
-                                </AnimatePresence>
-                              </div>
-                            ))}
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-
-                  {navLinks.slice(1).map((link) => (
-                    <a
-                      key={link.key}
-                      href={link.href}
-                      className="block px-4 py-3 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-muted rounded-lg transition-colors"
-                      onClick={() => setIsMobileOpen(false)}
-                    >
-                      {t(link.key)}
-                    </a>
-                  ))}
-                </div>
-
-                <a
-                  href="#contact"
-                  className="mt-6 flex items-center justify-center px-6 py-3 rounded-pill bg-gradient-eco text-secondary-foreground text-sm font-semibold shimmer"
-                  onClick={() => setIsMobileOpen(false)}
-                >
-                  {t("contactUs")}
-                </a>
+      {isMobileOpen && (
+        <>
+          <div
+            className="fixed inset-0 bg-foreground/20 backdrop-blur-sm z-40 animate-fade-in"
+            onClick={() => setIsMobileOpen(false)}
+          />
+          <div
+            className={`fixed top-0 ${direction === "rtl" ? "left-0" : "right-0"} h-full w-80 bg-card shadow-2xl z-50 overflow-y-auto animate-slide-in-right`}
+          >
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-8">
+                <span className="text-lg font-bold text-foreground">Mivora™</span>
+                <button onClick={() => setIsMobileOpen(false)} aria-label="Close menu">
+                  <X className="h-5 w-5 text-foreground" />
+                </button>
               </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+
+              <div className="space-y-1">
+                {navLinks.slice(0, 1).map((link) => (
+                  <a
+                    key={link.key}
+                    href={link.href}
+                    className="block px-4 py-3 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+                    onClick={() => setIsMobileOpen(false)}
+                  >
+                    {t(link.key)}
+                  </a>
+                ))}
+
+                {/* Products Accordion */}
+                <div>
+                  <button
+                    onClick={() =>
+                      setOpenAccordion(openAccordion === "products" ? null : "products")
+                    }
+                    className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+                  >
+                    {t("products")}
+                    <ChevronDown
+                      className={`h-4 w-4 transition-transform duration-200 ${
+                        openAccordion === "products" ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+                  {openAccordion === "products" && (
+                    <div className="ps-4 space-y-2 py-2 animate-fade-in">
+                      {megaMenuCategories.map((cat) => (
+                        <div key={cat.titleKey}>
+                          <button
+                            onClick={() =>
+                              setOpenAccordion(
+                                openAccordion === cat.titleKey ? "products" : cat.titleKey
+                              )
+                            }
+                            className="w-full flex items-center justify-between px-3 py-2 text-xs font-bold text-foreground hover:bg-muted rounded-md"
+                          >
+                            {t(cat.titleKey)}
+                            <ChevronRight
+                              className={`h-3 w-3 transition-transform duration-200 ${
+                                openAccordion === cat.titleKey ? "rotate-90" : ""
+                              }`}
+                            />
+                          </button>
+                          {openAccordion === cat.titleKey && (
+                            <ul className="ps-4 space-y-1 py-1 animate-fade-in">
+                              {cat.items.map((item) => (
+                                <li key={item.titleKey}>
+                                  <a
+                                    href="#"
+                                    className="block px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                                    onClick={() => setIsMobileOpen(false)}
+                                  >
+                                    {t(item.titleKey)}
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {navLinks.slice(1).map((link) => (
+                  <a
+                    key={link.key}
+                    href={link.href}
+                    className="block px-4 py-3 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+                    onClick={() => setIsMobileOpen(false)}
+                  >
+                    {t(link.key)}
+                  </a>
+                ))}
+              </div>
+
+              <a
+                href="#contact"
+                className="mt-6 flex items-center justify-center px-6 py-3 rounded-pill bg-gradient-eco text-secondary-foreground text-sm font-semibold shimmer"
+                onClick={() => setIsMobileOpen(false)}
+              >
+                {t("contactUs")}
+              </a>
+            </div>
+          </div>
+        </>
+      )}
     </header>
   );
 };
