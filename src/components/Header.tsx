@@ -94,7 +94,7 @@ export default function Header() {
               >
                 <button
                   onClick={() => scrollToSection(item.href)}
-                  className="px-3 py-2 text-[15px] font-medium text-white drop-shadow-md hover:text-white transition-colors rounded-full hover:bg-white/10 flex items-center gap-1 relative after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-0 hover:after:w-3/4 after:h-[2px] after:bg-red-500 after:transition-all after:duration-300"
+                  className="px-3 py-2 text-[15px] font-medium text-white drop-shadow-md hover:text-white transition-colors flex items-center gap-1 relative after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-0 hover:after:w-3/4 after:h-[2px] after:bg-red-500 after:transition-all after:duration-300"
                 >
                   {item.label}
                   {item.hasDropdown && <ChevronDown className="w-3.5 h-3.5" />}
