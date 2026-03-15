@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Menu, X, ChevronDown, ChevronRight, Leaf, Sun, Moon } from "lucide-react";
+import { Menu, X, ChevronDown, ChevronRight, Sun, Moon } from "lucide-react";
+import logo from "@/assets/logo.jpeg";
 import { Button } from "@/components/ui/button";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
 import { supabase } from "@/integrations/supabase/client";
