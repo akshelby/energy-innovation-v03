@@ -150,7 +150,7 @@ export default function Header() {
               onClick={() => setLanguage(language === "en" ? "ar" : "en")}
               className="px-3 py-1.5 text-xs font-semibold rounded-full border border-border hover:bg-secondary transition-colors"
             >
-              {language === "en" ? "AR" : "EN"}
+              {language === "en" ? "عربي" : "EN"}
             </button>
 
             {/* Contact Button - Desktop */}
