@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Send } from "lucide-react";
+import { Send, Phone, Mail, MapPin } from "lucide-react";
 import PhoneInput from "@/components/PhoneInput";
 
 const contactSchema = z.object({
@@ -19,10 +19,30 @@ const contactSchema = z.object({
 });
 
 export default function ContactSection() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const ref = useScrollReveal();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", company: "", message: "" });
+  const [contactInfo, setContactInfo] = useState({ phone: "", email: "", address: "" });
+
+  useEffect(() => {
+    const fetchContactInfo = async () => {
+      const { data } = await supabase
+        .from("site_content")
+        .select("content_key, value_en, value_ar")
+        .in("content_key", ["contact_phone", "contact_email", "contact_address"]);
+      if (data) {
+        const map: Record<string, { en: string; ar: string }> = {};
+        data.forEach((r) => { map[r.content_key] = { en: r.value_en, ar: r.value_ar }; });
+        setContactInfo({
+          phone: map.contact_phone?.[language] || "",
+          email: map.contact_email?.[language] || "",
+          address: map.contact_address?.[language] || "",
+        });
+      }
+    };
+    fetchContactInfo();
+  }, [language]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +74,7 @@ export default function ContactSection() {
 
   return (
     <section id="contact" className="py-24 px-6 bg-secondary/30" ref={ref}>
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12 scroll-reveal">
           <span className="inline-block px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-accent bg-accent/10 rounded-full mb-4">
             {t("contact.tag")}
@@ -65,72 +85,100 @@ export default function ContactSection() {
           <p className="text-muted-foreground text-lg">{t("contact.desc")}</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="scroll-reveal space-y-5 bg-card rounded-2xl border border-border p-8 shadow-lg">
-          <div className="grid sm:grid-cols-2 gap-5">
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Contact Info Cards */}
+          <div className="space-y-5 scroll-reveal">
+            {[
+              { icon: Phone, label: t("contact.phone"), value: contactInfo.phone, href: `tel:${contactInfo.phone.replace(/\s/g, "")}` },
+              { icon: Mail, label: t("contact.email"), value: contactInfo.email, href: `mailto:${contactInfo.email}` },
+              { icon: MapPin, label: t("footer.address"), value: contactInfo.address, href: undefined },
+            ].map(({ icon: Icon, label, value, href }) => (
+              <div key={label} className="bg-card rounded-2xl border border-border p-6 shadow-lg flex items-start gap-4">
+                <div className="shrink-0 w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center">
+                  <Icon className="w-5 h-5 text-accent" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-muted-foreground mb-1">{label}</p>
+                  {href ? (
+                    <a href={href} className="text-foreground font-semibold hover:text-accent transition-colors break-all">
+                      {value}
+                    </a>
+                  ) : (
+                    <p className="text-foreground font-semibold">{value}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Contact Form */}
+          <form onSubmit={handleSubmit} className="scroll-reveal lg:col-span-2 space-y-5 bg-card rounded-2xl border border-border p-8 shadow-lg">
+            <div className="grid sm:grid-cols-2 gap-5">
+              <div>
+                <label className="text-sm font-medium text-foreground mb-2 block">{t("contact.name")}</label>
+                <Input
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  placeholder={t("contact.name")}
+                  maxLength={100}
+                  required
+                  className="rounded-xl"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-foreground mb-2 block">{t("contact.email")}</label>
+                <Input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  placeholder={t("contact.email")}
+                  maxLength={255}
+                  required
+                  className="rounded-xl"
+                />
+              </div>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-5">
+              <div>
+                <label className="text-sm font-medium text-foreground mb-2 block">{t("contact.phone")}</label>
+                <PhoneInput
+                  value={form.phone}
+                  onChange={(val) => setForm({ ...form, phone: val })}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-foreground mb-2 block">{t("contact.company")}</label>
+                <Input
+                  value={form.company}
+                  onChange={(e) => setForm({ ...form, company: e.target.value })}
+                  placeholder={t("contact.company")}
+                  maxLength={100}
+                  className="rounded-xl"
+                />
+              </div>
+            </div>
             <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">{t("contact.name")}</label>
-              <Input
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder={t("contact.name")}
-                maxLength={100}
+              <label className="text-sm font-medium text-foreground mb-2 block">{t("contact.message")}</label>
+              <Textarea
+                value={form.message}
+                onChange={(e) => setForm({ ...form, message: e.target.value })}
+                placeholder={t("contact.message")}
+                maxLength={1000}
                 required
-                className="rounded-xl"
+                rows={5}
+                className="rounded-xl resize-none"
               />
             </div>
-            <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">{t("contact.email")}</label>
-              <Input
-                type="email"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                placeholder={t("contact.email")}
-                maxLength={255}
-                required
-                className="rounded-xl"
-              />
-            </div>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-5">
-            <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">{t("contact.phone")}</label>
-              <PhoneInput
-                value={form.phone}
-                onChange={(val) => setForm({ ...form, phone: val })}
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">{t("contact.company")}</label>
-              <Input
-                value={form.company}
-                onChange={(e) => setForm({ ...form, company: e.target.value })}
-                placeholder={t("contact.company")}
-                maxLength={100}
-                className="rounded-xl"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="text-sm font-medium text-foreground mb-2 block">{t("contact.message")}</label>
-            <Textarea
-              value={form.message}
-              onChange={(e) => setForm({ ...form, message: e.target.value })}
-              placeholder={t("contact.message")}
-              maxLength={1000}
-              required
-              rows={5}
-              className="rounded-xl resize-none"
-            />
-          </div>
-          <Button
-            type="submit"
-            disabled={loading}
-            className="w-full gradient-accent text-accent-foreground rounded-full py-6 text-base font-semibold hover:scale-[1.02] transition-transform border-0"
-          >
-            <Send className="w-4 h-4" />
-            {loading ? t("contact.sending") : t("contact.send")}
-          </Button>
-        </form>
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full gradient-accent text-accent-foreground rounded-full py-6 text-base font-semibold hover:scale-[1.02] transition-transform border-0"
+            >
+              <Send className="w-4 h-4" />
+              {loading ? t("contact.sending") : t("contact.send")}
+            </Button>
+          </form>
+        </div>
       </div>
     </section>
   );
