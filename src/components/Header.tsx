@@ -108,20 +108,30 @@ export default function Header() {
 
   return (
     <>
+      {/* Floating Logo - separate from nav bar */}
+      <a
+        href="#home"
+        onClick={() => scrollToSection("#home")}
+        className={`fixed z-50 left-1/2 -translate-x-1/2 transition-all duration-300 ${
+          scrolled ? "top-2 scale-75" : "top-3"
+        }`}
+        style={{ width: "fit-content" }}
+      >
+        <div className="bg-card/90 backdrop-blur-md rounded-2xl shadow-lg border border-border/50 px-4 py-2">
+          <img src={logoUrl} alt={brandName} className="h-12 w-auto object-contain" />
+        </div>
+      </a>
+
+      {/* Navigation Bar */}
       <header
-        className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-6xl transition-all duration-300 rounded-xl ${
+        className={`fixed top-20 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-5xl transition-all duration-300 rounded-xl ${
           scrolled
-            ? "glass shadow-lg border border-border/50"
+            ? "!top-12 glass shadow-lg border border-border/50"
             : "glass shadow-md border border-border/30"
         }`}
       >
-        <div className="flex items-center justify-between px-4 md:px-6 py-3">
-          {/* Logo */}
-          <a href="#home" onClick={() => scrollToSection("#home")} className="flex items-center gap-2 shrink-0">
-            <img src={logoUrl} alt={brandName} className="h-10 w-auto object-contain" />
-          </a>
-
-          {/* Desktop Nav */}
+        <div className="flex items-center justify-center px-4 md:px-6 py-2.5 relative">
+          {/* Desktop Nav - centered */}
           <nav className="hidden md:flex items-center gap-1">
             {navItems.map((item) => (
               <div key={item.href} className="relative"
@@ -197,8 +207,8 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* Right side */}
-          <div className="flex items-center gap-1.5">
+          {/* Right side - absolute positioned */}
+          <div className={`absolute ${isRTL ? 'left-4' : 'right-4'} flex items-center gap-1.5`}>
             <button
               onClick={toggleTheme}
               className={`p-2 rounded-full border ${borderColor} ${textColor} ${hoverBg} transition-colors duration-300`}
