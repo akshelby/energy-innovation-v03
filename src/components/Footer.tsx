@@ -32,10 +32,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-full gradient-accent flex items-center justify-center">
-                <Leaf className="w-4 h-4 text-accent-foreground" />
-              </div>
-              <span className="text-lg font-bold">Mivora™</span>
+              <img src={logo} alt="Energy Innovation" className="h-10 w-auto object-contain brightness-0 invert" />
             </div>
             <p className="text-primary-foreground/60 text-sm leading-relaxed">
               {t("footer.desc")}
