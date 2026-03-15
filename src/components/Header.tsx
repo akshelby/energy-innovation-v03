@@ -156,7 +156,7 @@ export default function Header() {
             {/* Contact Button - Desktop */}
             <Button
               onClick={() => scrollToSection("#contact")}
-              className="hidden md:inline-flex gradient-accent text-accent-foreground rounded-full px-5 text-sm font-semibold hover:opacity-90 transition-opacity border-0"
+              className="hidden md:inline-flex gradient-accent text-accent-foreground rounded-full px-5 text-[15px] font-semibold hover:opacity-90 transition-opacity border-0"
             >
               {t("nav.contact")}
             </Button>
