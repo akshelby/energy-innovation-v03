@@ -627,6 +627,95 @@ export default function Admin() {
           ))}
         </div>
 
+        {/* ─── Branding Tab ──────── */}
+        {activeTab === "branding" && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-foreground">Branding</h2>
+              <Button variant="outline" size="sm" onClick={fetchBranding} disabled={loading} className="rounded-xl">
+                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
+              </Button>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Logo Upload */}
+              <div className="bg-card border border-border rounded-2xl p-6">
+                <h3 className="font-semibold text-foreground mb-4">Company Logo</h3>
+                <p className="text-sm text-muted-foreground mb-4">Upload your logo (PNG, JPG, SVG). It will appear in the header and footer.</p>
+                
+                {brandLogoUrl && (
+                  <div className="mb-4 p-4 bg-secondary rounded-xl flex items-center justify-center">
+                    <img src={brandLogoUrl} alt="Current logo" className="max-h-20 w-auto object-contain" />
+                  </div>
+                )}
+                
+                <input
+                  ref={brandLogoRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    setBrandLogoUploading(true);
+                    try {
+                      // Upload as branding/logo (no extension, upsert)
+                      const base64 = await fileToBase64(file);
+                      await apiCall("upload", "POST", storedPassword, {
+                        bucket: "images",
+                        filePath: "branding/logo",
+                        base64,
+                        contentType: file.type,
+                      });
+                      toast.success("Logo uploaded! Refresh the main site to see changes.");
+                      fetchBranding();
+                    } catch (err: any) { toast.error(err.message); }
+                    finally { setBrandLogoUploading(false); }
+                  }}
+                />
+                <Button
+                  onClick={() => brandLogoRef.current?.click()}
+                  disabled={brandLogoUploading}
+                  className="gradient-accent text-accent-foreground rounded-xl border-0"
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  {brandLogoUploading ? "Uploading..." : brandLogoUrl ? "Replace Logo" : "Upload Logo"}
+                </Button>
+              </div>
+
+              {/* Business Name */}
+              <div className="bg-card border border-border rounded-2xl p-6">
+                <h3 className="font-semibold text-foreground mb-4">Business Name</h3>
+                <p className="text-sm text-muted-foreground mb-4">This name appears in the footer copyright and page metadata.</p>
+                
+                <div className="space-y-3">
+                  <Input
+                    value={brandName}
+                    onChange={(e) => setBrandName(e.target.value)}
+                    placeholder="Your business name"
+                    className="rounded-xl"
+                  />
+                  <Button
+                    onClick={async () => {
+                      try {
+                        await apiCall("content", "POST", storedPassword, {
+                          content_key: "brand.name",
+                          value_en: brandName,
+                          value_ar: brandName,
+                        });
+                        toast.success("Business name saved! Refresh the main site to see changes.");
+                      } catch (err: any) { toast.error(err.message); }
+                    }}
+                    className="gradient-accent text-accent-foreground rounded-xl border-0"
+                  >
+                    <Save className="w-4 h-4 mr-2" />Save Name
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ─── Leads Tab ──────── */}
         {activeTab === "leads" && (
           <div>
