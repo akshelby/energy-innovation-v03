@@ -3,6 +3,12 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Menu, X, ChevronDown, ChevronRight, Leaf, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+
+// Map product item keys to PDF paths
+const itemPdfMap: Record<string, string> = {
+  "item.fireCurtains": "/pdfs/Energy-BACHFIRE_E_120.pdf",
+};
 
 const productCategories = [
   {
@@ -35,6 +41,19 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
+  const [pdfOpen, setPdfOpen] = useState(false);
+  const [pdfSrc, setPdfSrc] = useState("");
+
+  const handleItemClick = (itemKey: string) => {
+    if (itemPdfMap[itemKey]) {
+      setPdfSrc(itemPdfMap[itemKey]);
+      setPdfOpen(true);
+      setProductsOpen(false);
+      setMobileOpen(false);
+    } else {
+      scrollToSection("#products");
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -123,14 +142,14 @@ export default function Header() {
                             <ul className="space-y-1.5">
                               {cat.items.map((itemKey) => (
                                 <li key={itemKey}>
-                                  <a
-                                    href="#products"
-                                    onClick={(e) => { e.preventDefault(); scrollToSection("#products"); }}
-                                    className="text-sm text-muted-foreground hover:text-red-500 transition-colors flex items-center gap-1 group"
+                                  <button
+                                    type="button"
+                                    onClick={(e) => { e.preventDefault(); handleItemClick(itemKey); }}
+                                    className="text-sm text-muted-foreground hover:text-red-500 transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer"
                                   >
                                     <ChevronRight className={`w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity ${isRTL ? 'rotate-180' : ''}`} />
                                     {t(itemKey)}
-                                  </a>
+                                  </button>
                                 </li>
                               ))}
                             </ul>
@@ -147,14 +166,14 @@ export default function Header() {
                             <ul className="space-y-1.5">
                               {cat.items.map((itemKey) => (
                                 <li key={itemKey}>
-                                  <a
-                                    href="#products"
-                                    onClick={(e) => { e.preventDefault(); scrollToSection("#products"); }}
-                                    className="text-sm text-muted-foreground hover:text-red-500 transition-colors flex items-center gap-1 group"
+                                  <button
+                                    type="button"
+                                    onClick={(e) => { e.preventDefault(); handleItemClick(itemKey); }}
+                                    className="text-sm text-muted-foreground hover:text-red-500 transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer"
                                   >
                                     <ChevronRight className={`w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity ${isRTL ? 'rotate-180' : ''}`} />
                                     {t(itemKey)}
-                                  </a>
+                                  </button>
                                 </li>
                               ))}
                             </ul>
@@ -233,7 +252,7 @@ export default function Header() {
                               {cat.items.map((itemKey) => (
                                 <button
                                   key={itemKey}
-                                  onClick={() => scrollToSection("#products")}
+                                  onClick={() => handleItemClick(itemKey)}
                                   className="w-full text-start px-4 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
                                 >
                                   {t(itemKey)}
@@ -264,6 +283,17 @@ export default function Header() {
           </div>
         </div>
       )}
+
+      {/* PDF Viewer Dialog */}
+      <Dialog open={pdfOpen} onOpenChange={setPdfOpen}>
+        <DialogContent className="max-w-4xl w-[95vw] h-[85vh] p-0 overflow-hidden">
+          <iframe
+            src={pdfSrc}
+            className="w-full h-full border-0"
+            title="PDF Viewer"
+          />
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
