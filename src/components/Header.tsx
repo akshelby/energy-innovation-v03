@@ -149,7 +149,7 @@ export default function Header() {
                         <div className="grid grid-cols-3 gap-x-8 gap-y-6">
                           {row1.map((cat) => (
                             <div key={cat.key}>
-                              <h4 className="text-xs font-bold uppercase tracking-wider text-accent mb-3">
+                              <h4 className="text-sm font-bold uppercase tracking-wider text-accent mb-3">
                                 {t(cat.key)}
                               </h4>
                               <ul className="space-y-1.5">
@@ -158,7 +158,7 @@ export default function Header() {
                                     <button
                                       type="button"
                                       onClick={(e) => { e.preventDefault(); handleItemClick(pi); }}
-                                      className="text-[13.5px] text-card-foreground hover:bg-accent/25 hover:text-red-500 px-2 py-1 rounded transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer w-full text-start"
+                                      className="text-[13.5px] font-semibold text-card-foreground hover:bg-accent/25 hover:text-red-500 px-2 py-1 rounded transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer w-full text-start"
                                     >
                                       <ChevronRight className={`w-3 h-3 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity ${isRTL ? 'rotate-180' : ''}`} />
                                       {isAr ? pi.name_ar : pi.name_en}
@@ -174,7 +174,7 @@ export default function Header() {
                         <div className="grid grid-cols-3 gap-x-8 mt-6">
                           {row2.map((cat) => (
                             <div key={cat.key}>
-                              <h4 className="text-xs font-bold uppercase tracking-wider text-accent mb-3">
+                              <h4 className="text-sm font-bold uppercase tracking-wider text-accent mb-3">
                                 {t(cat.key)}
                               </h4>
                               <ul className="space-y-1.5">
@@ -183,7 +183,7 @@ export default function Header() {
                                     <button
                                       type="button"
                                       onClick={(e) => { e.preventDefault(); handleItemClick(pi); }}
-                                      className="text-[13.5px] text-card-foreground hover:bg-accent/25 hover:text-red-500 px-2 py-1 rounded transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer w-full text-start"
+                                      className="text-[13.5px] font-semibold text-card-foreground hover:bg-accent/25 hover:text-red-500 px-2 py-1 rounded transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer w-full text-start"
                                     >
                                       <ChevronRight className={`w-3 h-3 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity ${isRTL ? 'rotate-180' : ''}`} />
                                       {isAr ? pi.name_ar : pi.name_en}
@@ -258,14 +258,14 @@ export default function Header() {
                         <div className="ml-4 mt-1 space-y-3 pb-2">
                           {categoriesWithItems.map((cat) => (
                             <div key={cat.key}>
-                              <h4 className="text-xs font-bold uppercase tracking-wider text-accent px-4 mb-1">
+                              <h4 className="text-sm font-bold uppercase tracking-wider text-accent px-4 mb-1">
                                 {t(cat.key)}
                               </h4>
                               {cat.items.map((pi) => (
                                 <button
                                   key={pi.id}
                                   onClick={() => handleItemClick(pi)}
-                                  className="w-full text-start px-4 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                                  className="w-full text-start px-4 py-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
                                 >
                                   {isAr ? pi.name_ar : pi.name_en}
                                 </button>
