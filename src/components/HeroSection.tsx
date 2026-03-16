@@ -80,10 +80,10 @@ export default function HeroSection() {
       </button>
 
       <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-primary-foreground max-w-4xl leading-tight animate-fade-in-up drop-shadow-lg">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white max-w-4xl leading-tight animate-fade-in-up drop-shadow-lg">
           {t("hero.headline")}
         </h1>
-        <p className="mt-6 text-lg md:text-xl font-semibold text-primary-foreground/85 max-w-2xl animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
+        <p className="mt-6 text-lg md:text-xl font-semibold text-white/85 max-w-2xl animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
           {t("hero.subtext")}
         </p>
         <div className="mt-8 flex flex-wrap gap-4 justify-center animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
