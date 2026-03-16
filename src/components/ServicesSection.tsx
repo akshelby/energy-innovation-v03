@@ -51,7 +51,7 @@ export default function ServicesSection() {
     <section id="services" className="py-24 px-6 bg-background" ref={ref}>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16 scroll-reveal">
-          <span className="inline-block px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-accent bg-accent/10 rounded-full mb-4">
+          <span className="inline-block px-5 py-2 text-sm font-semibold uppercase tracking-wider text-accent bg-accent/10 rounded-full mb-4">
             {t("services.tag")}
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
