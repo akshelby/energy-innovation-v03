@@ -74,7 +74,8 @@ interface MenuChildItem {
 }
 
 const CATEGORY_OPTIONS = [
-  { key: "cat.fire", label: "Fire & Smoke Safety Systems" },
+  { key: "cat.fire", label: "Fire Curtains" },
+  { key: "cat.smoke", label: "Smoke Curtains" },
   { key: "cat.roller", label: "Roller Shutters & Doors" },
   { key: "cat.oil", label: "Oil & Gas Industry Equipment" },
   { key: "cat.hvac", label: "HVAC & Ventilation Solutions" },
