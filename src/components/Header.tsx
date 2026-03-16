@@ -174,7 +174,7 @@ export default function Header() {
                         <div className="grid grid-cols-3 gap-x-8 mt-6">
                           {row2.map((cat) => (
                             <div key={cat.key}>
-                              <h4 className="text-xs font-bold uppercase tracking-wider text-accent mb-3">
+                              <h4 className="text-sm font-bold uppercase tracking-wider text-accent mb-3">
                                 {t(cat.key)}
                               </h4>
                               <ul className="space-y-1.5">
