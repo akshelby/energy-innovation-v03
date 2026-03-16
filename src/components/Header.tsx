@@ -258,7 +258,7 @@ export default function Header() {
                         <div className="ml-4 mt-1 space-y-3 pb-2">
                           {categoriesWithItems.map((cat) => (
                             <div key={cat.key}>
-                              <h4 className="text-xs font-bold uppercase tracking-wider text-accent px-4 mb-1">
+                              <h4 className="text-sm font-bold uppercase tracking-wider text-accent px-4 mb-1">
                                 {t(cat.key)}
                               </h4>
                               {cat.items.map((pi) => (
