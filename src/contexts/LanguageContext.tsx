@@ -87,7 +87,8 @@ const translations: Record<Language, Record<string, string>> = {
     "footer.phone": "+1 (555) 000-0000",
     "footer.address": "Industrial District, Building 7",
     // Product categories
-    "cat.fire": "Fire & Smoke Safety Systems",
+    "cat.fire": "Fire Curtains",
+    "cat.smoke": "Smoke Curtains",
     "cat.roller": "Roller Shutters & Doors",
     "cat.oil": "Oil & Gas Industry Equipment",
     "cat.hvac": "HVAC & Ventilation Solutions",
