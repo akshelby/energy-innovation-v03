@@ -183,7 +183,7 @@ export default function Header() {
                                     <button
                                       type="button"
                                       onClick={(e) => { e.preventDefault(); handleItemClick(pi); }}
-                                      className="text-[13.5px] text-card-foreground hover:bg-accent/25 hover:text-red-500 px-2 py-1 rounded transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer w-full text-start"
+                                      className="text-[13.5px] font-semibold text-card-foreground hover:bg-accent/25 hover:text-red-500 px-2 py-1 rounded transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer w-full text-start"
                                     >
                                       <ChevronRight className={`w-3 h-3 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity ${isRTL ? 'rotate-180' : ''}`} />
                                       {isAr ? pi.name_ar : pi.name_en}
