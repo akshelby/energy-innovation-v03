@@ -265,7 +265,7 @@ export default function Header() {
                                 <button
                                   key={pi.id}
                                   onClick={() => handleItemClick(pi)}
-                                  className="w-full text-start px-4 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                                  className="w-full text-start px-4 py-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
                                 >
                                   {isAr ? pi.name_ar : pi.name_en}
                                 </button>
