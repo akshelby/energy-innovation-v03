@@ -65,7 +65,7 @@ export default function Footer() {
                 <li key={i}>
                   <button
                     onClick={() => scrollTo("#products")}
-                    className="text-sm text-primary-foreground/60 hover:text-primary-foreground transition-colors text-start"
+                    className="text-sm text-primary-foreground hover:bg-primary-foreground/10 px-2 py-1 rounded transition-colors text-start"
                   >
                     {link}
                   </button>
