@@ -180,7 +180,7 @@ export default function Header() {
                                     <button
                                       type="button"
                                       onClick={(e) => { e.preventDefault(); handleItemClick(pi); }}
-                                      className="text-sm text-card-foreground hover:bg-accent/10 hover:text-red-500 px-2 py-1 rounded transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer"
+                                      className="text-sm text-card-foreground hover:bg-accent/25 hover:text-red-500 px-2 py-1 rounded transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer"
                                     >
                                       <ChevronRight className={`w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity ${isRTL ? 'rotate-180' : ''}`} />
                                       {isAr ? pi.name_ar : pi.name_en}
