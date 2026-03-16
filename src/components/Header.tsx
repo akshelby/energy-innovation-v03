@@ -16,7 +16,7 @@ interface ProductItem {
   sort_order: number;
 }
 
-const CATEGORY_ORDER = ["cat.fire", "cat.smoke", "cat.roller", "cat.oil", "cat.hvac", "cat.loading"];
+const CATEGORY_ORDER = ["cat.fire", "cat.roller", "cat.oil", "cat.hvac", "cat.loading"];
 
 export default function Header() {
   const { t, language, setLanguage, isRTL } = useLanguage();
