@@ -173,6 +173,15 @@ Deno.serve(async (req) => {
       }
       if (method === "POST") {
         const body = await req.json();
+        // Support bulk insert via array
+        if (Array.isArray(body)) {
+          const { data, error } = await supabase
+            .from("product_items")
+            .insert(body)
+            .select();
+          if (error) throw error;
+          return json(data);
+        }
         const { data, error } = await supabase
           .from("product_items")
           .upsert(body, { onConflict: "id" })
