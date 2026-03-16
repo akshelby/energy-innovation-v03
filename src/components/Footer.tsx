@@ -78,15 +78,15 @@ export default function Footer() {
           <div>
             <h4 className="font-bold mb-4">{t("footer.contactInfo")}</h4>
             <ul className="space-y-3">
-              <li className="flex items-center gap-2 text-sm text-primary-foreground/60">
+              <li className="flex items-center gap-2 text-sm text-primary-foreground hover:bg-primary-foreground/10 px-2 py-1 rounded transition-colors">
                 <Mail className="w-4 h-4 shrink-0" />
                 {t("footer.email")}
               </li>
-              <li className="flex items-center gap-2 text-sm text-primary-foreground/60">
+              <li className="flex items-center gap-2 text-sm text-primary-foreground hover:bg-primary-foreground/10 px-2 py-1 rounded transition-colors">
                 <Phone className="w-4 h-4 shrink-0" />
                 {t("footer.phone")}
               </li>
-              <li className="flex items-center gap-2 text-sm text-primary-foreground/60">
+              <li className="flex items-center gap-2 text-sm text-primary-foreground hover:bg-primary-foreground/10 px-2 py-1 rounded transition-colors">
                 <MapPin className="w-4 h-4 shrink-0" />
                 {t("footer.address")}
               </li>
