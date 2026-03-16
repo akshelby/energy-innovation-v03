@@ -110,19 +110,20 @@ export default function Header() {
     <>
       {/* Navigation Bar */}
       <header
-        className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-6xl transition-all duration-300 rounded-xl ${
-          scrolled
-            ? "glass shadow-lg border border-border/50"
-            : "glass shadow-md border border-border/30"
-        }`}
+        className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-6xl transition-all duration-300"
       >
-        <div className="flex items-center justify-between px-4 md:px-6 py-2.5 relative">
-          {/* Logo on the left - breaks out of glass border */}
-          <a href="#home" onClick={() => scrollToSection("#home")} className="flex items-center shrink-0 -my-4 relative z-10">
-            <div className="bg-card/90 backdrop-blur-md border border-border/50 rounded-xl p-1.5 shadow-lg">
-              <img src={logoUrl} alt={brandName} className="h-11 w-auto object-contain" />
-            </div>
+        <div className="flex items-center gap-3 px-4 md:px-0">
+          {/* Logo - separate from glass bar */}
+          <a href="#home" onClick={() => scrollToSection("#home")} className="flex items-center shrink-0 relative z-10">
+            <img src={logoUrl} alt={brandName} className="h-12 w-auto object-contain" />
           </a>
+
+          {/* Glass bar - nav + utilities */}
+          <div className={`flex-1 flex items-center justify-between px-4 md:px-6 py-2.5 rounded-xl transition-all duration-300 ${
+            scrolled
+              ? "glass shadow-lg border border-border/50"
+              : "glass shadow-md border border-border/30"
+          }`}>
 
           {/* Desktop Nav - centered */}
           {/* Desktop Nav - centered */}
