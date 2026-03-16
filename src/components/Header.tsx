@@ -116,10 +116,12 @@ export default function Header() {
             : "glass shadow-md border border-border/30"
         }`}
       >
-        <div className="flex items-center justify-between px-4 md:px-6 py-2.5">
-          {/* Logo on the left */}
-          <a href="#home" onClick={() => scrollToSection("#home")} className="flex items-center shrink-0">
-            <img src={logoUrl} alt={brandName} className="h-10 w-auto object-contain" />
+        <div className="flex items-center justify-between px-4 md:px-6 py-2.5 relative">
+          {/* Logo on the left - breaks out of glass border */}
+          <a href="#home" onClick={() => scrollToSection("#home")} className="flex items-center shrink-0 -my-4 relative z-10">
+            <div className="bg-card/90 backdrop-blur-md border border-border/50 rounded-xl p-1.5 shadow-lg">
+              <img src={logoUrl} alt={brandName} className="h-11 w-auto object-contain" />
+            </div>
           </a>
 
           {/* Desktop Nav - centered */}
