@@ -589,7 +589,18 @@ export default function Admin() {
     } catch (e: any) { toast.error(e.message); }
   };
 
-  // File upload handlers for product/service forms
+  const saveHeroSpeed = async (seconds: number) => {
+    setHeroSpeed(seconds);
+    try {
+      await apiCall("content", "POST", storedPassword, {
+        content_key: "hero.speed",
+        value_en: String(seconds),
+        value_ar: String(seconds),
+      });
+      toast.success(`Carousel speed set to ${seconds}s`);
+    } catch (e: any) { toast.error(e.message); }
+  };
+
   const handleFormFileUpload = async (
     file: File,
     bucket: string,
