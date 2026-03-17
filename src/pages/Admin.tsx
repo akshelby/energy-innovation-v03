@@ -1703,6 +1703,7 @@ export default function Admin() {
                                     <GripVertical className="w-3.5 h-3.5 text-muted-foreground" />
                                   </div>
                                   <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-3 shrink-0">
                                     <div className="flex items-center gap-2 flex-wrap">
                                       <span className={`font-medium text-foreground ${depth === 0 ? "text-sm font-bold" : "text-sm"}`}>
                                         {item.name_en}
