@@ -63,7 +63,8 @@ export default function ServicesSection() {
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {services.map((service, i) => {
-            const Icon = iconMap[service.icon] || Wrench;
+            const isCustomIcon = service.icon?.startsWith("http") || service.icon?.startsWith("/") || service.icon?.startsWith("data:");
+            const Icon = !isCustomIcon ? (iconMap[service.icon] || Wrench) : null;
             return (
               <div
                 key={i}

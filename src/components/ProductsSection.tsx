@@ -73,7 +73,8 @@ export default function ProductsSection() {
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.map((product, i) => {
-            const Icon = iconMap[product.icon] || Flame;
+            const isCustomIcon = product.icon?.startsWith("http") || product.icon?.startsWith("/") || product.icon?.startsWith("data:");
+            const Icon = !isCustomIcon ? (iconMap[product.icon] || Flame) : null;
             return (
               <div
                 key={i}
