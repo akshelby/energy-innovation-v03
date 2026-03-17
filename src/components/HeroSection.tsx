@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { getHeroImageUrl } from "@/lib/storage";
 
 // Fallback local imports in case Supabase images aren't uploaded yet
 import hero1Local from "@/assets/hero-1.webp";
