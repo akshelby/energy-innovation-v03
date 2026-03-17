@@ -219,6 +219,7 @@ export default function Admin() {
   const [translating, setTranslating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeHeroImages, setActiveHeroImages] = useState<string[]>([]);
+  const [heroSpeed, setHeroSpeed] = useState(6);
 
   // Branding state
   const [brandName, setBrandName] = useState("Energy Innovation");
@@ -322,6 +323,10 @@ export default function Admin() {
             setActiveHeroImages(JSON.parse(entry.value_en));
           } else {
             setActiveHeroImages([]);
+          }
+          const speedEntry = contentData.find((d: ContentItem) => d.content_key === "hero.speed");
+          if (speedEntry) {
+            setHeroSpeed(parseFloat(speedEntry.value_en) || 6);
           }
         } catch { setActiveHeroImages([]); }
       }
@@ -584,7 +589,18 @@ export default function Admin() {
     } catch (e: any) { toast.error(e.message); }
   };
 
-  // File upload handlers for product/service forms
+  const saveHeroSpeed = async (seconds: number) => {
+    setHeroSpeed(seconds);
+    try {
+      await apiCall("content", "POST", storedPassword, {
+        content_key: "hero.speed",
+        value_en: String(seconds),
+        value_ar: String(seconds),
+      });
+      toast.success(`Carousel speed set to ${seconds}s`);
+    } catch (e: any) { toast.error(e.message); }
+  };
+
   const handleFormFileUpload = async (
     file: File,
     bucket: string,
@@ -1521,6 +1537,24 @@ export default function Admin() {
               {selectedFolder.folder === "hero" && " Toggle images on/off to control which ones appear in the homepage slider."}
               {selectedFolder.folder === "products" && " Name files product-fire.jpg, product-roller.jpg, etc. for product cards."}
             </p>
+
+            {selectedFolder.folder === "hero" && (
+              <div className="flex items-center gap-4 mb-4 p-3 bg-secondary/50 rounded-xl">
+                <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">Slide Speed:</span>
+                <input
+                  type="range"
+                  min={2}
+                  max={15}
+                  step={1}
+                  value={heroSpeed}
+                  onChange={(e) => setHeroSpeed(Number(e.target.value))}
+                  onMouseUp={(e) => saveHeroSpeed(Number((e.target as HTMLInputElement).value))}
+                  onTouchEnd={(e) => saveHeroSpeed(Number((e.target as HTMLInputElement).value))}
+                  className="flex-1 accent-accent h-1.5"
+                />
+                <span className="text-xs font-semibold text-foreground min-w-[3rem] text-center">{heroSpeed}s</span>
+              </div>
+            )}
 
             {files.length === 0 ? (
               <div className="text-center py-16 text-muted-foreground">
