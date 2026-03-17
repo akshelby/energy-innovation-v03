@@ -29,6 +29,7 @@ export default function HeroSection() {
   const { t } = useLanguage();
   const [current, setCurrent] = useState(0);
   const [images, setImages] = useState<string[]>(localImages);
+  const [speed, setSpeed] = useState(6000);
 
   useEffect(() => {
     async function fetchHeroImages() {
