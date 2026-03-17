@@ -75,7 +75,7 @@ export default function Header() {
 
   // Get children of a parent item
   const getChildren = (parentId: string) =>
-    productItems.filter((item) => item.parent_id === parentId);
+    productItems.filter((item) => item.parent_id === parentId && item.is_active !== false);
 
   const hasChildren = (parentId: string) =>
     productItems.some((item) => item.parent_id === parentId);
