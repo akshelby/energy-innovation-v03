@@ -535,10 +535,30 @@ export default function Admin() {
 
   const handleDeleteFile = async (fileName: string) => {
     try {
-      const path = selectedFolder.folder ? `${selectedFolder.folder}/${fileName}` : fileName;
-      await apiCall("files", "DELETE", storedPassword, { bucket: selectedFolder.bucket, paths: [path] });
-      setFiles((prev) => prev.filter((f) => f.name !== fileName));
-      toast.success("File deleted");
+      const folder = selectedFolder.folder;
+      const basePath = folder ? `${folder}/${fileName}` : fileName;
+      const pathsToDelete = [basePath];
+
+      // For hero folder, also delete duplicate variants (jpg/webp/png with same stem)
+      if (folder === "hero") {
+        const stem = fileName.replace(/\.(png|jpe?g|webp|avif)$/i, "");
+        // Fetch full file list to find all variants
+        const allFiles = await apiCall(
+          `files?bucket=${selectedFolder.bucket}&folder=${folder}`,
+          "GET",
+          storedPassword
+        );
+        for (const f of allFiles) {
+          if (f.name !== fileName && f.name.replace(/\.(png|jpe?g|webp|avif)$/i, "") === stem) {
+            pathsToDelete.push(folder ? `${folder}/${f.name}` : f.name);
+          }
+        }
+      }
+
+      await apiCall("files", "DELETE", storedPassword, { bucket: selectedFolder.bucket, paths: pathsToDelete });
+      const deletedNames = pathsToDelete.map((p) => p.split("/").pop());
+      setFiles((prev) => prev.filter((f) => !deletedNames.includes(f.name)));
+      toast.success(pathsToDelete.length > 1 ? `Deleted ${pathsToDelete.length} file variants` : "File deleted");
     } catch (e: any) { toast.error(e.message); }
   };
 
