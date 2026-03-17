@@ -26,6 +26,7 @@ export default function FloatingButtons() {
       .in("content_key", [
         "whatsapp_number",
         "whatsapp_active",
+        "whatsapp_message",
         "floating_email",
         "email_active",
       ])
