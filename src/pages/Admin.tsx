@@ -211,6 +211,7 @@ export default function Admin() {
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [whatsappActive, setWhatsappActive] = useState(false);
   const [whatsappMessage, setWhatsappMessage] = useState("Hello, I'm interested in your products and services.");
+  const [whatsappMessageAr, setWhatsappMessageAr] = useState("مرحبًا، أنا مهتم بمنتجاتكم وخدماتكم.");
   const [floatingEmail, setFloatingEmail] = useState("");
   const [emailActive, setEmailActive] = useState(false);
   const productImageRef = useRef<HTMLInputElement>(null);
