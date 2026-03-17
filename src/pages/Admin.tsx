@@ -519,7 +519,36 @@ export default function Admin() {
     type: "product" | "service"
   ) => (
     <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
-      <h3 className="font-semibold text-foreground">{item.id ? "Edit" : "New"} {type === "product" ? "Product" : "Service"}</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="font-semibold text-foreground">{item.id ? "Edit" : "New"} {type === "product" ? "Product" : "Service"}</h3>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={translating || (!item.name_en && !item.tag_en && !item.description_en)}
+          onClick={async () => {
+            try {
+              setTranslating(true);
+              const result = await translateTexts({
+                name_en: item.name_en,
+                tag_en: item.tag_en,
+                description_en: item.description_en,
+              });
+              setItem({
+                ...item,
+                name_ar: result.name_ar || item.name_ar,
+                tag_ar: result.tag_ar || item.tag_ar,
+                description_ar: result.description_ar || item.description_ar,
+              });
+              toast.success("Arabic translations generated");
+            } catch (e: any) { toast.error(e.message); }
+            finally { setTranslating(false); }
+          }}
+          className="rounded-xl"
+        >
+          <Languages className="w-4 h-4 mr-2" />
+          {translating ? <RefreshCw className="w-4 h-4 animate-spin" /> : "Auto Translate to Arabic"}
+        </Button>
+      </div>
       
       {/* Tags */}
       <div className="grid md:grid-cols-2 gap-4">
@@ -528,8 +557,8 @@ export default function Admin() {
           <Input value={item.tag_en} onChange={(e) => setItem({ ...item, tag_en: e.target.value })} placeholder="e.g. Fire Safety" className="rounded-xl" />
         </div>
         <div>
-          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Tag (AR)</label>
-          <Input value={item.tag_ar} onChange={(e) => setItem({ ...item, tag_ar: e.target.value })} placeholder="e.g. السلامة من الحريق" className="rounded-xl" dir="rtl" />
+          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Tag (AR) — auto-generated</label>
+          <Input value={item.tag_ar} onChange={(e) => setItem({ ...item, tag_ar: e.target.value })} placeholder="auto-generated" className="rounded-xl bg-muted/50" dir="rtl" />
         </div>
       </div>
 
@@ -540,8 +569,8 @@ export default function Admin() {
           <Input value={item.name_en} onChange={(e) => setItem({ ...item, name_en: e.target.value })} placeholder="Product name" className="rounded-xl" />
         </div>
         <div>
-          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Name (AR)</label>
-          <Input value={item.name_ar} onChange={(e) => setItem({ ...item, name_ar: e.target.value })} placeholder="اسم المنتج" className="rounded-xl" dir="rtl" />
+          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Name (AR) — auto-generated</label>
+          <Input value={item.name_ar} onChange={(e) => setItem({ ...item, name_ar: e.target.value })} placeholder="auto-generated" className="rounded-xl bg-muted/50" dir="rtl" />
         </div>
       </div>
 
@@ -552,8 +581,8 @@ export default function Admin() {
           <Textarea value={item.description_en} onChange={(e) => setItem({ ...item, description_en: e.target.value })} rows={3} className="rounded-xl resize-none" />
         </div>
         <div>
-          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Description (AR)</label>
-          <Textarea value={item.description_ar} onChange={(e) => setItem({ ...item, description_ar: e.target.value })} rows={3} className="rounded-xl resize-none" dir="rtl" />
+          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Description (AR) — auto-generated</label>
+          <Textarea value={item.description_ar} onChange={(e) => setItem({ ...item, description_ar: e.target.value })} rows={3} className="rounded-xl resize-none bg-muted/50" dir="rtl" />
         </div>
       </div>
 
