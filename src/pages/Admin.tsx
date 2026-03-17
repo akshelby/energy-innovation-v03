@@ -768,8 +768,16 @@ export default function Admin() {
                   <Textarea
                     value={whatsappMessage}
                     onChange={(e) => setWhatsappMessage(e.target.value)}
-                    placeholder="Default WhatsApp message text..."
+                    placeholder="Default WhatsApp message (English)..."
                     className="bg-muted/50 border-border text-foreground min-h-[60px]"
+                    rows={2}
+                  />
+                  <Textarea
+                    value={whatsappMessageAr}
+                    onChange={(e) => setWhatsappMessageAr(e.target.value)}
+                    placeholder="رسالة واتساب الافتراضية (عربي)..."
+                    className="bg-muted/50 border-border text-foreground min-h-[60px]"
+                    dir="rtl"
                     rows={2}
                   />
                   <Button
