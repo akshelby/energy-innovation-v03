@@ -216,6 +216,7 @@ export default function Admin() {
   const [selectedFolder, setSelectedFolder] = useState(IMAGE_FOLDERS[0]);
   const [files, setFiles] = useState<StorageFile[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [translating, setTranslating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Branding state
