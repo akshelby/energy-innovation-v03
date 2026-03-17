@@ -63,7 +63,8 @@ export default function ServicesSection() {
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {services.map((service, i) => {
-            const Icon = iconMap[service.icon] || Wrench;
+            const isCustomIcon = service.icon?.startsWith("http") || service.icon?.startsWith("/") || service.icon?.startsWith("data:");
+            const Icon = !isCustomIcon ? (iconMap[service.icon] || Wrench) : null;
             return (
               <div
                 key={i}
@@ -85,9 +86,13 @@ export default function ServicesSection() {
                   <div className="w-16 h-16 rounded-2xl overflow-hidden mx-auto mb-5">
                     <img src={service.image_url} alt={isAr ? service.name_ar : service.name_en} className="w-full h-full object-cover" />
                   </div>
+                ) : isCustomIcon ? (
+                  <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mb-5 mx-auto">
+                    <img src={service.icon} alt="" className="w-8 h-8 object-contain" />
+                  </div>
                 ) : (
                   <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mb-5 mx-auto">
-                    <Icon className="w-8 h-8 text-primary-foreground" />
+                    {Icon && <Icon className="w-8 h-8 text-primary-foreground" />}
                   </div>
                 )}
                 <h3 className="text-lg font-bold text-foreground mb-3">

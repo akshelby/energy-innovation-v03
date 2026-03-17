@@ -626,15 +626,92 @@ export default function Admin() {
       <div className="grid md:grid-cols-2 gap-4">
         <div>
           <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Icon</label>
-          <select
-            value={item.icon}
-            onChange={(e) => setItem({ ...item, icon: e.target.value })}
-            className="w-full h-10 rounded-xl border border-input bg-background px-3 text-sm"
-          >
-            {ICON_OPTIONS.map((icon) => (
-              <option key={icon} value={icon}>{icon}</option>
-            ))}
-          </select>
+          <div className="space-y-2">
+            {/* Mode selector */}
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setItem({ ...item, icon: "Flame" })}
+                className={`text-xs px-3 py-1.5 rounded-lg border transition-colors ${
+                  !item.icon.startsWith("http") && !item.icon.startsWith("/") && !item.icon.startsWith("data:")
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-background border-input text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Preset Icons
+              </button>
+              <button
+                type="button"
+                onClick={() => setItem({ ...item, icon: "" })}
+                className={`text-xs px-3 py-1.5 rounded-lg border transition-colors ${
+                  item.icon.startsWith("http") || item.icon.startsWith("/") || item.icon.startsWith("data:") || item.icon === ""
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-background border-input text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Custom Icon
+              </button>
+            </div>
+
+            {/* Preset dropdown or custom URL/upload */}
+            {!item.icon.startsWith("http") && !item.icon.startsWith("/") && !item.icon.startsWith("data:") && item.icon !== "" ? (
+              <select
+                value={item.icon}
+                onChange={(e) => setItem({ ...item, icon: e.target.value })}
+                className="w-full h-10 rounded-xl border border-input bg-background px-3 text-sm"
+              >
+                {ICON_OPTIONS.map((icon) => (
+                  <option key={icon} value={icon}>{icon}</option>
+                ))}
+              </select>
+            ) : (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={item.icon.startsWith("http") || item.icon.startsWith("/") ? item.icon : ""}
+                    onChange={(e) => setItem({ ...item, icon: e.target.value })}
+                    placeholder="Paste icon URL (Google Icons, CDN, etc.)"
+                    className="rounded-xl flex-1"
+                  />
+                  <input
+                    type="file"
+                    accept="image/*,.svg"
+                    className="hidden"
+                    ref={(el) => { if (el) el.dataset.iconUpload = "true"; }}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleFormFileUpload(file, "images", "icons", (url) => setItem({ ...item, icon: url }));
+                    }}
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const input = document.querySelector('input[data-icon-upload="true"]') as HTMLInputElement;
+                      input?.click();
+                    }}
+                    disabled={uploading}
+                    className="rounded-xl shrink-0"
+                  >
+                    {uploading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                  </Button>
+                </div>
+                <p className="text-[10px] text-muted-foreground">Upload SVG/PNG/JPG or paste a URL from Google Icons, Font Awesome CDN, etc.</p>
+              </div>
+            )}
+
+            {/* Icon preview */}
+            {item.icon && (
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-[10px] text-muted-foreground">Preview:</span>
+                {item.icon.startsWith("http") || item.icon.startsWith("/") || item.icon.startsWith("data:") ? (
+                  <img src={item.icon} alt="icon" className="w-8 h-8 object-contain rounded border border-border" />
+                ) : (
+                  <span className="text-xs bg-secondary px-2 py-1 rounded text-secondary-foreground">{item.icon}</span>
+                )}
+              </div>
+            )}
+          </div>
         </div>
         <div>
           <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Sort Order</label>
