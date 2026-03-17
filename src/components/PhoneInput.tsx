@@ -34,6 +34,14 @@ const countries = [
   { code: "+34", iso: "es", name: "Spain" },
 ];
 
+function stripCountryCode(val: string, country: typeof countries[0]): string {
+  const cleaned = val.replace(/[^0-9+]/g, "");
+  if (cleaned.startsWith(country.code)) {
+    return cleaned.slice(country.code.length).trim();
+  }
+  return cleaned.replace(/^\+\d+\s?/, "").trim();
+}
+
 const FlagImg = ({ iso, className = "" }: { iso: string; className?: string }) => (
   <img
     src={`https://flagcdn.com/w40/${iso}.png`}
