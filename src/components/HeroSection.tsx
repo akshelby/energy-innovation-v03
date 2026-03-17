@@ -33,16 +33,23 @@ export default function HeroSection() {
 
   useEffect(() => {
     async function fetchHeroImages() {
-      // Fetch active images list from site_content
-      const { data: contentData } = await supabase
+      // Fetch active images list and speed from site_content
+      const { data: contentRows } = await supabase
         .from("site_content")
-        .select("value_en")
-        .eq("content_key", "hero.active_images")
-        .single();
+        .select("content_key, value_en")
+        .in("content_key", ["hero.active_images", "hero.speed"]);
 
-      const activeList: string[] = contentData?.value_en
-        ? JSON.parse(contentData.value_en)
+      const activeEntry = contentRows?.find((r) => r.content_key === "hero.active_images");
+      const speedEntry = contentRows?.find((r) => r.content_key === "hero.speed");
+
+      const activeList: string[] = activeEntry?.value_en
+        ? JSON.parse(activeEntry.value_en)
         : [];
+
+      if (speedEntry?.value_en) {
+        const seconds = parseFloat(speedEntry.value_en);
+        if (seconds >= 1) setSpeed(seconds * 1000);
+      }
 
       const { data, error } = await supabase.storage.from("images").list("hero", {
         sortBy: { column: "name", order: "asc" },
