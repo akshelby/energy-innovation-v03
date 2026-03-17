@@ -1480,7 +1480,7 @@ export default function Admin() {
                       try {
                         setTranslating(true);
                         const result = await translateTexts({ label_en: editingCategory.label_en });
-                        setEditingCategory({ ...editingCategory, label_ar: result.label_en || editingCategory.label_ar });
+                        setEditingCategory({ ...editingCategory, label_ar: result.label_ar || editingCategory.label_ar });
                         toast.success("Arabic translation generated");
                       } catch (e: any) { toast.error(e.message); }
                       finally { setTranslating(false); }
