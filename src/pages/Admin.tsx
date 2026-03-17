@@ -761,16 +761,30 @@ export default function Admin() {
                     value={whatsappNumber}
                     onChange={(val) => setWhatsappNumber(val)}
                   />
+                  <Textarea
+                    value={whatsappMessage}
+                    onChange={(e) => setWhatsappMessage(e.target.value)}
+                    placeholder="Default WhatsApp message text..."
+                    className="bg-muted/50 border-border text-foreground min-h-[60px]"
+                    rows={2}
+                  />
                   <Button
                     onClick={async () => {
                       try {
                         const cleaned = whatsappNumber.replace(/[^0-9+]/g, "");
-                        await apiCall("content", "POST", storedPassword, {
-                          content_key: "whatsapp_number",
-                          value_en: cleaned,
-                          value_ar: cleaned,
-                        });
-                        toast.success("WhatsApp number saved!");
+                        await Promise.all([
+                          apiCall("content", "POST", storedPassword, {
+                            content_key: "whatsapp_number",
+                            value_en: cleaned,
+                            value_ar: cleaned,
+                          }),
+                          apiCall("content", "POST", storedPassword, {
+                            content_key: "whatsapp_message",
+                            value_en: whatsappMessage,
+                            value_ar: whatsappMessage,
+                          }),
+                        ]);
+                        toast.success("WhatsApp settings saved!");
                       } catch (err: any) { toast.error(err.message); }
                     }}
                     className="gradient-accent text-accent-foreground rounded-xl border-0 w-full sm:w-auto"

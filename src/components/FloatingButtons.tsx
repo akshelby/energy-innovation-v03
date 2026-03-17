@@ -56,7 +56,7 @@ export default function FloatingButtons() {
     <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
       {showWhatsapp && (
         <a
-          href={`https://wa.me/${clean}`}
+          href={`https://wa.me/${clean}${msgParam}`}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Chat on WhatsApp"
