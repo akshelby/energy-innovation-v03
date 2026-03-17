@@ -4,7 +4,7 @@ import { useBranding } from "@/contexts/BrandingContext";
 
 export default function Footer() {
   const { t } = useLanguage();
-  const { logoUrl, brandName } = useBranding();
+  const { logoUrl, brandName, logoSize } = useBranding();
 
   const quickLinks = [
     { label: t("nav.home"), href: "#home" },
