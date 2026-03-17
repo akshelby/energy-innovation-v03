@@ -57,7 +57,18 @@ export default function HeroSection() {
           filtered = filtered.filter((file) => activeList.includes(file.name));
         }
 
-        const urls = filtered.map((file) =>
+        // Deduplicate by filename stem, preferring .webp over other formats
+        const stemMap = new Map<string, typeof filtered[0]>();
+        for (const file of filtered) {
+          const stem = file.name.replace(/\.(png|jpe?g|webp|avif)$/i, "");
+          const existing = stemMap.get(stem);
+          if (!existing || file.name.endsWith(".webp")) {
+            stemMap.set(stem, file);
+          }
+        }
+        const deduped = Array.from(stemMap.values());
+
+        const urls = deduped.map((file) =>
           buildHeroImageUrl(file.name, file.updated_at ?? file.created_at ?? undefined)
         );
 

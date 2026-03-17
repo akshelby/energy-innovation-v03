@@ -296,7 +296,22 @@ export default function Admin() {
         "GET",
         storedPassword
       );
-      setFiles(data.filter((f: StorageFile) => f.name !== ".emptyFolderPlaceholder"));
+      let fileList = data.filter((f: StorageFile) => f.name !== ".emptyFolderPlaceholder");
+
+      // Deduplicate hero images by filename stem, preferring .webp
+      if (selectedFolder.folder === "hero") {
+        const stemMap = new Map<string, StorageFile>();
+        for (const file of fileList) {
+          const stem = file.name.replace(/\.(png|jpe?g|webp|avif)$/i, "");
+          const existing = stemMap.get(stem);
+          if (!existing || file.name.endsWith(".webp")) {
+            stemMap.set(stem, file);
+          }
+        }
+        fileList = Array.from(stemMap.values());
+      }
+
+      setFiles(fileList);
 
       // Fetch active hero images when viewing hero folder
       if (selectedFolder.folder === "hero") {
