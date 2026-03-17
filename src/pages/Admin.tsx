@@ -8,6 +8,7 @@ import {
   LogOut, Image, Upload, Plus, Package, Briefcase, GripVertical, List, Palette,
 } from "lucide-react";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
+import PhoneInput from "@/components/PhoneInput";
 
 const PROJECT_ID = import.meta.env.VITE_SUPABASE_PROJECT_ID;
 const FUNCTION_URL = `https://${PROJECT_ID}.supabase.co/functions/v1/admin-api`;
@@ -753,19 +754,18 @@ export default function Admin() {
                   </label>
                 </div>
                 <div className="flex gap-3">
-                  <Input
+                  <PhoneInput
                     value={whatsappNumber}
-                    onChange={(e) => setWhatsappNumber(e.target.value)}
-                    placeholder="+971 5X XXX XXXX"
-                    className="rounded-xl"
+                    onChange={(val) => setWhatsappNumber(val)}
                   />
                   <Button
                     onClick={async () => {
                       try {
+                        const cleaned = whatsappNumber.replace(/[^0-9+]/g, "");
                         await apiCall("content", "POST", storedPassword, {
                           content_key: "whatsapp_number",
-                          value_en: whatsappNumber,
-                          value_ar: whatsappNumber,
+                          value_en: cleaned,
+                          value_ar: cleaned,
                         });
                         toast.success("WhatsApp number saved!");
                       } catch (err: any) { toast.error(err.message); }
