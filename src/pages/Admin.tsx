@@ -5,8 +5,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import {
   Lock, Trash2, Save, RefreshCw, Database, FileText, MessageSquare,
-  LogOut, Image, Upload, Plus, Package, Briefcase, GripVertical, List, Palette, Languages,
+  LogOut, Image, Upload, Plus, Package, Briefcase, GripVertical, List, Palette, Languages, Sun, Moon,
 } from "lucide-react";
+import { useTheme } from "@/contexts/ThemeContext";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
 import PhoneInput from "@/components/PhoneInput";
 
