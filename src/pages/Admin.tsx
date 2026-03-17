@@ -1518,8 +1518,8 @@ export default function Admin() {
                           onChange={(e) => setEditingMenuItem({ ...editingMenuItem, category_key: e.target.value, parent_id: null })}
                           className="w-full h-10 rounded-xl border border-input bg-background px-3 text-sm"
                         >
-                          {CATEGORY_OPTIONS.map((cat) => (
-                            <option key={cat.key} value={cat.key}>{cat.label}</option>
+                          {categories.map((cat) => (
+                            <option key={cat.key} value={cat.key}>{cat.label_en}</option>
                           ))}
                         </select>
                       </div>
