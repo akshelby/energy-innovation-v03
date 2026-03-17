@@ -391,11 +391,11 @@ export default function Admin() {
       else if (activeTab === "content") fetchContent();
       else if (activeTab === "products") fetchProducts();
       else if (activeTab === "services") fetchServices();
-      else if (activeTab === "menu-items") fetchMenuItems();
+      else if (activeTab === "menu-items") { fetchMenuItems(); fetchCategories(); }
       else if (activeTab === "branding") fetchBranding();
       else fetchFiles();
     }
-  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchProducts, fetchServices, fetchMenuItems, fetchFiles, fetchBranding]);
+  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
