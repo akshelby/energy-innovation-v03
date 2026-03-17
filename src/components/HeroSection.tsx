@@ -5,11 +5,11 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getHeroImageUrl } from "@/lib/storage";
 
 // Fallback local imports in case Supabase images aren't uploaded yet
-import hero1Local from "@/assets/hero-1.jpg";
-import hero2Local from "@/assets/hero-2.jpg";
-import hero3Local from "@/assets/hero-3.jpg";
-import hero4Local from "@/assets/hero-4.jpg";
-import hero5Local from "@/assets/hero-5.jpg";
+import hero1Local from "@/assets/hero-1.webp";
+import hero2Local from "@/assets/hero-2.webp";
+import hero3Local from "@/assets/hero-3.webp";
+import hero4Local from "@/assets/hero-4.webp";
+import hero5Local from "@/assets/hero-5.webp";
 
 const localImages = [hero1Local, hero2Local, hero3Local, hero4Local, hero5Local];
 
