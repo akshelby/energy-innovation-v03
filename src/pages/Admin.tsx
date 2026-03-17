@@ -802,7 +802,7 @@ export default function Admin() {
                     />
                   </label>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex flex-col gap-3">
                   <Input
                     value={floatingEmail}
                     onChange={(e) => setFloatingEmail(e.target.value)}
