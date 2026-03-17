@@ -449,6 +449,12 @@ export default function Admin() {
   const handleSaveMenuItem = async (item: MenuChildItem) => {
     try {
       setLoading(true);
+      if (item.name_en && !item.name_ar) {
+        try {
+          const result = await translateTexts({ name_en: item.name_en });
+          item = { ...item, name_ar: result.name_ar || item.name_ar };
+        } catch { /* proceed */ }
+      }
       await apiCall("product-items", "POST", storedPassword, item);
       toast.success("Menu item saved");
       setEditingMenuItem(null);
