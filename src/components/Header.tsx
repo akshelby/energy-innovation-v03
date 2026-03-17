@@ -240,10 +240,10 @@ export default function Header() {
           </a>
 
           {/* Glass bar - nav + utilities */}
-          <div className={`flex-1 flex items-center justify-between px-4 md:px-6 py-2.5 rounded-xl transition-all duration-300 ${
+          <div className={`flex-1 flex items-center justify-between px-4 md:px-6 py-2.5 rounded-xl transition-all duration-300 bg-card ${
             scrolled
-              ? "glass shadow-lg border border-accent/60 shadow-[0_0_15px_hsl(var(--accent)/0.3)]"
-              : "glass shadow-md border border-accent/40 shadow-[0_0_10px_hsl(var(--accent)/0.2)]"
+              ? "shadow-lg border border-accent/60 shadow-[0_0_15px_hsl(var(--accent)/0.3)]"
+              : "shadow-md border border-accent/40 shadow-[0_0_10px_hsl(var(--accent)/0.2)]"
           }`}>
 
           {/* Desktop Nav - centered */}
