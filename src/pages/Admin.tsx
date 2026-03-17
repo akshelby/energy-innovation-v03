@@ -218,6 +218,7 @@ export default function Admin() {
   const [uploading, setUploading] = useState(false);
   const [translating, setTranslating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [activeHeroImages, setActiveHeroImages] = useState<string[]>([]);
 
   // Branding state
   const [brandName, setBrandName] = useState("Energy Innovation");
