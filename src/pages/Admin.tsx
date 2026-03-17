@@ -1437,7 +1437,7 @@ export default function Admin() {
                 });
 
                 return (
-                  <div className="bg-card border-2 border-accent/30 rounded-2xl p-5 space-y-4" style={{ marginLeft: `${depth * 24}px` }}>
+                  <div ref={menuEditorRef} className="bg-card border-2 border-accent/30 rounded-2xl p-5 space-y-4" style={{ marginLeft: `${depth * 24}px` }}>
                     <div className="flex items-center justify-between">
                       <h3 className="font-semibold text-foreground text-sm">
                         {editingMenuItem.id ? "✏️ Edit" : "➕ New"} Item
