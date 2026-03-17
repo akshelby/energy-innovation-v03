@@ -5,10 +5,25 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import {
   Lock, Trash2, Save, RefreshCw, Database, FileText, MessageSquare,
-  LogOut, Image, Upload, Plus, Package, Briefcase, GripVertical, List, Palette,
+  LogOut, Image, Upload, Plus, Package, Briefcase, GripVertical, List, Palette, Languages,
 } from "lucide-react";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
 import PhoneInput from "@/components/PhoneInput";
+
+const TRANSLATE_URL = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/translate`;
+
+async function translateTexts(texts: Record<string, string>): Promise<Record<string, string>> {
+  const nonEmpty = Object.fromEntries(Object.entries(texts).filter(([_, v]) => v && v.trim()));
+  if (Object.keys(nonEmpty).length === 0) return {};
+  const res = await fetch(TRANSLATE_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ texts: nonEmpty }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Translation failed");
+  return data.translations;
+}
 
 const PROJECT_ID = import.meta.env.VITE_SUPABASE_PROJECT_ID;
 const FUNCTION_URL = `https://${PROJECT_ID}.supabase.co/functions/v1/admin-api`;
@@ -201,6 +216,7 @@ export default function Admin() {
   const [selectedFolder, setSelectedFolder] = useState(IMAGE_FOLDERS[0]);
   const [files, setFiles] = useState<StorageFile[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [translating, setTranslating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Branding state
@@ -346,8 +362,17 @@ export default function Admin() {
     const edited = editedContent[key];
     if (!edited) return;
     try {
+      // Auto-translate if Arabic is empty
+      let valueAr = edited.value_ar;
+      if (edited.value_en && !valueAr) {
+        try {
+          const result = await translateTexts({ value_en: edited.value_en });
+          valueAr = result.value_ar || "";
+          updateEditedField(key, "value_ar", valueAr);
+        } catch { /* proceed */ }
+      }
       await apiCall("content", "POST", storedPassword, {
-        content_key: key, value_en: edited.value_en, value_ar: edited.value_ar,
+        content_key: key, value_en: edited.value_en, value_ar: valueAr,
       });
       toast.success(`Saved "${key}"`);
       fetchContent();
@@ -372,6 +397,17 @@ export default function Admin() {
   const handleSaveProduct = async (item: ProductItem) => {
     try {
       setLoading(true);
+      // Auto-translate if Arabic fields are empty
+      if (item.name_en && (!item.name_ar || !item.tag_ar || !item.description_ar)) {
+        try {
+          const result = await translateTexts({
+            ...(item.name_en && !item.name_ar ? { name_en: item.name_en } : {}),
+            ...(item.tag_en && !item.tag_ar ? { tag_en: item.tag_en } : {}),
+            ...(item.description_en && !item.description_ar ? { description_en: item.description_en } : {}),
+          });
+          item = { ...item, name_ar: result.name_ar || item.name_ar, tag_ar: result.tag_ar || item.tag_ar, description_ar: result.description_ar || item.description_ar };
+        } catch { /* proceed without translation */ }
+      }
       await apiCall("products", "POST", storedPassword, item);
       toast.success("Product saved");
       setEditingProduct(null);
@@ -392,6 +428,16 @@ export default function Admin() {
   const handleSaveService = async (item: ServiceItem) => {
     try {
       setLoading(true);
+      if (item.name_en && (!item.name_ar || !item.tag_ar || !item.description_ar)) {
+        try {
+          const result = await translateTexts({
+            ...(item.name_en && !item.name_ar ? { name_en: item.name_en } : {}),
+            ...(item.tag_en && !item.tag_ar ? { tag_en: item.tag_en } : {}),
+            ...(item.description_en && !item.description_ar ? { description_en: item.description_en } : {}),
+          });
+          item = { ...item, name_ar: result.name_ar || item.name_ar, tag_ar: result.tag_ar || item.tag_ar, description_ar: result.description_ar || item.description_ar };
+        } catch { /* proceed without translation */ }
+      }
       await apiCall("services", "POST", storedPassword, item);
       toast.success("Service saved");
       setEditingService(null);
@@ -412,6 +458,12 @@ export default function Admin() {
   const handleSaveMenuItem = async (item: MenuChildItem) => {
     try {
       setLoading(true);
+      if (item.name_en && !item.name_ar) {
+        try {
+          const result = await translateTexts({ name_en: item.name_en });
+          item = { ...item, name_ar: result.name_ar || item.name_ar };
+        } catch { /* proceed */ }
+      }
       await apiCall("product-items", "POST", storedPassword, item);
       toast.success("Menu item saved");
       setEditingMenuItem(null);
@@ -503,7 +555,36 @@ export default function Admin() {
     type: "product" | "service"
   ) => (
     <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
-      <h3 className="font-semibold text-foreground">{item.id ? "Edit" : "New"} {type === "product" ? "Product" : "Service"}</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="font-semibold text-foreground">{item.id ? "Edit" : "New"} {type === "product" ? "Product" : "Service"}</h3>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={translating || (!item.name_en && !item.tag_en && !item.description_en)}
+          onClick={async () => {
+            try {
+              setTranslating(true);
+              const result = await translateTexts({
+                name_en: item.name_en,
+                tag_en: item.tag_en,
+                description_en: item.description_en,
+              });
+              setItem({
+                ...item,
+                name_ar: result.name_ar || item.name_ar,
+                tag_ar: result.tag_ar || item.tag_ar,
+                description_ar: result.description_ar || item.description_ar,
+              });
+              toast.success("Arabic translations generated");
+            } catch (e: any) { toast.error(e.message); }
+            finally { setTranslating(false); }
+          }}
+          className="rounded-xl"
+        >
+          <Languages className="w-4 h-4 mr-2" />
+          {translating ? <RefreshCw className="w-4 h-4 animate-spin" /> : "Auto Translate to Arabic"}
+        </Button>
+      </div>
       
       {/* Tags */}
       <div className="grid md:grid-cols-2 gap-4">
@@ -512,8 +593,8 @@ export default function Admin() {
           <Input value={item.tag_en} onChange={(e) => setItem({ ...item, tag_en: e.target.value })} placeholder="e.g. Fire Safety" className="rounded-xl" />
         </div>
         <div>
-          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Tag (AR)</label>
-          <Input value={item.tag_ar} onChange={(e) => setItem({ ...item, tag_ar: e.target.value })} placeholder="e.g. السلامة من الحريق" className="rounded-xl" dir="rtl" />
+          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Tag (AR) — auto-generated</label>
+          <Input value={item.tag_ar} onChange={(e) => setItem({ ...item, tag_ar: e.target.value })} placeholder="auto-generated" className="rounded-xl bg-muted/50" dir="rtl" />
         </div>
       </div>
 
@@ -524,8 +605,8 @@ export default function Admin() {
           <Input value={item.name_en} onChange={(e) => setItem({ ...item, name_en: e.target.value })} placeholder="Product name" className="rounded-xl" />
         </div>
         <div>
-          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Name (AR)</label>
-          <Input value={item.name_ar} onChange={(e) => setItem({ ...item, name_ar: e.target.value })} placeholder="اسم المنتج" className="rounded-xl" dir="rtl" />
+          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Name (AR) — auto-generated</label>
+          <Input value={item.name_ar} onChange={(e) => setItem({ ...item, name_ar: e.target.value })} placeholder="auto-generated" className="rounded-xl bg-muted/50" dir="rtl" />
         </div>
       </div>
 
@@ -536,8 +617,8 @@ export default function Admin() {
           <Textarea value={item.description_en} onChange={(e) => setItem({ ...item, description_en: e.target.value })} rows={3} className="rounded-xl resize-none" />
         </div>
         <div>
-          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Description (AR)</label>
-          <Textarea value={item.description_ar} onChange={(e) => setItem({ ...item, description_ar: e.target.value })} rows={3} className="rounded-xl resize-none" dir="rtl" />
+          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Description (AR) — auto-generated</label>
+          <Textarea value={item.description_ar} onChange={(e) => setItem({ ...item, description_ar: e.target.value })} rows={3} className="rounded-xl resize-none bg-muted/50" dir="rtl" />
         </div>
       </div>
 
@@ -926,9 +1007,31 @@ export default function Admin() {
                   <div key={item.id} className="bg-card border border-border rounded-2xl p-6">
                     <div className="flex items-center justify-between mb-4">
                       <span className="text-sm font-mono bg-secondary px-3 py-1 rounded-lg text-secondary-foreground">{item.content_key}</span>
-                      <Button size="sm" onClick={() => handleSaveContent(item.content_key)} className="gradient-accent text-accent-foreground rounded-xl border-0">
-                        <Save className="w-4 h-4 mr-2" />Save
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={translating || !editedContent[item.content_key]?.value_en}
+                          onClick={async () => {
+                            try {
+                              setTranslating(true);
+                              const result = await translateTexts({ value_en: editedContent[item.content_key]?.value_en || "" });
+                              if (result.value_ar) {
+                                updateEditedField(item.content_key, "value_ar", result.value_ar);
+                                toast.success("Arabic translation generated");
+                              }
+                            } catch (e: any) { toast.error(e.message); }
+                            finally { setTranslating(false); }
+                          }}
+                          className="rounded-xl"
+                        >
+                          <Languages className="w-4 h-4 mr-1" />
+                          {translating ? "..." : "Translate"}
+                        </Button>
+                        <Button size="sm" onClick={() => handleSaveContent(item.content_key)} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                          <Save className="w-4 h-4 mr-2" />Save
+                        </Button>
+                      </div>
                     </div>
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
@@ -1102,7 +1205,27 @@ export default function Admin() {
             {/* Editor */}
             {editingMenuItem && (
               <div className="bg-card border border-border rounded-2xl p-6 space-y-4 mb-6">
-                <h3 className="font-semibold text-foreground">{editingMenuItem.id ? "Edit" : "New"} Menu Item</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-foreground">{editingMenuItem.id ? "Edit" : "New"} Menu Item</h3>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={translating || !editingMenuItem.name_en}
+                    onClick={async () => {
+                      try {
+                        setTranslating(true);
+                        const result = await translateTexts({ name_en: editingMenuItem.name_en });
+                        setEditingMenuItem({ ...editingMenuItem, name_ar: result.name_ar || editingMenuItem.name_ar });
+                        toast.success("Arabic translation generated");
+                      } catch (e: any) { toast.error(e.message); }
+                      finally { setTranslating(false); }
+                    }}
+                    className="rounded-xl"
+                  >
+                    <Languages className="w-4 h-4 mr-2" />
+                    {translating ? "..." : "Auto Translate"}
+                  </Button>
+                </div>
                 
                 {/* Category */}
                 <div>
@@ -1125,8 +1248,8 @@ export default function Admin() {
                     <Input value={editingMenuItem.name_en} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, name_en: e.target.value })} placeholder="e.g. Fire Curtains" className="rounded-xl" />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Name (AR)</label>
-                    <Input value={editingMenuItem.name_ar} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, name_ar: e.target.value })} placeholder="e.g. ستائر الحريق" className="rounded-xl" dir="rtl" />
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Name (AR) — auto-generated</label>
+                    <Input value={editingMenuItem.name_ar} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, name_ar: e.target.value })} placeholder="auto-generated" className="rounded-xl bg-muted/50" dir="rtl" />
                   </div>
                 </div>
 
