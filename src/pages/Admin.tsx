@@ -293,6 +293,8 @@ export default function Admin() {
       if (waEntry) setWhatsappNumber(waEntry.value_en);
       const waActive = data.find((d: ContentItem) => d.content_key === "whatsapp_active");
       setWhatsappActive(waActive?.value_en === "true");
+      const waMsg = data.find((d: ContentItem) => d.content_key === "whatsapp_message");
+      if (waMsg) setWhatsappMessage(waMsg.value_en);
       const emailEntry = data.find((d: ContentItem) => d.content_key === "floating_email");
       if (emailEntry) setFloatingEmail(emailEntry.value_en);
       const emActive = data.find((d: ContentItem) => d.content_key === "email_active");
