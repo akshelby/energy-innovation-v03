@@ -295,7 +295,10 @@ export default function Admin() {
       const waActive = data.find((d: ContentItem) => d.content_key === "whatsapp_active");
       setWhatsappActive(waActive?.value_en === "true");
       const waMsg = data.find((d: ContentItem) => d.content_key === "whatsapp_message");
-      if (waMsg) setWhatsappMessage(waMsg.value_en);
+      if (waMsg) {
+        setWhatsappMessage(waMsg.value_en);
+        setWhatsappMessageAr(waMsg.value_ar);
+      }
       const emailEntry = data.find((d: ContentItem) => d.content_key === "floating_email");
       if (emailEntry) setFloatingEmail(emailEntry.value_en);
       const emActive = data.find((d: ContentItem) => d.content_key === "email_active");
