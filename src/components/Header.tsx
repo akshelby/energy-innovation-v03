@@ -358,7 +358,7 @@ export default function Header() {
                           {categoriesWithItems.map((cat) => (
                             <div key={cat.key}>
                               <h4 className="text-sm font-bold uppercase tracking-wider text-accent px-4 mb-1">
-                                {t(cat.key)}
+                                {language === "ar" ? cat.label_ar : cat.label_en}
                               </h4>
                               {cat.items.map((pi) => renderMobileItem(pi))}
                             </div>
