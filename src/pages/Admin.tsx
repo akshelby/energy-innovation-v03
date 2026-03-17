@@ -191,6 +191,7 @@ const emptyMenuChild: MenuChildItem = {
 };
 
 export default function Admin() {
+  const { theme, toggleTheme } = useTheme();
   const [password, setPassword] = useState(() => sessionStorage.getItem("admin_pw") || "");
   const [authenticated, setAuthenticated] = useState(() => !!sessionStorage.getItem("admin_pw"));
   const [activeTab, setActiveTab] = useState<TabKey>("leads");
