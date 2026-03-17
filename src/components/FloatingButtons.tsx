@@ -26,7 +26,7 @@ export default function FloatingButtons() {
   useEffect(() => {
     supabase
       .from("site_content")
-      .select("content_key, value_en")
+      .select("content_key, value_en, value_ar")
       .in("content_key", [
         "whatsapp_number",
         "whatsapp_active",
