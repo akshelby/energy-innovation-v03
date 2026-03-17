@@ -1468,6 +1468,52 @@ export default function Admin() {
               </div>
             </div>
 
+            {/* New Category form (when creating, no id) */}
+            {editingCategory && !editingCategory.id && (
+              <div className="bg-card border-2 border-accent/30 rounded-2xl p-4 mb-6 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-semibold text-foreground">➕ New Category</h4>
+                  <Button
+                    variant="outline" size="sm"
+                    disabled={translating || !editingCategory.label_en}
+                    onClick={async () => {
+                      try {
+                        setTranslating(true);
+                        const result = await translateTexts({ label_en: editingCategory.label_en });
+                        setEditingCategory({ ...editingCategory, label_ar: result.label_en || editingCategory.label_ar });
+                        toast.success("Arabic translation generated");
+                      } catch (e: any) { toast.error(e.message); }
+                      finally { setTranslating(false); }
+                    }}
+                    className="rounded-xl"
+                  >
+                    <Languages className="w-4 h-4 mr-2" />
+                    {translating ? "..." : "Auto Translate"}
+                  </Button>
+                </div>
+                <div className="grid md:grid-cols-3 gap-3">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Key (unique identifier)</label>
+                    <Input value={editingCategory.key} onChange={(e) => setEditingCategory({ ...editingCategory, key: e.target.value })} placeholder="cat.new-category" className="rounded-xl" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Label (EN)</label>
+                    <Input value={editingCategory.label_en} onChange={(e) => setEditingCategory({ ...editingCategory, label_en: e.target.value })} placeholder="Category Name" className="rounded-xl" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Label (AR) — auto-generated</label>
+                    <Input value={editingCategory.label_ar} onChange={(e) => setEditingCategory({ ...editingCategory, label_ar: e.target.value })} placeholder="auto-generated" className="rounded-xl bg-muted/50" dir="rtl" />
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={() => handleSaveCategory(editingCategory)} disabled={loading || !editingCategory.key || !editingCategory.label_en} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                    <Save className="w-3.5 h-3.5 mr-1" />Save Category
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setEditingCategory(null)} className="rounded-xl">Cancel</Button>
+                </div>
+              </div>
+            )}
+
             {/* Inline editor renderer */}
             {(() => {
               const renderInlineEditor = (depth: number) => {
