@@ -14,6 +14,7 @@ export default function FloatingButtons() {
   const [config, setConfig] = useState<FloatingConfig>({
     whatsappNumber: "",
     whatsappActive: false,
+    whatsappMessage: "",
     floatingEmail: "",
     emailActive: false,
   });
