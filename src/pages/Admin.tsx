@@ -544,7 +544,7 @@ export default function Admin() {
       if (cat.label_en && !cat.label_ar) {
         try {
           const result = await translateTexts({ label_en: cat.label_en });
-          cat = { ...cat, label_ar: result.label_en || cat.label_ar };
+          cat = { ...cat, label_ar: result.label_ar || cat.label_ar };
         } catch { /* proceed */ }
       }
       await apiCall("product-categories", "POST", storedPassword, cat);
