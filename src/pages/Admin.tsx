@@ -5,10 +5,25 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import {
   Lock, Trash2, Save, RefreshCw, Database, FileText, MessageSquare,
-  LogOut, Image, Upload, Plus, Package, Briefcase, GripVertical, List, Palette,
+  LogOut, Image, Upload, Plus, Package, Briefcase, GripVertical, List, Palette, Languages,
 } from "lucide-react";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
 import PhoneInput from "@/components/PhoneInput";
+
+const TRANSLATE_URL = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/translate`;
+
+async function translateTexts(texts: Record<string, string>): Promise<Record<string, string>> {
+  const nonEmpty = Object.fromEntries(Object.entries(texts).filter(([_, v]) => v && v.trim()));
+  if (Object.keys(nonEmpty).length === 0) return {};
+  const res = await fetch(TRANSLATE_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ texts: nonEmpty }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Translation failed");
+  return data.translations;
+}
 
 const PROJECT_ID = import.meta.env.VITE_SUPABASE_PROJECT_ID;
 const FUNCTION_URL = `https://${PROJECT_ID}.supabase.co/functions/v1/admin-api`;
