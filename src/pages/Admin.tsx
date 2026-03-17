@@ -341,6 +341,8 @@ export default function Admin() {
       const data = await apiCall("content", "GET", storedPassword);
       const brandEntry = data.find((d: ContentItem) => d.content_key === "brand.name");
       if (brandEntry) setBrandName(brandEntry.value_en);
+      const sizeEntry = data.find((d: ContentItem) => d.content_key === "logo.size");
+      if (sizeEntry) setLogoSize(parseInt(sizeEntry.value_en) || 56);
       const waEntry = data.find((d: ContentItem) => d.content_key === "whatsapp_number");
       if (waEntry) setWhatsappNumber(waEntry.value_en);
       const waActive = data.find((d: ContentItem) => d.content_key === "whatsapp_active");
