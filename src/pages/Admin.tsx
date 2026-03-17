@@ -514,9 +514,20 @@ export default function Admin() {
     setUploading(true);
     try {
       for (const file of Array.from(fileList)) {
+        // Prevent duplicate hero images (same stem, different extension)
+        if (selectedFolder.folder === "hero") {
+          const stem = file.name.replace(/\.(png|jpe?g|webp|avif)$/i, "");
+          const duplicate = files.find(
+            (f) => f.name !== file.name && f.name.replace(/\.(png|jpe?g|webp|avif)$/i, "") === stem
+          );
+          if (duplicate) {
+            toast.error(`Skipped "${file.name}" — a similar image "${duplicate.name}" already exists.`);
+            continue;
+          }
+        }
         await uploadFileAndGetUrl(file, selectedFolder.bucket, selectedFolder.folder, storedPassword);
       }
-      toast.success(`Uploaded ${fileList.length} file(s)`);
+      toast.success(`Upload complete`);
       fetchFiles();
     } catch (e: any) { toast.error(e.message); }
     finally { setUploading(false); }
