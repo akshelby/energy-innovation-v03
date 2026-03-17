@@ -303,6 +303,13 @@ export default function Admin() {
     finally { setLoading(false); }
   }, [storedPassword]);
 
+  const fetchCategories = useCallback(async () => {
+    try {
+      const data = await apiCall("product-categories", "GET", storedPassword);
+      setCategories(data);
+    } catch (e: any) { toast.error(e.message); }
+  }, [storedPassword]);
+
   const fetchFiles = useCallback(async () => {
     setLoading(true);
     try {
