@@ -44,6 +44,33 @@ export type Database = {
         }
         Relationships: []
       }
+      product_categories: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          label_ar: string
+          label_en: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          label_ar?: string
+          label_en?: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          label_ar?: string
+          label_en?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       product_items: {
         Row: {
           category_key: string
