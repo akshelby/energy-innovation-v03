@@ -570,6 +570,24 @@ export default function Admin() {
     } catch (e: any) { toast.error(e.message); }
   };
 
+  const handleToggleCategoryActive = async (cat: CategoryItem & { id: string }) => {
+    try {
+      const updated = { ...cat, is_active: !cat.is_active };
+      await apiCall("product-categories", "POST", storedPassword, updated);
+      setCategories((prev) => prev.map((c) => c.id === cat.id ? { ...c, is_active: !cat.is_active } : c));
+      toast.success(`Category ${updated.is_active ? "activated" : "deactivated"}`);
+    } catch (e: any) { toast.error(e.message); }
+  };
+
+  const handleToggleItemActive = async (item: MenuChildItem & { id: string }) => {
+    try {
+      const updated = { ...item, is_active: !item.is_active };
+      await apiCall("product-items", "POST", storedPassword, updated);
+      setMenuItems((prev) => prev.map((m) => m.id === item.id ? { ...m, is_active: !item.is_active } : m));
+      toast.success(`Item ${updated.is_active ? "activated" : "deactivated"}`);
+    } catch (e: any) { toast.error(e.message); }
+  };
+
   // File uploads for images tab
   const handleUploadFiles = async (fileList: FileList) => {
     setUploading(true);
