@@ -1702,10 +1702,9 @@ export default function Admin() {
                                     {depth > 0 && <span className="text-muted-foreground text-xs select-none">└</span>}
                                     <GripVertical className="w-3.5 h-3.5 text-muted-foreground" />
                                   </div>
-                                  <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-3 shrink-0">
+                                   <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 flex-wrap">
-                                      <span className={`font-medium text-foreground ${depth === 0 ? "text-sm font-bold" : "text-sm"}`}>
+                                      <span className={`font-medium ${(item as any).is_active === false ? "text-muted-foreground line-through" : "text-foreground"} ${depth === 0 ? "text-sm font-bold" : "text-sm"}`}>
                                         {item.name_en}
                                       </span>
                                       <span className="text-xs text-muted-foreground">/ {item.name_ar}</span>
@@ -1719,29 +1718,41 @@ export default function Admin() {
                                           {children.length} sub-item{children.length > 1 ? "s" : ""}
                                         </span>
                                       )}
+                                      {(item as any).is_active === false && (
+                                        <span className="text-[10px] bg-destructive/10 text-destructive px-2 py-0.5 rounded-full font-medium">Inactive</span>
+                                      )}
                                     </div>
-                                  </div>
-                                  <div className="flex gap-1 shrink-0">
-                                    <Button
-                                      variant="outline" size="sm"
-                                      onClick={() => setEditingMenuItem({
-                                        ...emptyMenuChild,
-                                        category_key: item.category_key,
-                                        parent_id: item.id!,
-                                        sort_order: children.length,
-                                      })}
-                                      className="rounded-xl text-xs h-7 px-2"
-                                      title="Add child item"
-                                    >
-                                      <Plus className="w-3 h-3" />
-                                    </Button>
-                                    <Button variant="outline" size="sm" onClick={() => setEditingMenuItem({ ...item })} className="rounded-xl text-xs h-7">Edit</Button>
-                                    <Button variant="ghost" size="sm" onClick={() => handleDeleteMenuItem(item.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl h-7 w-7 p-0">
-                                      <Trash2 className="w-3.5 h-3.5" />
-                                    </Button>
-                                  </div>
-                                </div>
-                              )}
+                                   </div>
+                                   <div className="flex gap-1 items-center shrink-0">
+                                    <label className="flex items-center gap-1 cursor-pointer mr-1" title={(item as any).is_active === false ? "Activate item" : "Deactivate item"}>
+                                      <span className="text-[10px] text-muted-foreground">{(item as any).is_active === false ? "Off" : "On"}</span>
+                                      <input
+                                        type="checkbox"
+                                        checked={(item as any).is_active !== false}
+                                        onChange={() => handleToggleItemActive(item as MenuChildItem & { id: string })}
+                                        className="w-3.5 h-3.5 accent-primary"
+                                      />
+                                    </label>
+                                     <Button
+                                       variant="outline" size="sm"
+                                       onClick={() => setEditingMenuItem({
+                                         ...emptyMenuChild,
+                                         category_key: item.category_key,
+                                         parent_id: item.id!,
+                                         sort_order: children.length,
+                                       })}
+                                       className="rounded-xl text-xs h-7 px-2"
+                                       title="Add child item"
+                                     >
+                                       <Plus className="w-3 h-3" />
+                                     </Button>
+                                     <Button variant="outline" size="sm" onClick={() => setEditingMenuItem({ ...item })} className="rounded-xl text-xs h-7">Edit</Button>
+                                     <Button variant="ghost" size="sm" onClick={() => handleDeleteMenuItem(item.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl h-7 w-7 p-0">
+                                       <Trash2 className="w-3.5 h-3.5" />
+                                     </Button>
+                                   </div>
+                                 </div>
+                               )}
                               {isEditingThis && renderInlineEditor(depth)}
                               {children.map(child => renderItem(child, depth + 1))}
                               {isAddingChildHere && renderInlineEditor(depth + 1)}
