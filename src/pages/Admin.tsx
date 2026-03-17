@@ -971,9 +971,31 @@ export default function Admin() {
                   <div key={item.id} className="bg-card border border-border rounded-2xl p-6">
                     <div className="flex items-center justify-between mb-4">
                       <span className="text-sm font-mono bg-secondary px-3 py-1 rounded-lg text-secondary-foreground">{item.content_key}</span>
-                      <Button size="sm" onClick={() => handleSaveContent(item.content_key)} className="gradient-accent text-accent-foreground rounded-xl border-0">
-                        <Save className="w-4 h-4 mr-2" />Save
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={translating || !editedContent[item.content_key]?.value_en}
+                          onClick={async () => {
+                            try {
+                              setTranslating(true);
+                              const result = await translateTexts({ value_en: editedContent[item.content_key]?.value_en || "" });
+                              if (result.value_ar) {
+                                updateEditedField(item.content_key, "value_ar", result.value_ar);
+                                toast.success("Arabic translation generated");
+                              }
+                            } catch (e: any) { toast.error(e.message); }
+                            finally { setTranslating(false); }
+                          }}
+                          className="rounded-xl"
+                        >
+                          <Languages className="w-4 h-4 mr-1" />
+                          {translating ? "..." : "Translate"}
+                        </Button>
+                        <Button size="sm" onClick={() => handleSaveContent(item.content_key)} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                          <Save className="w-4 h-4 mr-2" />Save
+                        </Button>
+                      </div>
                     </div>
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
