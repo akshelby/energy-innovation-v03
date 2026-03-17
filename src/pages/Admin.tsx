@@ -1608,102 +1608,63 @@ export default function Admin() {
                     </div>
                   ) : (
                     <div className="space-y-8">
-                      {CATEGORY_OPTIONS.map((cat) => {
+                      {categories.map((cat) => {
                         const catItems = menuItems.filter((m) => m.category_key === cat.key);
                         const topLevel = catItems.filter(m => !m.parent_id).sort((a, b) => a.sort_order - b.sort_order);
                         const getChildren = (pid: string) => catItems.filter(m => m.parent_id === pid).sort((a, b) => a.sort_order - b.sort_order);
                         const isEditorForThisCategory = editingMenuItem && editingMenuItem.category_key === cat.key;
 
-                        if (catItems.length === 0 && !isEditorForThisCategory) return null;
-
-                        const renderItem = (item: typeof menuItems[0], depth: number) => {
-                          const children = getChildren(item.id);
-                          const hasChildren = children.length > 0;
-                          const isEditingThis = editingMenuItem && editorItemId === item.id;
-                          // Show editor after this item's children if adding a new child to this item
-                          const isAddingChildHere = editingMenuItem && !editorItemId && editorParentId === item.id;
-
-                          return (
-                            <div key={item.id}>
-                              {/* The item row */}
-                              {!isEditingThis && (
-                                <div
-                                  className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${
-                                    depth === 0 ? "bg-card border-border" : depth === 1 ? "bg-secondary/50 border-border/50" : "bg-muted/30 border-border/30"
-                                  }`}
-                                  style={{ marginLeft: `${depth * 24}px` }}
-                                >
-                                  <div className="flex items-center gap-1 shrink-0">
-                                    {depth > 0 && (
-                                      <span className="text-muted-foreground text-xs select-none">└</span>
-                                    )}
-                                    <GripVertical className="w-3.5 h-3.5 text-muted-foreground" />
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <div className="flex items-center gap-2 flex-wrap">
-                                      <span className={`font-medium text-foreground ${depth === 0 ? "text-sm font-bold" : "text-sm"}`}>
-                                        {item.name_en}
-                                      </span>
-                                      <span className="text-xs text-muted-foreground">/ {item.name_ar}</span>
-                                      {item.pdf_url ? (
-                                        <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full font-medium">PDF ✓</span>
-                                      ) : (
-                                        <span className="text-[10px] bg-muted text-muted-foreground px-2 py-0.5 rounded-full">No PDF</span>
-                                      )}
-                                      {hasChildren && (
-                                        <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
-                                          {children.length} sub-item{children.length > 1 ? "s" : ""}
-                                        </span>
-                                      )}
-                                    </div>
-                                  </div>
-                                  <div className="flex gap-1 shrink-0">
-                                    <Button
-                                      variant="outline" size="sm"
-                                      onClick={() => setEditingMenuItem({
-                                        ...emptyMenuChild,
-                                        category_key: item.category_key,
-                                        parent_id: item.id!,
-                                        sort_order: children.length,
-                                      })}
-                                      className="rounded-xl text-xs h-7 px-2"
-                                      title="Add child item"
-                                    >
-                                      <Plus className="w-3 h-3" />
-                                    </Button>
-                                    <Button variant="outline" size="sm" onClick={() => setEditingMenuItem({ ...item })} className="rounded-xl text-xs h-7">Edit</Button>
-                                    <Button variant="ghost" size="sm" onClick={() => handleDeleteMenuItem(item.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl h-7 w-7 p-0">
-                                      <Trash2 className="w-3.5 h-3.5" />
-                                    </Button>
-                                  </div>
-                                </div>
-                              )}
-                              {/* Show inline editor if editing this item */}
-                              {isEditingThis && renderInlineEditor(depth)}
-                              {/* Render children */}
-                              {children.map(child => renderItem(child, depth + 1))}
-                              {/* Show inline editor after children if adding a new child to this item */}
-                              {isAddingChildHere && renderInlineEditor(depth + 1)}
-                            </div>
-                          );
-                        };
-
                         return (
                           <div key={cat.key}>
                             <div className="flex items-center justify-between mb-3">
-                              <h3 className="text-sm font-bold uppercase tracking-wider text-accent">{cat.label}</h3>
-                              <Button
-                                variant="outline" size="sm"
-                                onClick={() => setEditingMenuItem({
-                                  ...emptyMenuChild,
-                                  category_key: cat.key,
-                                  sort_order: topLevel.length,
-                                })}
-                                className="rounded-xl text-xs h-7"
-                              >
-                                <Plus className="w-3 h-3 mr-1" />Add to {cat.label.split(" ")[0]}
-                              </Button>
+                              <div className="flex items-center gap-2">
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-accent">{cat.label_en}</h3>
+                                <span className="text-xs text-muted-foreground">/ {cat.label_ar}</span>
+                              </div>
+                              <div className="flex gap-1">
+                                <Button
+                                  variant="outline" size="sm"
+                                  onClick={() => setEditingMenuItem({
+                                    ...emptyMenuChild,
+                                    category_key: cat.key,
+                                    sort_order: topLevel.length,
+                                  })}
+                                  className="rounded-xl text-xs h-7"
+                                >
+                                  <Plus className="w-3 h-3 mr-1" />Add Item
+                                </Button>
+                                <Button variant="outline" size="sm" onClick={() => setEditingCategory({ ...cat })} className="rounded-xl text-xs h-7">Edit</Button>
+                                <Button variant="ghost" size="sm" onClick={() => handleDeleteCategory(cat.id!)} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl h-7 w-7 p-0">
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </Button>
+                              </div>
                             </div>
+                            {/* Inline category editor */}
+                            {editingCategory && editingCategory.id === cat.id && (
+                              <div className="bg-card border-2 border-accent/30 rounded-2xl p-4 mb-3 space-y-3">
+                                <h4 className="text-sm font-semibold text-foreground">✏️ Edit Category</h4>
+                                <div className="grid md:grid-cols-3 gap-3">
+                                  <div>
+                                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Key</label>
+                                    <Input value={editingCategory.key} onChange={(e) => setEditingCategory({ ...editingCategory, key: e.target.value })} placeholder="cat.new" className="rounded-xl" />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Label (EN)</label>
+                                    <Input value={editingCategory.label_en} onChange={(e) => setEditingCategory({ ...editingCategory, label_en: e.target.value })} placeholder="Category Name" className="rounded-xl" />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Label (AR)</label>
+                                    <Input value={editingCategory.label_ar} onChange={(e) => setEditingCategory({ ...editingCategory, label_ar: e.target.value })} placeholder="auto-generated" className="rounded-xl bg-muted/50" dir="rtl" />
+                                  </div>
+                                </div>
+                                <div className="flex gap-2">
+                                  <Button size="sm" onClick={() => handleSaveCategory(editingCategory)} disabled={loading} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                                    <Save className="w-3.5 h-3.5 mr-1" />Save
+                                  </Button>
+                                  <Button variant="outline" size="sm" onClick={() => setEditingCategory(null)} className="rounded-xl">Cancel</Button>
+                                </div>
+                              </div>
+                            )}
                             <div className="space-y-2">
                               {topLevel.map(item => renderItem(item, 0))}
                               {/* Show editor at bottom of category if adding top-level item here */}
