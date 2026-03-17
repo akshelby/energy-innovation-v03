@@ -97,12 +97,20 @@ export default function ProductsSection() {
                     />
                   ) : (
                     <div className="w-full h-full bg-muted flex items-center justify-center">
-                      <Icon className="w-12 h-12 text-muted-foreground/30" />
+                      {isCustomIcon ? (
+                        <img src={product.icon} alt="" className="w-12 h-12 object-contain opacity-30" />
+                      ) : Icon ? (
+                        <Icon className="w-12 h-12 text-muted-foreground/30" />
+                      ) : null}
                     </div>
                   )}
                   <div className="absolute inset-0" />
                   <div className="absolute bottom-3 left-3 w-10 h-10 rounded-xl gradient-accent flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-accent-foreground" />
+                    {isCustomIcon ? (
+                      <img src={product.icon} alt="" className="w-5 h-5 object-contain" />
+                    ) : Icon ? (
+                      <Icon className="w-5 h-5 text-accent-foreground" />
+                    ) : null}
                   </div>
                   {(isAr ? product.tag_ar : product.tag_en) && (
                     <span className="absolute top-3 right-3 text-[10px] font-semibold uppercase tracking-wider bg-accent/90 text-accent-foreground px-2.5 py-1 rounded-full">
