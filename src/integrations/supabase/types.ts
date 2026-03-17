@@ -51,6 +51,7 @@ export type Database = {
           id: string
           name_ar: string
           name_en: string
+          parent_id: string | null
           pdf_url: string | null
           sort_order: number
         }
@@ -60,6 +61,7 @@ export type Database = {
           id?: string
           name_ar?: string
           name_en?: string
+          parent_id?: string | null
           pdf_url?: string | null
           sort_order?: number
         }
@@ -69,10 +71,19 @@ export type Database = {
           id?: string
           name_ar?: string
           name_en?: string
+          parent_id?: string | null
           pdf_url?: string | null
           sort_order?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "product_items_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "product_items"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       products: {
         Row: {
