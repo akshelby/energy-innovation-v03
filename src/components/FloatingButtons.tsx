@@ -36,8 +36,12 @@ export default function FloatingButtons() {
       ])
       .then(({ data }) => {
         if (!data) return;
-        const map: Record<string, string> = {};
-        data.forEach((d) => (map[d.content_key] = d.value_en));
+        const mapEn: Record<string, string> = {};
+        const mapAr: Record<string, string> = {};
+        data.forEach((d) => {
+          mapEn[d.content_key] = d.value_en;
+          mapAr[d.content_key] = d.value_ar;
+        });
         setConfig({
           whatsappNumber: map["whatsapp_number"] || "",
           whatsappActive: map["whatsapp_active"] === "true",
