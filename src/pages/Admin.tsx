@@ -537,6 +537,37 @@ export default function Admin() {
     } catch (e: any) { toast.error(e.message); }
   };
 
+  // Category CRUD
+  const handleSaveCategory = async (cat: CategoryItem) => {
+    try {
+      setLoading(true);
+      if (cat.label_en && !cat.label_ar) {
+        try {
+          const result = await translateTexts({ label_en: cat.label_en });
+          cat = { ...cat, label_ar: result.label_en || cat.label_ar };
+        } catch { /* proceed */ }
+      }
+      await apiCall("product-categories", "POST", storedPassword, cat);
+      toast.success("Category saved");
+      setEditingCategory(null);
+      fetchCategories();
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  };
+
+  const handleDeleteCategory = async (id: string) => {
+    const catItems = menuItems.filter(m => categories.find(c => c.id === id)?.key === m.category_key);
+    if (catItems.length > 0) {
+      toast.error(`Cannot delete: ${catItems.length} items belong to this category`);
+      return;
+    }
+    try {
+      await apiCall("product-categories", "DELETE", storedPassword, { id });
+      setCategories((prev) => prev.filter((c) => c.id !== id));
+      toast.success("Category deleted");
+    } catch (e: any) { toast.error(e.message); }
+  };
+
   // File uploads for images tab
   const handleUploadFiles = async (fileList: FileList) => {
     setUploading(true);
