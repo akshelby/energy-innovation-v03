@@ -718,6 +718,36 @@ export default function Admin() {
                   </Button>
                 </div>
               </div>
+
+              {/* WhatsApp Number */}
+              <div className="bg-card border border-border rounded-2xl p-6 md:col-span-2">
+                <h3 className="font-semibold text-foreground mb-4">WhatsApp Number</h3>
+                <p className="text-sm text-muted-foreground mb-4">Enter the phone number (with country code) for the floating WhatsApp button. Leave empty to hide it.</p>
+                
+                <div className="flex gap-3 max-w-md">
+                  <Input
+                    value={whatsappNumber}
+                    onChange={(e) => setWhatsappNumber(e.target.value)}
+                    placeholder="+966 5X XXX XXXX"
+                    className="rounded-xl"
+                  />
+                  <Button
+                    onClick={async () => {
+                      try {
+                        await apiCall("content", "POST", storedPassword, {
+                          content_key: "whatsapp_number",
+                          value_en: whatsappNumber,
+                          value_ar: whatsappNumber,
+                        });
+                        toast.success("WhatsApp number saved!");
+                      } catch (err: any) { toast.error(err.message); }
+                    }}
+                    className="gradient-accent text-accent-foreground rounded-xl border-0 shrink-0"
+                  >
+                    <Save className="w-4 h-4 mr-2" />Save
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         )}
