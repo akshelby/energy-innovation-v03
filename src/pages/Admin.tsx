@@ -289,7 +289,12 @@ export default function Admin() {
       if (brandEntry) setBrandName(brandEntry.value_en);
       const waEntry = data.find((d: ContentItem) => d.content_key === "whatsapp_number");
       if (waEntry) setWhatsappNumber(waEntry.value_en);
-    } catch { /* ignore */ }
+      const waActive = data.find((d: ContentItem) => d.content_key === "whatsapp_active");
+      setWhatsappActive(waActive?.value_en === "true");
+      const emailEntry = data.find((d: ContentItem) => d.content_key === "floating_email");
+      if (emailEntry) setFloatingEmail(emailEntry.value_en);
+      const emActive = data.find((d: ContentItem) => d.content_key === "email_active");
+      setEmailActive(emActive?.value_en === "true");
     // Load logo URL
     const logoPublicUrl = `${STORAGE_BASE}/images/branding/logo`;
     try {
