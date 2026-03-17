@@ -1419,9 +1419,6 @@ export default function Admin() {
                 </p>
               </div>
               <div className="flex gap-2">
-                <Button size="sm" onClick={() => setEditingMenuItem({ ...emptyMenuChild, sort_order: menuItems.filter(m => !m.parent_id).length })} className="gradient-accent text-accent-foreground rounded-xl border-0">
-                  <Plus className="w-4 h-4 mr-2" />Add Item
-                </Button>
                 <Button variant="outline" size="sm" onClick={fetchMenuItems} disabled={loading} className="rounded-xl">
                   <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
                 </Button>
