@@ -91,13 +91,13 @@ interface MenuChildItem {
   sort_order: number;
 }
 
-const CATEGORY_OPTIONS = [
-  { key: "cat.fire", label: "Fire & Smoke Safety Systems" },
-  { key: "cat.roller", label: "Roller Shutters & Doors" },
-  { key: "cat.oil", label: "Oil & Gas Industry Equipment" },
-  { key: "cat.hvac", label: "HVAC & Ventilation Solutions" },
-  { key: "cat.loading", label: "Loading Bay & Material Handling" },
-];
+interface CategoryItem {
+  id?: string;
+  key: string;
+  label_en: string;
+  label_ar: string;
+  sort_order: number;
+}
 
 const ICON_OPTIONS = [
   "Flame", "DoorOpen", "Droplets", "Wind", "Truck", "Shield",
@@ -209,6 +209,8 @@ export default function Admin() {
   // Menu Items state
   const [menuItems, setMenuItems] = useState<(MenuChildItem & { id: string })[]>([]);
   const [editingMenuItem, setEditingMenuItem] = useState<MenuChildItem | null>(null);
+  const [categories, setCategories] = useState<(CategoryItem & { id: string })[]>([]);
+  const [editingCategory, setEditingCategory] = useState<CategoryItem | null>(null);
   const menuItemPdfRef = useRef<HTMLInputElement>(null);
   const menuEditorRef = useRef<HTMLDivElement>(null);
 
@@ -301,6 +303,13 @@ export default function Admin() {
     finally { setLoading(false); }
   }, [storedPassword]);
 
+  const fetchCategories = useCallback(async () => {
+    try {
+      const data = await apiCall("product-categories", "GET", storedPassword);
+      setCategories(data);
+    } catch (e: any) { toast.error(e.message); }
+  }, [storedPassword]);
+
   const fetchFiles = useCallback(async () => {
     setLoading(true);
     try {
@@ -382,11 +391,11 @@ export default function Admin() {
       else if (activeTab === "content") fetchContent();
       else if (activeTab === "products") fetchProducts();
       else if (activeTab === "services") fetchServices();
-      else if (activeTab === "menu-items") fetchMenuItems();
+      else if (activeTab === "menu-items") { fetchMenuItems(); fetchCategories(); }
       else if (activeTab === "branding") fetchBranding();
       else fetchFiles();
     }
-  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchProducts, fetchServices, fetchMenuItems, fetchFiles, fetchBranding]);
+  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -525,6 +534,37 @@ export default function Admin() {
       await apiCall("product-items", "DELETE", storedPassword, { id });
       setMenuItems((prev) => prev.filter((m) => m.id !== id));
       toast.success("Menu item deleted");
+    } catch (e: any) { toast.error(e.message); }
+  };
+
+  // Category CRUD
+  const handleSaveCategory = async (cat: CategoryItem) => {
+    try {
+      setLoading(true);
+      if (cat.label_en && !cat.label_ar) {
+        try {
+          const result = await translateTexts({ label_en: cat.label_en });
+          cat = { ...cat, label_ar: result.label_en || cat.label_ar };
+        } catch { /* proceed */ }
+      }
+      await apiCall("product-categories", "POST", storedPassword, cat);
+      toast.success("Category saved");
+      setEditingCategory(null);
+      fetchCategories();
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  };
+
+  const handleDeleteCategory = async (id: string) => {
+    const catItems = menuItems.filter(m => categories.find(c => c.id === id)?.key === m.category_key);
+    if (catItems.length > 0) {
+      toast.error(`Cannot delete: ${catItems.length} items belong to this category`);
+      return;
+    }
+    try {
+      await apiCall("product-categories", "DELETE", storedPassword, { id });
+      setCategories((prev) => prev.filter((c) => c.id !== id));
+      toast.success("Category deleted");
     } catch (e: any) { toast.error(e.message); }
   };
 
@@ -1419,11 +1459,60 @@ export default function Admin() {
                 </p>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={fetchMenuItems} disabled={loading} className="rounded-xl">
+                <Button size="sm" onClick={() => setEditingCategory({ key: "", label_en: "", label_ar: "", sort_order: categories.length })} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                  <Plus className="w-4 h-4 mr-2" />New Category
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => { fetchMenuItems(); fetchCategories(); }} disabled={loading} className="rounded-xl">
                   <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
                 </Button>
               </div>
             </div>
+
+            {/* New Category form (when creating, no id) */}
+            {editingCategory && !editingCategory.id && (
+              <div className="bg-card border-2 border-accent/30 rounded-2xl p-4 mb-6 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-semibold text-foreground">➕ New Category</h4>
+                  <Button
+                    variant="outline" size="sm"
+                    disabled={translating || !editingCategory.label_en}
+                    onClick={async () => {
+                      try {
+                        setTranslating(true);
+                        const result = await translateTexts({ label_en: editingCategory.label_en });
+                        setEditingCategory({ ...editingCategory, label_ar: result.label_en || editingCategory.label_ar });
+                        toast.success("Arabic translation generated");
+                      } catch (e: any) { toast.error(e.message); }
+                      finally { setTranslating(false); }
+                    }}
+                    className="rounded-xl"
+                  >
+                    <Languages className="w-4 h-4 mr-2" />
+                    {translating ? "..." : "Auto Translate"}
+                  </Button>
+                </div>
+                <div className="grid md:grid-cols-3 gap-3">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Key (unique identifier)</label>
+                    <Input value={editingCategory.key} onChange={(e) => setEditingCategory({ ...editingCategory, key: e.target.value })} placeholder="cat.new-category" className="rounded-xl" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Label (EN)</label>
+                    <Input value={editingCategory.label_en} onChange={(e) => setEditingCategory({ ...editingCategory, label_en: e.target.value })} placeholder="Category Name" className="rounded-xl" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Label (AR) — auto-generated</label>
+                    <Input value={editingCategory.label_ar} onChange={(e) => setEditingCategory({ ...editingCategory, label_ar: e.target.value })} placeholder="auto-generated" className="rounded-xl bg-muted/50" dir="rtl" />
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={() => handleSaveCategory(editingCategory)} disabled={loading || !editingCategory.key || !editingCategory.label_en} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                    <Save className="w-3.5 h-3.5 mr-1" />Save Category
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setEditingCategory(null)} className="rounded-xl">Cancel</Button>
+                </div>
+              </div>
+            )}
 
             {/* Inline editor renderer */}
             {(() => {
@@ -1478,8 +1567,8 @@ export default function Admin() {
                           onChange={(e) => setEditingMenuItem({ ...editingMenuItem, category_key: e.target.value, parent_id: null })}
                           className="w-full h-10 rounded-xl border border-input bg-background px-3 text-sm"
                         >
-                          {CATEGORY_OPTIONS.map((cat) => (
-                            <option key={cat.key} value={cat.key}>{cat.label}</option>
+                          {categories.map((cat) => (
+                            <option key={cat.key} value={cat.key}>{cat.label_en}</option>
                           ))}
                         </select>
                       </div>
@@ -1568,24 +1657,20 @@ export default function Admin() {
                     </div>
                   ) : (
                     <div className="space-y-8">
-                      {CATEGORY_OPTIONS.map((cat) => {
+                      {categories.map((cat) => {
                         const catItems = menuItems.filter((m) => m.category_key === cat.key);
                         const topLevel = catItems.filter(m => !m.parent_id).sort((a, b) => a.sort_order - b.sort_order);
                         const getChildren = (pid: string) => catItems.filter(m => m.parent_id === pid).sort((a, b) => a.sort_order - b.sort_order);
                         const isEditorForThisCategory = editingMenuItem && editingMenuItem.category_key === cat.key;
 
-                        if (catItems.length === 0 && !isEditorForThisCategory) return null;
-
                         const renderItem = (item: typeof menuItems[0], depth: number) => {
                           const children = getChildren(item.id);
                           const hasChildren = children.length > 0;
                           const isEditingThis = editingMenuItem && editorItemId === item.id;
-                          // Show editor after this item's children if adding a new child to this item
                           const isAddingChildHere = editingMenuItem && !editorItemId && editorParentId === item.id;
 
                           return (
                             <div key={item.id}>
-                              {/* The item row */}
                               {!isEditingThis && (
                                 <div
                                   className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${
@@ -1594,9 +1679,7 @@ export default function Admin() {
                                   style={{ marginLeft: `${depth * 24}px` }}
                                 >
                                   <div className="flex items-center gap-1 shrink-0">
-                                    {depth > 0 && (
-                                      <span className="text-muted-foreground text-xs select-none">└</span>
-                                    )}
+                                    {depth > 0 && <span className="text-muted-foreground text-xs select-none">└</span>}
                                     <GripVertical className="w-3.5 h-3.5 text-muted-foreground" />
                                   </div>
                                   <div className="flex-1 min-w-0">
@@ -1638,11 +1721,8 @@ export default function Admin() {
                                   </div>
                                 </div>
                               )}
-                              {/* Show inline editor if editing this item */}
                               {isEditingThis && renderInlineEditor(depth)}
-                              {/* Render children */}
                               {children.map(child => renderItem(child, depth + 1))}
-                              {/* Show inline editor after children if adding a new child to this item */}
                               {isAddingChildHere && renderInlineEditor(depth + 1)}
                             </div>
                           );
@@ -1651,19 +1731,54 @@ export default function Admin() {
                         return (
                           <div key={cat.key}>
                             <div className="flex items-center justify-between mb-3">
-                              <h3 className="text-sm font-bold uppercase tracking-wider text-accent">{cat.label}</h3>
-                              <Button
-                                variant="outline" size="sm"
-                                onClick={() => setEditingMenuItem({
-                                  ...emptyMenuChild,
-                                  category_key: cat.key,
-                                  sort_order: topLevel.length,
-                                })}
-                                className="rounded-xl text-xs h-7"
-                              >
-                                <Plus className="w-3 h-3 mr-1" />Add to {cat.label.split(" ")[0]}
-                              </Button>
+                              <div className="flex items-center gap-2">
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-accent">{cat.label_en}</h3>
+                                <span className="text-xs text-muted-foreground">/ {cat.label_ar}</span>
+                              </div>
+                              <div className="flex gap-1">
+                                <Button
+                                  variant="outline" size="sm"
+                                  onClick={() => setEditingMenuItem({
+                                    ...emptyMenuChild,
+                                    category_key: cat.key,
+                                    sort_order: topLevel.length,
+                                  })}
+                                  className="rounded-xl text-xs h-7"
+                                >
+                                  <Plus className="w-3 h-3 mr-1" />Add Item
+                                </Button>
+                                <Button variant="outline" size="sm" onClick={() => setEditingCategory({ ...cat })} className="rounded-xl text-xs h-7">Edit</Button>
+                                <Button variant="ghost" size="sm" onClick={() => handleDeleteCategory(cat.id!)} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl h-7 w-7 p-0">
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </Button>
+                              </div>
                             </div>
+                            {/* Inline category editor */}
+                            {editingCategory && editingCategory.id === cat.id && (
+                              <div className="bg-card border-2 border-accent/30 rounded-2xl p-4 mb-3 space-y-3">
+                                <h4 className="text-sm font-semibold text-foreground">✏️ Edit Category</h4>
+                                <div className="grid md:grid-cols-3 gap-3">
+                                  <div>
+                                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Key</label>
+                                    <Input value={editingCategory.key} onChange={(e) => setEditingCategory({ ...editingCategory, key: e.target.value })} placeholder="cat.new" className="rounded-xl" />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Label (EN)</label>
+                                    <Input value={editingCategory.label_en} onChange={(e) => setEditingCategory({ ...editingCategory, label_en: e.target.value })} placeholder="Category Name" className="rounded-xl" />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Label (AR)</label>
+                                    <Input value={editingCategory.label_ar} onChange={(e) => setEditingCategory({ ...editingCategory, label_ar: e.target.value })} placeholder="auto-generated" className="rounded-xl bg-muted/50" dir="rtl" />
+                                  </div>
+                                </div>
+                                <div className="flex gap-2">
+                                  <Button size="sm" onClick={() => handleSaveCategory(editingCategory)} disabled={loading} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                                    <Save className="w-3.5 h-3.5 mr-1" />Save
+                                  </Button>
+                                  <Button variant="outline" size="sm" onClick={() => setEditingCategory(null)} className="rounded-xl">Cancel</Button>
+                                </div>
+                              </div>
+                            )}
                             <div className="space-y-2">
                               {topLevel.map(item => renderItem(item, 0))}
                               {/* Show editor at bottom of category if adding top-level item here */}

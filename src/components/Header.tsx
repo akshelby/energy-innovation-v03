@@ -17,7 +17,13 @@ interface ProductItem {
   parent_id: string | null;
 }
 
-const CATEGORY_ORDER = ["cat.fire", "cat.roller", "cat.oil", "cat.hvac", "cat.loading"];
+interface CategoryItem {
+  id: string;
+  key: string;
+  label_en: string;
+  label_ar: string;
+  sort_order: number;
+}
 
 export default function Header() {
   const { t, language, setLanguage, isRTL } = useLanguage();
@@ -31,10 +37,11 @@ export default function Header() {
   const [pdfOpen, setPdfOpen] = useState(false);
   const [pdfSrc, setPdfSrc] = useState("");
   const [productItems, setProductItems] = useState<ProductItem[]>([]);
+  const [productCategories, setProductCategories] = useState<CategoryItem[]>([]);
   const [expandedParents, setExpandedParents] = useState<Set<string>>(new Set());
   const [expandedMobileParents, setExpandedMobileParents] = useState<Set<string>>(new Set());
 
-  // Fetch product items from Supabase
+  // Fetch product items and categories from Supabase
   useEffect(() => {
     supabase
       .from("product_items")
@@ -44,13 +51,22 @@ export default function Header() {
       .then(({ data }) => {
         if (data && data.length > 0) setProductItems(data as ProductItem[]);
       });
+    supabase
+      .from("product_categories")
+      .select("*")
+      .order("sort_order")
+      .then(({ data }) => {
+        if (data && data.length > 0) setProductCategories(data as CategoryItem[]);
+      });
   }, []);
 
   // Top-level items (no parent) grouped by category
-  const categoriesWithItems = CATEGORY_ORDER
-    .map((key) => ({
-      key,
-      items: productItems.filter((item) => item.category_key === key && !item.parent_id),
+  const categoriesWithItems = productCategories
+    .map((cat) => ({
+      key: cat.key,
+      label_en: cat.label_en,
+      label_ar: cat.label_ar,
+      items: productItems.filter((item) => item.category_key === cat.key && !item.parent_id),
     }))
     .filter((cat) => cat.items.length > 0);
 
@@ -263,7 +279,7 @@ export default function Header() {
                         <div className="grid grid-cols-3 gap-x-8 gap-y-6">
                           {row1.map((cat) => (
                             <div key={cat.key}>
-                              <h4 className="text-sm font-bold uppercase tracking-wider text-accent mb-3">{t(cat.key)}</h4>
+                              <h4 className="text-sm font-bold uppercase tracking-wider text-accent mb-3">{language === "ar" ? cat.label_ar : cat.label_en}</h4>
                               <ul className="space-y-1.5">{cat.items.map((pi) => renderDesktopItem(pi))}</ul>
                             </div>
                           ))}
@@ -273,7 +289,7 @@ export default function Header() {
                         <div className="grid grid-cols-3 gap-x-8 mt-6">
                           {row2.map((cat) => (
                             <div key={cat.key}>
-                              <h4 className="text-sm font-bold uppercase tracking-wider text-accent mb-3">{t(cat.key)}</h4>
+                              <h4 className="text-sm font-bold uppercase tracking-wider text-accent mb-3">{language === "ar" ? cat.label_ar : cat.label_en}</h4>
                               <ul className="space-y-1.5">{cat.items.map((pi) => renderDesktopItem(pi))}</ul>
                             </div>
                           ))}
@@ -342,7 +358,7 @@ export default function Header() {
                           {categoriesWithItems.map((cat) => (
                             <div key={cat.key}>
                               <h4 className="text-sm font-bold uppercase tracking-wider text-accent px-4 mb-1">
-                                {t(cat.key)}
+                                {language === "ar" ? cat.label_ar : cat.label_en}
                               </h4>
                               {cat.items.map((pi) => renderMobileItem(pi))}
                             </div>
