@@ -210,6 +210,7 @@ export default function Admin() {
   const [brandLogoUploading, setBrandLogoUploading] = useState(false);
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [whatsappActive, setWhatsappActive] = useState(false);
+  const [whatsappMessage, setWhatsappMessage] = useState("Hello, I'm interested in your products and services.");
   const [floatingEmail, setFloatingEmail] = useState("");
   const [emailActive, setEmailActive] = useState(false);
   const productImageRef = useRef<HTMLInputElement>(null);
@@ -292,6 +293,8 @@ export default function Admin() {
       if (waEntry) setWhatsappNumber(waEntry.value_en);
       const waActive = data.find((d: ContentItem) => d.content_key === "whatsapp_active");
       setWhatsappActive(waActive?.value_en === "true");
+      const waMsg = data.find((d: ContentItem) => d.content_key === "whatsapp_message");
+      if (waMsg) setWhatsappMessage(waMsg.value_en);
       const emailEntry = data.find((d: ContentItem) => d.content_key === "floating_email");
       if (emailEntry) setFloatingEmail(emailEntry.value_en);
       const emActive = data.find((d: ContentItem) => d.content_key === "email_active");
@@ -758,16 +761,30 @@ export default function Admin() {
                     value={whatsappNumber}
                     onChange={(val) => setWhatsappNumber(val)}
                   />
+                  <Textarea
+                    value={whatsappMessage}
+                    onChange={(e) => setWhatsappMessage(e.target.value)}
+                    placeholder="Default WhatsApp message text..."
+                    className="bg-muted/50 border-border text-foreground min-h-[60px]"
+                    rows={2}
+                  />
                   <Button
                     onClick={async () => {
                       try {
                         const cleaned = whatsappNumber.replace(/[^0-9+]/g, "");
-                        await apiCall("content", "POST", storedPassword, {
-                          content_key: "whatsapp_number",
-                          value_en: cleaned,
-                          value_ar: cleaned,
-                        });
-                        toast.success("WhatsApp number saved!");
+                        await Promise.all([
+                          apiCall("content", "POST", storedPassword, {
+                            content_key: "whatsapp_number",
+                            value_en: cleaned,
+                            value_ar: cleaned,
+                          }),
+                          apiCall("content", "POST", storedPassword, {
+                            content_key: "whatsapp_message",
+                            value_en: whatsappMessage,
+                            value_ar: whatsappMessage,
+                          }),
+                        ]);
+                        toast.success("WhatsApp settings saved!");
                       } catch (err: any) { toast.error(err.message); }
                     }}
                     className="gradient-accent text-accent-foreground rounded-xl border-0 w-full sm:w-auto"

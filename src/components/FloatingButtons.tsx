@@ -5,6 +5,7 @@ import { Mail } from "lucide-react";
 interface FloatingConfig {
   whatsappNumber: string;
   whatsappActive: boolean;
+  whatsappMessage: string;
   floatingEmail: string;
   emailActive: boolean;
 }
@@ -13,6 +14,7 @@ export default function FloatingButtons() {
   const [config, setConfig] = useState<FloatingConfig>({
     whatsappNumber: "",
     whatsappActive: false,
+    whatsappMessage: "",
     floatingEmail: "",
     emailActive: false,
   });
@@ -24,6 +26,7 @@ export default function FloatingButtons() {
       .in("content_key", [
         "whatsapp_number",
         "whatsapp_active",
+        "whatsapp_message",
         "floating_email",
         "email_active",
       ])
@@ -34,6 +37,7 @@ export default function FloatingButtons() {
         setConfig({
           whatsappNumber: map["whatsapp_number"] || "",
           whatsappActive: map["whatsapp_active"] === "true",
+          whatsappMessage: map["whatsapp_message"] || "",
           floatingEmail: map["floating_email"] || "",
           emailActive: map["email_active"] === "true",
         });
@@ -46,12 +50,13 @@ export default function FloatingButtons() {
   if (!showWhatsapp && !showEmail) return null;
 
   const clean = config.whatsappNumber.replace(/[^0-9+]/g, "").replace(/^\+/, "");
+  const msgParam = config.whatsappMessage ? `?text=${encodeURIComponent(config.whatsappMessage)}` : "";
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
       {showWhatsapp && (
         <a
-          href={`https://wa.me/${clean}`}
+          href={`https://wa.me/${clean}${msgParam}`}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Chat on WhatsApp"
