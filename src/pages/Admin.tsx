@@ -574,11 +574,16 @@ export default function Admin() {
               }}
             />
             <Button variant="outline" size="sm" onClick={() => imageRef.current?.click()} disabled={uploading} className="rounded-xl shrink-0">
-              <Upload className="w-4 h-4" />
+              {uploading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
             </Button>
           </div>
-          {item.image_url && (
-            <img src={item.image_url} alt="Preview" className="mt-2 h-20 w-32 object-cover rounded-lg border border-border" />
+          {item.image_url ? (
+            <div className="mt-2 flex items-center gap-2">
+              <img src={item.image_url} alt="Preview" className="h-20 w-32 object-cover rounded-lg border border-border" />
+              <span className="text-xs text-green-600 font-medium">✓ Image uploaded</span>
+            </div>
+          ) : (
+            <p className="mt-1.5 text-xs text-muted-foreground">No image uploaded</p>
           )}
         </div>
 
