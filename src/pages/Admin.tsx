@@ -226,6 +226,7 @@ export default function Admin() {
   const [brandLogoUrl, setBrandLogoUrl] = useState("");
   const brandLogoRef = useRef<HTMLInputElement>(null);
   const [brandLogoUploading, setBrandLogoUploading] = useState(false);
+  const [logoSize, setLogoSize] = useState(56);
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [whatsappActive, setWhatsappActive] = useState(false);
   const [whatsappMessage, setWhatsappMessage] = useState("Hello, I'm interested in your products and services.");
@@ -340,6 +341,8 @@ export default function Admin() {
       const data = await apiCall("content", "GET", storedPassword);
       const brandEntry = data.find((d: ContentItem) => d.content_key === "brand.name");
       if (brandEntry) setBrandName(brandEntry.value_en);
+      const sizeEntry = data.find((d: ContentItem) => d.content_key === "logo.size");
+      if (sizeEntry) setLogoSize(parseInt(sizeEntry.value_en) || 56);
       const waEntry = data.find((d: ContentItem) => d.content_key === "whatsapp_number");
       if (waEntry) setWhatsappNumber(waEntry.value_en);
       const waActive = data.find((d: ContentItem) => d.content_key === "whatsapp_active");
@@ -957,6 +960,45 @@ export default function Admin() {
                   <Upload className="w-4 h-4 mr-2" />
                   {brandLogoUploading ? "Uploading..." : brandLogoUrl ? "Replace Logo" : "Upload Logo"}
                 </Button>
+
+                {/* Logo Size Slider */}
+                <div className="mt-6 pt-4 border-t border-border">
+                  <h4 className="text-sm font-medium text-foreground mb-2">Logo Size</h4>
+                  <p className="text-xs text-muted-foreground mb-3">Adjust the logo height across the website ({logoSize}px)</p>
+                  <div className="flex items-center gap-4">
+                    <span className="text-xs text-muted-foreground w-8">32</span>
+                    <input
+                      type="range"
+                      min={32}
+                      max={120}
+                      step={2}
+                      value={logoSize}
+                      onChange={(e) => setLogoSize(parseInt(e.target.value))}
+                      className="flex-1 accent-primary"
+                    />
+                    <span className="text-xs text-muted-foreground w-8">120</span>
+                  </div>
+                  {brandLogoUrl && (
+                    <div className="mt-3 p-3 bg-secondary rounded-xl flex items-center justify-center">
+                      <img src={brandLogoUrl} alt="Preview" className="w-auto object-contain" style={{ height: `${logoSize}px` }} />
+                    </div>
+                  )}
+                  <Button
+                    onClick={async () => {
+                      try {
+                        await apiCall("content", "POST", storedPassword, {
+                          content_key: "logo.size",
+                          value_en: String(logoSize),
+                          value_ar: String(logoSize),
+                        });
+                        toast.success("Logo size saved! Refresh the main site to see changes.");
+                      } catch (err: any) { toast.error(err.message); }
+                    }}
+                    className="gradient-accent text-accent-foreground rounded-xl border-0 mt-3"
+                  >
+                    <Save className="w-4 h-4 mr-2" />Save Size
+                  </Button>
+                </div>
               </div>
 
               {/* Business Name */}
