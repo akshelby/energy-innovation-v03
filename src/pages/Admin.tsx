@@ -1459,7 +1459,10 @@ export default function Admin() {
                 </p>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={fetchMenuItems} disabled={loading} className="rounded-xl">
+                <Button size="sm" onClick={() => setEditingCategory({ key: "", label_en: "", label_ar: "", sort_order: categories.length })} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                  <Plus className="w-4 h-4 mr-2" />New Category
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => { fetchMenuItems(); fetchCategories(); }} disabled={loading} className="rounded-xl">
                   <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
                 </Button>
               </div>
