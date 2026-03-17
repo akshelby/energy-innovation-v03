@@ -210,6 +210,7 @@ export default function Admin() {
   const [menuItems, setMenuItems] = useState<(MenuChildItem & { id: string })[]>([]);
   const [editingMenuItem, setEditingMenuItem] = useState<MenuChildItem | null>(null);
   const menuItemPdfRef = useRef<HTMLInputElement>(null);
+  const menuEditorRef = useRef<HTMLDivElement>(null);
 
   // PDF preview
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState("");
