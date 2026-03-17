@@ -362,8 +362,17 @@ export default function Admin() {
     const edited = editedContent[key];
     if (!edited) return;
     try {
+      // Auto-translate if Arabic is empty
+      let valueAr = edited.value_ar;
+      if (edited.value_en && !valueAr) {
+        try {
+          const result = await translateTexts({ value_en: edited.value_en });
+          valueAr = result.value_ar || "";
+          updateEditedField(key, "value_ar", valueAr);
+        } catch { /* proceed */ }
+      }
       await apiCall("content", "POST", storedPassword, {
-        content_key: key, value_en: edited.value_en, value_ar: edited.value_ar,
+        content_key: key, value_en: edited.value_en, value_ar: valueAr,
       });
       toast.success(`Saved "${key}"`);
       fetchContent();
