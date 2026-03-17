@@ -1752,10 +1752,20 @@ export default function Admin() {
                           <div key={cat.key}>
                             <div className="flex items-center justify-between mb-3">
                               <div className="flex items-center gap-2">
-                                <h3 className="text-sm font-bold uppercase tracking-wider text-accent">{cat.label_en}</h3>
+                                <h3 className={`text-sm font-bold uppercase tracking-wider ${cat.is_active === false ? "text-muted-foreground line-through" : "text-accent"}`}>{cat.label_en}</h3>
                                 <span className="text-xs text-muted-foreground">/ {cat.label_ar}</span>
+                                {cat.is_active === false && <span className="text-[10px] bg-destructive/10 text-destructive px-2 py-0.5 rounded-full font-medium">Inactive</span>}
                               </div>
-                              <div className="flex gap-1">
+                              <div className="flex gap-1 items-center">
+                                <label className="flex items-center gap-1.5 cursor-pointer mr-2" title={cat.is_active === false ? "Activate category" : "Deactivate category"}>
+                                  <span className="text-[10px] text-muted-foreground">{cat.is_active === false ? "Off" : "On"}</span>
+                                  <input
+                                    type="checkbox"
+                                    checked={cat.is_active !== false}
+                                    onChange={() => handleToggleCategoryActive(cat as CategoryItem & { id: string })}
+                                    className="w-4 h-4 accent-primary"
+                                  />
+                                </label>
                                 <Button
                                   variant="outline" size="sm"
                                   onClick={() => setEditingMenuItem({
