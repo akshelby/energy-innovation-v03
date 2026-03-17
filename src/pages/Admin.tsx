@@ -893,6 +893,7 @@ export default function Admin() {
               <LogOut className="w-4 h-4 mr-2" />Logout
             </Button>
           </div>
+        </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
