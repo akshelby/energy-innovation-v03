@@ -209,6 +209,8 @@ export default function Admin() {
   // Menu Items state
   const [menuItems, setMenuItems] = useState<(MenuChildItem & { id: string })[]>([]);
   const [editingMenuItem, setEditingMenuItem] = useState<MenuChildItem | null>(null);
+  const [categories, setCategories] = useState<(CategoryItem & { id: string })[]>([]);
+  const [editingCategory, setEditingCategory] = useState<CategoryItem | null>(null);
   const menuItemPdfRef = useRef<HTMLInputElement>(null);
   const menuEditorRef = useRef<HTMLDivElement>(null);
 
