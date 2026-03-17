@@ -140,7 +140,7 @@ export default function HeroSection() {
         <ChevronRight className="w-5 h-5" />
       </button>
 
-      <div className="relative z-10 h-full flex flex-col justify-end pb-20 md:pb-24 text-center px-6">
+      <div className="relative z-10 h-full flex flex-col justify-end pb-8 md:pb-12 text-center px-6">
         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary-foreground max-w-3xl mx-auto leading-tight animate-fade-in-up drop-shadow-lg">
           {t("hero.headline")}
         </h1>
