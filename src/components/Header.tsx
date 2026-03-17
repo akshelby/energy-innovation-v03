@@ -64,11 +64,12 @@ export default function Header() {
 
   // Top-level items (no parent) grouped by category
   const categoriesWithItems = productCategories
+    .filter((cat) => cat.is_active !== false)
     .map((cat) => ({
       key: cat.key,
       label_en: cat.label_en,
       label_ar: cat.label_ar,
-      items: productItems.filter((item) => item.category_key === cat.key && !item.parent_id),
+      items: productItems.filter((item) => item.category_key === cat.key && !item.parent_id && item.is_active !== false),
     }))
     .filter((cat) => cat.items.length > 0);
 
