@@ -211,6 +211,7 @@ export default function Admin() {
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [whatsappActive, setWhatsappActive] = useState(false);
   const [whatsappMessage, setWhatsappMessage] = useState("Hello, I'm interested in your products and services.");
+  const [whatsappMessageAr, setWhatsappMessageAr] = useState("مرحبًا، أنا مهتم بمنتجاتكم وخدماتكم.");
   const [floatingEmail, setFloatingEmail] = useState("");
   const [emailActive, setEmailActive] = useState(false);
   const productImageRef = useRef<HTMLInputElement>(null);
@@ -294,7 +295,10 @@ export default function Admin() {
       const waActive = data.find((d: ContentItem) => d.content_key === "whatsapp_active");
       setWhatsappActive(waActive?.value_en === "true");
       const waMsg = data.find((d: ContentItem) => d.content_key === "whatsapp_message");
-      if (waMsg) setWhatsappMessage(waMsg.value_en);
+      if (waMsg) {
+        setWhatsappMessage(waMsg.value_en);
+        setWhatsappMessageAr(waMsg.value_ar);
+      }
       const emailEntry = data.find((d: ContentItem) => d.content_key === "floating_email");
       if (emailEntry) setFloatingEmail(emailEntry.value_en);
       const emActive = data.find((d: ContentItem) => d.content_key === "email_active");
@@ -764,8 +768,16 @@ export default function Admin() {
                   <Textarea
                     value={whatsappMessage}
                     onChange={(e) => setWhatsappMessage(e.target.value)}
-                    placeholder="Default WhatsApp message text..."
+                    placeholder="Default WhatsApp message (English)..."
                     className="bg-muted/50 border-border text-foreground min-h-[60px]"
+                    rows={2}
+                  />
+                  <Textarea
+                    value={whatsappMessageAr}
+                    onChange={(e) => setWhatsappMessageAr(e.target.value)}
+                    placeholder="رسالة واتساب الافتراضية (عربي)..."
+                    className="bg-muted/50 border-border text-foreground min-h-[60px]"
+                    dir="rtl"
                     rows={2}
                   />
                   <Button
@@ -781,7 +793,7 @@ export default function Admin() {
                           apiCall("content", "POST", storedPassword, {
                             content_key: "whatsapp_message",
                             value_en: whatsappMessage,
-                            value_ar: whatsappMessage,
+                            value_ar: whatsappMessageAr,
                           }),
                         ]);
                         toast.success("WhatsApp settings saved!");

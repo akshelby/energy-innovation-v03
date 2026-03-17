@@ -1,20 +1,24 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Mail } from "lucide-react";
 
 interface FloatingConfig {
   whatsappNumber: string;
   whatsappActive: boolean;
-  whatsappMessage: string;
+  whatsappMessageEn: string;
+  whatsappMessageAr: string;
   floatingEmail: string;
   emailActive: boolean;
 }
 
 export default function FloatingButtons() {
+  const { language } = useLanguage();
   const [config, setConfig] = useState<FloatingConfig>({
     whatsappNumber: "",
     whatsappActive: false,
-    whatsappMessage: "",
+    whatsappMessageEn: "",
+    whatsappMessageAr: "",
     floatingEmail: "",
     emailActive: false,
   });
@@ -22,7 +26,7 @@ export default function FloatingButtons() {
   useEffect(() => {
     supabase
       .from("site_content")
-      .select("content_key, value_en")
+      .select("content_key, value_en, value_ar")
       .in("content_key", [
         "whatsapp_number",
         "whatsapp_active",
@@ -32,14 +36,19 @@ export default function FloatingButtons() {
       ])
       .then(({ data }) => {
         if (!data) return;
-        const map: Record<string, string> = {};
-        data.forEach((d) => (map[d.content_key] = d.value_en));
+        const mapEn: Record<string, string> = {};
+        const mapAr: Record<string, string> = {};
+        data.forEach((d) => {
+          mapEn[d.content_key] = d.value_en;
+          mapAr[d.content_key] = d.value_ar;
+        });
         setConfig({
-          whatsappNumber: map["whatsapp_number"] || "",
-          whatsappActive: map["whatsapp_active"] === "true",
-          whatsappMessage: map["whatsapp_message"] || "",
-          floatingEmail: map["floating_email"] || "",
-          emailActive: map["email_active"] === "true",
+          whatsappNumber: mapEn["whatsapp_number"] || "",
+          whatsappActive: mapEn["whatsapp_active"] === "true",
+          whatsappMessageEn: mapEn["whatsapp_message"] || "",
+          whatsappMessageAr: mapAr["whatsapp_message"] || "",
+          floatingEmail: mapEn["floating_email"] || "",
+          emailActive: mapEn["email_active"] === "true",
         });
       });
   }, []);
@@ -50,7 +59,8 @@ export default function FloatingButtons() {
   if (!showWhatsapp && !showEmail) return null;
 
   const clean = config.whatsappNumber.replace(/[^0-9+]/g, "").replace(/^\+/, "");
-  const msgParam = config.whatsappMessage ? `?text=${encodeURIComponent(config.whatsappMessage)}` : "";
+  const whatsappMsg = language === "ar" ? config.whatsappMessageAr : config.whatsappMessageEn;
+  const msgParam = whatsappMsg ? `?text=${encodeURIComponent(whatsappMsg)}` : "";
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
