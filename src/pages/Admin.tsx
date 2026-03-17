@@ -89,6 +89,7 @@ interface MenuChildItem {
   name_ar: string;
   pdf_url: string | null;
   sort_order: number;
+  is_active?: boolean;
 }
 
 interface CategoryItem {
@@ -97,6 +98,7 @@ interface CategoryItem {
   label_en: string;
   label_ar: string;
   sort_order: number;
+  is_active?: boolean;
 }
 
 const ICON_OPTIONS = [
