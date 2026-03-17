@@ -78,7 +78,7 @@ export default function ProductsSection() {
             return (
               <div
                 key={i}
-                className="scroll-reveal group rounded-2xl bg-transparent border border-border hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
+                className="scroll-reveal group rounded-2xl bg-transparent border border-border hover:border-accent/50 hover:shadow-xl hover:shadow-accent/5 transition-all duration-300 cursor-pointer overflow-hidden"
                 style={{ transitionDelay: `${i * 80}ms` }}
                 onClick={() => {
                   if (product.pdf_url) {
