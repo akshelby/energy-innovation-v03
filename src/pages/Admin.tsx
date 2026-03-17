@@ -753,7 +753,7 @@ export default function Admin() {
                     />
                   </label>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex flex-col gap-3">
                   <PhoneInput
                     value={whatsappNumber}
                     onChange={(val) => setWhatsappNumber(val)}
@@ -770,7 +770,7 @@ export default function Admin() {
                         toast.success("WhatsApp number saved!");
                       } catch (err: any) { toast.error(err.message); }
                     }}
-                    className="gradient-accent text-accent-foreground rounded-xl border-0 shrink-0"
+                    className="gradient-accent text-accent-foreground rounded-xl border-0 w-full sm:w-auto"
                   >
                     <Save className="w-4 h-4 mr-2" />Save
                   </Button>
