@@ -235,14 +235,14 @@ export default function Header() {
           scrolled ? "shadow-md border-b border-border" : "border-b border-border/80"
         }`}
       >
-        <div className="mx-auto flex w-full max-w-6xl items-center gap-3 px-4 py-4 md:px-6">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3 md:px-6">
           {/* Logo */}
-          <a href="#home" onClick={() => scrollToSection("#home")} className="flex items-center shrink-0 relative z-10">
-            <img src={logoUrl} alt={brandName} className="h-12 w-auto object-contain" />
+          <a href="#home" onClick={() => scrollToSection("#home")} className="flex items-center shrink-0">
+            <img src={logoUrl} alt={brandName} className="h-10 md:h-12 w-auto object-contain" />
           </a>
 
-          {/* Nav + utilities */}
-          <div className="flex-1 flex items-center justify-between">
+          {/* Desktop Nav - centered */}
+          <nav className="hidden md:flex items-center gap-1 mx-auto">
 
           {/* Desktop Nav - centered */}
           <nav className="hidden md:flex items-center gap-1">
