@@ -32,14 +32,34 @@ export default function HeroSection() {
 
   useEffect(() => {
     async function fetchHeroImages() {
+      // Fetch active images list from site_content
+      const { data: contentData } = await supabase
+        .from("site_content")
+        .select("value_en")
+        .eq("content_key", "hero.active_images")
+        .single();
+
+      const activeList: string[] = contentData?.value_en
+        ? JSON.parse(contentData.value_en)
+        : [];
+
       const { data, error } = await supabase.storage.from("images").list("hero", {
         sortBy: { column: "name", order: "asc" },
       });
 
       if (!error && data && data.length > 0) {
-        const urls = data
-          .filter((file) => file.name && !file.name.startsWith(".") && imageFilePattern.test(file.name))
-          .map((file) => buildHeroImageUrl(file.name, file.updated_at ?? file.created_at ?? undefined));
+        let filtered = data.filter(
+          (file) => file.name && !file.name.startsWith(".") && imageFilePattern.test(file.name)
+        );
+
+        // If admin has set active images, only show those
+        if (activeList.length > 0) {
+          filtered = filtered.filter((file) => activeList.includes(file.name));
+        }
+
+        const urls = filtered.map((file) =>
+          buildHeroImageUrl(file.name, file.updated_at ?? file.created_at ?? undefined)
+        );
 
         if (urls.length > 0) {
           setCurrent(0);

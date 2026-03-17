@@ -218,6 +218,7 @@ export default function Admin() {
   const [uploading, setUploading] = useState(false);
   const [translating, setTranslating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [activeHeroImages, setActiveHeroImages] = useState<string[]>([]);
 
   // Branding state
   const [brandName, setBrandName] = useState("Energy Innovation");
@@ -296,6 +297,19 @@ export default function Admin() {
         storedPassword
       );
       setFiles(data.filter((f: StorageFile) => f.name !== ".emptyFolderPlaceholder"));
+
+      // Fetch active hero images when viewing hero folder
+      if (selectedFolder.folder === "hero") {
+        try {
+          const contentData = await apiCall("content", "GET", storedPassword);
+          const entry = contentData.find((d: ContentItem) => d.content_key === "hero.active_images");
+          if (entry) {
+            setActiveHeroImages(JSON.parse(entry.value_en));
+          } else {
+            setActiveHeroImages([]);
+          }
+        } catch { setActiveHeroImages([]); }
+      }
     } catch (e: any) { toast.error(e.message); }
     finally { setLoading(false); }
   }, [storedPassword, selectedFolder]);
@@ -508,6 +522,21 @@ export default function Admin() {
   };
 
   const isImage = (name: string) => /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(name);
+
+  const toggleHeroImageActive = async (fileName: string) => {
+    const updated = activeHeroImages.includes(fileName)
+      ? activeHeroImages.filter((f) => f !== fileName)
+      : [...activeHeroImages, fileName];
+    setActiveHeroImages(updated);
+    try {
+      await apiCall("content", "POST", storedPassword, {
+        content_key: "hero.active_images",
+        value_en: JSON.stringify(updated),
+        value_ar: JSON.stringify(updated),
+      });
+      toast.success("Active hero images updated");
+    } catch (e: any) { toast.error(e.message); }
+  };
 
   // File upload handlers for product/service forms
   const handleFormFileUpload = async (
@@ -1443,7 +1472,7 @@ export default function Admin() {
 
             <p className="text-xs text-muted-foreground mb-4">
               Upload to <span className="font-mono bg-secondary px-1.5 py-0.5 rounded text-secondary-foreground">{selectedFolder.bucket}/{selectedFolder.folder}</span>.
-              {selectedFolder.folder === "hero" && " Name files hero-1.jpg through hero-5.jpg for the homepage slider."}
+              {selectedFolder.folder === "hero" && " Toggle images on/off to control which ones appear in the homepage slider."}
               {selectedFolder.folder === "products" && " Name files product-fire.jpg, product-roller.jpg, etc. for product cards."}
             </p>
 
@@ -1453,17 +1482,29 @@ export default function Admin() {
               </div>
             ) : (
               <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {files.map((file) => (
-                  <div key={file.id || file.name} className="bg-card border border-border rounded-2xl overflow-hidden group">
-                    {isImage(file.name) ? (
-                      <div className="aspect-video bg-muted">
-                        <img src={getPublicUrl(file.name)} alt={file.name} className="w-full h-full object-cover" />
-                      </div>
-                    ) : (
-                      <div className="aspect-video bg-muted flex items-center justify-center">
-                        <FileText className="w-10 h-10 text-muted-foreground/40" />
-                      </div>
-                    )}
+                {files.map((file) => {
+                  const isHeroFolder = selectedFolder.folder === "hero";
+                  const isActive = activeHeroImages.includes(file.name);
+                  return (
+                    <div key={file.id || file.name} className={`bg-card border rounded-2xl overflow-hidden group ${isHeroFolder && isImage(file.name) ? (isActive ? "border-accent ring-2 ring-accent/30" : "border-border opacity-60") : "border-border"}`}>
+                      {isImage(file.name) ? (
+                        <div className="aspect-video bg-muted relative">
+                          <img src={getPublicUrl(file.name)} alt={file.name} className="w-full h-full object-cover" />
+                          {isHeroFolder && (
+                            <button
+                              onClick={() => toggleHeroImageActive(file.name)}
+                              className={`absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${isActive ? "bg-accent text-accent-foreground shadow-md" : "bg-card/80 text-muted-foreground border border-border backdrop-blur-sm"}`}
+                              title={isActive ? "Active – click to hide" : "Inactive – click to show"}
+                            >
+                              {isActive ? "✓" : "○"}
+                            </button>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="aspect-video bg-muted flex items-center justify-center">
+                          <FileText className="w-10 h-10 text-muted-foreground/40" />
+                        </div>
+                      )}
                     <div className="p-3 flex items-center justify-between">
                       <span className="text-xs text-foreground truncate flex-1" title={file.name}>{file.name}</span>
                       <Button variant="ghost" size="sm" onClick={() => handleDeleteFile(file.name)} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-lg shrink-0 h-7 w-7 p-0">
@@ -1471,7 +1512,8 @@ export default function Admin() {
                       </Button>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
