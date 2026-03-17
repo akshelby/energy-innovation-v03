@@ -92,7 +92,7 @@ export default function ProductsSection() {
                     <img
                       src={product.image_url}
                       alt={isAr ? product.name_ar : product.name_en}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      className="w-full h-full object-cover transition-transform duration-500"
                       loading="lazy"
                     />
                   ) : (
