@@ -212,6 +212,13 @@ export default function Admin() {
   const menuItemPdfRef = useRef<HTMLInputElement>(null);
   const menuEditorRef = useRef<HTMLDivElement>(null);
 
+  // Scroll to editor when it opens
+  useEffect(() => {
+    if (editingMenuItem && menuEditorRef.current) {
+      setTimeout(() => menuEditorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 100);
+    }
+  }, [editingMenuItem]);
+
   // PDF preview
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState("");
   const [pdfPreviewOpen, setPdfPreviewOpen] = useState(false);
