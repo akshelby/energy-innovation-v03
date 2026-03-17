@@ -207,6 +207,7 @@ export default function Admin() {
   const [brandLogoUrl, setBrandLogoUrl] = useState("");
   const brandLogoRef = useRef<HTMLInputElement>(null);
   const [brandLogoUploading, setBrandLogoUploading] = useState(false);
+  const [whatsappNumber, setWhatsappNumber] = useState("");
   const productImageRef = useRef<HTMLInputElement>(null);
   const productPdfRef = useRef<HTMLInputElement>(null);
   const serviceImageRef = useRef<HTMLInputElement>(null);
