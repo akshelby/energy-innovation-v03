@@ -60,12 +60,7 @@ export default function HeroSection() {
           (file) => file.name && !file.name.startsWith(".") && imageFilePattern.test(file.name)
         );
 
-        // If admin has set active images, only show those
-        if (activeList.length > 0) {
-          filtered = filtered.filter((file) => activeList.includes(file.name));
-        }
-
-        // Deduplicate by filename stem, preferring .webp over other formats
+        // Deduplicate by filename stem first, preferring .webp
         const stemMap = new Map<string, typeof filtered[0]>();
         for (const file of filtered) {
           const stem = file.name.replace(/\.(png|jpe?g|webp|avif)$/i, "");
@@ -74,7 +69,18 @@ export default function HeroSection() {
             stemMap.set(stem, file);
           }
         }
-        const deduped = Array.from(stemMap.values());
+        let deduped = Array.from(stemMap.values());
+
+        // If admin has set active images, filter by stem match
+        if (activeList.length > 0) {
+          const activeStems = new Set(
+            activeList.map((name) => name.replace(/\.(png|jpe?g|webp|avif)$/i, ""))
+          );
+          deduped = deduped.filter((file) => {
+            const stem = file.name.replace(/\.(png|jpe?g|webp|avif)$/i, "");
+            return activeStems.has(stem);
+          });
+        }
 
         const urls = deduped.map((file) =>
           buildHeroImageUrl(file.name, file.updated_at ?? file.created_at ?? undefined)
