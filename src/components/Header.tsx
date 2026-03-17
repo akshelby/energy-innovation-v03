@@ -124,9 +124,9 @@ export default function Header() {
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
-  const textColor = pastHero ? "text-foreground" : "text-white";
-  const borderColor = pastHero ? "border-border" : "border-white/30";
-  const hoverBg = pastHero ? "hover:bg-secondary/50" : "hover:bg-white/10";
+  const textColor = "text-foreground";
+  const borderColor = "border-border";
+  const hoverBg = "hover:bg-muted";
 
   const isAr = language === "ar";
 
