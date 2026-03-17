@@ -45,7 +45,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section id="home" className="relative h-screen w-full overflow-hidden">
+    <section id="home" className="relative h-[calc(100vh-5rem)] w-full overflow-hidden mt-20">
       {images.map((img, i) => (
         <div
           key={i}
