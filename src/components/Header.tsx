@@ -231,20 +231,18 @@ export default function Header() {
     <>
       {/* Navigation Bar */}
       <header
-        className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-6xl transition-all duration-300"
+        className={`fixed top-0 left-0 z-50 w-full bg-card transition-all duration-300 ${
+          scrolled ? "shadow-md border-b border-border" : "border-b border-border/80"
+        }`}
       >
-        <div className={`flex items-center gap-3 px-4 md:px-4 py-2.5 rounded-xl transition-all duration-300 bg-white ${
-            scrolled
-              ? "shadow-lg border border-accent/60 shadow-[0_0_15px_hsl(var(--accent)/0.3)]"
-              : "shadow-md border border-accent/40 shadow-[0_0_10px_hsl(var(--accent)/0.2)]"
-          }`}>
+        <div className="mx-auto flex w-full max-w-6xl items-center gap-3 px-4 py-4 md:px-6">
           {/* Logo */}
           <a href="#home" onClick={() => scrollToSection("#home")} className="flex items-center shrink-0 relative z-10">
             <img src={logoUrl} alt={brandName} className="h-12 w-auto object-contain" />
           </a>
 
           {/* Nav + utilities */}
-          <div className="flex-1 flex items-center justify-between px-2 md:px-4">
+          <div className="flex-1 flex items-center justify-between">
 
           {/* Desktop Nav - centered */}
           <nav className="hidden md:flex items-center gap-1">
