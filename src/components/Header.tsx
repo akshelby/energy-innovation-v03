@@ -242,9 +242,6 @@ export default function Header() {
           </a>
 
           {/* Desktop Nav - centered */}
-          <nav className="hidden md:flex items-center gap-1 mx-auto">
-
-          {/* Desktop Nav - centered */}
           <nav className="hidden md:flex items-center gap-1">
             {navItems.map((item) => (
               <div key={item.href} className="relative"
@@ -259,7 +256,6 @@ export default function Header() {
                   {item.hasDropdown && <ChevronDown className="w-3.5 h-3.5" />}
                 </button>
 
-                {/* Mega Menu Dropdown */}
                 {item.hasDropdown && productsOpen && categoriesWithItems.length > 0 && (
                   <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2" style={{ width: "750px" }}>
                     <div className="bg-card rounded-2xl shadow-xl border border-border p-6 animate-slide-down max-h-[70vh] overflow-y-auto">
@@ -267,12 +263,8 @@ export default function Header() {
                         <div className="grid grid-cols-3 gap-x-8 gap-y-6">
                           {row1.map((cat) => (
                             <div key={cat.key}>
-                              <h4 className="text-sm font-bold uppercase tracking-wider text-accent mb-3">
-                                {t(cat.key)}
-                              </h4>
-                              <ul className="space-y-1.5">
-                                {cat.items.map((pi) => renderDesktopItem(pi))}
-                              </ul>
+                              <h4 className="text-sm font-bold uppercase tracking-wider text-accent mb-3">{t(cat.key)}</h4>
+                              <ul className="space-y-1.5">{cat.items.map((pi) => renderDesktopItem(pi))}</ul>
                             </div>
                           ))}
                         </div>
@@ -281,12 +273,8 @@ export default function Header() {
                         <div className="grid grid-cols-3 gap-x-8 mt-6">
                           {row2.map((cat) => (
                             <div key={cat.key}>
-                              <h4 className="text-sm font-bold uppercase tracking-wider text-accent mb-3">
-                                {t(cat.key)}
-                              </h4>
-                              <ul className="space-y-1.5">
-                                {cat.items.map((pi) => renderDesktopItem(pi))}
-                              </ul>
+                              <h4 className="text-sm font-bold uppercase tracking-wider text-accent mb-3">{t(cat.key)}</h4>
+                              <ul className="space-y-1.5">{cat.items.map((pi) => renderDesktopItem(pi))}</ul>
                             </div>
                           ))}
                         </div>
@@ -299,10 +287,10 @@ export default function Header() {
           </nav>
 
           {/* Right side */}
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <button
               onClick={toggleTheme}
-              className={`p-2 rounded-full border border-accent/50 shadow-[0_0_8px_hsl(var(--accent)/0.3)] ${textColor} ${hoverBg} transition-all duration-300`}
+              className={`p-2 rounded-full border border-border ${textColor} hover:bg-muted transition-all duration-300`}
               aria-label="Toggle theme"
             >
               {theme === "light" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
@@ -310,7 +298,7 @@ export default function Header() {
 
             <button
               onClick={() => setLanguage(language === "en" ? "ar" : "en")}
-              className={`px-3 py-1.5 text-sm font-semibold rounded-full border border-accent/50 shadow-[0_0_8px_hsl(var(--accent)/0.3)] ${textColor} ${hoverBg} transition-all duration-300`}
+              className={`px-3 py-1.5 text-sm font-semibold rounded-full border border-border ${textColor} hover:bg-muted transition-all duration-300`}
             >
               {language === "en" ? "عربي" : "EN"}
             </button>
@@ -324,11 +312,10 @@ export default function Header() {
 
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className={`md:hidden p-2 rounded-full ${textColor} ${hoverBg} transition-colors duration-300`}
+              className={`md:hidden p-2 rounded-full ${textColor} hover:bg-muted transition-colors duration-300`}
             >
               {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
-          </div>
           </div>
         </div>
       </header>
