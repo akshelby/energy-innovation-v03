@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 // Fallback local imports in case Supabase images aren't uploaded yet
 import hero1Local from "@/assets/hero-1.webp";
@@ -15,8 +16,25 @@ const localImages = [hero1Local, hero2Local, hero3Local, hero4Local, hero5Local]
 export default function HeroSection() {
   const { t } = useLanguage();
   const [current, setCurrent] = useState(0);
+  const [images, setImages] = useState<string[]>(localImages);
 
-  const images = localImages;
+  useEffect(() => {
+    async function fetchHeroImages() {
+      const { data, error } = await supabase.storage.from("images").list("hero", {
+        sortBy: { column: "name", order: "asc" },
+      });
+      if (!error && data && data.length > 0) {
+        const urls = data
+          .filter((f) => f.name && !f.name.startsWith("."))
+          .map((f) => {
+            const { data: urlData } = supabase.storage.from("images").getPublicUrl(`hero/${f.name}`);
+            return urlData.publicUrl;
+          });
+        if (urls.length > 0) setImages(urls);
+      }
+    }
+    fetchHeroImages();
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
