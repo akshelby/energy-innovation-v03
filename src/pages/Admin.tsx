@@ -208,6 +208,9 @@ export default function Admin() {
   const brandLogoRef = useRef<HTMLInputElement>(null);
   const [brandLogoUploading, setBrandLogoUploading] = useState(false);
   const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [whatsappActive, setWhatsappActive] = useState(false);
+  const [floatingEmail, setFloatingEmail] = useState("");
+  const [emailActive, setEmailActive] = useState(false);
   const productImageRef = useRef<HTMLInputElement>(null);
   const productPdfRef = useRef<HTMLInputElement>(null);
   const serviceImageRef = useRef<HTMLInputElement>(null);
