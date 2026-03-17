@@ -14,6 +14,7 @@ interface ProductItem {
   name_ar: string;
   pdf_url: string | null;
   sort_order: number;
+  parent_id: string | null;
 }
 
 const CATEGORY_ORDER = ["cat.fire", "cat.roller", "cat.oil", "cat.hvac", "cat.loading"];
@@ -30,6 +31,8 @@ export default function Header() {
   const [pdfOpen, setPdfOpen] = useState(false);
   const [pdfSrc, setPdfSrc] = useState("");
   const [productItems, setProductItems] = useState<ProductItem[]>([]);
+  const [expandedParents, setExpandedParents] = useState<Set<string>>(new Set());
+  const [expandedMobileParents, setExpandedMobileParents] = useState<Set<string>>(new Set());
 
   // Fetch product items from Supabase
   useEffect(() => {
@@ -43,13 +46,38 @@ export default function Header() {
       });
   }, []);
 
-  // Group items by category
+  // Top-level items (no parent) grouped by category
   const categoriesWithItems = CATEGORY_ORDER
     .map((key) => ({
       key,
-      items: productItems.filter((item) => item.category_key === key),
+      items: productItems.filter((item) => item.category_key === key && !item.parent_id),
     }))
     .filter((cat) => cat.items.length > 0);
+
+  // Get children of a parent item
+  const getChildren = (parentId: string) =>
+    productItems.filter((item) => item.parent_id === parentId);
+
+  const hasChildren = (parentId: string) =>
+    productItems.some((item) => item.parent_id === parentId);
+
+  const toggleExpanded = (id: string) => {
+    setExpandedParents((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleMobileExpanded = (id: string) => {
+    setExpandedMobileParents((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   const handleItemClick = (item: ProductItem) => {
     if (item.pdf_url) {
@@ -106,6 +134,99 @@ export default function Header() {
   const row1 = categoriesWithItems.slice(0, 3);
   const row2 = categoriesWithItems.slice(3);
 
+  // Render a single item (parent or leaf) for desktop mega menu
+  const renderDesktopItem = (pi: ProductItem) => {
+    const children = getChildren(pi.id);
+    const isExpanded = expandedParents.has(pi.id);
+
+    if (children.length > 0) {
+      return (
+        <li key={pi.id}>
+          <button
+            type="button"
+            onClick={() => toggleExpanded(pi.id)}
+            className="text-[13.5px] font-semibold text-card-foreground hover:bg-accent/25 hover:text-red-500 px-2 py-1 rounded transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer w-full text-start"
+          >
+            <ChevronRight className={`w-3 h-3 shrink-0 transition-transform ${isExpanded ? 'rotate-90' : ''} ${isRTL ? 'rotate-180' : ''}`} />
+            {isAr ? pi.name_ar : pi.name_en}
+          </button>
+          {isExpanded && (
+            <ul className="ml-4 mt-1 space-y-1 border-l-2 border-accent/20 pl-2">
+              {children.map((child) => (
+                <li key={child.id}>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.preventDefault(); handleItemClick(child); }}
+                    className="text-[12.5px] font-medium text-muted-foreground hover:text-red-500 hover:bg-accent/15 px-2 py-1 rounded transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer w-full text-start"
+                  >
+                    <ChevronRight className={`w-2.5 h-2.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity ${isRTL ? 'rotate-180' : ''}`} />
+                    {isAr ? child.name_ar : child.name_en}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </li>
+      );
+    }
+
+    return (
+      <li key={pi.id}>
+        <button
+          type="button"
+          onClick={(e) => { e.preventDefault(); handleItemClick(pi); }}
+          className="text-[13.5px] font-semibold text-card-foreground hover:bg-accent/25 hover:text-red-500 px-2 py-1 rounded transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer w-full text-start"
+        >
+          <ChevronRight className={`w-3 h-3 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity ${isRTL ? 'rotate-180' : ''}`} />
+          {isAr ? pi.name_ar : pi.name_en}
+        </button>
+      </li>
+    );
+  };
+
+  // Render a single item for mobile menu
+  const renderMobileItem = (pi: ProductItem) => {
+    const children = getChildren(pi.id);
+    const isExpanded = expandedMobileParents.has(pi.id);
+
+    if (children.length > 0) {
+      return (
+        <div key={pi.id}>
+          <button
+            onClick={() => toggleMobileExpanded(pi.id)}
+            className="w-full text-start px-4 py-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors flex items-center justify-between"
+          >
+            {isAr ? pi.name_ar : pi.name_en}
+            <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+          </button>
+          {isExpanded && (
+            <div className="ml-4 border-l-2 border-accent/20 pl-2 mt-1 space-y-0.5">
+              {children.map((child) => (
+                <button
+                  key={child.id}
+                  onClick={() => handleItemClick(child)}
+                  className="w-full text-start px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {isAr ? child.name_ar : child.name_en}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <button
+        key={pi.id}
+        onClick={() => handleItemClick(pi)}
+        className="w-full text-start px-4 py-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
+      >
+        {isAr ? pi.name_ar : pi.name_en}
+      </button>
+    );
+  };
+
   return (
     <>
       {/* Navigation Bar */}
@@ -125,7 +246,6 @@ export default function Header() {
               : "glass shadow-md border border-border/30"
           }`}>
 
-          {/* Desktop Nav - centered */}
           {/* Desktop Nav - centered */}
           <nav className="hidden md:flex items-center gap-1">
             {navItems.map((item) => (
@@ -153,18 +273,7 @@ export default function Header() {
                                 {t(cat.key)}
                               </h4>
                               <ul className="space-y-1.5">
-                                {cat.items.map((pi) => (
-                                  <li key={pi.id}>
-                                    <button
-                                      type="button"
-                                      onClick={(e) => { e.preventDefault(); handleItemClick(pi); }}
-                                      className="text-[13.5px] font-semibold text-card-foreground hover:bg-accent/25 hover:text-red-500 px-2 py-1 rounded transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer w-full text-start"
-                                    >
-                                      <ChevronRight className={`w-3 h-3 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity ${isRTL ? 'rotate-180' : ''}`} />
-                                      {isAr ? pi.name_ar : pi.name_en}
-                                    </button>
-                                  </li>
-                                ))}
+                                {cat.items.map((pi) => renderDesktopItem(pi))}
                               </ul>
                             </div>
                           ))}
@@ -178,18 +287,7 @@ export default function Header() {
                                 {t(cat.key)}
                               </h4>
                               <ul className="space-y-1.5">
-                                {cat.items.map((pi) => (
-                                  <li key={pi.id}>
-                                    <button
-                                      type="button"
-                                      onClick={(e) => { e.preventDefault(); handleItemClick(pi); }}
-                                      className="text-[13.5px] font-semibold text-card-foreground hover:bg-accent/25 hover:text-red-500 px-2 py-1 rounded transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer w-full text-start"
-                                    >
-                                      <ChevronRight className={`w-3 h-3 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity ${isRTL ? 'rotate-180' : ''}`} />
-                                      {isAr ? pi.name_ar : pi.name_en}
-                                    </button>
-                                  </li>
-                                ))}
+                                {cat.items.map((pi) => renderDesktopItem(pi))}
                               </ul>
                             </div>
                           ))}
@@ -261,15 +359,7 @@ export default function Header() {
                               <h4 className="text-sm font-bold uppercase tracking-wider text-accent px-4 mb-1">
                                 {t(cat.key)}
                               </h4>
-                              {cat.items.map((pi) => (
-                                <button
-                                  key={pi.id}
-                                  onClick={() => handleItemClick(pi)}
-                                  className="w-full text-start px-4 py-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
-                                >
-                                  {isAr ? pi.name_ar : pi.name_en}
-                                </button>
-                              ))}
+                              {cat.items.map((pi) => renderMobileItem(pi))}
                             </div>
                           ))}
                         </div>
