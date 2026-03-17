@@ -279,11 +279,13 @@ export default function Admin() {
   }, [storedPassword, selectedFolder]);
 
   const fetchBranding = useCallback(async () => {
-    // Load brand name from site_content
+    // Load brand name + whatsapp from site_content
     try {
       const data = await apiCall("content", "GET", storedPassword);
       const brandEntry = data.find((d: ContentItem) => d.content_key === "brand.name");
       if (brandEntry) setBrandName(brandEntry.value_en);
+      const waEntry = data.find((d: ContentItem) => d.content_key === "whatsapp_number");
+      if (waEntry) setWhatsappNumber(waEntry.value_en);
     } catch { /* ignore */ }
     // Load logo URL
     const logoPublicUrl = `${STORAGE_BASE}/images/branding/logo`;
