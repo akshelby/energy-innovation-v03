@@ -140,30 +140,30 @@ export default function HeroSection() {
         <ChevronRight className="w-5 h-5" />
       </button>
 
-      <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-primary-foreground max-w-4xl leading-tight animate-fade-in-up drop-shadow-lg">
+      <div className="relative z-10 h-full flex flex-col justify-end pb-20 md:pb-24 text-center px-6">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary-foreground max-w-3xl mx-auto leading-tight animate-fade-in-up drop-shadow-lg">
           {t("hero.headline")}
         </h1>
-        <p className="mt-6 text-lg md:text-xl font-semibold text-primary-foreground/85 max-w-2xl animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
+        <p className="mt-4 text-sm md:text-base font-medium text-primary-foreground/80 max-w-xl mx-auto animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
           {t("hero.subtext")}
         </p>
-        <div className="mt-8 flex flex-wrap gap-4 justify-center animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
+        <div className="mt-6 flex flex-wrap gap-3 justify-center animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
           <Button
             onClick={() => scrollTo("#products")}
-            className="gradient-accent text-accent-foreground rounded-full px-8 py-6 text-base font-semibold transition-all border-0"
+            className="gradient-accent text-accent-foreground rounded-full px-6 py-5 text-sm font-semibold transition-all border-0"
           >
             {t("hero.explore")}
           </Button>
           <Button
             onClick={() => scrollTo("#contact")}
             variant="outline"
-            className="rounded-full px-8 py-6 text-base font-semibold border-2 border-white text-white bg-white/10 backdrop-blur-sm hover:border-red-500 hover:bg-white/20 hover:text-white transition-all duration-500"
+            className="rounded-full px-6 py-5 text-sm font-semibold border-2 border-white text-white bg-white/10 backdrop-blur-sm hover:border-red-500 hover:bg-white/20 hover:text-white transition-all duration-500"
           >
             {t("hero.contact")}
           </Button>
         </div>
 
-        <div className="absolute bottom-10 md:bottom-12 flex gap-2">
+        <div className="flex gap-2 justify-center mt-6">
           {images.map((_, i) => (
             <button
               key={i}
