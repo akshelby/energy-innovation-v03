@@ -1169,7 +1169,27 @@ export default function Admin() {
             {/* Editor */}
             {editingMenuItem && (
               <div className="bg-card border border-border rounded-2xl p-6 space-y-4 mb-6">
-                <h3 className="font-semibold text-foreground">{editingMenuItem.id ? "Edit" : "New"} Menu Item</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-foreground">{editingMenuItem.id ? "Edit" : "New"} Menu Item</h3>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={translating || !editingMenuItem.name_en}
+                    onClick={async () => {
+                      try {
+                        setTranslating(true);
+                        const result = await translateTexts({ name_en: editingMenuItem.name_en });
+                        setEditingMenuItem({ ...editingMenuItem, name_ar: result.name_ar || editingMenuItem.name_ar });
+                        toast.success("Arabic translation generated");
+                      } catch (e: any) { toast.error(e.message); }
+                      finally { setTranslating(false); }
+                    }}
+                    className="rounded-xl"
+                  >
+                    <Languages className="w-4 h-4 mr-2" />
+                    {translating ? "..." : "Auto Translate"}
+                  </Button>
+                </div>
                 
                 {/* Category */}
                 <div>
@@ -1192,8 +1212,8 @@ export default function Admin() {
                     <Input value={editingMenuItem.name_en} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, name_en: e.target.value })} placeholder="e.g. Fire Curtains" className="rounded-xl" />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Name (AR)</label>
-                    <Input value={editingMenuItem.name_ar} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, name_ar: e.target.value })} placeholder="e.g. ستائر الحريق" className="rounded-xl" dir="rtl" />
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Name (AR) — auto-generated</label>
+                    <Input value={editingMenuItem.name_ar} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, name_ar: e.target.value })} placeholder="auto-generated" className="rounded-xl bg-muted/50" dir="rtl" />
                   </div>
                 </div>
 
