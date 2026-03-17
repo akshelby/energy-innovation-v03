@@ -1614,6 +1614,71 @@ export default function Admin() {
                         const getChildren = (pid: string) => catItems.filter(m => m.parent_id === pid).sort((a, b) => a.sort_order - b.sort_order);
                         const isEditorForThisCategory = editingMenuItem && editingMenuItem.category_key === cat.key;
 
+                        const renderItem = (item: typeof menuItems[0], depth: number) => {
+                          const children = getChildren(item.id);
+                          const hasChildren = children.length > 0;
+                          const isEditingThis = editingMenuItem && editorItemId === item.id;
+                          const isAddingChildHere = editingMenuItem && !editorItemId && editorParentId === item.id;
+
+                          return (
+                            <div key={item.id}>
+                              {!isEditingThis && (
+                                <div
+                                  className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${
+                                    depth === 0 ? "bg-card border-border" : depth === 1 ? "bg-secondary/50 border-border/50" : "bg-muted/30 border-border/30"
+                                  }`}
+                                  style={{ marginLeft: `${depth * 24}px` }}
+                                >
+                                  <div className="flex items-center gap-1 shrink-0">
+                                    {depth > 0 && <span className="text-muted-foreground text-xs select-none">└</span>}
+                                    <GripVertical className="w-3.5 h-3.5 text-muted-foreground" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <span className={`font-medium text-foreground ${depth === 0 ? "text-sm font-bold" : "text-sm"}`}>
+                                        {item.name_en}
+                                      </span>
+                                      <span className="text-xs text-muted-foreground">/ {item.name_ar}</span>
+                                      {item.pdf_url ? (
+                                        <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full font-medium">PDF ✓</span>
+                                      ) : (
+                                        <span className="text-[10px] bg-muted text-muted-foreground px-2 py-0.5 rounded-full">No PDF</span>
+                                      )}
+                                      {hasChildren && (
+                                        <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
+                                          {children.length} sub-item{children.length > 1 ? "s" : ""}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className="flex gap-1 shrink-0">
+                                    <Button
+                                      variant="outline" size="sm"
+                                      onClick={() => setEditingMenuItem({
+                                        ...emptyMenuChild,
+                                        category_key: item.category_key,
+                                        parent_id: item.id!,
+                                        sort_order: children.length,
+                                      })}
+                                      className="rounded-xl text-xs h-7 px-2"
+                                      title="Add child item"
+                                    >
+                                      <Plus className="w-3 h-3" />
+                                    </Button>
+                                    <Button variant="outline" size="sm" onClick={() => setEditingMenuItem({ ...item })} className="rounded-xl text-xs h-7">Edit</Button>
+                                    <Button variant="ghost" size="sm" onClick={() => handleDeleteMenuItem(item.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl h-7 w-7 p-0">
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              )}
+                              {isEditingThis && renderInlineEditor(depth)}
+                              {children.map(child => renderItem(child, depth + 1))}
+                              {isAddingChildHere && renderInlineEditor(depth + 1)}
+                            </div>
+                          );
+                        };
+
                         return (
                           <div key={cat.key}>
                             <div className="flex items-center justify-between mb-3">
