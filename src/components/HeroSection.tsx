@@ -102,7 +102,7 @@ export default function HeroSection() {
           </Button>
         </div>
 
-        <div className="absolute bottom-24 md:bottom-20 flex gap-2">
+        <div className="absolute bottom-10 md:bottom-12 flex gap-2">
           {images.map((_, i) => (
             <button
               key={i}
