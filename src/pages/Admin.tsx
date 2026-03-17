@@ -1538,6 +1538,24 @@ export default function Admin() {
               {selectedFolder.folder === "products" && " Name files product-fire.jpg, product-roller.jpg, etc. for product cards."}
             </p>
 
+            {selectedFolder.folder === "hero" && (
+              <div className="flex items-center gap-4 mb-4 p-3 bg-secondary/50 rounded-xl">
+                <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">Slide Speed:</span>
+                <input
+                  type="range"
+                  min={2}
+                  max={15}
+                  step={1}
+                  value={heroSpeed}
+                  onChange={(e) => setHeroSpeed(Number(e.target.value))}
+                  onMouseUp={(e) => saveHeroSpeed(Number((e.target as HTMLInputElement).value))}
+                  onTouchEnd={(e) => saveHeroSpeed(Number((e.target as HTMLInputElement).value))}
+                  className="flex-1 accent-accent h-1.5"
+                />
+                <span className="text-xs font-semibold text-foreground min-w-[3rem] text-center">{heroSpeed}s</span>
+              </div>
+            )}
+
             {files.length === 0 ? (
               <div className="text-center py-16 text-muted-foreground">
                 <Image className="w-12 h-12 mx-auto mb-4 opacity-30" /><p>No files in this folder yet. Upload some!</p>
