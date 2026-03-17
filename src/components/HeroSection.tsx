@@ -3,6 +3,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { getStorageUrl } from "@/lib/storage";
 
 // Fallback local imports in case Supabase images aren't uploaded yet
 import hero1Local from "@/assets/hero-1.webp";
@@ -12,6 +13,17 @@ import hero4Local from "@/assets/hero-4.webp";
 import hero5Local from "@/assets/hero-5.webp";
 
 const localImages = [hero1Local, hero2Local, hero3Local, hero4Local, hero5Local];
+const imageFilePattern = /\.(png|jpe?g|webp|avif)$/i;
+
+const buildHeroImageUrl = (fileName: string, version?: string) => {
+  const encodedPath = `hero/${fileName}`
+    .split("/")
+    .map((segment) => encodeURIComponent(segment))
+    .join("/");
+
+  const baseUrl = getStorageUrl("images", encodedPath);
+  return version ? `${baseUrl}?v=${encodeURIComponent(version)}` : baseUrl;
+};
 
 export default function HeroSection() {
   const { t } = useLanguage();
@@ -23,16 +35,19 @@ export default function HeroSection() {
       const { data, error } = await supabase.storage.from("images").list("hero", {
         sortBy: { column: "name", order: "asc" },
       });
+
       if (!error && data && data.length > 0) {
         const urls = data
-          .filter((f) => f.name && !f.name.startsWith("."))
-          .map((f) => {
-            const { data: urlData } = supabase.storage.from("images").getPublicUrl(`hero/${f.name}`);
-            return urlData.publicUrl;
-          });
-        if (urls.length > 0) setImages(urls);
+          .filter((file) => file.name && !file.name.startsWith(".") && imageFilePattern.test(file.name))
+          .map((file) => buildHeroImageUrl(file.name, file.updated_at ?? file.created_at ?? undefined));
+
+        if (urls.length > 0) {
+          setCurrent(0);
+          setImages(urls);
+        }
       }
     }
+
     fetchHeroImages();
   }, []);
 
