@@ -16,19 +16,8 @@ const localImages = [hero1Local, hero2Local, hero3Local, hero4Local, hero5Local]
 export default function HeroSection() {
   const { t } = useLanguage();
   const [current, setCurrent] = useState(0);
-  const [useSupabase, setUseSupabase] = useState(true);
 
-  // Check if Supabase images are available
-  useEffect(() => {
-    const img = new Image();
-    img.onload = () => setUseSupabase(true);
-    img.onerror = () => setUseSupabase(false);
-    img.src = getHeroImageUrl(0);
-  }, []);
-
-  const images = useSupabase
-    ? Array.from({ length: 5 }, (_, i) => getHeroImageUrl(i))
-    : localImages;
+  const images = localImages;
 
   useEffect(() => {
     const interval = setInterval(() => {
