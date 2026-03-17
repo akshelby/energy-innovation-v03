@@ -2,8 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 
 const countries = [
-  { code: "+966", iso: "sa", name: "Saudi Arabia" },
   { code: "+971", iso: "ae", name: "UAE" },
+  { code: "+966", iso: "sa", name: "Saudi Arabia" },
   { code: "+974", iso: "qa", name: "Qatar" },
   { code: "+973", iso: "bh", name: "Bahrain" },
   { code: "+968", iso: "om", name: "Oman" },
