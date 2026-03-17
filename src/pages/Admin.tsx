@@ -885,10 +885,14 @@ export default function Admin() {
       <header className="border-b border-border bg-card px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <h1 className="text-xl font-bold text-foreground">Energy Innovation Admin</h1>
-          <Button variant="outline" size="sm" onClick={() => { sessionStorage.removeItem("admin_pw"); setAuthenticated(false); setPassword(""); }} className="rounded-xl">
-            <LogOut className="w-4 h-4 mr-2" />Logout
-          </Button>
-        </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="icon" onClick={toggleTheme} className="rounded-xl" title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}>
+              {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => { sessionStorage.removeItem("admin_pw"); setAuthenticated(false); setPassword(""); }} className="rounded-xl">
+              <LogOut className="w-4 h-4 mr-2" />Logout
+            </Button>
+          </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
