@@ -83,6 +83,7 @@ interface ServiceItem {
 interface MenuChildItem {
   id?: string;
   category_key: string;
+  parent_id: string | null;
   name_en: string;
   name_ar: string;
   pdf_url: string | null;
