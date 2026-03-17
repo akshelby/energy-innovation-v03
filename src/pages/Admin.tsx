@@ -295,7 +295,7 @@ export default function Admin() {
       if (emailEntry) setFloatingEmail(emailEntry.value_en);
       const emActive = data.find((d: ContentItem) => d.content_key === "email_active");
       setEmailActive(emActive?.value_en === "true");
-    // Load logo URL
+    } catch { /* ignore */ }
     const logoPublicUrl = `${STORAGE_BASE}/images/branding/logo`;
     try {
       const res = await fetch(logoPublicUrl, { method: "HEAD" });
