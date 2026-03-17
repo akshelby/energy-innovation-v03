@@ -1,0 +1,10 @@
+
+INSERT INTO product_items (category_key, name_en, name_ar, sort_order) VALUES
+('cat.fire', 'ENERGY-BACHFIRE E 120', 'ENERGY-BACHFIRE E 120', 2),
+('cat.fire', 'ENERGY-BACHFIRE EW', 'ENERGY-BACHFIRE EW', 3),
+('cat.fire', 'ENERGY-SUPERFIRE', 'ENERGY-SUPERFIRE', 4),
+('cat.fire', 'ENERGY-BACHFIRE Z', 'ENERGY-BACHFIRE Z', 5),
+('cat.fire', 'ENERGY-MEGAFIRE EI60', 'ENERGY-MEGAFIRE EI60', 6),
+('cat.smoke', 'ENERGY-BACHSMOKE DA', 'ENERGY-BACHSMOKE DA', 2),
+('cat.smoke', 'ENERGY-BACHSMOKE DHA', 'ENERGY-BACHSMOKE DHA', 3),
+('cat.smoke', 'ENERGY-BACHSMOKE EW', 'ENERGY-BACHSMOKE EW', 4);
