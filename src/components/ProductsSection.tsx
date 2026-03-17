@@ -99,7 +99,7 @@ export default function ProductsSection() {
                       <Icon className="w-12 h-12 text-muted-foreground/30" />
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent" />
                   <div className="absolute bottom-3 left-3 w-10 h-10 rounded-xl gradient-accent flex items-center justify-center">
                     <Icon className="w-5 h-5 text-accent-foreground" />
                   </div>
