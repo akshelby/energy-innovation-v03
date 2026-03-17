@@ -52,7 +52,23 @@ export default function PhoneInput({ value, onChange }: PhoneInputProps) {
   const [selected, setSelected] = useState(countries[0]);
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [initialized, setInitialized] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+
+  // Detect country code from initial value
+  useEffect(() => {
+    if (initialized || !value) return;
+    // Sort by code length descending to match longest first (e.g. +971 before +97)
+    const sorted = [...countries].sort((a, b) => b.code.length - a.code.length);
+    const cleaned = value.replace(/[^0-9+]/g, "");
+    for (const c of sorted) {
+      if (cleaned.startsWith(c.code)) {
+        setSelected(c);
+        break;
+      }
+    }
+    setInitialized(true);
+  }, [value, initialized]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -72,16 +88,15 @@ export default function PhoneInput({ value, onChange }: PhoneInputProps) {
     setSelected(country);
     setOpen(false);
     setSearch("");
-    // Update the phone value with new country code
-    const phoneNumber = value.replace(/^\+\d+\s?/, "");
-    onChange(`${country.code} ${phoneNumber}`);
+    const phoneNumber = stripCountryCode(value, selected);
+    onChange(`${country.code}${phoneNumber}`);
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(`${selected.code} ${e.target.value}`);
+    onChange(`${selected.code}${e.target.value}`);
   };
 
-  const phoneNumber = value.replace(/^\+\d+\s?/, "");
+  const phoneNumber = stripCountryCode(value, selected);
 
   return (
     <div className="relative flex" ref={ref}>
