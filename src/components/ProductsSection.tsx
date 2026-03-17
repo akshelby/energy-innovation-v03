@@ -87,7 +87,7 @@ export default function ProductsSection() {
                   }
                 }}
               >
-                <div className="relative h-48 overflow-hidden">
+                <div className="relative h-64 overflow-hidden">
                   {product.image_url ? (
                     <img
                       src={product.image_url}
@@ -118,11 +118,11 @@ export default function ProductsSection() {
                     </span>
                   )}
                 </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-foreground mb-3">
+                <div className="p-4">
+                  <h3 className="text-lg font-bold text-foreground mb-1.5 line-clamp-1">
                     {isAr ? product.name_ar : product.name_en}
                   </h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
+                  <p className="text-muted-foreground text-sm leading-relaxed line-clamp-2">
                     {isAr ? product.description_ar : product.description_en}
                   </p>
                 </div>
