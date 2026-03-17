@@ -5,6 +5,7 @@ import { Mail } from "lucide-react";
 interface FloatingConfig {
   whatsappNumber: string;
   whatsappActive: boolean;
+  whatsappMessage: string;
   floatingEmail: string;
   emailActive: boolean;
 }
