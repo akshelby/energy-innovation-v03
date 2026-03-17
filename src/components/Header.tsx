@@ -289,7 +289,7 @@ export default function Header() {
                         <div className="grid grid-cols-3 gap-x-8 mt-6">
                           {row2.map((cat) => (
                             <div key={cat.key}>
-                              <h4 className="text-sm font-bold uppercase tracking-wider text-accent mb-3">{t(cat.key)}</h4>
+                              <h4 className="text-sm font-bold uppercase tracking-wider text-accent mb-3">{language === "ar" ? cat.label_ar : cat.label_en}</h4>
                               <ul className="space-y-1.5">{cat.items.map((pi) => renderDesktopItem(pi))}</ul>
                             </div>
                           ))}
