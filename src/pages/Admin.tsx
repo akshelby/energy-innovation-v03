@@ -793,7 +793,7 @@ export default function Admin() {
                           apiCall("content", "POST", storedPassword, {
                             content_key: "whatsapp_message",
                             value_en: whatsappMessage,
-                            value_ar: whatsappMessage,
+                            value_ar: whatsappMessageAr,
                           }),
                         ]);
                         toast.success("WhatsApp settings saved!");

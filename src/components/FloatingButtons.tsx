@@ -59,7 +59,8 @@ export default function FloatingButtons() {
   if (!showWhatsapp && !showEmail) return null;
 
   const clean = config.whatsappNumber.replace(/[^0-9+]/g, "").replace(/^\+/, "");
-  const msgParam = config.whatsappMessage ? `?text=${encodeURIComponent(config.whatsappMessage)}` : "";
+  const whatsappMsg = language === "ar" ? config.whatsappMessageAr : config.whatsappMessageEn;
+  const msgParam = whatsappMsg ? `?text=${encodeURIComponent(whatsappMsg)}` : "";
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
