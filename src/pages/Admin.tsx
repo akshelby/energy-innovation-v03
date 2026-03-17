@@ -8,6 +8,7 @@ import {
   LogOut, Image, Upload, Plus, Package, Briefcase, GripVertical, List, Palette,
 } from "lucide-react";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
+import PhoneInput from "@/components/PhoneInput";
 
 const PROJECT_ID = import.meta.env.VITE_SUPABASE_PROJECT_ID;
 const FUNCTION_URL = `https://${PROJECT_ID}.supabase.co/functions/v1/admin-api`;
