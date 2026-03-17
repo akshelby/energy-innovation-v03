@@ -210,6 +210,14 @@ export default function Admin() {
   const [menuItems, setMenuItems] = useState<(MenuChildItem & { id: string })[]>([]);
   const [editingMenuItem, setEditingMenuItem] = useState<MenuChildItem | null>(null);
   const menuItemPdfRef = useRef<HTMLInputElement>(null);
+  const menuEditorRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to editor when it opens
+  useEffect(() => {
+    if (editingMenuItem && menuEditorRef.current) {
+      setTimeout(() => menuEditorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 100);
+    }
+  }, [editingMenuItem]);
 
   // PDF preview
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState("");
@@ -1436,7 +1444,7 @@ export default function Admin() {
                 });
 
                 return (
-                  <div className="bg-card border-2 border-accent/30 rounded-2xl p-5 space-y-4" style={{ marginLeft: `${depth * 24}px` }}>
+                  <div ref={menuEditorRef} className="bg-card border-2 border-accent/30 rounded-2xl p-5 space-y-4" style={{ marginLeft: `${depth * 24}px` }}>
                     <div className="flex items-center justify-between">
                       <h3 className="font-semibold text-foreground text-sm">
                         {editingMenuItem.id ? "✏️ Edit" : "➕ New"} Item
