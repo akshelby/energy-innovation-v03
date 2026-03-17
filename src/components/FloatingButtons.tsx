@@ -43,11 +43,12 @@ export default function FloatingButtons() {
           mapAr[d.content_key] = d.value_ar;
         });
         setConfig({
-          whatsappNumber: map["whatsapp_number"] || "",
-          whatsappActive: map["whatsapp_active"] === "true",
-          whatsappMessage: map["whatsapp_message"] || "",
-          floatingEmail: map["floating_email"] || "",
-          emailActive: map["email_active"] === "true",
+          whatsappNumber: mapEn["whatsapp_number"] || "",
+          whatsappActive: mapEn["whatsapp_active"] === "true",
+          whatsappMessageEn: mapEn["whatsapp_message"] || "",
+          whatsappMessageAr: mapAr["whatsapp_message"] || "",
+          floatingEmail: mapEn["floating_email"] || "",
+          emailActive: mapEn["email_active"] === "true",
         });
       });
   }, []);
