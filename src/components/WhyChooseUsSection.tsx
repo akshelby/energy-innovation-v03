@@ -30,7 +30,7 @@ export default function WhyChooseUsSection() {
             return (
               <div
                 key={reason.key}
-                className="scroll-reveal text-center p-8 rounded-2xl bg-primary-foreground/10 border border-primary-foreground/10 hover:border-accent/50 hover:shadow-xl hover:shadow-accent/5 backdrop-blur-sm transition-all duration-300"
+                className="scroll-reveal text-center p-8 rounded-2xl bg-primary-foreground/10 border border-primary-foreground/10 hover:border-primary-foreground/30 hover:bg-primary-foreground/20 backdrop-blur-sm transition-all duration-300"
                 style={{ transitionDelay: `${i * 100}ms` }}
               >
                 <div className="w-14 h-14 rounded-2xl bg-accent/20 flex items-center justify-center mb-5 mx-auto">
