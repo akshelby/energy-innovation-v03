@@ -232,7 +232,7 @@ export default function Header() {
       {/* Navigation Bar */}
       <header
         className={`fixed top-0 left-0 z-50 w-full bg-card transition-all duration-300 ${
-          scrolled ? "shadow-md border-b border-border" : "border-b border-border/80"
+          scrolled ? "shadow-md" : ""
         }`}
       >
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3 md:px-6">
