@@ -68,7 +68,7 @@ export default function ServicesSection() {
             return (
               <div
                 key={i}
-                className="scroll-reveal text-center p-8 rounded-2xl bg-card border border-border hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer relative"
+                className="scroll-reveal text-center p-8 rounded-2xl bg-card border border-border hover:shadow-xl transition-all duration-300 cursor-pointer relative"
                 style={{ transitionDelay: `${i * 100}ms` }}
                 onClick={() => {
                   if (service.pdf_url) {
