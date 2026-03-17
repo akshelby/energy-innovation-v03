@@ -1413,228 +1413,258 @@ export default function Admin() {
               </div>
             </div>
 
-            {/* Editor */}
-            {editingMenuItem && (() => {
-              const categoryItems = menuItems.filter(m => m.category_key === editingMenuItem.category_key && m.id !== editingMenuItem.id);
-              const topLevelItems = categoryItems.filter(m => !m.parent_id);
-              const getChildrenOf = (pid: string) => categoryItems.filter(m => m.parent_id === pid);
-              // Build parent options: top-level and their children (for grandchild nesting)
-              const parentOptions: { id: string; label: string; depth: number }[] = [];
-              topLevelItems.sort((a, b) => a.sort_order - b.sort_order).forEach(item => {
-                parentOptions.push({ id: item.id!, label: item.name_en, depth: 0 });
-                getChildrenOf(item.id!).sort((a, b) => a.sort_order - b.sort_order).forEach(child => {
-                  parentOptions.push({ id: child.id!, label: child.name_en, depth: 1 });
+            {/* Inline editor renderer */}
+            {(() => {
+              const renderInlineEditor = (depth: number) => {
+                if (!editingMenuItem) return null;
+                const categoryItems = menuItems.filter(m => m.category_key === editingMenuItem.category_key && m.id !== editingMenuItem.id);
+                const topLevelItems = categoryItems.filter(m => !m.parent_id);
+                const getChildrenOf = (pid: string) => categoryItems.filter(m => m.parent_id === pid);
+                const parentOptions: { id: string; label: string; depth: number }[] = [];
+                topLevelItems.sort((a, b) => a.sort_order - b.sort_order).forEach(item => {
+                  parentOptions.push({ id: item.id!, label: item.name_en, depth: 0 });
+                  getChildrenOf(item.id!).sort((a, b) => a.sort_order - b.sort_order).forEach(child => {
+                    parentOptions.push({ id: child.id!, label: child.name_en, depth: 1 });
+                  });
                 });
-              });
+
+                return (
+                  <div className="bg-card border-2 border-accent/30 rounded-2xl p-5 space-y-4" style={{ marginLeft: `${depth * 24}px` }}>
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold text-foreground text-sm">
+                        {editingMenuItem.id ? "✏️ Edit" : "➕ New"} Item
+                        {editingMenuItem.parent_id && !editingMenuItem.id && (
+                          <span className="text-xs font-normal text-muted-foreground ml-2">
+                            (under {menuItems.find(m => m.id === editingMenuItem.parent_id)?.name_en || "parent"})
+                          </span>
+                        )}
+                      </h3>
+                      <Button
+                        variant="outline" size="sm"
+                        disabled={translating || !editingMenuItem.name_en}
+                        onClick={async () => {
+                          try {
+                            setTranslating(true);
+                            const result = await translateTexts({ name_en: editingMenuItem.name_en });
+                            setEditingMenuItem({ ...editingMenuItem, name_ar: result.name_ar || editingMenuItem.name_ar });
+                            toast.success("Arabic translation generated");
+                          } catch (e: any) { toast.error(e.message); }
+                          finally { setTranslating(false); }
+                        }}
+                        className="rounded-xl"
+                      >
+                        <Languages className="w-4 h-4 mr-2" />
+                        {translating ? "..." : "Auto Translate"}
+                      </Button>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Category</label>
+                        <select
+                          value={editingMenuItem.category_key}
+                          onChange={(e) => setEditingMenuItem({ ...editingMenuItem, category_key: e.target.value, parent_id: null })}
+                          className="w-full h-10 rounded-xl border border-input bg-background px-3 text-sm"
+                        >
+                          {CATEGORY_OPTIONS.map((cat) => (
+                            <option key={cat.key} value={cat.key}>{cat.label}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Parent Item</label>
+                        <select
+                          value={editingMenuItem.parent_id || ""}
+                          onChange={(e) => setEditingMenuItem({ ...editingMenuItem, parent_id: e.target.value || null })}
+                          className="w-full h-10 rounded-xl border border-input bg-background px-3 text-sm"
+                        >
+                          <option value="">— Top Level (no parent) —</option>
+                          {parentOptions.map((opt) => (
+                            <option key={opt.id} value={opt.id}>
+                              {"　".repeat(opt.depth)}{"└ ".repeat(opt.depth ? 1 : 0)}{opt.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Name (EN)</label>
+                        <Input value={editingMenuItem.name_en} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, name_en: e.target.value })} placeholder="e.g. Fire Curtains" className="rounded-xl" />
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Name (AR) — auto-generated</label>
+                        <Input value={editingMenuItem.name_ar} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, name_ar: e.target.value })} placeholder="auto-generated" className="rounded-xl bg-muted/50" dir="rtl" />
+                      </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">PDF Document</label>
+                        <div className="flex items-center gap-2">
+                          <Input value={editingMenuItem.pdf_url || ""} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, pdf_url: e.target.value || null })} placeholder="PDF URL or upload" className="rounded-xl flex-1" />
+                          <input ref={menuItemPdfRef} type="file" accept=".pdf" className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleFormFileUpload(file, "pdfs", "", (url) => setEditingMenuItem({ ...editingMenuItem!, pdf_url: url }));
+                            }}
+                          />
+                          <Button variant="outline" size="sm" onClick={() => menuItemPdfRef.current?.click()} disabled={uploading} className="rounded-xl shrink-0">
+                            <Upload className="w-4 h-4" />
+                          </Button>
+                        </div>
+                        {editingMenuItem.pdf_url && (
+                          <button
+                            onClick={() => { setPdfPreviewUrl(editingMenuItem.pdf_url!); setPdfPreviewOpen(true); }}
+                            className="mt-2 text-xs text-primary underline"
+                          >
+                            Preview PDF
+                          </button>
+                        )}
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Sort Order</label>
+                        <Input type="number" value={editingMenuItem.sort_order} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, sort_order: parseInt(e.target.value) || 0 })} className="rounded-xl" />
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2 pt-2">
+                      <Button onClick={() => handleSaveMenuItem(editingMenuItem)} disabled={loading} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                        <Save className="w-4 h-4 mr-2" />Save
+                      </Button>
+                      <Button variant="outline" onClick={() => setEditingMenuItem(null)} className="rounded-xl">Cancel</Button>
+                    </div>
+                  </div>
+                );
+              };
+
+              // Determine where editor should show: after which item ID, or at category top level
+              const editorParentId = editingMenuItem?.parent_id || null;
+              const editorItemId = editingMenuItem?.id || null;
+              // "showEditorAfter" = the item id after which the form renders
+              // If editing an existing item: show after that item
+              // If adding child to a parent: show after that parent's children
+              // If adding top-level to category: show at bottom of that category
 
               return (
-                <div className="bg-card border border-border rounded-2xl p-6 space-y-4 mb-6">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-foreground">{editingMenuItem.id ? "Edit" : "New"} Menu Item</h3>
-                    <Button
-                      variant="outline" size="sm"
-                      disabled={translating || !editingMenuItem.name_en}
-                      onClick={async () => {
-                        try {
-                          setTranslating(true);
-                          const result = await translateTexts({ name_en: editingMenuItem.name_en });
-                          setEditingMenuItem({ ...editingMenuItem, name_ar: result.name_ar || editingMenuItem.name_ar });
-                          toast.success("Arabic translation generated");
-                        } catch (e: any) { toast.error(e.message); }
-                        finally { setTranslating(false); }
-                      }}
-                      className="rounded-xl"
-                    >
-                      <Languages className="w-4 h-4 mr-2" />
-                      {translating ? "..." : "Auto Translate"}
-                    </Button>
-                  </div>
-
-                  {/* Category & Parent */}
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Category</label>
-                      <select
-                        value={editingMenuItem.category_key}
-                        onChange={(e) => setEditingMenuItem({ ...editingMenuItem, category_key: e.target.value, parent_id: null })}
-                        className="w-full h-10 rounded-xl border border-input bg-background px-3 text-sm"
-                      >
-                        {CATEGORY_OPTIONS.map((cat) => (
-                          <option key={cat.key} value={cat.key}>{cat.label}</option>
-                        ))}
-                      </select>
+                <>
+                  {/* Tree List grouped by category */}
+                  {menuItems.length === 0 && !editingMenuItem ? (
+                    <div className="text-center py-16 text-muted-foreground">
+                      <List className="w-12 h-12 mx-auto mb-4 opacity-30" /><p>No menu items yet.</p>
                     </div>
-                    <div>
-                      <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Parent Item</label>
-                      <select
-                        value={editingMenuItem.parent_id || ""}
-                        onChange={(e) => setEditingMenuItem({ ...editingMenuItem, parent_id: e.target.value || null })}
-                        className="w-full h-10 rounded-xl border border-input bg-background px-3 text-sm"
-                      >
-                        <option value="">— Top Level (no parent) —</option>
-                        {parentOptions.map((opt) => (
-                          <option key={opt.id} value={opt.id}>
-                            {"　".repeat(opt.depth)}{"└ ".repeat(opt.depth ? 1 : 0)}{opt.label}
-                          </option>
-                        ))}
-                      </select>
-                      <p className="text-[10px] text-muted-foreground mt-1">Select a parent to nest this item underneath it.</p>
-                    </div>
-                  </div>
+                  ) : (
+                    <div className="space-y-8">
+                      {CATEGORY_OPTIONS.map((cat) => {
+                        const catItems = menuItems.filter((m) => m.category_key === cat.key);
+                        const topLevel = catItems.filter(m => !m.parent_id).sort((a, b) => a.sort_order - b.sort_order);
+                        const getChildren = (pid: string) => catItems.filter(m => m.parent_id === pid).sort((a, b) => a.sort_order - b.sort_order);
+                        const isEditorForThisCategory = editingMenuItem && editingMenuItem.category_key === cat.key;
 
-                  {/* Names */}
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Name (EN)</label>
-                      <Input value={editingMenuItem.name_en} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, name_en: e.target.value })} placeholder="e.g. Fire Curtains" className="rounded-xl" />
-                    </div>
-                    <div>
-                      <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Name (AR) — auto-generated</label>
-                      <Input value={editingMenuItem.name_ar} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, name_ar: e.target.value })} placeholder="auto-generated" className="rounded-xl bg-muted/50" dir="rtl" />
-                    </div>
-                  </div>
+                        if (catItems.length === 0 && !isEditorForThisCategory) return null;
 
-                  {/* PDF & Sort Order */}
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs font-medium text-muted-foreground mb-1.5 block">PDF Document</label>
-                      <div className="flex items-center gap-2">
-                        <Input value={editingMenuItem.pdf_url || ""} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, pdf_url: e.target.value || null })} placeholder="PDF URL or upload" className="rounded-xl flex-1" />
-                        <input ref={menuItemPdfRef} type="file" accept=".pdf" className="hidden"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) handleFormFileUpload(file, "pdfs", "", (url) => setEditingMenuItem({ ...editingMenuItem!, pdf_url: url }));
-                          }}
-                        />
-                        <Button variant="outline" size="sm" onClick={() => menuItemPdfRef.current?.click()} disabled={uploading} className="rounded-xl shrink-0">
-                          <Upload className="w-4 h-4" />
-                        </Button>
-                      </div>
-                      {editingMenuItem.pdf_url && (
-                        <button
-                          onClick={() => { setPdfPreviewUrl(editingMenuItem.pdf_url!); setPdfPreviewOpen(true); }}
-                          className="mt-2 text-xs text-primary underline"
-                        >
-                          Preview PDF
-                        </button>
-                      )}
-                    </div>
-                    <div>
-                      <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Sort Order</label>
-                      <Input type="number" value={editingMenuItem.sort_order} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, sort_order: parseInt(e.target.value) || 0 })} className="rounded-xl" />
-                    </div>
-                  </div>
+                        const renderItem = (item: typeof menuItems[0], depth: number) => {
+                          const children = getChildren(item.id);
+                          const hasChildren = children.length > 0;
+                          const isEditingThis = editingMenuItem && editorItemId === item.id;
+                          // Show editor after this item's children if adding a new child to this item
+                          const isAddingChildHere = editingMenuItem && !editorItemId && editorParentId === item.id;
 
-                  {/* Actions */}
-                  <div className="flex gap-2 pt-2">
-                    <Button onClick={() => handleSaveMenuItem(editingMenuItem)} disabled={loading} className="gradient-accent text-accent-foreground rounded-xl border-0">
-                      <Save className="w-4 h-4 mr-2" />Save
-                    </Button>
-                    <Button variant="outline" onClick={() => setEditingMenuItem(null)} className="rounded-xl">Cancel</Button>
-                  </div>
-                </div>
-              );
-            })()}
-
-            {/* Tree List grouped by category */}
-            {menuItems.length === 0 && !editingMenuItem ? (
-              <div className="text-center py-16 text-muted-foreground">
-                <List className="w-12 h-12 mx-auto mb-4 opacity-30" /><p>No menu items yet.</p>
-              </div>
-            ) : (
-              <div className="space-y-8">
-                {CATEGORY_OPTIONS.map((cat) => {
-                  const catItems = menuItems.filter((m) => m.category_key === cat.key);
-                  if (catItems.length === 0) return null;
-                  const topLevel = catItems.filter(m => !m.parent_id).sort((a, b) => a.sort_order - b.sort_order);
-                  const getChildren = (pid: string) => catItems.filter(m => m.parent_id === pid).sort((a, b) => a.sort_order - b.sort_order);
-
-                  const renderItem = (item: typeof menuItems[0], depth: number) => {
-                    const children = getChildren(item.id);
-                    const hasChildren = children.length > 0;
-                    return (
-                      <div key={item.id}>
-                        <div
-                          className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${
-                            depth === 0 ? "bg-card border-border" : depth === 1 ? "bg-secondary/50 border-border/50" : "bg-muted/30 border-border/30"
-                          }`}
-                          style={{ marginLeft: `${depth * 24}px` }}
-                        >
-                          <div className="flex items-center gap-1 shrink-0">
-                            {depth > 0 && (
-                              <span className="text-muted-foreground text-xs select-none">
-                                {"└".padStart(depth, " ")}
-                              </span>
-                            )}
-                            <GripVertical className="w-3.5 h-3.5 text-muted-foreground" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className={`font-medium text-foreground ${depth === 0 ? "text-sm font-bold" : "text-sm"}`}>
-                                {item.name_en}
-                              </span>
-                              <span className="text-xs text-muted-foreground">/ {item.name_ar}</span>
-                              {item.pdf_url ? (
-                                <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full font-medium">PDF ✓</span>
-                              ) : (
-                                <span className="text-[10px] bg-muted text-muted-foreground px-2 py-0.5 rounded-full">No PDF</span>
+                          return (
+                            <div key={item.id}>
+                              {/* The item row */}
+                              {!isEditingThis && (
+                                <div
+                                  className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${
+                                    depth === 0 ? "bg-card border-border" : depth === 1 ? "bg-secondary/50 border-border/50" : "bg-muted/30 border-border/30"
+                                  }`}
+                                  style={{ marginLeft: `${depth * 24}px` }}
+                                >
+                                  <div className="flex items-center gap-1 shrink-0">
+                                    {depth > 0 && (
+                                      <span className="text-muted-foreground text-xs select-none">└</span>
+                                    )}
+                                    <GripVertical className="w-3.5 h-3.5 text-muted-foreground" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <span className={`font-medium text-foreground ${depth === 0 ? "text-sm font-bold" : "text-sm"}`}>
+                                        {item.name_en}
+                                      </span>
+                                      <span className="text-xs text-muted-foreground">/ {item.name_ar}</span>
+                                      {item.pdf_url ? (
+                                        <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full font-medium">PDF ✓</span>
+                                      ) : (
+                                        <span className="text-[10px] bg-muted text-muted-foreground px-2 py-0.5 rounded-full">No PDF</span>
+                                      )}
+                                      {hasChildren && (
+                                        <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
+                                          {children.length} sub-item{children.length > 1 ? "s" : ""}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className="flex gap-1 shrink-0">
+                                    <Button
+                                      variant="outline" size="sm"
+                                      onClick={() => setEditingMenuItem({
+                                        ...emptyMenuChild,
+                                        category_key: item.category_key,
+                                        parent_id: item.id!,
+                                        sort_order: children.length,
+                                      })}
+                                      className="rounded-xl text-xs h-7 px-2"
+                                      title="Add child item"
+                                    >
+                                      <Plus className="w-3 h-3" />
+                                    </Button>
+                                    <Button variant="outline" size="sm" onClick={() => setEditingMenuItem({ ...item })} className="rounded-xl text-xs h-7">Edit</Button>
+                                    <Button variant="ghost" size="sm" onClick={() => handleDeleteMenuItem(item.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl h-7 w-7 p-0">
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </Button>
+                                  </div>
+                                </div>
                               )}
-                              {hasChildren && (
-                                <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
-                                  {children.length} sub-item{children.length > 1 ? "s" : ""}
-                                </span>
-                              )}
+                              {/* Show inline editor if editing this item */}
+                              {isEditingThis && renderInlineEditor(depth)}
+                              {/* Render children */}
+                              {children.map(child => renderItem(child, depth + 1))}
+                              {/* Show inline editor after children if adding a new child to this item */}
+                              {isAddingChildHere && renderInlineEditor(depth + 1)}
+                            </div>
+                          );
+                        };
+
+                        return (
+                          <div key={cat.key}>
+                            <div className="flex items-center justify-between mb-3">
+                              <h3 className="text-sm font-bold uppercase tracking-wider text-accent">{cat.label}</h3>
+                              <Button
+                                variant="outline" size="sm"
+                                onClick={() => setEditingMenuItem({
+                                  ...emptyMenuChild,
+                                  category_key: cat.key,
+                                  sort_order: topLevel.length,
+                                })}
+                                className="rounded-xl text-xs h-7"
+                              >
+                                <Plus className="w-3 h-3 mr-1" />Add to {cat.label.split(" ")[0]}
+                              </Button>
+                            </div>
+                            <div className="space-y-2">
+                              {topLevel.map(item => renderItem(item, 0))}
+                              {/* Show editor at bottom of category if adding top-level item here */}
+                              {isEditorForThisCategory && !editorItemId && !editorParentId && renderInlineEditor(0)}
                             </div>
                           </div>
-                          <div className="flex gap-1 shrink-0">
-                            <Button
-                              variant="outline" size="sm"
-                              onClick={() => setEditingMenuItem({
-                                ...emptyMenuChild,
-                                category_key: item.category_key,
-                                parent_id: item.id!,
-                                sort_order: children.length,
-                              })}
-                              className="rounded-xl text-xs h-7 px-2"
-                              title="Add child item"
-                            >
-                              <Plus className="w-3 h-3" />
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => setEditingMenuItem({ ...item })} className="rounded-xl text-xs h-7">Edit</Button>
-                            <Button variant="ghost" size="sm" onClick={() => handleDeleteMenuItem(item.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl h-7 w-7 p-0">
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </Button>
-                          </div>
-                        </div>
-                        {children.map(child => renderItem(child, depth + 1))}
-                      </div>
-                    );
-                  };
-
-                  return (
-                    <div key={cat.key}>
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-sm font-bold uppercase tracking-wider text-accent">{cat.label}</h3>
-                        <Button
-                          variant="outline" size="sm"
-                          onClick={() => setEditingMenuItem({
-                            ...emptyMenuChild,
-                            category_key: cat.key,
-                            sort_order: topLevel.length,
-                          })}
-                          className="rounded-xl text-xs h-7"
-                        >
-                          <Plus className="w-3 h-3 mr-1" />Add to {cat.label.split(" ")[0]}
-                        </Button>
-                      </div>
-                      <div className="space-y-2">
-                        {topLevel.map(item => renderItem(item, 0))}
-                      </div>
+                        );
+                      })}
                     </div>
-                  );
-                })}
-              </div>
-            )}
+                  )}
+                </>
+              );
+            })()}
           </div>
         )}
 
