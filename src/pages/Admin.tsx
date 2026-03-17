@@ -324,6 +324,10 @@ export default function Admin() {
           } else {
             setActiveHeroImages([]);
           }
+          const speedEntry = contentData.find((d: ContentItem) => d.content_key === "hero.speed");
+          if (speedEntry) {
+            setHeroSpeed(parseFloat(speedEntry.value_en) || 6);
+          }
         } catch { setActiveHeroImages([]); }
       }
     } catch (e: any) { toast.error(e.message); }
