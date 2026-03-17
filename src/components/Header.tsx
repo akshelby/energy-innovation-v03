@@ -15,6 +15,7 @@ interface ProductItem {
   pdf_url: string | null;
   sort_order: number;
   parent_id: string | null;
+  is_active?: boolean;
 }
 
 interface CategoryItem {
@@ -23,6 +24,7 @@ interface CategoryItem {
   label_en: string;
   label_ar: string;
   sort_order: number;
+  is_active?: boolean;
 }
 
 export default function Header() {
@@ -62,17 +64,18 @@ export default function Header() {
 
   // Top-level items (no parent) grouped by category
   const categoriesWithItems = productCategories
+    .filter((cat) => cat.is_active !== false)
     .map((cat) => ({
       key: cat.key,
       label_en: cat.label_en,
       label_ar: cat.label_ar,
-      items: productItems.filter((item) => item.category_key === cat.key && !item.parent_id),
+      items: productItems.filter((item) => item.category_key === cat.key && !item.parent_id && item.is_active !== false),
     }))
     .filter((cat) => cat.items.length > 0);
 
   // Get children of a parent item
   const getChildren = (parentId: string) =>
-    productItems.filter((item) => item.parent_id === parentId);
+    productItems.filter((item) => item.parent_id === parentId && item.is_active !== false);
 
   const hasChildren = (parentId: string) =>
     productItems.some((item) => item.parent_id === parentId);

@@ -89,6 +89,7 @@ interface MenuChildItem {
   name_ar: string;
   pdf_url: string | null;
   sort_order: number;
+  is_active?: boolean;
 }
 
 interface CategoryItem {
@@ -97,6 +98,7 @@ interface CategoryItem {
   label_en: string;
   label_ar: string;
   sort_order: number;
+  is_active?: boolean;
 }
 
 const ICON_OPTIONS = [
@@ -187,7 +189,7 @@ const emptyService: ServiceItem = {
 type TabKey = "leads" | "content" | "products" | "services" | "menu-items" | "images" | "branding";
 
 const emptyMenuChild: MenuChildItem = {
-  category_key: "cat.fire", parent_id: null, name_en: "", name_ar: "", pdf_url: null, sort_order: 0,
+  category_key: "cat.fire", parent_id: null, name_en: "", name_ar: "", pdf_url: null, sort_order: 0, is_active: true,
 };
 
 export default function Admin() {
@@ -565,6 +567,24 @@ export default function Admin() {
       await apiCall("product-categories", "DELETE", storedPassword, { id });
       setCategories((prev) => prev.filter((c) => c.id !== id));
       toast.success("Category deleted");
+    } catch (e: any) { toast.error(e.message); }
+  };
+
+  const handleToggleCategoryActive = async (cat: CategoryItem & { id: string }) => {
+    try {
+      const updated = { ...cat, is_active: !cat.is_active };
+      await apiCall("product-categories", "POST", storedPassword, updated);
+      setCategories((prev) => prev.map((c) => c.id === cat.id ? { ...c, is_active: !cat.is_active } : c));
+      toast.success(`Category ${updated.is_active ? "activated" : "deactivated"}`);
+    } catch (e: any) { toast.error(e.message); }
+  };
+
+  const handleToggleItemActive = async (item: MenuChildItem & { id: string }) => {
+    try {
+      const updated = { ...item, is_active: !item.is_active };
+      await apiCall("product-items", "POST", storedPassword, updated);
+      setMenuItems((prev) => prev.map((m) => m.id === item.id ? { ...m, is_active: !item.is_active } : m));
+      toast.success(`Item ${updated.is_active ? "activated" : "deactivated"}`);
     } catch (e: any) { toast.error(e.message); }
   };
 
@@ -1682,9 +1702,9 @@ export default function Admin() {
                                     {depth > 0 && <span className="text-muted-foreground text-xs select-none">└</span>}
                                     <GripVertical className="w-3.5 h-3.5 text-muted-foreground" />
                                   </div>
-                                  <div className="flex-1 min-w-0">
+                                   <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 flex-wrap">
-                                      <span className={`font-medium text-foreground ${depth === 0 ? "text-sm font-bold" : "text-sm"}`}>
+                                      <span className={`font-medium ${(item as any).is_active === false ? "text-muted-foreground line-through" : "text-foreground"} ${depth === 0 ? "text-sm font-bold" : "text-sm"}`}>
                                         {item.name_en}
                                       </span>
                                       <span className="text-xs text-muted-foreground">/ {item.name_ar}</span>
@@ -1698,29 +1718,41 @@ export default function Admin() {
                                           {children.length} sub-item{children.length > 1 ? "s" : ""}
                                         </span>
                                       )}
+                                      {(item as any).is_active === false && (
+                                        <span className="text-[10px] bg-destructive/10 text-destructive px-2 py-0.5 rounded-full font-medium">Inactive</span>
+                                      )}
                                     </div>
-                                  </div>
-                                  <div className="flex gap-1 shrink-0">
-                                    <Button
-                                      variant="outline" size="sm"
-                                      onClick={() => setEditingMenuItem({
-                                        ...emptyMenuChild,
-                                        category_key: item.category_key,
-                                        parent_id: item.id!,
-                                        sort_order: children.length,
-                                      })}
-                                      className="rounded-xl text-xs h-7 px-2"
-                                      title="Add child item"
-                                    >
-                                      <Plus className="w-3 h-3" />
-                                    </Button>
-                                    <Button variant="outline" size="sm" onClick={() => setEditingMenuItem({ ...item })} className="rounded-xl text-xs h-7">Edit</Button>
-                                    <Button variant="ghost" size="sm" onClick={() => handleDeleteMenuItem(item.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl h-7 w-7 p-0">
-                                      <Trash2 className="w-3.5 h-3.5" />
-                                    </Button>
-                                  </div>
-                                </div>
-                              )}
+                                   </div>
+                                   <div className="flex gap-1 items-center shrink-0">
+                                    <label className="flex items-center gap-1 cursor-pointer mr-1" title={(item as any).is_active === false ? "Activate item" : "Deactivate item"}>
+                                      <span className="text-[10px] text-muted-foreground">{(item as any).is_active === false ? "Off" : "On"}</span>
+                                      <input
+                                        type="checkbox"
+                                        checked={(item as any).is_active !== false}
+                                        onChange={() => handleToggleItemActive(item as MenuChildItem & { id: string })}
+                                        className="w-3.5 h-3.5 accent-primary"
+                                      />
+                                    </label>
+                                     <Button
+                                       variant="outline" size="sm"
+                                       onClick={() => setEditingMenuItem({
+                                         ...emptyMenuChild,
+                                         category_key: item.category_key,
+                                         parent_id: item.id!,
+                                         sort_order: children.length,
+                                       })}
+                                       className="rounded-xl text-xs h-7 px-2"
+                                       title="Add child item"
+                                     >
+                                       <Plus className="w-3 h-3" />
+                                     </Button>
+                                     <Button variant="outline" size="sm" onClick={() => setEditingMenuItem({ ...item })} className="rounded-xl text-xs h-7">Edit</Button>
+                                     <Button variant="ghost" size="sm" onClick={() => handleDeleteMenuItem(item.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl h-7 w-7 p-0">
+                                       <Trash2 className="w-3.5 h-3.5" />
+                                     </Button>
+                                   </div>
+                                 </div>
+                               )}
                               {isEditingThis && renderInlineEditor(depth)}
                               {children.map(child => renderItem(child, depth + 1))}
                               {isAddingChildHere && renderInlineEditor(depth + 1)}
@@ -1732,10 +1764,20 @@ export default function Admin() {
                           <div key={cat.key}>
                             <div className="flex items-center justify-between mb-3">
                               <div className="flex items-center gap-2">
-                                <h3 className="text-sm font-bold uppercase tracking-wider text-accent">{cat.label_en}</h3>
+                                <h3 className={`text-sm font-bold uppercase tracking-wider ${cat.is_active === false ? "text-muted-foreground line-through" : "text-accent"}`}>{cat.label_en}</h3>
                                 <span className="text-xs text-muted-foreground">/ {cat.label_ar}</span>
+                                {cat.is_active === false && <span className="text-[10px] bg-destructive/10 text-destructive px-2 py-0.5 rounded-full font-medium">Inactive</span>}
                               </div>
-                              <div className="flex gap-1">
+                              <div className="flex gap-1 items-center">
+                                <label className="flex items-center gap-1.5 cursor-pointer mr-2" title={cat.is_active === false ? "Activate category" : "Deactivate category"}>
+                                  <span className="text-[10px] text-muted-foreground">{cat.is_active === false ? "Off" : "On"}</span>
+                                  <input
+                                    type="checkbox"
+                                    checked={cat.is_active !== false}
+                                    onChange={() => handleToggleCategoryActive(cat as CategoryItem & { id: string })}
+                                    className="w-4 h-4 accent-primary"
+                                  />
+                                </label>
                                 <Button
                                   variant="outline" size="sm"
                                   onClick={() => setEditingMenuItem({
