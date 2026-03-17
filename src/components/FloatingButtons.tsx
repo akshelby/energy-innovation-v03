@@ -13,6 +13,7 @@ interface FloatingConfig {
 }
 
 export default function FloatingButtons() {
+  const { language } = useLanguage();
   const [config, setConfig] = useState<FloatingConfig>({
     whatsappNumber: "",
     whatsappActive: false,
