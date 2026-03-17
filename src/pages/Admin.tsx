@@ -208,6 +208,9 @@ export default function Admin() {
   const brandLogoRef = useRef<HTMLInputElement>(null);
   const [brandLogoUploading, setBrandLogoUploading] = useState(false);
   const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [whatsappActive, setWhatsappActive] = useState(false);
+  const [floatingEmail, setFloatingEmail] = useState("");
+  const [emailActive, setEmailActive] = useState(false);
   const productImageRef = useRef<HTMLInputElement>(null);
   const productPdfRef = useRef<HTMLInputElement>(null);
   const serviceImageRef = useRef<HTMLInputElement>(null);
@@ -286,8 +289,13 @@ export default function Admin() {
       if (brandEntry) setBrandName(brandEntry.value_en);
       const waEntry = data.find((d: ContentItem) => d.content_key === "whatsapp_number");
       if (waEntry) setWhatsappNumber(waEntry.value_en);
+      const waActive = data.find((d: ContentItem) => d.content_key === "whatsapp_active");
+      setWhatsappActive(waActive?.value_en === "true");
+      const emailEntry = data.find((d: ContentItem) => d.content_key === "floating_email");
+      if (emailEntry) setFloatingEmail(emailEntry.value_en);
+      const emActive = data.find((d: ContentItem) => d.content_key === "email_active");
+      setEmailActive(emActive?.value_en === "true");
     } catch { /* ignore */ }
-    // Load logo URL
     const logoPublicUrl = `${STORAGE_BASE}/images/branding/logo`;
     try {
       const res = await fetch(logoPublicUrl, { method: "HEAD" });
@@ -719,16 +727,36 @@ export default function Admin() {
                 </div>
               </div>
 
-              {/* WhatsApp Number */}
-              <div className="bg-card border border-border rounded-2xl p-6 md:col-span-2">
-                <h3 className="font-semibold text-foreground mb-4">WhatsApp Number</h3>
-                <p className="text-sm text-muted-foreground mb-4">Enter the phone number (with country code) for the floating WhatsApp button. Leave empty to hide it.</p>
-                
-                <div className="flex gap-3 max-w-md">
+              {/* WhatsApp */}
+              <div className="bg-card border border-border rounded-2xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold text-foreground">WhatsApp Button</h3>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <span className="text-sm text-muted-foreground">{whatsappActive ? "Active" : "Inactive"}</span>
+                    <input
+                      type="checkbox"
+                      checked={whatsappActive}
+                      onChange={async (e) => {
+                        const val = e.target.checked;
+                        setWhatsappActive(val);
+                        try {
+                          await apiCall("content", "POST", storedPassword, {
+                            content_key: "whatsapp_active",
+                            value_en: String(val),
+                            value_ar: String(val),
+                          });
+                          toast.success(val ? "WhatsApp activated" : "WhatsApp deactivated");
+                        } catch (err: any) { toast.error(err.message); }
+                      }}
+                      className="w-5 h-5 accent-primary"
+                    />
+                  </label>
+                </div>
+                <div className="flex gap-3">
                   <Input
                     value={whatsappNumber}
                     onChange={(e) => setWhatsappNumber(e.target.value)}
-                    placeholder="+966 5X XXX XXXX"
+                    placeholder="+971 5X XXX XXXX"
                     className="rounded-xl"
                   />
                   <Button
@@ -740,6 +768,56 @@ export default function Admin() {
                           value_ar: whatsappNumber,
                         });
                         toast.success("WhatsApp number saved!");
+                      } catch (err: any) { toast.error(err.message); }
+                    }}
+                    className="gradient-accent text-accent-foreground rounded-xl border-0 shrink-0"
+                  >
+                    <Save className="w-4 h-4 mr-2" />Save
+                  </Button>
+                </div>
+              </div>
+
+              {/* Floating Email */}
+              <div className="bg-card border border-border rounded-2xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold text-foreground">Email Button</h3>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <span className="text-sm text-muted-foreground">{emailActive ? "Active" : "Inactive"}</span>
+                    <input
+                      type="checkbox"
+                      checked={emailActive}
+                      onChange={async (e) => {
+                        const val = e.target.checked;
+                        setEmailActive(val);
+                        try {
+                          await apiCall("content", "POST", storedPassword, {
+                            content_key: "email_active",
+                            value_en: String(val),
+                            value_ar: String(val),
+                          });
+                          toast.success(val ? "Email activated" : "Email deactivated");
+                        } catch (err: any) { toast.error(err.message); }
+                      }}
+                      className="w-5 h-5 accent-primary"
+                    />
+                  </label>
+                </div>
+                <div className="flex gap-3">
+                  <Input
+                    value={floatingEmail}
+                    onChange={(e) => setFloatingEmail(e.target.value)}
+                    placeholder="info@example.com"
+                    className="rounded-xl"
+                  />
+                  <Button
+                    onClick={async () => {
+                      try {
+                        await apiCall("content", "POST", storedPassword, {
+                          content_key: "floating_email",
+                          value_en: floatingEmail,
+                          value_ar: floatingEmail,
+                        });
+                        toast.success("Email saved!");
                       } catch (err: any) { toast.error(err.message); }
                     }}
                     className="gradient-accent text-accent-foreground rounded-xl border-0 shrink-0"
