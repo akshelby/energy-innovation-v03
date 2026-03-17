@@ -290,7 +290,7 @@ export default function Header() {
           <div className="flex items-center gap-2">
             <button
               onClick={toggleTheme}
-              className={`p-2 rounded-full border border-border ${textColor} hover:bg-muted transition-all duration-300`}
+              className={`p-2 rounded-full border border-border ${textColor} hover:bg-muted hover:border-red-500 hover:text-red-500 transition-all duration-300`}
               aria-label="Toggle theme"
             >
               {theme === "light" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
@@ -298,7 +298,7 @@ export default function Header() {
 
             <button
               onClick={() => setLanguage(language === "en" ? "ar" : "en")}
-              className={`px-3 py-1.5 text-sm font-semibold rounded-full border border-border ${textColor} hover:bg-muted transition-all duration-300`}
+              className={`px-3 py-1.5 text-sm font-semibold rounded-full border border-border ${textColor} hover:bg-muted hover:border-red-500 hover:text-red-500 transition-all duration-300`}
             >
               {language === "en" ? "عربي" : "EN"}
             </button>
