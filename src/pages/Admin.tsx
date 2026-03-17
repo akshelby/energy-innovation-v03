@@ -820,7 +820,7 @@ export default function Admin() {
                         toast.success("Email saved!");
                       } catch (err: any) { toast.error(err.message); }
                     }}
-                    className="gradient-accent text-accent-foreground rounded-xl border-0 shrink-0"
+                    className="gradient-accent text-accent-foreground rounded-xl border-0 w-full sm:w-auto"
                   >
                     <Save className="w-4 h-4 mr-2" />Save
                   </Button>
