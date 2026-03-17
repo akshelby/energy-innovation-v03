@@ -523,6 +523,21 @@ export default function Admin() {
 
   const isImage = (name: string) => /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(name);
 
+  const toggleHeroImageActive = async (fileName: string) => {
+    const updated = activeHeroImages.includes(fileName)
+      ? activeHeroImages.filter((f) => f !== fileName)
+      : [...activeHeroImages, fileName];
+    setActiveHeroImages(updated);
+    try {
+      await apiCall("content", "POST", storedPassword, {
+        content_key: "hero.active_images",
+        value_en: JSON.stringify(updated),
+        value_ar: JSON.stringify(updated),
+      });
+      toast.success("Active hero images updated");
+    } catch (e: any) { toast.error(e.message); }
+  };
+
   // File upload handlers for product/service forms
   const handleFormFileUpload = async (
     file: File,
