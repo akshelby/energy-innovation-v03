@@ -2,33 +2,21 @@ import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { getHeroImageUrl } from "@/lib/storage";
 
 // Fallback local imports in case Supabase images aren't uploaded yet
-import hero1Local from "@/assets/hero-1.jpg";
-import hero2Local from "@/assets/hero-2.jpg";
-import hero3Local from "@/assets/hero-3.jpg";
-import hero4Local from "@/assets/hero-4.jpg";
-import hero5Local from "@/assets/hero-5.jpg";
+import hero1Local from "@/assets/hero-1.webp";
+import hero2Local from "@/assets/hero-2.webp";
+import hero3Local from "@/assets/hero-3.webp";
+import hero4Local from "@/assets/hero-4.webp";
+import hero5Local from "@/assets/hero-5.webp";
 
 const localImages = [hero1Local, hero2Local, hero3Local, hero4Local, hero5Local];
 
 export default function HeroSection() {
   const { t } = useLanguage();
   const [current, setCurrent] = useState(0);
-  const [useSupabase, setUseSupabase] = useState(true);
 
-  // Check if Supabase images are available
-  useEffect(() => {
-    const img = new Image();
-    img.onload = () => setUseSupabase(true);
-    img.onerror = () => setUseSupabase(false);
-    img.src = getHeroImageUrl(0);
-  }, []);
-
-  const images = useSupabase
-    ? Array.from({ length: 5 }, (_, i) => getHeroImageUrl(i))
-    : localImages;
+  const images = localImages;
 
   useEffect(() => {
     const interval = setInterval(() => {
