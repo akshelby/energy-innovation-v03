@@ -202,8 +202,13 @@ Deno.serve(async (req) => {
       }
       if (method === "DELETE") {
         const { bucket, paths } = await req.json();
-        const { error } = await supabase.storage.from(bucket).remove(paths);
-        if (error) throw error;
+        console.log("Deleting files:", JSON.stringify({ bucket, paths }));
+        const { data, error } = await supabase.storage.from(bucket).remove(paths);
+        if (error) {
+          console.error("Storage delete error:", error.message);
+          throw error;
+        }
+        console.log("Delete result:", JSON.stringify(data));
         return json({ success: true });
       }
     }
