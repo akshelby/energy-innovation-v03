@@ -419,6 +419,16 @@ export default function Admin() {
   const handleSaveService = async (item: ServiceItem) => {
     try {
       setLoading(true);
+      if (item.name_en && (!item.name_ar || !item.tag_ar || !item.description_ar)) {
+        try {
+          const result = await translateTexts({
+            ...(item.name_en && !item.name_ar ? { name_en: item.name_en } : {}),
+            ...(item.tag_en && !item.tag_ar ? { tag_en: item.tag_en } : {}),
+            ...(item.description_en && !item.description_ar ? { description_en: item.description_en } : {}),
+          });
+          item = { ...item, name_ar: result.name_ar || item.name_ar, tag_ar: result.tag_ar || item.tag_ar, description_ar: result.description_ar || item.description_ar };
+        } catch { /* proceed without translation */ }
+      }
       await apiCall("services", "POST", storedPassword, item);
       toast.success("Service saved");
       setEditingService(null);
