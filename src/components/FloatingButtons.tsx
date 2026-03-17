@@ -37,6 +37,7 @@ export default function FloatingButtons() {
         setConfig({
           whatsappNumber: map["whatsapp_number"] || "",
           whatsappActive: map["whatsapp_active"] === "true",
+          whatsappMessage: map["whatsapp_message"] || "",
           floatingEmail: map["floating_email"] || "",
           emailActive: map["email_active"] === "true",
         });
