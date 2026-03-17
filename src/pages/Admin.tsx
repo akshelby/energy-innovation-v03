@@ -388,6 +388,17 @@ export default function Admin() {
   const handleSaveProduct = async (item: ProductItem) => {
     try {
       setLoading(true);
+      // Auto-translate if Arabic fields are empty
+      if (item.name_en && (!item.name_ar || !item.tag_ar || !item.description_ar)) {
+        try {
+          const result = await translateTexts({
+            ...(item.name_en && !item.name_ar ? { name_en: item.name_en } : {}),
+            ...(item.tag_en && !item.tag_ar ? { tag_en: item.tag_en } : {}),
+            ...(item.description_en && !item.description_ar ? { description_en: item.description_en } : {}),
+          });
+          item = { ...item, name_ar: result.name_ar || item.name_ar, tag_ar: result.tag_ar || item.tag_ar, description_ar: result.description_ar || item.description_ar };
+        } catch { /* proceed without translation */ }
+      }
       await apiCall("products", "POST", storedPassword, item);
       toast.success("Product saved");
       setEditingProduct(null);
