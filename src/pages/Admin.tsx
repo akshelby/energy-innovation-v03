@@ -297,6 +297,19 @@ export default function Admin() {
         storedPassword
       );
       setFiles(data.filter((f: StorageFile) => f.name !== ".emptyFolderPlaceholder"));
+
+      // Fetch active hero images when viewing hero folder
+      if (selectedFolder.folder === "hero") {
+        try {
+          const contentData = await apiCall("content", "GET", storedPassword);
+          const entry = contentData.find((d: ContentItem) => d.content_key === "hero.active_images");
+          if (entry) {
+            setActiveHeroImages(JSON.parse(entry.value_en));
+          } else {
+            setActiveHeroImages([]);
+          }
+        } catch { setActiveHeroImages([]); }
+      }
     } catch (e: any) { toast.error(e.message); }
     finally { setLoading(false); }
   }, [storedPassword, selectedFolder]);
