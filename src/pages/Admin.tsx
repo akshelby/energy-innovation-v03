@@ -1318,7 +1318,44 @@ export default function Admin() {
                 </Button>
               </div>
             </div>
-            {content.length === 0 ? (
+
+            {/* Hero Visibility Toggles */}
+            <div className="bg-card border border-border rounded-2xl p-6 mb-6">
+              <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Image className="w-4 h-4 text-accent" />
+                Hero Section Visibility
+              </h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {[
+                  { key: "hero.show_headline", label: "Headline" },
+                  { key: "hero.show_subtext", label: "Subtext" },
+                  { key: "hero.show_explore_btn", label: "Explore Products Button" },
+                  { key: "hero.show_contact_btn", label: "Contact Us Button" },
+                  { key: "hero.show_arrows", label: "Navigation Arrows" },
+                  { key: "hero.show_dots", label: "Slide Dots" },
+                ].map(({ key, label }) => (
+                  <label
+                    key={key}
+                    className={`flex items-center gap-2.5 p-3 rounded-xl border cursor-pointer transition-colors ${
+                      heroVisibility[key]
+                        ? "bg-accent/10 border-accent/30"
+                        : "bg-muted/50 border-border"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={heroVisibility[key]}
+                      onChange={() => handleToggleHeroVisibility(key)}
+                      className="w-4 h-4 accent-[hsl(var(--accent))] rounded"
+                    />
+                    <span className={`text-sm font-medium ${heroVisibility[key] ? "text-foreground" : "text-muted-foreground line-through"}`}>
+                      {label}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
               <div className="text-center py-16 text-muted-foreground">
                 <FileText className="w-12 h-12 mx-auto mb-4 opacity-30" /><p>No content yet. Click "Seed Defaults" to populate.</p>
               </div>
