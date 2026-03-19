@@ -266,6 +266,7 @@ export default function Header() {
               <div key={item.href} className="relative"
                 onMouseEnter={() => item.hasDropdown && setProductsOpen(true)}
                 onMouseLeave={() => item.hasDropdown && setProductsOpen(false)}
+                onClick={() => item.hasDropdown && setProductsOpen((prev) => !prev)}
               >
                 <button
                   onClick={() => scrollToSection(item.href)}
@@ -277,7 +278,7 @@ export default function Header() {
 
                 {item.hasDropdown && productsOpen && categoriesWithItems.length > 0 && (
                   <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2" style={{ width: "750px" }}>
-                    <div className="bg-card rounded-2xl shadow-xl border border-border p-6 animate-slide-down max-h-[70vh] overflow-y-auto">
+                    <div className="bg-card rounded-2xl shadow-xl border border-border p-6 animate-slide-down max-h-[70vh] overflow-y-auto mega-menu-scroll">
                       {row1.length > 0 && (
                         <div className="grid grid-cols-3 gap-x-8 gap-y-6">
                           {row1.map((cat) => (
