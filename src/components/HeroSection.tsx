@@ -45,7 +45,7 @@ export default function HeroSection() {
       const { data: contentRows } = await supabase
         .from("site_content")
         .select("content_key, value_en")
-        .in("content_key", ["hero.active_images", "hero.speed"]);
+        .in("content_key", ["hero.active_images", "hero.speed", "hero.show_headline", "hero.show_subtext", "hero.show_explore_btn", "hero.show_contact_btn", "hero.show_arrows", "hero.show_dots"]);
 
       const activeEntry = contentRows?.find((r) => r.content_key === "hero.active_images");
       const speedEntry = contentRows?.find((r) => r.content_key === "hero.speed");
