@@ -388,6 +388,15 @@ export default function Admin() {
       if (emailEntry) setFloatingEmail(emailEntry.value_en);
       const emActive = data.find((d: ContentItem) => d.content_key === "email_active");
       setEmailActive(emActive?.value_en === "true");
+
+      // Load hero visibility toggles
+      const visKeys = ["hero.show_headline", "hero.show_subtext", "hero.show_explore_btn", "hero.show_contact_btn", "hero.show_arrows", "hero.show_dots"];
+      const vis: Record<string, boolean> = {};
+      visKeys.forEach((k) => {
+        const entry = data.find((d: ContentItem) => d.content_key === k);
+        vis[k] = entry ? entry.value_en !== "false" : true;
+      });
+      setHeroVisibility(vis);
     } catch { /* ignore */ }
     const logoPublicUrl = `${STORAGE_BASE}/images/branding/logo`;
     try {
