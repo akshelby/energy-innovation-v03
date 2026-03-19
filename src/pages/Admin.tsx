@@ -457,7 +457,22 @@ export default function Admin() {
     } catch (e: any) { toast.error(e.message); }
   };
 
-  const handleSeedContent = async () => {
+  const handleToggleHeroVisibility = async (key: string) => {
+    const newVal = !heroVisibility[key];
+    setHeroVisibility((prev) => ({ ...prev, [key]: newVal }));
+    try {
+      await apiCall("content", "POST", storedPassword, {
+        content_key: key,
+        value_en: String(newVal),
+        value_ar: String(newVal),
+      });
+      toast.success(`${key.replace("hero.show_", "").replace(/_/g, " ")} ${newVal ? "shown" : "hidden"}`);
+    } catch (e: any) {
+      setHeroVisibility((prev) => ({ ...prev, [key]: !newVal }));
+      toast.error(e.message);
+    }
+  };
+
     try {
       setLoading(true);
       await apiCall("seed", "POST", storedPassword, { entries: defaultContent });
