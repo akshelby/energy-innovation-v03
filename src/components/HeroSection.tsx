@@ -38,7 +38,6 @@ export default function HeroSection() {
     "hero.show_arrows": true,
     "hero.show_dots": true,
   });
-  const [speed, setSpeed] = useState(6000);
 
   useEffect(() => {
     async function fetchHeroImages() {
