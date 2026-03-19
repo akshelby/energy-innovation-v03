@@ -473,6 +473,7 @@ export default function Admin() {
     }
   };
 
+  const handleSeedContent = async () => {
     try {
       setLoading(true);
       await apiCall("seed", "POST", storedPassword, { entries: defaultContent });
