@@ -248,6 +248,16 @@ export default function Admin() {
   const [whatsappMessageAr, setWhatsappMessageAr] = useState("مرحبًا، أنا مهتم بمنتجاتكم وخدماتكم.");
   const [floatingEmail, setFloatingEmail] = useState("");
   const [emailActive, setEmailActive] = useState(false);
+
+  // Hero visibility toggles
+  const [heroVisibility, setHeroVisibility] = useState<Record<string, boolean>>({
+    "hero.show_headline": true,
+    "hero.show_subtext": true,
+    "hero.show_explore_btn": true,
+    "hero.show_contact_btn": true,
+    "hero.show_arrows": true,
+    "hero.show_dots": true,
+  });
   const productImageRef = useRef<HTMLInputElement>(null);
   const productPdfRef = useRef<HTMLInputElement>(null);
   const serviceImageRef = useRef<HTMLInputElement>(null);
