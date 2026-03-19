@@ -1361,57 +1361,86 @@ export default function Admin() {
                 <FileText className="w-12 h-12 mx-auto mb-4 opacity-30" /><p>No content yet. Click "Seed Defaults" to populate.</p>
               </div>
             ) : (
-              <div className="space-y-4">
-                {content.map((item) => (
-                  <div key={item.id} className="bg-card border border-border rounded-2xl p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-sm font-mono bg-secondary px-3 py-1 rounded-lg text-secondary-foreground">{item.content_key}</span>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          disabled={translating || !editedContent[item.content_key]?.value_en}
-                          onClick={async () => {
-                            try {
-                              setTranslating(true);
-                              const result = await translateTexts({ value_en: editedContent[item.content_key]?.value_en || "" });
-                              if (result.value_ar) {
-                                updateEditedField(item.content_key, "value_ar", result.value_ar);
-                                toast.success("Arabic translation generated");
-                              }
-                            } catch (e: any) { toast.error(e.message); }
-                            finally { setTranslating(false); }
-                          }}
-                          className="rounded-xl"
-                        >
-                          <Languages className="w-4 h-4 mr-1" />
-                          {translating ? "..." : "Translate"}
-                        </Button>
-                        <Button size="sm" onClick={() => handleSaveContent(item.content_key)} className="gradient-accent text-accent-foreground rounded-xl border-0">
-                          <Save className="w-4 h-4 mr-2" />Save
-                        </Button>
+              <div className="space-y-6">
+                {(() => {
+                  const grouped: Record<string, ContentItem[]> = {};
+                  content.forEach((item) => {
+                    const section = item.content_key.split(".")[0] || "other";
+                    if (!grouped[section]) grouped[section] = [];
+                    grouped[section].push(item);
+                  });
+                  const sectionLabels: Record<string, string> = {
+                    about: "About Section",
+                    brand: "Brand",
+                    hero: "Hero Section",
+                    contact: "Contact Section",
+                    footer: "Footer",
+                    nav: "Navigation",
+                    why: "Why Choose Us",
+                    services: "Services",
+                    products: "Products",
+                  };
+                  return Object.entries(grouped).map(([section, items]) => (
+                    <div key={section} className="border border-border rounded-2xl overflow-hidden">
+                      <div className="bg-secondary/50 px-5 py-3 flex items-center gap-2 border-b border-border">
+                        <span className="text-sm font-semibold text-foreground capitalize">{sectionLabels[section] || section}</span>
+                        <span className="text-xs text-muted-foreground">({items.length})</span>
+                      </div>
+                      <div className="divide-y divide-border">
+                        {items.map((item) => (
+                          <div key={item.id} className="p-5">
+                            <div className="flex items-center justify-between mb-4">
+                              <span className="text-sm font-mono bg-secondary px-3 py-1 rounded-lg text-secondary-foreground">{item.content_key}</span>
+                              <div className="flex gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  disabled={translating || !editedContent[item.content_key]?.value_en}
+                                  onClick={async () => {
+                                    try {
+                                      setTranslating(true);
+                                      const result = await translateTexts({ value_en: editedContent[item.content_key]?.value_en || "" });
+                                      if (result.value_ar) {
+                                        updateEditedField(item.content_key, "value_ar", result.value_ar);
+                                        toast.success("Arabic translation generated");
+                                      }
+                                    } catch (e: any) { toast.error(e.message); }
+                                    finally { setTranslating(false); }
+                                  }}
+                                  className="rounded-xl"
+                                >
+                                  <Languages className="w-4 h-4 mr-1" />
+                                  {translating ? "..." : "Translate"}
+                                </Button>
+                                <Button size="sm" onClick={() => handleSaveContent(item.content_key)} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                                  <Save className="w-4 h-4 mr-2" />Save
+                                </Button>
+                              </div>
+                            </div>
+                            <div className="grid md:grid-cols-2 gap-4">
+                              <div>
+                                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">English</label>
+                                {(editedContent[item.content_key]?.value_en?.length || 0) > 100 ? (
+                                  <Textarea value={editedContent[item.content_key]?.value_en || ""} onChange={(e) => updateEditedField(item.content_key, "value_en", e.target.value)} rows={3} className="rounded-xl resize-none" />
+                                ) : (
+                                  <Input value={editedContent[item.content_key]?.value_en || ""} onChange={(e) => updateEditedField(item.content_key, "value_en", e.target.value)} className="rounded-xl" />
+                                )}
+                              </div>
+                              <div>
+                                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Arabic</label>
+                                {(editedContent[item.content_key]?.value_ar?.length || 0) > 100 ? (
+                                  <Textarea value={editedContent[item.content_key]?.value_ar || ""} onChange={(e) => updateEditedField(item.content_key, "value_ar", e.target.value)} rows={3} className="rounded-xl resize-none" dir="rtl" />
+                                ) : (
+                                  <Input value={editedContent[item.content_key]?.value_ar || ""} onChange={(e) => updateEditedField(item.content_key, "value_ar", e.target.value)} className="rounded-xl" dir="rtl" />
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">English</label>
-                        {(editedContent[item.content_key]?.value_en?.length || 0) > 100 ? (
-                          <Textarea value={editedContent[item.content_key]?.value_en || ""} onChange={(e) => updateEditedField(item.content_key, "value_en", e.target.value)} rows={3} className="rounded-xl resize-none" />
-                        ) : (
-                          <Input value={editedContent[item.content_key]?.value_en || ""} onChange={(e) => updateEditedField(item.content_key, "value_en", e.target.value)} className="rounded-xl" />
-                        )}
-                      </div>
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Arabic</label>
-                        {(editedContent[item.content_key]?.value_ar?.length || 0) > 100 ? (
-                          <Textarea value={editedContent[item.content_key]?.value_ar || ""} onChange={(e) => updateEditedField(item.content_key, "value_ar", e.target.value)} rows={3} className="rounded-xl resize-none" dir="rtl" />
-                        ) : (
-                          <Input value={editedContent[item.content_key]?.value_ar || ""} onChange={(e) => updateEditedField(item.content_key, "value_ar", e.target.value)} className="rounded-xl" dir="rtl" />
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                  ));
+                })()}
               </div>
             )}
           </div>
