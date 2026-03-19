@@ -59,6 +59,15 @@ export default function HeroSection() {
         if (seconds >= 1) setSpeed(seconds * 1000);
       }
 
+      // Parse visibility toggles
+      const visKeys = ["hero.show_headline", "hero.show_subtext", "hero.show_explore_btn", "hero.show_contact_btn", "hero.show_arrows", "hero.show_dots"];
+      const vis: Record<string, boolean> = {};
+      visKeys.forEach((k) => {
+        const entry = contentRows?.find((r) => r.content_key === k);
+        vis[k] = entry ? entry.value_en !== "false" : true;
+      });
+      setVisibility(vis);
+
       const { data, error } = await supabase.storage.from("images").list("hero", {
         sortBy: { column: "name", order: "asc" },
       });
