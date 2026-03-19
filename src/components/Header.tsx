@@ -322,13 +322,6 @@ export default function Header() {
               {language === "en" ? "عربي" : "EN"}
             </button>
 
-            <Button
-              onClick={() => scrollToSection("#contact")}
-              className="hidden md:inline-flex gradient-accent text-accent-foreground rounded-full px-5 text-[15px] font-semibold transition-all border-0"
-            >
-              {t("nav.contact")}
-            </Button>
-
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
               className={`md:hidden p-2 rounded-full ${textColor} hover:bg-muted transition-colors duration-300`}
@@ -336,6 +329,13 @@ export default function Header() {
               {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
+
+          <Button
+            onClick={() => scrollToSection("#contact")}
+            className="hidden md:inline-flex gradient-accent text-accent-foreground rounded-full px-5 text-[15px] font-semibold transition-all border-0 shrink-0"
+          >
+            {t("nav.contact")}
+          </Button>
         </div>
       </header>
 
