@@ -248,6 +248,16 @@ export default function Admin() {
   const [whatsappMessageAr, setWhatsappMessageAr] = useState("مرحبًا، أنا مهتم بمنتجاتكم وخدماتكم.");
   const [floatingEmail, setFloatingEmail] = useState("");
   const [emailActive, setEmailActive] = useState(false);
+
+  // Hero visibility toggles
+  const [heroVisibility, setHeroVisibility] = useState<Record<string, boolean>>({
+    "hero.show_headline": true,
+    "hero.show_subtext": true,
+    "hero.show_explore_btn": true,
+    "hero.show_contact_btn": true,
+    "hero.show_arrows": true,
+    "hero.show_dots": true,
+  });
   const productImageRef = useRef<HTMLInputElement>(null);
   const productPdfRef = useRef<HTMLInputElement>(null);
   const serviceImageRef = useRef<HTMLInputElement>(null);
@@ -378,6 +388,15 @@ export default function Admin() {
       if (emailEntry) setFloatingEmail(emailEntry.value_en);
       const emActive = data.find((d: ContentItem) => d.content_key === "email_active");
       setEmailActive(emActive?.value_en === "true");
+
+      // Load hero visibility toggles
+      const visKeys = ["hero.show_headline", "hero.show_subtext", "hero.show_explore_btn", "hero.show_contact_btn", "hero.show_arrows", "hero.show_dots"];
+      const vis: Record<string, boolean> = {};
+      visKeys.forEach((k) => {
+        const entry = data.find((d: ContentItem) => d.content_key === k);
+        vis[k] = entry ? entry.value_en !== "false" : true;
+      });
+      setHeroVisibility(vis);
     } catch { /* ignore */ }
     const logoPublicUrl = `${STORAGE_BASE}/images/branding/logo`;
     try {
@@ -436,6 +455,22 @@ export default function Admin() {
       toast.success(`Saved "${key}"`);
       fetchContent();
     } catch (e: any) { toast.error(e.message); }
+  };
+
+  const handleToggleHeroVisibility = async (key: string) => {
+    const newVal = !heroVisibility[key];
+    setHeroVisibility((prev) => ({ ...prev, [key]: newVal }));
+    try {
+      await apiCall("content", "POST", storedPassword, {
+        content_key: key,
+        value_en: String(newVal),
+        value_ar: String(newVal),
+      });
+      toast.success(`${key.replace("hero.show_", "").replace(/_/g, " ")} ${newVal ? "shown" : "hidden"}`);
+    } catch (e: any) {
+      setHeroVisibility((prev) => ({ ...prev, [key]: !newVal }));
+      toast.error(e.message);
+    }
   };
 
   const handleSeedContent = async () => {
@@ -1283,6 +1318,44 @@ export default function Admin() {
                 </Button>
               </div>
             </div>
+
+            {/* Hero Visibility Toggles */}
+            <div className="bg-card border border-border rounded-2xl p-6 mb-6">
+              <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Image className="w-4 h-4 text-accent" />
+                Hero Section Visibility
+              </h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {[
+                  { key: "hero.show_headline", label: "Headline" },
+                  { key: "hero.show_subtext", label: "Subtext" },
+                  { key: "hero.show_explore_btn", label: "Explore Products Button" },
+                  { key: "hero.show_contact_btn", label: "Contact Us Button" },
+                  { key: "hero.show_arrows", label: "Navigation Arrows" },
+                  { key: "hero.show_dots", label: "Slide Dots" },
+                ].map(({ key, label }) => (
+                  <label
+                    key={key}
+                    className={`flex items-center gap-2.5 p-3 rounded-xl border cursor-pointer transition-colors ${
+                      heroVisibility[key]
+                        ? "bg-accent/10 border-accent/30"
+                        : "bg-muted/50 border-border"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={heroVisibility[key]}
+                      onChange={() => handleToggleHeroVisibility(key)}
+                      className="w-4 h-4 accent-[hsl(var(--accent))] rounded"
+                    />
+                    <span className={`text-sm font-medium ${heroVisibility[key] ? "text-foreground" : "text-muted-foreground line-through"}`}>
+                      {label}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
             {content.length === 0 ? (
               <div className="text-center py-16 text-muted-foreground">
                 <FileText className="w-12 h-12 mx-auto mb-4 opacity-30" /><p>No content yet. Click "Seed Defaults" to populate.</p>
