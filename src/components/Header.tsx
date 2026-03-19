@@ -256,7 +256,7 @@ export default function Header() {
       >
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 md:px-6">
           {/* Logo */}
-          <a href="#home" onClick={() => scrollToSection("#home")} className="flex items-center shrink-0 py-1">
+          <a href="#home" onClick={() => scrollToSection("#home")} className="flex items-center shrink-0">
             <img src={logoUrl} alt={brandName} className="w-auto object-contain" style={{ height: `${logoSize}px` }} />
           </a>
 
@@ -269,7 +269,7 @@ export default function Header() {
               >
                 <button
                   onClick={() => scrollToSection(item.href)}
-                  className={`px-3 py-2 text-[15px] font-medium ${textColor} transition-colors duration-300 flex items-center gap-1 relative after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-0 hover:after:w-3/4 after:h-[3px] after:bg-red-500 after:transition-all after:duration-500`}
+                  className={`px-3 py-1 text-[15px] font-medium ${textColor} transition-colors duration-300 flex items-center gap-1 relative after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-0 hover:after:w-3/4 after:h-[3px] after:bg-red-500 after:transition-all after:duration-500`}
                 >
                   {item.label}
                   {item.hasDropdown && <ChevronDown className="w-3.5 h-3.5" />}
