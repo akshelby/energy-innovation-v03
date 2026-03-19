@@ -266,6 +266,7 @@ export default function Header() {
               <div key={item.href} className="relative"
                 onMouseEnter={() => item.hasDropdown && setProductsOpen(true)}
                 onMouseLeave={() => item.hasDropdown && setProductsOpen(false)}
+                onClick={() => item.hasDropdown && setProductsOpen((prev) => !prev)}
               >
                 <button
                   onClick={() => scrollToSection(item.href)}
