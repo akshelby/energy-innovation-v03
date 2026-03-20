@@ -9,6 +9,19 @@ export default function Footer() {
   const { logoUrl, brandName, logoSize, ready: brandReady } = useBranding();
   const [linkedinUrl, setLinkedinUrl] = useState("");
 
+  useEffect(() => {
+    supabase
+      .from("site_content")
+      .select("content_key, value_en")
+      .in("content_key", ["linkedin_url", "linkedin_active"])
+      .then(({ data }) => {
+        if (!data) return;
+        const active = data.find((d) => d.content_key === "linkedin_active");
+        const url = data.find((d) => d.content_key === "linkedin_url");
+        if (active?.value_en === "true" && url?.value_en) setLinkedinUrl(url.value_en);
+      });
+  }, []);
+
   const quickLinks = [
     { label: t("nav.home"), href: "#home" },
     { label: t("nav.about"), href: "#about" },
