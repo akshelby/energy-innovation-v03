@@ -304,12 +304,13 @@ export default function Admin() {
     requirements_ar: string;
     is_active: boolean;
     sort_order: number;
+    status: string;
   }
   const emptyCareer: CareerItem = {
     title_en: "", title_ar: "", department_en: "", department_ar: "",
     location_en: "", location_ar: "", type_en: "Full-time", type_ar: "دوام كامل",
     description_en: "", description_ar: "", requirements_en: "", requirements_ar: "",
-    is_active: true, sort_order: 0,
+    is_active: true, sort_order: 0, status: "open",
   };
   const [careersList, setCareersList] = useState<(CareerItem & { id: string })[]>([]);
   const [editingCareer, setEditingCareer] = useState<CareerItem | null>(null);
