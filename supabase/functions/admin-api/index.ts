@@ -72,8 +72,6 @@ Deno.serve(async (req) => {
     return json({ error: "Unauthorized" }, 401);
   }
 
-  const url = new URL(req.url);
-  const path = url.pathname.split("/").pop();
   const method = req.method;
 
   try {
