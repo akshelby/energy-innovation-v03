@@ -253,6 +253,15 @@ export default function Admin() {
   const [floatingEmail, setFloatingEmail] = useState("");
   const [emailActive, setEmailActive] = useState(false);
 
+  // Highlight section state
+  const [highlightImage, setHighlightImage] = useState("");
+  const [highlightStats, setHighlightStats] = useState<{ icon: string; value_en: string; value_ar: string; label_en: string; label_ar: string }[]>([
+    { icon: "Award", value_en: "100%", value_ar: "١٠٠٪", label_en: "Quality Assurance", label_ar: "ضمان الجودة" },
+    { icon: "TrendingUp", value_en: "20+", value_ar: "+٢٠", label_en: "Years of Experience", label_ar: "سنوات الخبرة" },
+    { icon: "Users", value_en: "500+", value_ar: "+٥٠٠", label_en: "Satisfied Clients", label_ar: "عملاء راضون" },
+  ]);
+  const highlightImageRef = useRef<HTMLInputElement>(null);
+
   // Hero visibility toggles
   const [heroVisibility, setHeroVisibility] = useState<Record<string, boolean>>({
     "hero.show_headline": true,
