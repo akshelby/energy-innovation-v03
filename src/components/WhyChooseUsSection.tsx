@@ -1,20 +1,58 @@
+import { useRef, useState, useEffect, useCallback } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { Award, CheckCircle, Target, Headphones, ArrowRight } from "lucide-react";
 
 const reasons = [
-  { key: "why.expertise", descKey: "why.expertise.desc", icon: Award, num: "01" },
-  { key: "why.quality", descKey: "why.quality.desc", icon: CheckCircle, num: "02" },
-  { key: "why.precision", descKey: "why.precision.desc", icon: Target, num: "03" },
-  { key: "why.support", descKey: "why.support.desc", icon: Headphones, num: "04" },
+  { key: "why.expertise", descKey: "why.expertise.desc", icon: Award, num: "01", speed: 0.06 },
+  { key: "why.quality", descKey: "why.quality.desc", icon: CheckCircle, num: "02", speed: 0.12 },
+  { key: "why.precision", descKey: "why.precision.desc", icon: Target, num: "03", speed: 0.04 },
+  { key: "why.support", descKey: "why.support.desc", icon: Headphones, num: "04", speed: 0.1 },
 ];
+
+function useParallax() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [offsets, setOffsets] = useState(reasons.map(() => 0));
+  const rafRef = useRef<number>();
+
+  const handleScroll = useCallback(() => {
+    if (!sectionRef.current) return;
+    const rect = sectionRef.current.getBoundingClientRect();
+    const viewH = window.innerHeight;
+    // How far the section center is from viewport center
+    const delta = rect.top + rect.height / 2 - viewH / 2;
+    setOffsets(reasons.map((r) => delta * r.speed));
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(handleScroll);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    handleScroll();
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [handleScroll]);
+
+  return { sectionRef, offsets };
+}
 
 export default function WhyChooseUsSection() {
   const { t } = useLanguage();
   const ref = useScrollReveal();
+  const { sectionRef, offsets } = useParallax();
 
   return (
-    <section className="py-24 px-6 gradient-primary overflow-hidden" ref={ref}>
+    <section
+      className="py-24 px-6 gradient-primary overflow-hidden"
+      ref={(el: HTMLDivElement | null) => {
+        (ref as React.MutableRefObject<HTMLElement | null>).current = el;
+        (sectionRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+      }}
+    >
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16 scroll-reveal">
           <span className="inline-block px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-accent-foreground bg-accent/20 rounded-full mb-4">
@@ -31,8 +69,8 @@ export default function WhyChooseUsSection() {
             return (
               <div
                 key={reason.key}
-                className="scroll-reveal group relative rounded-2xl overflow-hidden"
-                style={{ transitionDelay: `${i * 100}ms` }}
+                className="scroll-reveal group relative rounded-2xl overflow-hidden will-change-transform"
+                style={{ transitionDelay: `${i * 100}ms`, transform: `translateY(${offsets[i]}px)` }}
               >
                 {/* Left accent edge */}
                 <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-accent via-accent/40 to-transparent transition-all duration-500 group-hover:w-1.5 group-hover:from-accent group-hover:via-accent group-hover:to-accent/30" />
