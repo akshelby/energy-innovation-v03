@@ -941,7 +941,7 @@ export default function Admin() {
           storedPassword
         );
         for (const f of allFiles) {
-          if (f.name !== fileName && f.name.replace(/\.(png|jpe?g|webp|avif)$/i, "") === stem) {
+          if (f.name !== fileName && f.name.replace(/\.(png|jpe?g|webp|avif|svg)$/i, "") === stem) {
             pathsToDelete.push(folder ? `${folder}/${f.name}` : f.name);
           }
         }
