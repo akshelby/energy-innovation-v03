@@ -74,7 +74,7 @@ export default function ProductsSection() {
           </p>
         </div>
 
-        <StickyCardStack baseTop={90} offsetIncrement={0} scrollSpace="2svh" maxWidthClass="max-w-lg" fullHeight>
+        <StickyCardStack baseTop={90} offsetIncrement={0} scrollSpace="2svh" maxWidthClass="max-w-full md:max-w-lg" fullHeight>
           {products.map((product, i) => {
             const isCustomIcon = product.icon?.startsWith("http") || product.icon?.startsWith("/") || product.icon?.startsWith("data:");
             const Icon = !isCustomIcon ? (iconMap[product.icon] || Flame) : null;
