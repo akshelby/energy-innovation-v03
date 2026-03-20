@@ -61,14 +61,15 @@ export default function ServicesSection() {
             {t("services.desc")}
           </p>
         </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {services.map((service, i) => {
             const isCustomIcon = service.icon?.startsWith("http") || service.icon?.startsWith("/") || service.icon?.startsWith("data:");
             const Icon = !isCustomIcon ? (iconMap[service.icon] || Wrench) : null;
+            const num = String(i + 1).padStart(2, "0");
             return (
               <div
                 key={i}
-                className="scroll-reveal text-center p-8 rounded-2xl bg-card border border-border hover:border-accent/50 hover:shadow-xl hover:shadow-accent/5 transition-all duration-300 cursor-pointer relative"
+                className="scroll-reveal group relative h-[280px] rounded-2xl cursor-pointer"
                 style={{ transitionDelay: `${i * 100}ms` }}
                 onClick={() => {
                   if (service.pdf_url) {
@@ -77,36 +78,71 @@ export default function ServicesSection() {
                   }
                 }}
               >
-                {(isAr ? service.tag_ar : service.tag_en) && (
-                  <span className="absolute top-3 right-3 text-[10px] font-semibold uppercase tracking-wider bg-accent/10 text-accent px-2.5 py-1 rounded-full">
-                    {isAr ? service.tag_ar : service.tag_en}
+                {/* Resting state */}
+                <div className="absolute inset-0 rounded-2xl border border-border bg-gradient-to-b from-card to-transparent p-7 flex flex-col justify-between transition-all duration-500 group-hover:opacity-0 group-hover:scale-95">
+                  <span className="absolute -top-2 -right-1 text-[7rem] font-black leading-none text-accent/[0.04] select-none pointer-events-none">
+                    {num}
                   </span>
-                )}
-                {service.image_url ? (
-                  <div className="w-16 h-16 rounded-2xl overflow-hidden mx-auto mb-5">
-                    <img src={service.image_url} alt={isAr ? service.name_ar : service.name_en} className="w-full h-full object-cover" />
+
+                  {(isAr ? service.tag_ar : service.tag_en) && (
+                    <span className="absolute top-4 right-4 text-[10px] font-semibold uppercase tracking-wider bg-accent/10 text-accent px-2.5 py-1 rounded-full">
+                      {isAr ? service.tag_ar : service.tag_en}
+                    </span>
+                  )}
+
+                  {service.image_url ? (
+                    <div className="w-12 h-12 rounded-2xl overflow-hidden">
+                      <img src={service.image_url} alt="" className="w-full h-full object-cover" />
+                    </div>
+                  ) : (
+                    <div className="w-12 h-12 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center">
+                      {isCustomIcon ? (
+                        <img src={service.icon} alt="" className="w-6 h-6 object-contain" />
+                      ) : Icon ? (
+                        <Icon className="w-6 h-6 text-accent" />
+                      ) : null}
+                    </div>
+                  )}
+
+                  <div>
+                    <h3 className="text-lg font-bold text-foreground leading-snug mb-2">
+                      {isAr ? service.name_ar : service.name_en}
+                    </h3>
+                    <div className="w-10 h-[2px] rounded-full bg-gradient-to-r from-accent to-accent/0" />
                   </div>
-                ) : isCustomIcon ? (
-                  <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mb-5 mx-auto">
-                    <img src={service.icon} alt="" className="w-8 h-8 object-contain" />
+                </div>
+
+                {/* Hover state */}
+                <div className="absolute inset-0 rounded-2xl border border-accent/25 bg-gradient-to-br from-accent/[0.08] via-accent/[0.04] to-card backdrop-blur-sm p-7 flex flex-col justify-between opacity-0 scale-105 transition-all duration-500 group-hover:opacity-100 group-hover:scale-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-accent/15 border border-accent/25 flex items-center justify-center shrink-0">
+                      {isCustomIcon ? (
+                        <img src={service.icon} alt="" className="w-5 h-5 object-contain" />
+                      ) : Icon ? (
+                        <Icon className="w-5 h-5 text-accent" />
+                      ) : null}
+                    </div>
+                    <h3 className="text-base font-bold text-foreground leading-snug">
+                      {isAr ? service.name_ar : service.name_en}
+                    </h3>
                   </div>
-                ) : (
-                  <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mb-5 mx-auto">
-                    {Icon && <Icon className="w-8 h-8 text-primary-foreground" />}
+
+                  <p className="text-muted-foreground text-[13px] leading-relaxed">
+                    {isAr ? service.description_ar : service.description_en}
+                  </p>
+
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-mono font-bold tracking-widest text-accent/50">
+                      {num} / {String(services.length).padStart(2, "0")}
+                    </span>
+                    {service.pdf_url && (
+                      <span className="flex items-center gap-1 text-xs text-accent">
+                        <FileText className="w-3 h-3" />
+                        View PDF
+                      </span>
+                    )}
                   </div>
-                )}
-                <h3 className="text-lg font-bold text-foreground mb-3">
-                  {isAr ? service.name_ar : service.name_en}
-                </h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  {isAr ? service.description_ar : service.description_en}
-                </p>
-                {service.pdf_url && (
-                  <div className="mt-3 flex items-center justify-center gap-1 text-xs text-primary">
-                    <FileText className="w-3 h-3" />
-                    <span>View PDF</span>
-                  </div>
-                )}
+                </div>
               </div>
             );
           })}

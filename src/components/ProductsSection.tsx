@@ -71,14 +71,14 @@ export default function ProductsSection() {
             {t("products.desc")}
           </p>
         </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {products.map((product, i) => {
             const isCustomIcon = product.icon?.startsWith("http") || product.icon?.startsWith("/") || product.icon?.startsWith("data:");
             const Icon = !isCustomIcon ? (iconMap[product.icon] || Flame) : null;
             return (
               <div
                 key={i}
-                className="scroll-reveal group rounded-2xl bg-transparent border border-border hover:border-accent/50 hover:shadow-xl hover:shadow-accent/5 transition-all duration-300 cursor-pointer overflow-hidden"
+                className="scroll-reveal group rounded-2xl bg-transparent border border-border hover:border-accent/25 transition-all duration-300 cursor-pointer overflow-hidden"
                 style={{ transitionDelay: `${i * 80}ms` }}
                 onClick={() => {
                   if (product.pdf_url) {
@@ -104,12 +104,11 @@ export default function ProductsSection() {
                       ) : null}
                     </div>
                   )}
-                  <div className="absolute inset-0" />
-                  <div className="absolute bottom-3 left-3 w-10 h-10 rounded-xl gradient-accent flex items-center justify-center">
+                  <div className="absolute bottom-3 left-3 w-10 h-10 rounded-xl bg-accent/15 border border-accent/25 backdrop-blur-sm flex items-center justify-center">
                     {isCustomIcon ? (
                       <img src={product.icon} alt="" className="w-5 h-5 object-contain" />
                     ) : Icon ? (
-                      <Icon className="w-5 h-5 text-accent-foreground" />
+                      <Icon className="w-5 h-5 text-accent" />
                     ) : null}
                   </div>
                   {(isAr ? product.tag_ar : product.tag_en) && (
@@ -118,7 +117,7 @@ export default function ProductsSection() {
                     </span>
                   )}
                 </div>
-                <div className="p-4">
+                <div className="p-5">
                   <h3 className="text-lg font-bold text-foreground mb-1.5 line-clamp-1">
                     {isAr ? product.name_ar : product.name_en}
                   </h3>
