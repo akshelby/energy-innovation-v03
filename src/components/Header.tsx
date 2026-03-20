@@ -137,7 +137,6 @@ export default function Header() {
     { label: t("nav.products"), href: "#products", hasDropdown: true },
     { label: t("nav.services"), href: "#services" },
     { label: language === "ar" ? "الوظائف" : "Careers", href: "/careers", isRoute: true },
-    { label: t("nav.contact"), href: "#contact" },
   ];
 
   const scrollToSection = (href: string) => {
@@ -320,8 +319,15 @@ export default function Header() {
                           ))}
                         </div>
                       )}
-                    </div>
-                  </div>
+          </div>
+
+          <Button
+            onClick={() => scrollToSection("#contact")}
+            className="hidden md:inline-flex gradient-accent text-accent-foreground rounded-full px-5 text-[15px] font-semibold transition-all border-0 shrink-0"
+          >
+            {t("nav.contact")}
+          </Button>
+        </div>
                 )}
               </div>
             ))}
