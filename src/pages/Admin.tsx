@@ -479,6 +479,10 @@ export default function Admin() {
       if (emailEntry) setFloatingEmail(emailEntry.value_en);
       const emActive = data.find((d: ContentItem) => d.content_key === "email_active");
       setEmailActive(emActive?.value_en === "true");
+      const liEntry = data.find((d: ContentItem) => d.content_key === "linkedin_url");
+      if (liEntry) setLinkedinUrl(liEntry.value_en);
+      const liActive = data.find((d: ContentItem) => d.content_key === "linkedin_active");
+      setLinkedinActive(liActive?.value_en === "true");
 
       // Load hero visibility toggles
       const visKeys = ["hero.show_headline", "hero.show_subtext", "hero.show_explore_btn", "hero.show_contact_btn", "hero.show_arrows", "hero.show_dots"];
