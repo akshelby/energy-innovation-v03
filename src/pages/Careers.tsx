@@ -151,11 +151,11 @@ export default function Careers() {
 
         {/* Stats bar */}
         <div className="bg-card border-b border-border">
-          <div className={`max-w-5xl mx-auto grid grid-cols-${Math.min(allStats.length, 4)} divide-x divide-border rtl:divide-x-reverse`}>
+          <div className="max-w-5xl mx-auto flex divide-x divide-border rtl:divide-x-reverse">
             {allStats.map((stat, i) => (
-              <div key={i} className="py-5 md:py-6 text-center">
-                <div className="text-2xl md:text-3xl font-bold text-foreground tabular-nums">{typeof stat.value === "number" || typeof stat.value === "string" ? stat.value : "—"}</div>
-                <div className="text-xs md:text-sm text-muted-foreground mt-1">{isAr ? stat.label_ar : stat.label_en}</div>
+              <div key={i} className="flex-1 py-5 md:py-6 text-center">
+                <div className="text-xl md:text-3xl font-bold text-foreground tabular-nums">{typeof stat.value === "number" || typeof stat.value === "string" ? stat.value : "—"}</div>
+                <div className="text-[10px] md:text-sm text-muted-foreground mt-1">{isAr ? stat.label_ar : stat.label_en}</div>
               </div>
             ))}
           </div>
