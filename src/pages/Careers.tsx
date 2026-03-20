@@ -119,7 +119,7 @@ export default function Careers() {
       <Header />
 
       {/* Hero Banner */}
-      <section className="relative pt-16 md:pt-20">
+      <section className="relative pt-20 md:pt-24">
         <div className="relative h-[320px] md:h-[420px] overflow-hidden">
           <img
             src={bannerUrl || careersBannerFallback}
