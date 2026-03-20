@@ -1,17 +1,49 @@
+import { useRef, useState, useEffect, useCallback } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { Award, CheckCircle, Target, Headphones, ArrowRight } from "lucide-react";
 
 const reasons = [
-  { key: "why.expertise", descKey: "why.expertise.desc", icon: Award, num: "01" },
-  { key: "why.quality", descKey: "why.quality.desc", icon: CheckCircle, num: "02" },
-  { key: "why.precision", descKey: "why.precision.desc", icon: Target, num: "03" },
-  { key: "why.support", descKey: "why.support.desc", icon: Headphones, num: "04" },
+  { key: "why.expertise", descKey: "why.expertise.desc", icon: Award, num: "01", speed: 0.06 },
+  { key: "why.quality", descKey: "why.quality.desc", icon: CheckCircle, num: "02", speed: 0.12 },
+  { key: "why.precision", descKey: "why.precision.desc", icon: Target, num: "03", speed: 0.04 },
+  { key: "why.support", descKey: "why.support.desc", icon: Headphones, num: "04", speed: 0.1 },
 ];
+
+function useParallax() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [offsets, setOffsets] = useState(reasons.map(() => 0));
+  const rafRef = useRef<number>();
+
+  const handleScroll = useCallback(() => {
+    if (!sectionRef.current) return;
+    const rect = sectionRef.current.getBoundingClientRect();
+    const viewH = window.innerHeight;
+    // How far the section center is from viewport center
+    const delta = rect.top + rect.height / 2 - viewH / 2;
+    setOffsets(reasons.map((r) => delta * r.speed));
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(handleScroll);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    handleScroll();
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [handleScroll]);
+
+  return { sectionRef, offsets };
+}
 
 export default function WhyChooseUsSection() {
   const { t } = useLanguage();
   const ref = useScrollReveal();
+  const { sectionRef, offsets } = useParallax();
 
   return (
     <section className="py-24 px-6 gradient-primary overflow-hidden" ref={ref}>
