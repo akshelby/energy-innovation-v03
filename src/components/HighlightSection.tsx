@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { useParallax } from "@/hooks/useParallax";
 import { supabase } from "@/integrations/supabase/client";
 import { Award, TrendingUp, Users, Clock } from "lucide-react";
 
