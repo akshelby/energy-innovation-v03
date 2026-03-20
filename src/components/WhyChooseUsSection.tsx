@@ -14,7 +14,7 @@ export default function WhyChooseUsSection() {
   const ref = useScrollReveal();
 
   return (
-    <section className="py-24 px-6 gradient-primary" ref={ref}>
+    <section className="py-24 px-6 gradient-primary overflow-hidden" ref={ref}>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16 scroll-reveal">
           <span className="inline-block px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-accent-foreground bg-accent/20 rounded-full mb-4">
@@ -24,42 +24,53 @@ export default function WhyChooseUsSection() {
             {t("why.title")}
           </h2>
         </div>
+
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {reasons.map((reason, i) => {
             const Icon = reason.icon;
             return (
               <div
                 key={reason.key}
-                className="scroll-reveal group relative overflow-hidden rounded-2xl transition-all duration-300"
+                className="scroll-reveal group relative h-[280px] rounded-2xl cursor-default"
                 style={{ transitionDelay: `${i * 100}ms` }}
               >
-                {/* Card body */}
-                <div className="relative p-7 pb-8 h-full flex flex-col bg-primary-foreground/5 border border-primary-foreground/10 rounded-2xl hover:border-primary-foreground/25 transition-colors duration-300">
-                  {/* Step number — top right */}
-                  <span className="absolute top-5 right-5 text-[11px] font-bold tracking-widest text-primary-foreground/20 select-none">
+                {/* Resting state — number + icon + title */}
+                <div className="absolute inset-0 rounded-2xl border border-primary-foreground/10 bg-primary-foreground/5 p-7 flex flex-col justify-between transition-all duration-500 group-hover:opacity-0 group-hover:scale-95">
+                  {/* Large watermark number */}
+                  <span className="absolute -top-2 -right-1 text-[7rem] font-black leading-none text-primary-foreground/[0.04] select-none pointer-events-none">
                     {reason.num}
                   </span>
 
-                  {/* Icon with accent line */}
-                  <div className="flex items-center gap-3 mb-5">
-                    <div className="w-10 h-10 rounded-xl bg-accent/15 flex items-center justify-center shrink-0">
-                      <Icon className="w-5 h-5 text-accent" />
-                    </div>
-                    <div className="h-px flex-1 bg-gradient-to-r from-accent/30 to-transparent" />
+                  <div className="w-12 h-12 rounded-2xl bg-accent/15 flex items-center justify-center">
+                    <Icon className="w-6 h-6 text-accent" />
                   </div>
 
-                  {/* Title */}
-                  <h3 className="text-base font-bold text-primary-foreground mb-2.5 leading-snug">
-                    {t(reason.key)}
-                  </h3>
+                  <div>
+                    <h3 className="text-lg font-bold text-primary-foreground leading-snug mb-1">
+                      {t(reason.key)}
+                    </h3>
+                    <div className="w-8 h-0.5 bg-accent/40 rounded-full" />
+                  </div>
+                </div>
 
-                  {/* Description */}
-                  <p className="text-primary-foreground/60 text-[13px] leading-relaxed flex-1">
+                {/* Hover state — slides up with description */}
+                <div className="absolute inset-0 rounded-2xl border border-accent/30 bg-accent/10 backdrop-blur-sm p-7 flex flex-col justify-between opacity-0 scale-105 transition-all duration-500 group-hover:opacity-100 group-hover:scale-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center shrink-0">
+                      <Icon className="w-5 h-5 text-accent" />
+                    </div>
+                    <h3 className="text-base font-bold text-primary-foreground leading-snug">
+                      {t(reason.key)}
+                    </h3>
+                  </div>
+
+                  <p className="text-primary-foreground/70 text-[13px] leading-relaxed">
                     {t(reason.descKey)}
                   </p>
 
-                  {/* Bottom accent bar — reveals on hover */}
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent/50 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+                  <span className="text-[11px] font-mono font-bold tracking-widest text-accent/60">
+                    {reason.num} / 04
+                  </span>
                 </div>
               </div>
             );
