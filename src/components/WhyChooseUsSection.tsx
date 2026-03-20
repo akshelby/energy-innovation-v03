@@ -37,7 +37,7 @@ export default function WhyChooseUsSection() {
                 {/* Left accent edge */}
                 <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-accent via-accent/40 to-transparent transition-all duration-500 group-hover:w-1.5 group-hover:from-accent group-hover:via-accent group-hover:to-accent/30" />
 
-                <div className="pl-6 pr-6 py-7 bg-primary-foreground/[0.05] border border-primary-foreground/[0.08] border-l-0 rounded-r-2xl transition-colors duration-300 group-hover:bg-primary-foreground/[0.08] group-hover:border-primary-foreground/[0.12]">
+                <div className="pl-6 pr-6 py-7 bg-primary-foreground/[0.05] border border-primary-foreground/[0.08] border-l-0 rounded-r-2xl transition-colors duration-300 group-hover:bg-primary-foreground/[0.08] group-hover:border-primary-foreground/[0.12] flex flex-col h-full">
                   {/* Number + Icon row */}
                   <div className="flex items-center justify-between mb-5">
                     <div className="w-12 h-12 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center transition-colors duration-300 group-hover:bg-accent/20 group-hover:border-accent/30">
