@@ -16,6 +16,9 @@ import hero5Local from "@/assets/hero-5.webp";
 const localImages = [hero1Local, hero2Local, hero3Local, hero4Local, hero5Local];
 const imageFilePattern = /\.\w+$/i;
 
+const normalizeFileName = (fileName: string) =>
+  fileName.trim().replace(/\s+\.(?=[^.]+$)/, ".");
+
 const buildHeroImageUrl = (fileName: string, version?: string) => {
   const encodedPath = `hero/${fileName}`
     .split("/")
@@ -51,9 +54,20 @@ export default function HeroSection() {
       const activeEntry = contentRows?.find((r) => r.content_key === "hero.active_images");
       const speedEntry = contentRows?.find((r) => r.content_key === "hero.speed");
 
-      const activeList: string[] = activeEntry?.value_en
-        ? JSON.parse(activeEntry.value_en)
-        : [];
+      let activeList: string[] = [];
+
+      if (activeEntry?.value_en) {
+        try {
+          const parsed = JSON.parse(activeEntry.value_en);
+          activeList = Array.isArray(parsed)
+            ? parsed
+                .map((value) => normalizeFileName(String(value)))
+                .filter((value) => value.length > 0)
+            : [];
+        } catch {
+          activeList = [];
+        }
+      }
 
       if (speedEntry?.value_en) {
         const seconds = parseFloat(speedEntry.value_en);
@@ -68,6 +82,12 @@ export default function HeroSection() {
       });
       setVisibility(vis);
 
+      if (activeList.length > 0) {
+        setCurrent(0);
+        setImages(activeList.map((fileName) => buildHeroImageUrl(fileName)));
+        return;
+      }
+
       const { data, error } = await supabase.storage.from("images").list("hero", {
         sortBy: { column: "name", order: "asc" },
       });
@@ -77,20 +97,16 @@ export default function HeroSection() {
           (file) => file.name && !file.name.startsWith(".") && imageFilePattern.test(file.name)
         );
 
-        const selectedFiles = activeList.length > 0
-          ? activeList
-              .map((name) => filtered.find((file) => file.name === name))
-              .filter((file): file is typeof filtered[number] => Boolean(file))
-          : Array.from(
-              filtered.reduce((stemMap, file) => {
-                const stem = file.name.replace(/\.[^.]+$/, "");
-                const existing = stemMap.get(stem);
-                if (!existing || file.name.toLowerCase().endsWith(".webp")) {
-                  stemMap.set(stem, file);
-                }
-                return stemMap;
-              }, new Map<string, typeof filtered[number]>()).values()
-            );
+        const selectedFiles = Array.from(
+          filtered.reduce((stemMap, file) => {
+            const stem = file.name.replace(/\.[^.]+$/, "");
+            const existing = stemMap.get(stem);
+            if (!existing || file.name.toLowerCase().endsWith(".webp")) {
+              stemMap.set(stem, file);
+            }
+            return stemMap;
+          }, new Map<string, typeof filtered[number]>()).values()
+        );
 
         const urls = selectedFiles.map((file) =>
           buildHeroImageUrl(file.name, file.updated_at ?? file.created_at ?? undefined)
@@ -102,7 +118,7 @@ export default function HeroSection() {
       }
 
       setCurrent(0);
-      setImages(activeList.length > 0 ? [] : localImages);
+      setImages(localImages);
     }
 
     fetchHeroImages();
@@ -144,6 +160,8 @@ export default function HeroSection() {
               alt={`Industrial scene ${i + 1}`}
               className={`w-full h-full object-cover ${i === current ? "animate-ken-burns" : ""}`}
               loading={i === 0 ? "eager" : "lazy"}
+              fetchPriority={i === 0 ? "high" : "auto"}
+              decoding={i === 0 ? "sync" : "async"}
             />
           </div>
         ))}
