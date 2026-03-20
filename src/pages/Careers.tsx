@@ -137,46 +137,8 @@ export default function Careers() {
         </div>
       </section>
 
-      {/* Why Join Us */}
-      <section className="py-16 md:py-24 px-6">
-        <div className="max-w-5xl mx-auto scroll-reveal" ref={perksRef}>
-          <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3" style={{ textWrap: "balance" }}>
-              {isAr ? "لماذا تنضم إلينا؟" : "Why Join Energy Innovation?"}
-            </h2>
-            <p className="text-muted-foreground max-w-lg mx-auto">
-              {isAr
-                ? "نقدم بيئة عمل محفزة تجمع بين التحدي والدعم لتحقيق أفضل أداء."
-                : "We offer an environment where challenge meets support, enabling you to do the best work of your career."}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {perks.map((perk, i) => (
-              <div
-                key={i}
-                className="relative bg-card border-2 border-border rounded-2xl p-6 hover:border-accent/50 hover:shadow-xl hover:shadow-accent/5 transition-all duration-300 group overflow-hidden"
-              >
-                {/* Top accent strip */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-accent to-accent/40 opacity-60 group-hover:opacity-100 transition-opacity" />
-
-                <div className="w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center mb-4 group-hover:bg-red-500/10 transition-colors">
-                  <perk.icon className="w-5 h-5 text-accent group-hover:text-red-500 transition-colors" />
-                </div>
-                <h3 className="text-base font-semibold text-foreground mb-2">
-                  {isAr ? perk.title_ar : perk.title_en}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
-                  {isAr ? perk.desc_ar : perk.desc_en}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Listings */}
-      <section className="pb-20 md:pb-32 px-6">
+      <section className="py-16 md:py-24 px-6">
         <div className="max-w-4xl mx-auto scroll-reveal" ref={listingsRef}>
           <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2 text-center">
             {isAr ? "الوظائف المتاحة" : "Open Positions"}
@@ -194,7 +156,6 @@ export default function Careers() {
               ))}
             </div>
           ) : selected ? (
-            /* Detail View */
             <div>
               <button
                 onClick={() => setSelected(null)}
@@ -203,7 +164,6 @@ export default function Careers() {
                 <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
                 {isAr ? "العودة إلى الوظائف" : "Back to all positions"}
               </button>
-
               <div className="bg-card border border-border rounded-2xl p-8 md:p-10">
                 <div className="flex flex-wrap items-start justify-between gap-4 mb-8">
                   <div>
@@ -211,10 +171,12 @@ export default function Careers() {
                       {isAr ? selected.title_ar : selected.title_en}
                     </h2>
                     <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-                      <span className="inline-flex items-center gap-1.5 bg-secondary/60 px-3 py-1 rounded-full">
-                        <Briefcase className="w-3.5 h-3.5" />
-                        {isAr ? selected.department_ar : selected.department_en}
-                      </span>
+                      {(isAr ? selected.department_ar : selected.department_en) && (
+                        <span className="inline-flex items-center gap-1.5 bg-secondary/60 px-3 py-1 rounded-full">
+                          <Briefcase className="w-3.5 h-3.5" />
+                          {isAr ? selected.department_ar : selected.department_en}
+                        </span>
+                      )}
                       <span className="inline-flex items-center gap-1.5 bg-secondary/60 px-3 py-1 rounded-full">
                         <MapPin className="w-3.5 h-3.5" />
                         {isAr ? selected.location_ar : selected.location_en}
@@ -235,7 +197,6 @@ export default function Careers() {
                     {isAr ? "قدم الآن" : "Apply Now"}
                   </Button>
                 </div>
-
                 <div className="space-y-8">
                   {(isAr ? selected.description_ar : selected.description_en) && (
                     <div>
@@ -247,7 +208,6 @@ export default function Careers() {
                       </div>
                     </div>
                   )}
-
                   {(isAr ? selected.requirements_ar : selected.requirements_en) && (
                     <div>
                       <h3 className="text-lg font-semibold text-foreground mb-3">
@@ -281,7 +241,6 @@ export default function Careers() {
                   onClick={() => { setSelected(career); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                   className="w-full text-start bg-card border-2 border-border rounded-2xl p-5 md:p-6 hover:border-accent/50 hover:shadow-xl hover:shadow-accent/5 transition-all duration-300 group active:scale-[0.98] overflow-hidden relative"
                 >
-                  {/* Top accent strip */}
                   <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-accent to-accent/40 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="flex items-center justify-between gap-4">
                     <div className="min-w-0 flex-1">
@@ -313,6 +272,41 @@ export default function Careers() {
               ))}
             </div>
           )}
+        </div>
+      </section>
+
+      {/* Why Join Us */}
+      <section className="pb-20 md:pb-32 px-6">
+        <div className="max-w-5xl mx-auto scroll-reveal" ref={perksRef}>
+          <div className="text-center mb-12">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3" style={{ textWrap: "balance" }}>
+              {isAr ? "لماذا تنضم إلينا؟" : "Why Join Energy Innovation?"}
+            </h2>
+            <p className="text-muted-foreground max-w-lg mx-auto">
+              {isAr
+                ? "نقدم بيئة عمل محفزة تجمع بين التحدي والدعم لتحقيق أفضل أداء."
+                : "We offer an environment where challenge meets support, enabling you to do the best work of your career."}
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {perks.map((perk, i) => (
+              <div
+                key={i}
+                className="relative bg-card border-2 border-border rounded-2xl p-6 hover:border-accent/50 hover:shadow-xl hover:shadow-accent/5 transition-all duration-300 group overflow-hidden"
+              >
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-accent to-accent/40 opacity-60 group-hover:opacity-100 transition-opacity" />
+                <div className="w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center mb-4 group-hover:bg-destructive/10 transition-colors">
+                  <perk.icon className="w-5 h-5 text-accent group-hover:text-destructive transition-colors" />
+                </div>
+                <h3 className="text-base font-semibold text-foreground mb-2">
+                  {isAr ? perk.title_ar : perk.title_en}
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                  {isAr ? perk.desc_ar : perk.desc_en}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
