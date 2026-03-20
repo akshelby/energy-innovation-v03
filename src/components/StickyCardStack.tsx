@@ -1,4 +1,5 @@
 import React, { Fragment, useEffect, useRef } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface StickyCardStackProps {
   children: React.ReactNode[];
@@ -13,9 +14,8 @@ interface StickyCardStackProps {
 }
 
 /**
- * Renders children as sticky-stacking cards that overlap on scroll.
- * Each card sticks at an incrementally higher `top` value so they
- * pile up like a deck, with subtle scale + brightness depth cues.
+ * Renders children as sticky-stacking cards that overlap on scroll (mobile only).
+ * On tablet/desktop the cards render as a plain vertical list without sticky/parallax.
  */
 export default function StickyCardStack({
   children,
@@ -26,9 +26,11 @@ export default function StickyCardStack({
 }: StickyCardStackProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const count = React.Children.count(children);
+  const isMobile = useIsMobile();
 
-  // Scroll-driven depth effect: cards further back scale down & dim
+  // Scroll-driven depth effect — only on mobile
   useEffect(() => {
+    if (!isMobile) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const container = containerRef.current;
@@ -40,7 +42,6 @@ export default function StickyCardStack({
     let ticking = false;
 
     const update = () => {
-      // Determine which cards are currently stuck
       const stuckStates: boolean[] = [];
       cards.forEach((card, i) => {
         const rect = card.getBoundingClientRect();
@@ -55,7 +56,6 @@ export default function StickyCardStack({
           return;
         }
 
-        // Count how many later cards are also stuck (stacking on top of this one)
         let cardsAbove = 0;
         for (let j = i + 1; j < cards.length; j++) {
           if (stuckStates[j]) cardsAbove++;
@@ -85,8 +85,22 @@ export default function StickyCardStack({
     window.addEventListener("scroll", onScroll, { passive: true });
     requestAnimationFrame(update);
     return () => window.removeEventListener("scroll", onScroll);
-  }, [baseTop, offsetIncrement, count]);
+  }, [baseTop, offsetIncrement, count, isMobile]);
 
+  // Desktop/tablet: plain list without sticky behavior
+  if (!isMobile) {
+    return (
+      <div className={`${maxWidthClass} mx-auto flex flex-col gap-8`}>
+        {React.Children.map(children, (child, i) => (
+          <div key={i} className="rounded-2xl">
+            {child}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // Mobile: sticky stacking cards
   return (
     <div ref={containerRef} className={`${maxWidthClass} mx-auto`}>
       {React.Children.map(children, (child, i) => (
