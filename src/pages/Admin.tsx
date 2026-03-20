@@ -1598,18 +1598,18 @@ export default function Admin() {
             ) : (
               <div className="space-y-4">
                 {leads.map((lead) => (
-                  <div key={lead.id} className="bg-card border border-border rounded-2xl p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
+                  <div key={lead.id} className="bg-card border border-border rounded-2xl p-4 sm:p-6">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-2">
                           <h3 className="font-semibold text-foreground">{lead.name}</h3>
-                          <span className="text-sm text-muted-foreground">{lead.email}</span>
+                          <span className="text-sm text-muted-foreground truncate">{lead.email}</span>
                           {lead.company && <span className="text-xs bg-secondary px-2 py-0.5 rounded-full text-secondary-foreground">{lead.company}</span>}
                         </div>
-                        <p className="text-sm text-muted-foreground leading-relaxed">{lead.message}</p>
+                        <p className="text-sm text-muted-foreground leading-relaxed break-words">{lead.message}</p>
                         <p className="text-xs text-muted-foreground mt-3">{new Date(lead.created_at).toLocaleString()}</p>
                       </div>
-                      <Button variant="ghost" size="sm" onClick={() => handleDeleteLead(lead.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl">
+                      <Button variant="ghost" size="sm" onClick={() => handleDeleteLead(lead.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl shrink-0">
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
