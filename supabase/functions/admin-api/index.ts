@@ -3,7 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-admin-password, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+    "authorization, x-client-info, apikey, content-type, x-admin-password, x-admin-email, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
   "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
 };
 
@@ -19,13 +19,6 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Verify admin password
-  const password = req.headers.get("x-admin-password");
-  const adminPassword = Deno.env.get("ADMIN_PASSWORD");
-  if (!password || password !== adminPassword) {
-    return json({ error: "Unauthorized" }, 401);
-  }
-
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
@@ -33,6 +26,52 @@ Deno.serve(async (req) => {
 
   const url = new URL(req.url);
   const path = url.pathname.split("/").pop();
+
+  // Public endpoint: check if an email is whitelisted (no auth needed)
+  if (path === "check-email" && req.method === "POST") {
+    try {
+      const { email } = await req.json();
+      const { data: emailEntry } = await supabase
+        .from("admin_emails")
+        .select("id")
+        .eq("email", (email || "").toLowerCase())
+        .eq("is_active", true)
+        .maybeSingle();
+      return json({ authorized: !!emailEntry });
+    } catch (err) {
+      return json({ error: err.message }, 500);
+    }
+  }
+
+  // Verify admin password OR admin email
+  const password = req.headers.get("x-admin-password");
+  const adminEmail = req.headers.get("x-admin-email");
+  const adminPassword = Deno.env.get("ADMIN_PASSWORD");
+
+  let isAuthorized = false;
+
+  // Check password auth
+  if (password && password === adminPassword) {
+    isAuthorized = true;
+  }
+
+  // Check email auth
+  if (!isAuthorized && adminEmail) {
+    const { data: emailEntry } = await supabase
+      .from("admin_emails")
+      .select("id")
+      .eq("email", adminEmail.toLowerCase())
+      .eq("is_active", true)
+      .maybeSingle();
+    if (emailEntry) {
+      isAuthorized = true;
+    }
+  }
+
+  if (!isAuthorized) {
+    return json({ error: "Unauthorized" }, 401);
+  }
+
   const method = req.method;
 
   try {
@@ -288,6 +327,35 @@ Deno.serve(async (req) => {
       if (method === "DELETE") {
         const { id } = await req.json();
         const { error } = await supabase.from("careers").delete().eq("id", id);
+        if (error) throw error;
+        return json({ success: true });
+      }
+    }
+
+    // ADMIN EMAILS
+    if (path === "admin-emails") {
+      if (method === "GET") {
+        const { data, error } = await supabase
+          .from("admin_emails")
+          .select("*")
+          .order("created_at", { ascending: true });
+        if (error) throw error;
+        return json(data);
+      }
+      if (method === "POST") {
+        const body = await req.json();
+        body.email = body.email?.toLowerCase();
+        const { data, error } = await supabase
+          .from("admin_emails")
+          .upsert(body, { onConflict: "id" })
+          .select()
+          .single();
+        if (error) throw error;
+        return json(data);
+      }
+      if (method === "DELETE") {
+        const { id } = await req.json();
+        const { error } = await supabase.from("admin_emails").delete().eq("id", id);
         if (error) throw error;
         return json({ success: true });
       }

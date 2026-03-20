@@ -140,12 +140,13 @@ const IMAGE_FOLDERS = [
 ];
 
 async function apiCall(path: string, method: string, password: string, body?: unknown) {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (password) headers["x-admin-password"] = password;
+  const storedEmail = sessionStorage.getItem("admin_email");
+  if (storedEmail) headers["x-admin-email"] = storedEmail;
   const res = await fetch(`${FUNCTION_URL}/${path}`, {
     method,
-    headers: {
-      "Content-Type": "application/json",
-      "x-admin-password": password,
-    },
+    headers,
     body: body ? JSON.stringify(body) : undefined,
   });
   const data = await res.json();
@@ -193,7 +194,7 @@ const emptyService: ServiceItem = {
   tag_en: "", tag_ar: "", image_url: null, pdf_url: null, icon: "Wrench", sort_order: 0,
 };
 
-type TabKey = "leads" | "content" | "products" | "services" | "menu-items" | "images" | "branding" | "highlight" | "careers";
+type TabKey = "leads" | "content" | "products" | "services" | "menu-items" | "images" | "branding" | "highlight" | "careers" | "admin-emails";
 
 const emptyMenuChild: MenuChildItem = {
   category_key: "cat.fire", parent_id: null, name_en: "", name_ar: "", pdf_url: null, sort_order: 0, is_active: true,
@@ -202,8 +203,12 @@ const emptyMenuChild: MenuChildItem = {
 export default function Admin() {
   const { theme, toggleTheme } = useTheme();
   const [password, setPassword] = useState(() => sessionStorage.getItem("admin_pw") || "");
-  const [authenticated, setAuthenticated] = useState(() => !!sessionStorage.getItem("admin_pw"));
+  const [adminEmail, setAdminEmail] = useState(() => sessionStorage.getItem("admin_email") || "");
+  const [loginMode, setLoginMode] = useState<"password" | "email">("password");
+  const [authenticated, setAuthenticated] = useState(() => !!(sessionStorage.getItem("admin_pw") || sessionStorage.getItem("admin_email")));
   const [activeTab, setActiveTab] = useState<TabKey>("leads");
+  const [adminEmails, setAdminEmails] = useState<{ id: string; email: string; label: string; is_active: boolean }[]>([]);
+  const [editingAdminEmail, setEditingAdminEmail] = useState<{ id?: string; email: string; label: string; is_active: boolean } | null>(null);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [content, setContent] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -543,6 +548,13 @@ export default function Admin() {
     finally { setLoading(false); }
   }, [storedPassword]);
 
+  const fetchAdminEmails = useCallback(async () => {
+    try {
+      const data = await apiCall("admin-emails", "GET", storedPassword);
+      setAdminEmails(data);
+    } catch (e: any) { toast.error(e.message); }
+  }, [storedPassword]);
+
   useEffect(() => {
     if (authenticated) {
       if (activeTab === "leads") fetchLeads();
@@ -553,18 +565,35 @@ export default function Admin() {
       else if (activeTab === "branding") fetchBranding();
       else if (activeTab === "highlight") fetchHighlight();
       else if (activeTab === "careers") { fetchCareers(); fetchCareersContent(); }
+      else if (activeTab === "admin-emails") fetchAdminEmails();
       else fetchFiles();
     }
-  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchContactAddresses, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding, fetchHighlight, fetchCareers, fetchCareersContent]);
+  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchContactAddresses, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding, fetchHighlight, fetchCareers, fetchCareersContent, fetchAdminEmails]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await apiCall("leads", "GET", password);
-      sessionStorage.setItem("admin_pw", password);
-      setAuthenticated(true);
-      toast.success("Logged in successfully");
-    } catch { toast.error("Invalid password"); }
+      if (loginMode === "password") {
+        await apiCall("leads", "GET", password);
+        sessionStorage.setItem("admin_pw", password);
+        setAuthenticated(true);
+        toast.success("Logged in successfully");
+      } else {
+        const res = await fetch(`${FUNCTION_URL}/check-email`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: adminEmail.toLowerCase() }),
+        });
+        const data = await res.json();
+        if (data.authorized) {
+          sessionStorage.setItem("admin_email", adminEmail.toLowerCase());
+          setAuthenticated(true);
+          toast.success("Logged in successfully");
+        } else {
+          toast.error("Email not authorized");
+        }
+      }
+    } catch { toast.error(loginMode === "password" ? "Invalid password" : "Login failed"); }
   };
 
   const handleDeleteLead = async (id: string) => {
@@ -984,9 +1013,23 @@ export default function Admin() {
               <Lock className="w-8 h-8 text-primary-foreground" />
             </div>
             <h1 className="text-2xl font-bold text-foreground">Admin Panel</h1>
-            <p className="text-muted-foreground mt-2">Enter admin password to continue</p>
+            <p className="text-muted-foreground mt-2">
+              {loginMode === "password" ? "Enter admin password to continue" : "Enter your authorized email"}
+            </p>
           </div>
-          <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className="rounded-xl" required />
+          <div className="flex gap-2">
+            <Button type="button" variant={loginMode === "password" ? "default" : "outline"} className="flex-1 rounded-xl" onClick={() => setLoginMode("password")}>
+              <Lock className="w-4 h-4 mr-1" /> Password
+            </Button>
+            <Button type="button" variant={loginMode === "email" ? "default" : "outline"} className="flex-1 rounded-xl" onClick={() => setLoginMode("email")}>
+              <Mail className="w-4 h-4 mr-1" /> Email
+            </Button>
+          </div>
+          {loginMode === "password" ? (
+            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className="rounded-xl" required />
+          ) : (
+            <Input type="email" value={adminEmail} onChange={(e) => setAdminEmail(e.target.value)} placeholder="admin@example.com" className="rounded-xl" required />
+          )}
           <Button type="submit" className="w-full gradient-accent text-accent-foreground rounded-xl border-0">Login</Button>
         </form>
       </div>
@@ -1241,7 +1284,7 @@ export default function Admin() {
             <Button variant="outline" size="icon" onClick={toggleTheme} className="rounded-xl" title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}>
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </Button>
-            <Button variant="outline" size="sm" onClick={() => { sessionStorage.removeItem("admin_pw"); setAuthenticated(false); setPassword(""); }} className="rounded-xl">
+            <Button variant="outline" size="sm" onClick={() => { sessionStorage.removeItem("admin_pw"); sessionStorage.removeItem("admin_email"); setAuthenticated(false); setPassword(""); setAdminEmail(""); }} className="rounded-xl">
               <LogOut className="w-4 h-4 mr-2" />Logout
             </Button>
           </div>
@@ -1261,6 +1304,7 @@ export default function Admin() {
             { key: "menu-items" as TabKey, icon: List, label: `Product Catalog (${menuItems.length})` },
             { key: "careers" as TabKey, icon: UserPlus, label: `Careers (${careersList.length})` },
             { key: "images" as TabKey, icon: Image, label: "Files & Images" },
+            { key: "admin-emails" as TabKey, icon: Shield, label: `Admin Access (${adminEmails.length})` },
           ]).map((tab) => (
             <Button key={tab.key} variant={activeTab === tab.key ? "default" : "outline"} onClick={() => setActiveTab(tab.key)} className="rounded-xl">
               <tab.icon className="w-4 h-4 mr-2" />{tab.label}
@@ -3060,6 +3104,106 @@ export default function Admin() {
                 })}
               </div>
             )}
+          </div>
+        )}
+
+        {/* ─── Admin Emails Tab ──────── */}
+        {activeTab === "admin-emails" && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-foreground">Admin Email Access</h2>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={fetchAdminEmails} disabled={loading} className="rounded-xl">
+                  <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
+                </Button>
+                <Button size="sm" onClick={() => setEditingAdminEmail({ email: "", label: "", is_active: true })} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                  <Plus className="w-4 h-4 mr-2" />Add Email
+                </Button>
+              </div>
+            </div>
+
+            <p className="text-sm text-muted-foreground mb-6">
+              Add email addresses that can access the admin panel. Users can log in using their email instead of the shared password.
+            </p>
+
+            {editingAdminEmail && (
+              <div className="bg-card border border-border rounded-2xl p-6 space-y-4 mb-6">
+                <h3 className="font-semibold text-foreground">{editingAdminEmail.id ? "Edit" : "New"} Admin Email</h3>
+                <Input
+                  type="email"
+                  value={editingAdminEmail.email}
+                  onChange={(e) => setEditingAdminEmail({ ...editingAdminEmail, email: e.target.value })}
+                  placeholder="admin@example.com"
+                  className="rounded-xl"
+                />
+                <Input
+                  value={editingAdminEmail.label}
+                  onChange={(e) => setEditingAdminEmail({ ...editingAdminEmail, label: e.target.value })}
+                  placeholder="Label (e.g. John - Manager)"
+                  className="rounded-xl"
+                />
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editingAdminEmail.is_active}
+                    onChange={(e) => setEditingAdminEmail({ ...editingAdminEmail, is_active: e.target.checked })}
+                    className="w-5 h-5 accent-primary"
+                  />
+                  <span className="text-sm text-foreground">Active</span>
+                </label>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={async () => {
+                      try {
+                        await apiCall("admin-emails", "POST", storedPassword, editingAdminEmail);
+                        toast.success("Admin email saved");
+                        setEditingAdminEmail(null);
+                        fetchAdminEmails();
+                      } catch (e: any) { toast.error(e.message); }
+                    }}
+                    className="gradient-accent text-accent-foreground rounded-xl border-0"
+                  >
+                    <Save className="w-4 h-4 mr-2" />Save
+                  </Button>
+                  <Button variant="outline" onClick={() => setEditingAdminEmail(null)} className="rounded-xl">Cancel</Button>
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-3">
+              {adminEmails.map((ae) => (
+                <div key={ae.id} className="bg-card border border-border rounded-2xl p-4 flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-muted-foreground" />
+                      <span className="font-medium text-foreground">{ae.email}</span>
+                      {!ae.is_active && <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">Inactive</span>}
+                    </div>
+                    {ae.label && <p className="text-sm text-muted-foreground mt-1">{ae.label}</p>}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => setEditingAdminEmail(ae)} className="rounded-xl">Edit</Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={async () => {
+                        try {
+                          await apiCall("admin-emails", "DELETE", storedPassword, { id: ae.id });
+                          toast.success("Email removed");
+                          fetchAdminEmails();
+                        } catch (e: any) { toast.error(e.message); }
+                      }}
+                      className="rounded-xl text-destructive"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+              {adminEmails.length === 0 && (
+                <p className="text-center text-muted-foreground py-8">No admin emails added yet. Only password login is available.</p>
+              )}
+            </div>
           </div>
         )}
       </div>
