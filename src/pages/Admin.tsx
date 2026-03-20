@@ -314,6 +314,24 @@ export default function Admin() {
   const [editingCareer, setEditingCareer] = useState<CareerItem | null>(null);
   const careerEditorRef = useRef<HTMLDivElement>(null);
 
+  // Careers page content state
+  const [careersHeroTitle, setCareersHeroTitle] = useState("Build Your Future With Us");
+  const [careersHeroSubtitle, setCareersHeroSubtitle] = useState("Join a leading team in industrial innovation and engineering solutions across the Gulf region.");
+  const [careersBannerUrl, setCareersBannerUrl] = useState("");
+  const careersBannerRef = useRef<HTMLInputElement>(null);
+  const [careersBannerUploading, setCareersBannerUploading] = useState(false);
+  const [careersStats, setCareersStats] = useState<{ value_en: string; value_ar: string; label_en: string; label_ar: string }[]>([
+    { value_en: "5+", value_ar: "+٥", label_en: "Countries", label_ar: "دول" },
+    { value_en: "100%", value_ar: "١٠٠٪", label_en: "Growth Focus", label_ar: "تركيز على النمو" },
+  ]);
+  const [careersPerks, setCareersPerks] = useState<{ icon: string; title_en: string; title_ar: string; desc_en: string; desc_ar: string }[]>([
+    { icon: "TrendingUp", title_en: "Career Growth", title_ar: "النمو المهني", desc_en: "Clear advancement paths with mentorship programs and continuous learning opportunities.", desc_ar: "مسارات تقدم واضحة مع برامج إرشاد وفرص تعلم مستمرة." },
+    { icon: "Heart", title_en: "Health & Wellbeing", title_ar: "الصحة والرفاهية", desc_en: "Comprehensive medical coverage and wellness programs for you and your family.", desc_ar: "تغطية طبية شاملة وبرامج صحية لك ولعائلتك." },
+    { icon: "Users", title_en: "Collaborative Culture", title_ar: "ثقافة تعاونية", desc_en: "Work alongside industry experts in a supportive, inclusive team environment.", desc_ar: "اعمل جنباً إلى جنب مع خبراء الصناعة في بيئة فريق داعمة وشاملة." },
+    { icon: "Shield", title_en: "Job Security", title_ar: "الأمان الوظيفي", desc_en: "Stable employment with competitive compensation and performance-based rewards.", desc_ar: "توظيف مستقر مع تعويضات تنافسية ومكافآت قائمة على الأداء." },
+  ]);
+  const PERK_ICON_OPTIONS = ["TrendingUp", "Heart", "Users", "Shield", "Star", "Award", "Globe", "Zap", "Clock", "Briefcase"];
+
   useEffect(() => {
     if (editingCareer && careerEditorRef.current) {
       setTimeout(() => careerEditorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 100);
