@@ -5,12 +5,12 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FloatingButtons from "@/components/FloatingButtons";
 import { supabase } from "@/integrations/supabase/client";
-import { MapPin, Clock, Briefcase, ChevronRight, ArrowLeft, Users, TrendingUp, Heart, Shield, Star, Award, Globe, Zap } from "lucide-react";
+import { MapPin, Clock, Briefcase, ChevronRight, ArrowLeft, Users, TrendingUp, Heart, Shield, Star, Award, Globe, Zap, Phone, Mail, UserPlus, Package, Sun, Moon, FileText, MessageSquare, Database, Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import careersBannerFallback from "@/assets/careers-banner.jpg";
 
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
-  TrendingUp, Heart, Users, Shield, Star, Award, Globe, Zap, Clock, Briefcase,
+  TrendingUp, Heart, Users, Shield, Star, Award, Globe, Zap, Clock, Briefcase, Phone, Mail, UserPlus, Package, Sun, Moon, FileText, MessageSquare, Database, Palette,
 };
 
 interface CareerListing {

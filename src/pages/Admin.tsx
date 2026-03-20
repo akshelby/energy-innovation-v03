@@ -7,6 +7,7 @@ import {
   Lock, Trash2, Save, RefreshCw, Database, FileText, MessageSquare,
   LogOut, Image, Upload, Plus, Package, Briefcase, GripVertical, List, Palette, Languages, Sun, Moon,
   Star, Award, TrendingUp, Users, Clock, Globe, Phone, Mail, UserPlus, Heart,
+  Zap, Shield, icons,
 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
@@ -330,7 +331,7 @@ export default function Admin() {
     { icon: "Users", title_en: "Collaborative Culture", title_ar: "ثقافة تعاونية", desc_en: "Work alongside industry experts in a supportive, inclusive team environment.", desc_ar: "اعمل جنباً إلى جنب مع خبراء الصناعة في بيئة فريق داعمة وشاملة." },
     { icon: "Shield", title_en: "Job Security", title_ar: "الأمان الوظيفي", desc_en: "Stable employment with competitive compensation and performance-based rewards.", desc_ar: "توظيف مستقر مع تعويضات تنافسية ومكافآت قائمة على الأداء." },
   ]);
-  const PERK_ICON_OPTIONS = ["TrendingUp", "Heart", "Users", "Shield", "Star", "Award", "Globe", "Zap", "Clock", "Briefcase"];
+  const PERK_ICON_OPTIONS = ["TrendingUp", "Heart", "Users", "Shield", "Star", "Award", "Globe", "Zap", "Clock", "Briefcase", "Phone", "Mail", "UserPlus", "Package", "Sun", "Moon", "FileText", "MessageSquare", "Database", "Palette"];
 
   useEffect(() => {
     if (editingCareer && careerEditorRef.current) {
@@ -2695,13 +2696,22 @@ export default function Admin() {
                     <div className="grid md:grid-cols-3 gap-3">
                       <div>
                         <label className="text-xs font-medium text-muted-foreground mb-1 block">Icon</label>
-                        <select
-                          value={perk.icon}
-                          onChange={(e) => { const p = [...careersPerks]; p[i] = { ...p[i], icon: e.target.value }; setCareersPerks(p); }}
-                          className="w-full h-9 rounded-xl border border-input bg-background px-3 text-sm"
-                        >
-                          {PERK_ICON_OPTIONS.map((ic) => <option key={ic} value={ic}>{ic}</option>)}
-                        </select>
+                        <div className="flex flex-wrap gap-1.5">
+                          {PERK_ICON_OPTIONS.map((ic) => {
+                            const Ic = icons[ic as keyof typeof icons];
+                            return Ic ? (
+                              <button
+                                key={ic}
+                                type="button"
+                                title={ic}
+                                onClick={() => { const p = [...careersPerks]; p[i] = { ...p[i], icon: ic }; setCareersPerks(p); }}
+                                className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-colors ${perk.icon === ic ? "bg-primary text-primary-foreground border-primary" : "border-input bg-background hover:bg-accent text-muted-foreground hover:text-foreground"}`}
+                              >
+                                <Ic className="w-4 h-4" />
+                              </button>
+                            ) : null;
+                          })}
+                        </div>
                       </div>
                       <div>
                         <label className="text-xs font-medium text-muted-foreground mb-1 block">Title (EN)</label>
