@@ -597,6 +597,12 @@ export default function Admin() {
     } catch (e: any) { toast.error(e.message); }
   }, [storedPassword]);
 
+  const fetchAdminEmails = useCallback(async () => {
+    try {
+      const data = await apiCall("admin-emails", "GET", storedPassword);
+      setAdminEmails(data);
+    } catch (e: any) { toast.error(e.message); }
+  }, [storedPassword]);
 
   const handleDeleteLead = async (id: string) => {
     try {
