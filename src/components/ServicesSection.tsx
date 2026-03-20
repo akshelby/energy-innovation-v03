@@ -69,7 +69,7 @@ export default function ServicesSection() {
             return (
               <div
                 key={i}
-                className="scroll-reveal group relative rounded-2xl cursor-pointer overflow-hidden"
+                className="scroll-reveal group relative rounded-2xl cursor-pointer overflow-hidden border border-border hover:border-accent/20 bg-card transition-all duration-300"
                 style={{ transitionDelay: `${i * 100}ms` }}
                 onClick={() => {
                   if (service.pdf_url) {
@@ -81,7 +81,7 @@ export default function ServicesSection() {
                 {/* Top accent strip */}
                 <div className="h-1 w-full bg-gradient-to-r from-accent via-accent/60 to-transparent transition-all duration-500 group-hover:from-accent group-hover:via-accent group-hover:to-accent/40" />
 
-                <div className="border border-t-0 border-border group-hover:border-accent/20 rounded-b-2xl p-6 pb-7 bg-card transition-colors duration-300 flex flex-col h-full">
+                <div className="p-6 pb-7 flex flex-col flex-1">
                   {/* Tag */}
                   {(isAr ? service.tag_ar : service.tag_en) && (
                     <span className="inline-block text-[10px] font-semibold uppercase tracking-wider bg-accent/10 text-accent px-2.5 py-1 rounded-full mb-4">
