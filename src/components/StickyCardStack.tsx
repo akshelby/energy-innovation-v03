@@ -25,6 +25,7 @@ export default function StickyCardStack({
   offsetIncrement = 20,
   scrollSpace = "35vh",
   maxWidthClass = "max-w-lg",
+  fullHeight = false,
 }: StickyCardStackProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const count = React.Children.count(children);
