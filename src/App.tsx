@@ -9,10 +9,10 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { BrandingProvider } from "@/contexts/BrandingContext";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import Careers from "./pages/Careers.tsx";
 import CookieConsent from "@/components/CookieConsent";
 
 const Admin = lazy(() => import("./pages/Admin.tsx"));
-const Careers = lazy(() => import("./pages/Careers.tsx"));
 
 const queryClient = new QueryClient();
 
