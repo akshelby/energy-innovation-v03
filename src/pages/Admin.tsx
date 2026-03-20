@@ -1625,6 +1625,7 @@ export default function Admin() {
               )}
             </div>
 
+            {content.length === 0 ? (
               <div className="text-center py-16 text-muted-foreground">
                 <FileText className="w-12 h-12 mx-auto mb-4 opacity-30" /><p>No content yet. Click "Seed Defaults" to populate.</p>
               </div>
