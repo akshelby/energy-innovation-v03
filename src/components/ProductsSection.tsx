@@ -114,7 +114,7 @@ export default function ProductsSection() {
 
                   {/* Tag */}
                   {(isAr ? product.tag_ar : product.tag_en) && (
-                    <span className="absolute top-3 right-3 text-[10px] font-semibold uppercase tracking-wider bg-foreground/80 text-background px-2.5 py-1 rounded-full backdrop-blur-sm">
+                    <span className="absolute top-3 right-3 text-[11px] font-bold uppercase tracking-widest bg-background/90 text-foreground px-3 py-1.5 rounded-full backdrop-blur-md shadow-sm">
                       {isAr ? product.tag_ar : product.tag_en}
                     </span>
                   )}
