@@ -509,6 +509,26 @@ export default function Admin() {
     } catch { /* ignore */ }
   }, []);
 
+  const fetchCareersContent = useCallback(async () => {
+    try {
+      const data = await apiCall("content", "GET", storedPassword);
+      const titleEntry = data.find((d: ContentItem) => d.content_key === "careers.hero_title");
+      if (titleEntry) setCareersHeroTitle(titleEntry.value_en);
+      const subtitleEntry = data.find((d: ContentItem) => d.content_key === "careers.hero_subtitle");
+      if (subtitleEntry) setCareersHeroSubtitle(subtitleEntry.value_en);
+      const bannerEntry = data.find((d: ContentItem) => d.content_key === "careers.banner_image");
+      if (bannerEntry) setCareersBannerUrl(bannerEntry.value_en);
+      const statsEntry = data.find((d: ContentItem) => d.content_key === "careers.stats");
+      if (statsEntry?.value_en) {
+        try { setCareersStats(JSON.parse(statsEntry.value_en)); } catch { /* keep defaults */ }
+      }
+      const perksEntry = data.find((d: ContentItem) => d.content_key === "careers.perks");
+      if (perksEntry?.value_en) {
+        try { setCareersPerks(JSON.parse(perksEntry.value_en)); } catch { /* keep defaults */ }
+      }
+    } catch { /* ignore */ }
+  }, [storedPassword]);
+
   const fetchCareers = useCallback(async () => {
     setLoading(true);
     try {
