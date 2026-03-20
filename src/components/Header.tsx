@@ -138,12 +138,26 @@ export default function Header() {
     { label: t("nav.about"), href: "#about" },
     { label: t("nav.products"), href: "#products", hasDropdown: true },
     { label: t("nav.services"), href: "#services" },
+    { label: isAr ? "الوظائف" : "Careers", href: "/careers", isRoute: true },
     { label: t("nav.contact"), href: "#contact" },
   ];
 
   const scrollToSection = (href: string) => {
     setMobileOpen(false);
     setProductsOpen(false);
+    if (href.startsWith("/")) {
+      navigate(href);
+      return;
+    }
+    // If on a sub-page, navigate home first
+    if (location.pathname !== "/") {
+      navigate("/");
+      setTimeout(() => {
+        const el = document.querySelector(href);
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }, 300);
+      return;
+    }
     const el = document.querySelector(href);
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
