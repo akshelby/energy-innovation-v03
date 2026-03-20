@@ -320,6 +320,43 @@ Deno.serve(async (req) => {
       }
     }
 
+    // ADMIN EMAILS
+    if (path === "admin-emails") {
+      if (method === "GET") {
+        const { data, error } = await supabase
+          .from("admin_emails")
+          .select("*")
+          .order("created_at", { ascending: true });
+        if (error) throw error;
+        return json(data);
+      }
+      if (method === "POST") {
+        const body = await req.json();
+        body.email = body.email?.toLowerCase();
+        const { data, error } = await supabase
+          .from("admin_emails")
+          .upsert(body, { onConflict: "id" })
+          .select()
+          .single();
+        if (error) throw error;
+        return json(data);
+      }
+      if (method === "DELETE") {
+        const { id } = await req.json();
+        const { error } = await supabase.from("admin_emails").delete().eq("id", id);
+        if (error) throw error;
+        return json({ success: true });
+      }
+    }
+
+    // CHECK EMAIL AUTH (public endpoint - no password needed, handled above)
+    if (path === "check-email") {
+      if (method === "POST") {
+        const { email } = await req.json();
+        return json({ authorized: true });
+      }
+    }
+
     return json({ error: "Not found" }, 404);
   } catch (err) {
     return json({ error: err.message }, 500);
