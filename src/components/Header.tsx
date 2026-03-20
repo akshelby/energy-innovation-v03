@@ -171,18 +171,23 @@ export default function Header() {
           </button>
           {isExpanded && (
             <ul className="ml-4 mt-1 space-y-1 border-l-2 border-accent/20 pl-2">
-              {children.map((child) => (
-                <li key={child.id}>
-                  <button
-                    type="button"
-                    onClick={(e) => { e.preventDefault(); handleItemClick(child); }}
-                    className="text-[12.5px] font-medium text-muted-foreground hover:text-red-500 hover:bg-accent/15 px-2 py-1 rounded transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer w-full text-start"
-                  >
-                    <ChevronRight className={`w-2.5 h-2.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity ${isRTL ? 'rotate-180' : ''}`} />
-                    {isAr ? child.name_ar : child.name_en}
-                  </button>
-                </li>
-              ))}
+              {children.map((child) => {
+                const grandChildren = getChildren(child.id);
+                if (grandChildren.length > 0) {
+                  return renderDesktopItem(child);
+                }
+                return (
+                  <li key={child.id}>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleItemClick(child); }}
+                      className="text-[12.5px] font-medium text-muted-foreground hover:text-red-500 hover:bg-accent/15 px-2 py-1 rounded transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer w-full text-start"
+                    >
+                      {isAr ? child.name_ar : child.name_en}
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </li>
@@ -196,7 +201,6 @@ export default function Header() {
           onClick={(e) => { e.preventDefault(); handleItemClick(pi); }}
           className="text-[13.5px] font-semibold text-card-foreground hover:bg-accent/25 hover:text-red-500 px-2 py-1 rounded transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer w-full text-start"
         >
-          <ChevronRight className={`w-3 h-3 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity ${isRTL ? 'rotate-180' : ''}`} />
           {isAr ? pi.name_ar : pi.name_en}
         </button>
       </li>
