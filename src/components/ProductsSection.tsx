@@ -109,8 +109,7 @@ export default function ProductsSection() {
                     </div>
                   )}
 
-                  {/* Gradient overlay at bottom */}
-                  <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-card to-transparent" />
+                  {/* No overlay — clean image */}
 
                   {/* Tag */}
                   {(isAr ? product.tag_ar : product.tag_en) && (
