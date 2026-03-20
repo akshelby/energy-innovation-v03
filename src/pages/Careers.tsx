@@ -28,6 +28,7 @@ interface CareerListing {
   requirements_en: string;
   requirements_ar: string;
   is_active: boolean;
+  status: string;
   created_at: string;
 }
 

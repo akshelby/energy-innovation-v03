@@ -2939,7 +2939,10 @@ export default function Admin() {
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-semibold text-foreground truncate">{career.title_en}</span>
-                          {!career.is_active && <span className="text-[10px] bg-destructive/10 text-destructive px-2 py-0.5 rounded-full font-medium">Inactive</span>}
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${career.status === "open" ? "bg-emerald-500/15 text-emerald-600" : "bg-destructive/10 text-destructive"}`}>
+                            {career.status === "open" ? "Open" : "Closed"}
+                          </span>
+                          {!career.is_active && <span className="text-[10px] bg-muted text-muted-foreground px-2 py-0.5 rounded-full font-medium">Inactive</span>}
                         </div>
                         <div className="flex flex-wrap gap-x-3 text-xs text-muted-foreground">
                           <span>{career.department_en}</span>
