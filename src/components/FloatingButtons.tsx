@@ -63,7 +63,7 @@ export default function FloatingButtons() {
 
   const showWhatsapp = config.whatsappActive && config.whatsappNumber;
   const showEmail = config.emailActive && config.floatingEmail;
-  const showLinkedin = config.linkedinActive && config.linkedinUrl;
+  const showLinkedin = config.linkedinActive;
 
   if (!showWhatsapp && !showEmail && !showLinkedin) return null;
 
