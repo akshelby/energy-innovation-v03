@@ -361,14 +361,6 @@ Deno.serve(async (req) => {
       }
     }
 
-    // CHECK EMAIL AUTH (public endpoint - no password needed, handled above)
-    if (path === "check-email") {
-      if (method === "POST") {
-        const { email } = await req.json();
-        return json({ authorized: true });
-      }
-    }
-
     return json({ error: "Not found" }, 404);
   } catch (err) {
     return json({ error: err.message }, 500);
