@@ -289,6 +289,9 @@ export default function Careers() {
                           <Clock className="w-3.5 h-3.5" />
                           {isAr ? career.type_ar : career.type_en}
                         </span>
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${career.status === "open" ? "bg-emerald-500/15 text-emerald-600" : "bg-destructive/10 text-destructive"}`}>
+                          {career.status === "open" ? (isAr ? "مفتوح" : "Open") : (isAr ? "مغلق" : "Closed")}
+                        </span>
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-accent transition-colors shrink-0 rtl:rotate-180" />
