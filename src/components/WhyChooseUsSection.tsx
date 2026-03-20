@@ -46,7 +46,13 @@ export default function WhyChooseUsSection() {
   const { sectionRef, offsets } = useParallax();
 
   return (
-    <section className="py-24 px-6 gradient-primary overflow-hidden" ref={ref}>
+    <section
+      className="py-24 px-6 gradient-primary overflow-hidden"
+      ref={(el) => {
+        (ref as React.MutableRefObject<HTMLElement | null>).current = el;
+        (sectionRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+      }}
+    >
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16 scroll-reveal">
           <span className="inline-block px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-accent-foreground bg-accent/20 rounded-full mb-4">
