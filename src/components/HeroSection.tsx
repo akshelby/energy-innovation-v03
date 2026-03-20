@@ -28,6 +28,7 @@ const buildHeroImageUrl = (fileName: string, version?: string) => {
 
 export default function HeroSection() {
   const { t } = useLanguage();
+  const parallaxBg = useParallax(0.15);
   const [current, setCurrent] = useState(0);
   const [images, setImages] = useState<string[]>(localImages);
   const [speed, setSpeed] = useState(6000);
