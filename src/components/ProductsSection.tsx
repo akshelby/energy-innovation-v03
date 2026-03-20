@@ -60,9 +60,9 @@ export default function ProductsSection() {
   const isAr = language === "ar";
 
   return (
-    <section id="products" className="py-16 md:py-20 px-6 bg-secondary/30" ref={ref}>
+    <section id="products" className="py-12 md:py-20 px-6 bg-secondary/30" ref={ref}>
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16 scroll-reveal">
+        <div className="text-center mb-10 md:mb-16 scroll-reveal">
           <span className="inline-block px-5 py-2 text-sm font-semibold uppercase tracking-wider text-accent bg-accent/10 rounded-full mb-4">
             {t("products.tag")}
           </span>
@@ -74,7 +74,7 @@ export default function ProductsSection() {
           </p>
         </div>
 
-        <StickyCardStack baseTop={80} offsetIncrement={0} scrollSpace="10vh" maxWidthClass="max-w-lg" fullHeight>
+        <StickyCardStack baseTop={72} offsetIncrement={0} scrollSpace="8svh" maxWidthClass="max-w-lg" fullHeight>
           {products.map((product, i) => {
             const isCustomIcon = product.icon?.startsWith("http") || product.icon?.startsWith("/") || product.icon?.startsWith("data:");
             const Icon = !isCustomIcon ? (iconMap[product.icon] || Flame) : null;

@@ -49,9 +49,9 @@ export default function ServicesSection() {
   const isAr = language === "ar";
 
   return (
-    <section id="services" className="py-16 md:py-20 px-6 bg-background" ref={ref}>
+    <section id="services" className="py-12 md:py-20 px-6 bg-background" ref={ref}>
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16 scroll-reveal">
+        <div className="text-center mb-10 md:mb-16 scroll-reveal">
           <span className="inline-block px-5 py-2 text-sm font-semibold uppercase tracking-wider text-accent bg-accent/10 rounded-full mb-4">
             {t("services.tag")}
           </span>
@@ -63,7 +63,7 @@ export default function ServicesSection() {
           </p>
         </div>
 
-        <StickyCardStack baseTop={80} offsetIncrement={0} scrollSpace="10vh" maxWidthClass="max-w-md">
+        <StickyCardStack baseTop={72} offsetIncrement={0} scrollSpace="6svh" maxWidthClass="max-w-md">
           {services.map((service, i) => {
             const isCustomIcon = service.icon?.startsWith("http") || service.icon?.startsWith("/") || service.icon?.startsWith("data:");
             const Icon = !isCustomIcon ? (iconMap[service.icon] || Wrench) : null;
