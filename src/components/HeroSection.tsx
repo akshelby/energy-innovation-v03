@@ -158,7 +158,7 @@ export default function HeroSection() {
             <img
               src={img}
               alt={`Industrial scene ${i + 1}`}
-              className={`w-full h-full object-cover ${i === current ? "animate-ken-burns" : ""}`}
+              className={`w-full h-full object-contain sm:object-cover bg-black/5 ${i === current ? "animate-ken-burns" : ""}`}
               loading={i === 0 ? "eager" : "lazy"}
               fetchPriority={i === 0 ? "high" : "auto"}
               decoding={i === 0 ? "sync" : "async"}
