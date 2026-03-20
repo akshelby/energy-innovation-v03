@@ -260,6 +260,8 @@ export default function Admin() {
   const [whatsappMessageAr, setWhatsappMessageAr] = useState("مرحبًا، أنا مهتم بمنتجاتكم وخدماتكم.");
   const [floatingEmail, setFloatingEmail] = useState("");
   const [emailActive, setEmailActive] = useState(false);
+  const [linkedinUrl, setLinkedinUrl] = useState("");
+  const [linkedinActive, setLinkedinActive] = useState(false);
 
   // Contact addresses state
   const [contactAddresses, setContactAddresses] = useState<{ id: string; label_en: string; label_ar: string; is_active: boolean; sort_order: number }[]>([]);
@@ -477,6 +479,10 @@ export default function Admin() {
       if (emailEntry) setFloatingEmail(emailEntry.value_en);
       const emActive = data.find((d: ContentItem) => d.content_key === "email_active");
       setEmailActive(emActive?.value_en === "true");
+      const liEntry = data.find((d: ContentItem) => d.content_key === "linkedin_url");
+      if (liEntry) setLinkedinUrl(liEntry.value_en);
+      const liActive = data.find((d: ContentItem) => d.content_key === "linkedin_active");
+      setLinkedinActive(liActive?.value_en === "true");
 
       // Load hero visibility toggles
       const visKeys = ["hero.show_headline", "hero.show_subtext", "hero.show_explore_btn", "hero.show_contact_btn", "hero.show_arrows", "hero.show_dots"];
@@ -1581,6 +1587,56 @@ export default function Admin() {
                     <Save className="w-4 h-4 mr-2" />Save
                   </Button>
                 </div>
+              </div>
+            </div>
+
+            {/* LinkedIn Button */}
+            <div className="bg-card rounded-2xl border border-border p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-foreground">LinkedIn Button</h3>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <span className="text-sm text-muted-foreground">{linkedinActive ? "Active" : "Inactive"}</span>
+                  <input
+                    type="checkbox"
+                    checked={linkedinActive}
+                    onChange={async (e) => {
+                      const val = e.target.checked;
+                      setLinkedinActive(val);
+                      try {
+                        await apiCall("content", "POST", storedPassword, {
+                          content_key: "linkedin_active",
+                          value_en: val ? "true" : "false",
+                          value_ar: val ? "true" : "false",
+                        });
+                        toast.success(val ? "LinkedIn enabled" : "LinkedIn disabled");
+                      } catch (err: any) { toast.error(err.message); }
+                    }}
+                    className="w-5 h-5 accent-primary rounded"
+                  />
+                </label>
+              </div>
+              <div className="flex flex-col gap-3">
+                <Input
+                  value={linkedinUrl}
+                  onChange={(e) => setLinkedinUrl(e.target.value)}
+                  placeholder="https://linkedin.com/company/your-company"
+                  className="rounded-xl"
+                />
+                <Button
+                  onClick={async () => {
+                    try {
+                      await apiCall("content", "POST", storedPassword, {
+                        content_key: "linkedin_url",
+                        value_en: linkedinUrl,
+                        value_ar: linkedinUrl,
+                      });
+                      toast.success("LinkedIn URL saved!");
+                    } catch (err: any) { toast.error(err.message); }
+                  }}
+                  className="gradient-accent text-accent-foreground rounded-xl border-0 w-full sm:w-auto"
+                >
+                  <Save className="w-4 h-4 mr-2" />Save
+                </Button>
               </div>
             </div>
           </div>
