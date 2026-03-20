@@ -82,7 +82,7 @@ export default function HeroSection() {
         // Deduplicate by filename stem first, preferring .webp
         const stemMap = new Map<string, typeof filtered[0]>();
         for (const file of filtered) {
-          const stem = file.name.replace(/\.(png|jpe?g|webp|avif|svg)$/i, "");
+          const stem = file.name.replace(/\.[^.]+$/, "");
           const existing = stemMap.get(stem);
           if (!existing || file.name.endsWith(".webp")) {
             stemMap.set(stem, file);
