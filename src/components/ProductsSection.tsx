@@ -60,7 +60,7 @@ export default function ProductsSection() {
   const isAr = language === "ar";
 
   return (
-    <section id="products" className="py-10 md:py-20 px-6 bg-secondary/30" ref={ref}>
+    <section id="products" className="py-10 md:py-20 px-0 md:px-6 bg-secondary/30" ref={ref}>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-6 md:mb-16 scroll-reveal">
           <span className="inline-block px-5 py-2 text-sm font-semibold tracking-wide text-accent bg-accent/10 rounded-full mb-4">
