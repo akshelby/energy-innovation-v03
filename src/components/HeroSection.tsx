@@ -93,10 +93,10 @@ export default function HeroSection() {
         // If admin has set active images, filter by stem match
         if (activeList.length > 0) {
           const activeStems = new Set(
-            activeList.map((name) => name.replace(/\.[^.]+$/, ""))
+            activeList.map((name) => name.replace(/\.[^.]+$/, "").trim())
           );
           deduped = deduped.filter((file) => {
-            const stem = file.name.replace(/\.[^.]+$/, "");
+            const stem = file.name.replace(/\.[^.]+$/, "").trim();
             return activeStems.has(stem);
           });
         }
