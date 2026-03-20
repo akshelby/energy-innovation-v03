@@ -2694,24 +2694,84 @@ export default function Admin() {
                       </Button>
                     </div>
                     <div className="grid md:grid-cols-3 gap-3">
-                      <div>
+                      <div className="md:col-span-3">
                         <label className="text-xs font-medium text-muted-foreground mb-1 block">Icon</label>
-                        <div className="flex flex-wrap gap-1.5">
-                          {PERK_ICON_OPTIONS.map((ic) => {
-                            const Ic = icons[ic as keyof typeof icons];
-                            return Ic ? (
+                        {/* Mode tabs */}
+                        <div className="flex gap-1 mb-2">
+                          {["preset", "custom"].map((mode) => {
+                            const isCustom = perk.icon.startsWith("http") || perk.icon.startsWith("/") || perk.icon.startsWith("data:");
+                            const active = mode === "custom" ? isCustom : !isCustom;
+                            return (
                               <button
-                                key={ic}
+                                key={mode}
                                 type="button"
-                                title={ic}
-                                onClick={() => { const p = [...careersPerks]; p[i] = { ...p[i], icon: ic }; setCareersPerks(p); }}
-                                className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-colors ${perk.icon === ic ? "bg-primary text-primary-foreground border-primary" : "border-input bg-background hover:bg-accent text-muted-foreground hover:text-foreground"}`}
+                                onClick={() => {
+                                  if (mode === "preset" && isCustom) {
+                                    const p = [...careersPerks]; p[i] = { ...p[i], icon: "Star" }; setCareersPerks(p);
+                                  }
+                                  if (mode === "custom" && !isCustom) {
+                                    const p = [...careersPerks]; p[i] = { ...p[i], icon: "" }; setCareersPerks(p);
+                                  }
+                                }}
+                                className={`text-[11px] px-2.5 py-1 rounded-lg border transition-colors ${active ? "bg-primary text-primary-foreground border-primary" : "border-input bg-background text-muted-foreground hover:bg-accent"}`}
                               >
-                                <Ic className="w-4 h-4" />
+                                {mode === "preset" ? "Preset" : "Custom / URL"}
                               </button>
-                            ) : null;
+                            );
                           })}
                         </div>
+                        {!(perk.icon.startsWith("http") || perk.icon.startsWith("/") || perk.icon.startsWith("data:")) && perk.icon !== "" ? (
+                          <div className="flex flex-wrap gap-1.5">
+                            {PERK_ICON_OPTIONS.map((ic) => {
+                              const Ic = icons[ic as keyof typeof icons];
+                              return Ic ? (
+                                <button
+                                  key={ic}
+                                  type="button"
+                                  title={ic}
+                                  onClick={() => { const p = [...careersPerks]; p[i] = { ...p[i], icon: ic }; setCareersPerks(p); }}
+                                  className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-colors ${perk.icon === ic ? "bg-primary text-primary-foreground border-primary" : "border-input bg-background hover:bg-accent text-muted-foreground hover:text-foreground"}`}
+                                >
+                                  <Ic className="w-4 h-4" />
+                                </button>
+                              ) : null;
+                            })}
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <Input
+                                value={perk.icon.startsWith("http") || perk.icon.startsWith("/") ? perk.icon : ""}
+                                onChange={(e) => { const p = [...careersPerks]; p[i] = { ...p[i], icon: e.target.value }; setCareersPerks(p); }}
+                                placeholder="Paste icon URL (Google Icons, CDN, etc.)"
+                                className="rounded-xl flex-1"
+                              />
+                              <input
+                                type="file"
+                                accept="image/*,.svg"
+                                className="hidden"
+                                id={`perk-icon-upload-${i}`}
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) handleFormFileUpload(file, "images", "icons", (url) => { const p = [...careersPerks]; p[i] = { ...p[i], icon: url }; setCareersPerks(p); });
+                                }}
+                              />
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => (document.getElementById(`perk-icon-upload-${i}`) as HTMLInputElement)?.click()}
+                                disabled={uploading}
+                                className="rounded-xl shrink-0"
+                              >
+                                {uploading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                              </Button>
+                            </div>
+                            {(perk.icon.startsWith("http") || perk.icon.startsWith("/")) && (
+                              <img src={perk.icon} alt="icon preview" className="w-8 h-8 object-contain rounded border border-input" />
+                            )}
+                            <p className="text-[10px] text-muted-foreground">Upload SVG/PNG/JPG or paste a URL from Google Icons, Font Awesome CDN, etc.</p>
+                          </div>
+                        )}
                       </div>
                       <div>
                         <label className="text-xs font-medium text-muted-foreground mb-1 block">Title (EN)</label>

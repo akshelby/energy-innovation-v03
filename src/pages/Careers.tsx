@@ -315,7 +315,8 @@ export default function Careers() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {perks.map((perk, i) => {
-                const IconComp = ICON_MAP[perk.icon] || Star;
+                const isImageIcon = perk.icon.startsWith("http") || perk.icon.startsWith("/") || perk.icon.startsWith("data:");
+                const IconComp = !isImageIcon ? (ICON_MAP[perk.icon] || Star) : null;
                 return (
                   <div
                     key={i}
@@ -323,7 +324,11 @@ export default function Careers() {
                   >
                     <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-accent to-accent/40 opacity-60 group-hover:opacity-100 transition-opacity" />
                     <div className="w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center mb-4 group-hover:bg-destructive/10 transition-colors">
-                      <IconComp className="w-5 h-5 text-accent group-hover:text-destructive transition-colors" />
+                      {isImageIcon ? (
+                        <img src={perk.icon} alt="" className="w-5 h-5 object-contain" />
+                      ) : (
+                        IconComp && <IconComp className="w-5 h-5 text-accent group-hover:text-destructive transition-colors" />
+                      )}
                     </div>
                     <h3 className="text-base font-semibold text-foreground mb-2">
                       {isAr ? perk.title_ar : perk.title_en}
