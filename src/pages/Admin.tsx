@@ -2699,17 +2699,17 @@ export default function Admin() {
                         {/* Mode tabs */}
                         <div className="flex gap-1 mb-2">
                           {["preset", "custom"].map((mode) => {
-                            const isCustom = perk.icon.startsWith("http") || perk.icon.startsWith("/") || perk.icon.startsWith("data:");
+                            const isCustom = perk.icon === "" || perk.icon.startsWith("http") || perk.icon.startsWith("/") || perk.icon.startsWith("data:");
                             const active = mode === "custom" ? isCustom : !isCustom;
                             return (
                               <button
                                 key={mode}
                                 type="button"
                                 onClick={() => {
-                                  if (mode === "preset" && isCustom) {
+                                  if (mode === "preset") {
                                     const p = [...careersPerks]; p[i] = { ...p[i], icon: "Star" }; setCareersPerks(p);
                                   }
-                                  if (mode === "custom" && !isCustom) {
+                                  if (mode === "custom") {
                                     const p = [...careersPerks]; p[i] = { ...p[i], icon: "" }; setCareersPerks(p);
                                   }
                                 }}
@@ -2720,7 +2720,7 @@ export default function Admin() {
                             );
                           })}
                         </div>
-                        {!(perk.icon.startsWith("http") || perk.icon.startsWith("/") || perk.icon.startsWith("data:")) && perk.icon !== "" ? (
+                        {!(perk.icon === "" || perk.icon.startsWith("http") || perk.icon.startsWith("/") || perk.icon.startsWith("data:")) ? (
                           <div className="flex flex-wrap gap-1.5">
                             {PERK_ICON_OPTIONS.map((ic) => {
                               const Ic = icons[ic as keyof typeof icons];
