@@ -112,7 +112,7 @@ export default function ServicesSection() {
                   </h3>
 
                   {/* Description */}
-                  <p className="text-muted-foreground text-[13px] leading-relaxed mb-5">
+                  <p className="text-muted-foreground text-[13px] leading-relaxed mb-5 flex-1">
                     {isAr ? service.description_ar : service.description_en}
                   </p>
 
