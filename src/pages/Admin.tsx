@@ -558,9 +558,10 @@ export default function Admin() {
       else if (activeTab === "branding") fetchBranding();
       else if (activeTab === "highlight") fetchHighlight();
       else if (activeTab === "careers") { fetchCareers(); fetchCareersContent(); }
+      else if (activeTab === "admin-emails") fetchAdminEmails();
       else fetchFiles();
     }
-  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchContactAddresses, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding, fetchHighlight, fetchCareers, fetchCareersContent]);
+  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchContactAddresses, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding, fetchHighlight, fetchCareers, fetchCareersContent, fetchAdminEmails]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
