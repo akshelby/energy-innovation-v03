@@ -96,11 +96,11 @@ export default function ServicesSection() {
                         <img src={service.image_url} alt="" className="w-full h-full object-cover" />
                       </div>
                     ) : (
-                      <div className="w-14 h-14 rounded-xl bg-accent/8 flex items-center justify-center transition-colors duration-300 group-hover:bg-accent/15">
+                      <div className="w-14 h-14 rounded-xl bg-accent/8 flex items-center justify-center transition-colors duration-300 group-hover:bg-destructive/10">
                         {isCustomIcon ? (
                           <img src={service.icon} alt="" className="w-7 h-7 object-contain" />
                         ) : Icon ? (
-                          <Icon className="w-7 h-7 text-accent" />
+                          <Icon className="w-7 h-7 text-accent transition-colors duration-300 group-hover:text-destructive" />
                         ) : null}
                       </div>
                     )}
