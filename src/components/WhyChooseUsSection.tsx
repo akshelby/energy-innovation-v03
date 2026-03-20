@@ -14,9 +14,9 @@ export default function WhyChooseUsSection() {
   const ref = useScrollReveal();
 
   return (
-    <section className="py-24 px-6 gradient-primary overflow-hidden" ref={ref}>
+    <section className="py-14 md:py-24 px-6 gradient-primary overflow-hidden" ref={ref}>
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16 scroll-reveal">
+        <div className="text-center mb-10 md:mb-16 scroll-reveal">
           <span className="inline-block px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-accent-foreground bg-accent/20 rounded-full mb-4">
             {t("why.tag")}
           </span>

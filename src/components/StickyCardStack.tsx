@@ -110,7 +110,7 @@ export default function StickyCardStack({
         <Fragment key={i}>
           <div
             data-sticky-card
-            className={`sticky will-change-transform rounded-2xl transition-[transform,filter] duration-500 ease-out ${fullHeight ? "h-[calc(100vh-80px)]" : ""}`}
+            className={`sticky will-change-transform rounded-2xl transition-[transform,filter] duration-500 ease-out ${fullHeight ? "h-[calc(100svh-72px)]" : ""}`}
             style={{
               top: `${baseTop + i * offsetIncrement}px`,
               zIndex: i + 1,
@@ -119,7 +119,7 @@ export default function StickyCardStack({
             {child}
           </div>
           {i < count - 1 && (
-            <div style={{ height: fullHeight ? "100vh" : scrollSpace }} aria-hidden="true" />
+            <div style={{ height: fullHeight ? "100svh" : scrollSpace }} aria-hidden="true" />
           )}
         </Fragment>
       ))}

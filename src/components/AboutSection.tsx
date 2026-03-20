@@ -8,7 +8,7 @@ export default function AboutSection() {
   const parallaxHeading = useParallax(-0.04);
 
   return (
-    <section id="about" className="py-24 px-6 bg-background" ref={ref}>
+    <section id="about" className="py-14 md:py-24 px-6 bg-background" ref={ref}>
       <div className="max-w-6xl mx-auto">
         <div ref={parallaxHeading} className="text-center scroll-reveal will-change-transform">
           <span className="inline-block px-5 py-2 text-sm font-semibold uppercase tracking-wider text-accent bg-accent/10 rounded-full mb-4">

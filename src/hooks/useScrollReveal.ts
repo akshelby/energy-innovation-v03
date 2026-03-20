@@ -4,6 +4,8 @@ export function useScrollReveal() {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -12,7 +14,10 @@ export function useScrollReveal() {
           }
         });
       },
-      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
+      {
+        threshold: isMobile ? 0.01 : 0.1,
+        rootMargin: isMobile ? "0px 0px 80px 0px" : "0px 0px -50px 0px",
+      }
     );
 
     const el = ref.current;
