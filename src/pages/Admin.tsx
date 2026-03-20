@@ -491,6 +491,15 @@ export default function Admin() {
     } catch { /* ignore */ }
   }, []);
 
+  const fetchCareers = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await apiCall("careers", "GET", storedPassword);
+      setCareersList(data);
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  }, [storedPassword]);
+
   useEffect(() => {
     if (authenticated) {
       if (activeTab === "leads") fetchLeads();
@@ -500,9 +509,10 @@ export default function Admin() {
       else if (activeTab === "menu-items") { fetchMenuItems(); fetchCategories(); }
       else if (activeTab === "branding") fetchBranding();
       else if (activeTab === "highlight") fetchHighlight();
+      else if (activeTab === "careers") fetchCareers();
       else fetchFiles();
     }
-  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchContactAddresses, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding, fetchHighlight]);
+  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchContactAddresses, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding, fetchHighlight, fetchCareers]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
