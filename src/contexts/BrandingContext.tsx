@@ -5,6 +5,7 @@ interface BrandingContextType {
   logoUrl: string;
   brandName: string;
   logoSize: number;
+  ready: boolean;
 }
 
 const LOGO_STORAGE_PATH = "branding/logo";
@@ -18,12 +19,14 @@ const BrandingContext = createContext<BrandingContextType>({
   logoUrl: INITIAL_LOGO_URL,
   brandName: "Energy Innovation",
   logoSize: 56,
+  ready: false,
 });
 
 export function BrandingProvider({ children }: { children: ReactNode }) {
   const [logoUrl] = useState(INITIAL_LOGO_URL);
   const [brandName, setBrandName] = useState("Energy Innovation");
   const [logoSize, setLogoSize] = useState(56);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     supabase
@@ -37,11 +40,12 @@ export function BrandingProvider({ children }: { children: ReactNode }) {
             if (row.content_key === "logo.size" && row.value_en) setLogoSize(parseInt(row.value_en) || 56);
           }
         }
+        setReady(true);
       });
   }, []);
 
   return (
-    <BrandingContext.Provider value={{ logoUrl, brandName, logoSize }}>
+    <BrandingContext.Provider value={{ logoUrl, brandName, logoSize, ready }}>
       {children}
     </BrandingContext.Provider>
   );
