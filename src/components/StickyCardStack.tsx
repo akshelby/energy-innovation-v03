@@ -11,6 +11,8 @@ interface StickyCardStackProps {
   scrollSpace?: string;
   /** Max-width class for the card column */
   maxWidthClass?: string;
+  /** Whether mobile cards take full viewport height */
+  fullHeight?: boolean;
 }
 
 /**
@@ -23,6 +25,7 @@ export default function StickyCardStack({
   offsetIncrement = 20,
   scrollSpace = "35vh",
   maxWidthClass = "max-w-lg",
+  fullHeight = false,
 }: StickyCardStackProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const count = React.Children.count(children);
@@ -107,7 +110,7 @@ export default function StickyCardStack({
         <Fragment key={i}>
           <div
             data-sticky-card
-            className="sticky will-change-transform rounded-2xl transition-[transform,filter] duration-500 ease-out h-[calc(100vh-80px)]"
+            className={`sticky will-change-transform rounded-2xl transition-[transform,filter] duration-500 ease-out ${fullHeight ? "h-[calc(100vh-80px)]" : ""}`}
             style={{
               top: `${baseTop + i * offsetIncrement}px`,
               zIndex: i + 1,
