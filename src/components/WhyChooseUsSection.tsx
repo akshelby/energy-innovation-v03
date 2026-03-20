@@ -35,28 +35,28 @@ export default function WhyChooseUsSection() {
                 style={{ transitionDelay: `${i * 100}ms` }}
               >
                 {/* Resting state — number + icon + title */}
-                <div className="absolute inset-0 rounded-2xl border border-primary-foreground/10 bg-primary-foreground/5 p-7 flex flex-col justify-between transition-all duration-500 group-hover:opacity-0 group-hover:scale-95">
+                <div className="absolute inset-0 rounded-2xl border border-primary-foreground/[0.08] bg-gradient-to-b from-primary-foreground/[0.07] to-transparent p-7 flex flex-col justify-between transition-all duration-500 group-hover:opacity-0 group-hover:scale-95">
                   {/* Large watermark number */}
-                  <span className="absolute -top-2 -right-1 text-[7rem] font-black leading-none text-primary-foreground/[0.04] select-none pointer-events-none">
+                  <span className="absolute -top-2 -right-1 text-[7rem] font-black leading-none text-accent/[0.06] select-none pointer-events-none">
                     {reason.num}
                   </span>
 
-                  <div className="w-12 h-12 rounded-2xl bg-accent/15 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center">
                     <Icon className="w-6 h-6 text-accent" />
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-bold text-primary-foreground leading-snug mb-1">
+                    <h3 className="text-lg font-bold text-primary-foreground leading-snug mb-2">
                       {t(reason.key)}
                     </h3>
-                    <div className="w-8 h-0.5 bg-accent/40 rounded-full" />
+                    <div className="w-10 h-[2px] rounded-full bg-gradient-to-r from-accent to-accent/0" />
                   </div>
                 </div>
 
-                {/* Hover state — slides up with description */}
-                <div className="absolute inset-0 rounded-2xl border border-accent/30 bg-accent/10 backdrop-blur-sm p-7 flex flex-col justify-between opacity-0 scale-105 transition-all duration-500 group-hover:opacity-100 group-hover:scale-100">
+                {/* Hover state */}
+                <div className="absolute inset-0 rounded-2xl border border-accent/25 bg-gradient-to-br from-accent/[0.12] via-accent/[0.06] to-transparent backdrop-blur-sm p-7 flex flex-col justify-between opacity-0 scale-105 transition-all duration-500 group-hover:opacity-100 group-hover:scale-100">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-accent/20 border border-accent/30 flex items-center justify-center shrink-0">
                       <Icon className="w-5 h-5 text-accent" />
                     </div>
                     <h3 className="text-base font-bold text-primary-foreground leading-snug">
@@ -64,11 +64,11 @@ export default function WhyChooseUsSection() {
                     </h3>
                   </div>
 
-                  <p className="text-primary-foreground/70 text-[13px] leading-relaxed">
+                  <p className="text-primary-foreground/75 text-[13px] leading-relaxed">
                     {t(reason.descKey)}
                   </p>
 
-                  <span className="text-[11px] font-mono font-bold tracking-widest text-accent/60">
+                  <span className="text-[11px] font-mono font-bold tracking-widest text-accent/50">
                     {reason.num} / 04
                   </span>
                 </div>
