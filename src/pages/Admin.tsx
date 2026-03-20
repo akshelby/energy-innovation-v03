@@ -644,6 +644,47 @@ export default function Admin() {
     } catch (e: any) { toast.error(e.message); }
   };
 
+  // Careers CRUD
+  const handleSaveCareer = async (item: CareerItem) => {
+    try {
+      setLoading(true);
+      if (item.title_en && (!item.title_ar || !item.department_ar || !item.location_ar || !item.type_ar || !item.description_ar || !item.requirements_ar)) {
+        try {
+          const toTranslate: Record<string, string> = {};
+          if (item.title_en && !item.title_ar) toTranslate.title_en = item.title_en;
+          if (item.department_en && !item.department_ar) toTranslate.department_en = item.department_en;
+          if (item.location_en && !item.location_ar) toTranslate.location_en = item.location_en;
+          if (item.type_en && !item.type_ar) toTranslate.type_en = item.type_en;
+          if (item.description_en && !item.description_ar) toTranslate.description_en = item.description_en;
+          if (item.requirements_en && !item.requirements_ar) toTranslate.requirements_en = item.requirements_en;
+          const result = await translateTexts(toTranslate);
+          item = {
+            ...item,
+            title_ar: result.title_ar || item.title_ar,
+            department_ar: result.department_ar || item.department_ar,
+            location_ar: result.location_ar || item.location_ar,
+            type_ar: result.type_ar || item.type_ar,
+            description_ar: result.description_ar || item.description_ar,
+            requirements_ar: result.requirements_ar || item.requirements_ar,
+          };
+        } catch { /* proceed */ }
+      }
+      await apiCall("careers", "POST", storedPassword, item);
+      toast.success("Career listing saved");
+      setEditingCareer(null);
+      fetchCareers();
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  };
+
+  const handleDeleteCareer = async (id: string) => {
+    try {
+      await apiCall("careers", "DELETE", storedPassword, { id });
+      setCareersList((prev) => prev.filter((c) => c.id !== id));
+      toast.success("Career listing deleted");
+    } catch (e: any) { toast.error(e.message); }
+  };
+
   // Menu Items CRUD
   const handleSaveMenuItem = async (item: MenuChildItem) => {
     try {
