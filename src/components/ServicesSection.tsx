@@ -85,7 +85,7 @@ export default function ServicesSection() {
                 <div className="p-6 pb-7 flex flex-col flex-1">
                   {/* Tag */}
                   {(isAr ? service.tag_ar : service.tag_en) && (
-                    <span className="inline-block text-[10px] font-semibold uppercase tracking-wider bg-accent/10 text-accent px-2.5 py-1 rounded-full mb-4">
+                    <span className="inline-block text-[10px] font-semibold tracking-wide bg-accent/10 text-accent px-2.5 py-1 rounded-full mb-4">
                       {isAr ? service.tag_ar : service.tag_en}
                     </span>
                   )}
