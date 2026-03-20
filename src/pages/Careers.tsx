@@ -274,47 +274,43 @@ export default function Careers() {
               </p>
             </div>
           ) : (
-            <div className="space-y-10">
-              {departments.map((dept) => {
-                const deptCareers = careers.filter(c =>
-                  (isAr ? c.department_ar : c.department_en) === dept
-                );
-                return (
-                  <div key={dept}>
-                    <h3 className="text-sm font-semibold tracking-wide text-accent mb-4">
-                      {dept}
-                    </h3>
-                    <div className="space-y-3">
-                      {deptCareers.map((career) => (
-                        <button
-                          key={career.id}
-                          onClick={() => { setSelected(career); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                          className="w-full text-start bg-card border border-border rounded-2xl p-5 md:p-6 hover:border-accent/40 hover:shadow-lg hover:shadow-accent/5 transition-all duration-300 group active:scale-[0.98]"
-                        >
-                          <div className="flex items-center justify-between gap-4">
-                            <div className="min-w-0">
-                              <h4 className="text-base md:text-lg font-semibold text-foreground group-hover:text-accent transition-colors mb-2 truncate">
-                                {isAr ? career.title_ar : career.title_en}
-                              </h4>
-                              <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                                <span className="inline-flex items-center gap-1">
-                                  <MapPin className="w-3.5 h-3.5" />
-                                  {isAr ? career.location_ar : career.location_en}
-                                </span>
-                                <span className="inline-flex items-center gap-1">
-                                  <Clock className="w-3.5 h-3.5" />
-                                  {isAr ? career.type_ar : career.type_en}
-                                </span>
-                              </div>
-                            </div>
-                            <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-accent transition-colors shrink-0 rtl:rotate-180" />
-                          </div>
-                        </button>
-                      ))}
+            <div className="space-y-4">
+              {careers.map((career) => (
+                <button
+                  key={career.id}
+                  onClick={() => { setSelected(career); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                  className="w-full text-start bg-card border-2 border-border rounded-2xl p-5 md:p-6 hover:border-accent/50 hover:shadow-xl hover:shadow-accent/5 transition-all duration-300 group active:scale-[0.98] overflow-hidden relative"
+                >
+                  {/* Top accent strip */}
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-accent to-accent/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="min-w-0 flex-1">
+                      <h4 className="text-base md:text-lg font-semibold text-foreground group-hover:text-accent transition-colors mb-2 truncate">
+                        {isAr ? career.title_ar : career.title_en}
+                      </h4>
+                      <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-muted-foreground">
+                        {(isAr ? career.department_ar : career.department_en) && (
+                          <span className="inline-flex items-center gap-1.5 bg-secondary/60 px-2.5 py-0.5 rounded-full">
+                            <Briefcase className="w-3.5 h-3.5" />
+                            {isAr ? career.department_ar : career.department_en}
+                          </span>
+                        )}
+                        {(isAr ? career.location_ar : career.location_en) && (
+                          <span className="inline-flex items-center gap-1.5 bg-secondary/60 px-2.5 py-0.5 rounded-full">
+                            <MapPin className="w-3.5 h-3.5" />
+                            {isAr ? career.location_ar : career.location_en}
+                          </span>
+                        )}
+                        <span className="inline-flex items-center gap-1.5 bg-secondary/60 px-2.5 py-0.5 rounded-full">
+                          <Clock className="w-3.5 h-3.5" />
+                          {isAr ? career.type_ar : career.type_en}
+                        </span>
+                      </div>
                     </div>
+                    <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-accent transition-colors shrink-0 rtl:rotate-180" />
                   </div>
-                );
-              })}
+                </button>
+              ))}
             </div>
           )}
         </div>
