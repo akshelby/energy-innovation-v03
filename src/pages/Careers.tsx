@@ -95,7 +95,7 @@ export default function Careers() {
             alt="Careers at Energy Innovation"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-foreground/60" />
+          <div className="absolute inset-0 bg-black/60" />
           <div
             className="absolute inset-0 flex items-center justify-center px-6"
             ref={heroRef}
