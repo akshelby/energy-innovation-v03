@@ -26,11 +26,14 @@ const buildHeroImageUrl = (fileName: string, version?: string) => {
   return version ? `${baseUrl}?v=${encodeURIComponent(version)}` : baseUrl;
 };
 
+const normalizeFileName = (fileName: string) =>
+  fileName.trim().replace(/\s+\.(?=[^.]+$)/, ".");
+
 export default function HeroSection() {
   const { t } = useLanguage();
   const parallaxBg = useParallax(0.15);
   const [current, setCurrent] = useState(0);
-  const [images, setImages] = useState<string[]>(localImages);
+  const [images, setImages] = useState<string[]>([]);
   const [speed, setSpeed] = useState(6000);
   const [visibility, setVisibility] = useState<Record<string, boolean>>({
     "hero.show_headline": true,
@@ -43,7 +46,6 @@ export default function HeroSection() {
 
   useEffect(() => {
     async function fetchHeroImages() {
-      // Fetch active images list and speed from site_content
       const { data: contentRows } = await supabase
         .from("site_content")
         .select("content_key, value_en")
@@ -61,7 +63,6 @@ export default function HeroSection() {
         if (seconds >= 1) setSpeed(seconds * 1000);
       }
 
-      // Parse visibility toggles
       const visKeys = ["hero.show_headline", "hero.show_subtext", "hero.show_explore_btn", "hero.show_contact_btn", "hero.show_arrows", "hero.show_dots"];
       const vis: Record<string, boolean> = {};
       visKeys.forEach((k) => {
@@ -75,41 +76,39 @@ export default function HeroSection() {
       });
 
       if (!error && data && data.length > 0) {
-        let filtered = data.filter(
+        const filtered = data.filter(
           (file) => file.name && !file.name.startsWith(".") && imageFilePattern.test(file.name)
         );
 
-        // Deduplicate by filename stem first, preferring .webp
-        const stemMap = new Map<string, typeof filtered[0]>();
-        for (const file of filtered) {
-          const stem = file.name.replace(/\.[^.]+$/, "");
-          const existing = stemMap.get(stem);
-          if (!existing || file.name.endsWith(".webp")) {
-            stemMap.set(stem, file);
-          }
-        }
-        let deduped = Array.from(stemMap.values());
+        const selectedFiles = activeList.length > 0
+          ? activeList
+              .map((name) => {
+                const normalizedTarget = normalizeFileName(name);
+                return filtered.find((file) => normalizeFileName(file.name) === normalizedTarget);
+              })
+              .filter((file): file is typeof filtered[number] => Boolean(file))
+          : Array.from(
+              filtered.reduce((stemMap, file) => {
+                const stem = file.name.replace(/\.[^.]+$/, "");
+                const existing = stemMap.get(stem);
+                if (!existing || file.name.toLowerCase().endsWith(".webp")) {
+                  stemMap.set(stem, file);
+                }
+                return stemMap;
+              }, new Map<string, typeof filtered[number]>()).values()
+            );
 
-        // If admin has set active images, filter by stem match
-        if (activeList.length > 0) {
-          const activeStems = new Set(
-            activeList.map((name) => name.replace(/\.[^.]+$/, "").trim())
-          );
-          deduped = deduped.filter((file) => {
-            const stem = file.name.replace(/\.[^.]+$/, "").trim();
-            return activeStems.has(stem);
-          });
-        }
-
-        const urls = deduped.map((file) =>
+        const urls = selectedFiles.map((file) =>
           buildHeroImageUrl(file.name, file.updated_at ?? file.created_at ?? undefined)
         );
 
-        if (urls.length > 0) {
-          setCurrent(0);
-          setImages(urls);
-        }
+        setCurrent(0);
+        setImages(urls.length > 0 ? urls : activeList.length > 0 ? [] : localImages);
+        return;
       }
+
+      setCurrent(0);
+      setImages(activeList.length > 0 ? [] : localImages);
     }
 
     fetchHeroImages();
@@ -123,9 +122,15 @@ export default function HeroSection() {
     return () => clearInterval(interval);
   }, [images.length, speed]);
 
-  const prev = () => setCurrent((c) => (c - 1 + images.length) % images.length);
-  const next = () => setCurrent((c) => (c + 1) % images.length);
+  const prev = () => {
+    if (images.length <= 1) return;
+    setCurrent((c) => (c - 1 + images.length) % images.length);
+  };
 
+  const next = () => {
+    if (images.length <= 1) return;
+    setCurrent((c) => (c + 1) % images.length);
+  };
   const scrollTo = (id: string) => {
     document.querySelector(id)?.scrollIntoView({ behavior: "smooth" });
   };
