@@ -319,8 +319,15 @@ export default function Header() {
                           ))}
                         </div>
                       )}
-                    </div>
-                  </div>
+          </div>
+
+          <Button
+            onClick={() => scrollToSection("#contact")}
+            className="hidden md:inline-flex gradient-accent text-accent-foreground rounded-full px-5 text-[15px] font-semibold transition-all border-0 shrink-0"
+          >
+            {t("nav.contact")}
+          </Button>
+        </div>
                 )}
               </div>
             ))}
