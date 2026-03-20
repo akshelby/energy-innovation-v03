@@ -1589,6 +1589,56 @@ export default function Admin() {
                 </div>
               </div>
             </div>
+
+            {/* LinkedIn Button */}
+            <div className="bg-card rounded-2xl border border-border p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-foreground">LinkedIn Button</h3>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <span className="text-sm text-muted-foreground">{linkedinActive ? "Active" : "Inactive"}</span>
+                  <input
+                    type="checkbox"
+                    checked={linkedinActive}
+                    onChange={async (e) => {
+                      const val = e.target.checked;
+                      setLinkedinActive(val);
+                      try {
+                        await apiCall("content", "POST", storedPassword, {
+                          content_key: "linkedin_active",
+                          value_en: val ? "true" : "false",
+                          value_ar: val ? "true" : "false",
+                        });
+                        toast.success(val ? "LinkedIn enabled" : "LinkedIn disabled");
+                      } catch (err: any) { toast.error(err.message); }
+                    }}
+                    className="w-5 h-5 accent-primary rounded"
+                  />
+                </label>
+              </div>
+              <div className="flex flex-col gap-3">
+                <Input
+                  value={linkedinUrl}
+                  onChange={(e) => setLinkedinUrl(e.target.value)}
+                  placeholder="https://linkedin.com/company/your-company"
+                  className="rounded-xl"
+                />
+                <Button
+                  onClick={async () => {
+                    try {
+                      await apiCall("content", "POST", storedPassword, {
+                        content_key: "linkedin_url",
+                        value_en: linkedinUrl,
+                        value_ar: linkedinUrl,
+                      });
+                      toast.success("LinkedIn URL saved!");
+                    } catch (err: any) { toast.error(err.message); }
+                  }}
+                  className="gradient-accent text-accent-foreground rounded-xl border-0 w-full sm:w-auto"
+                >
+                  <Save className="w-4 h-4 mr-2" />Save
+                </Button>
+              </div>
+            </div>
           </div>
         )}
 
