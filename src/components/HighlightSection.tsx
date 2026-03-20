@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { useParallax } from "@/hooks/useParallax";
 import { supabase } from "@/integrations/supabase/client";
 import { Award, TrendingUp, Users, Clock } from "lucide-react";
 
@@ -60,6 +61,7 @@ const defaultStats: StatCard[] = [
 export default function HighlightSection() {
   const { t, language } = useLanguage();
   const ref = useScrollReveal();
+  const parallaxImage = useParallax(0.06);
   const isAr = language === "ar";
 
   const [imageUrl, setImageUrl] = useState("");
@@ -132,7 +134,7 @@ export default function HighlightSection() {
           {/* Right — Image + Stats */}
           <div className="scroll-reveal relative" style={{ transitionDelay: "150ms" }}>
             {/* Main image */}
-            <div className="rounded-2xl overflow-hidden shadow-2xl shadow-primary/10">
+            <div ref={parallaxImage} className="rounded-2xl overflow-hidden shadow-2xl shadow-primary/10 will-change-transform">
               {imageUrl ? (
                 <img
                   src={imageUrl}
