@@ -60,7 +60,7 @@ export default function ProductsSection() {
   const isAr = language === "ar";
 
   return (
-    <section id="products" className="py-10 md:py-20 px-6 bg-secondary/30" ref={ref}>
+    <section id="products" className="py-10 md:py-20 px-0 md:px-6 bg-secondary/30" ref={ref}>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-6 md:mb-16 scroll-reveal">
           <span className="inline-block px-5 py-2 text-sm font-semibold tracking-wide text-accent bg-accent/10 rounded-full mb-4">
@@ -74,14 +74,14 @@ export default function ProductsSection() {
           </p>
         </div>
 
-        <StickyCardStack baseTop={90} offsetIncrement={0} scrollSpace="2svh" maxWidthClass="max-w-full md:max-w-lg" fullHeight>
+        <StickyCardStack baseTop={90} offsetIncrement={0} scrollSpace="2svh" maxWidthClass="max-w-none md:max-w-lg" fullHeight>
           {products.map((product, i) => {
             const isCustomIcon = product.icon?.startsWith("http") || product.icon?.startsWith("/") || product.icon?.startsWith("data:");
             const Icon = !isCustomIcon ? (iconMap[product.icon] || Flame) : null;
             return (
               <div
                 key={i}
-                className="scroll-reveal md:!opacity-100 md:!translate-y-0 group rounded-2xl cursor-pointer overflow-hidden bg-card border border-border hover:border-accent/20 transition-all duration-300 h-full flex flex-col"
+                className="scroll-reveal md:!opacity-100 md:!translate-y-0 group rounded-none md:rounded-2xl cursor-pointer overflow-hidden bg-card border border-border hover:border-accent/20 transition-all duration-300 h-full flex flex-col"
                 style={{ transitionDelay: `${i * 80}ms` }}
                 onClick={() => {
                   if (product.pdf_url) {
