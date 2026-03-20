@@ -449,10 +449,22 @@ export default function Admin() {
     } catch { /* ignore */ }
   }, [storedPassword]);
 
+  const fetchContactAddresses = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE}?resource=contact_addresses`, {
+        headers: { "x-admin-password": storedPassword },
+      });
+      const data = await res.json();
+      if (res.ok && Array.isArray(data)) {
+        setContactAddresses(data.sort((a: any, b: any) => a.sort_order - b.sort_order));
+      }
+    } catch { /* ignore */ }
+  }, [storedPassword]);
+
   useEffect(() => {
     if (authenticated) {
       if (activeTab === "leads") fetchLeads();
-      else if (activeTab === "content") fetchContent();
+      else if (activeTab === "content") { fetchContent(); fetchContactAddresses(); }
       else if (activeTab === "products") fetchProducts();
       else if (activeTab === "services") fetchServices();
       else if (activeTab === "menu-items") { fetchMenuItems(); fetchCategories(); }
