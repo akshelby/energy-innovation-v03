@@ -1988,7 +1988,212 @@ export default function Admin() {
           </div>
         )}
 
-        {/* ─── Images Tab ─────── */}
+        {/* ─── Highlight Tab ─────── */}
+        {activeTab === "highlight" && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-foreground">Highlight Section</h2>
+              <Button variant="outline" size="sm" onClick={fetchHighlight} disabled={loading} className="rounded-xl">
+                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
+              </Button>
+            </div>
+
+            <div className="space-y-6">
+              {/* Text Content — managed via Site Content tab */}
+              <div className="bg-card border border-border rounded-2xl p-6">
+                <h3 className="font-semibold text-foreground mb-2">Text Content</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Edit the highlight section text (tagline, title, description, sub-description) in the <button className="text-accent underline" onClick={() => setActiveTab("content")}>Site Content</button> tab under the "Highlight" group.
+                </p>
+              </div>
+
+              {/* Image Upload */}
+              <div className="bg-card border border-border rounded-2xl p-6">
+                <h3 className="font-semibold text-foreground mb-4">Section Image</h3>
+                <p className="text-sm text-muted-foreground mb-4">Upload an image that appears on the right side of the highlight section.</p>
+                
+                {highlightImage && (
+                  <div className="mb-4 rounded-xl overflow-hidden border border-border max-w-md">
+                    <img src={highlightImage} alt="Highlight" className="w-full aspect-[4/3] object-cover" />
+                  </div>
+                )}
+
+                <div className="flex items-center gap-3">
+                  <Input
+                    value={highlightImage}
+                    onChange={(e) => setHighlightImage(e.target.value)}
+                    placeholder="Image URL or upload"
+                    className="rounded-xl flex-1 max-w-md"
+                  />
+                  <input
+                    ref={highlightImageRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        try {
+                          setUploading(true);
+                          const url = await uploadFileAndGetUrl(file, "images", "highlight", storedPassword);
+                          setHighlightImage(url);
+                          toast.success("Image uploaded");
+                        } catch (err: any) { toast.error(err.message); }
+                        finally { setUploading(false); }
+                      }
+                    }}
+                  />
+                  <Button variant="outline" size="sm" onClick={() => highlightImageRef.current?.click()} disabled={uploading} className="rounded-xl">
+                    {uploading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                  </Button>
+                </div>
+                <Button
+                  onClick={async () => {
+                    try {
+                      await apiCall("content", "POST", storedPassword, {
+                        content_key: "highlight.image",
+                        value_en: highlightImage,
+                        value_ar: highlightImage,
+                      });
+                      toast.success("Image saved!");
+                    } catch (err: any) { toast.error(err.message); }
+                  }}
+                  className="gradient-accent text-accent-foreground rounded-xl border-0 mt-3"
+                >
+                  <Save className="w-4 h-4 mr-2" />Save Image
+                </Button>
+              </div>
+
+              {/* Stats Cards */}
+              <div className="bg-card border border-border rounded-2xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold text-foreground">Stat Cards</h3>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setHighlightStats([...highlightStats, { icon: "Award", value_en: "", value_ar: "", label_en: "", label_ar: "" }])}
+                    className="rounded-xl"
+                    disabled={highlightStats.length >= 4}
+                  >
+                    <Plus className="w-4 h-4 mr-1" />Add Stat
+                  </Button>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">These appear as overlay cards on the image. Maximum 4 stats recommended.</p>
+
+                <div className="space-y-4">
+                  {highlightStats.map((stat, i) => (
+                    <div key={i} className="border border-border rounded-xl p-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold text-muted-foreground">Stat #{i + 1}</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setHighlightStats(highlightStats.filter((_, idx) => idx !== i))}
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl h-7 w-7 p-0"
+                          disabled={highlightStats.length <= 1}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                      <div className="grid md:grid-cols-3 gap-3">
+                        <div>
+                          <label className="text-xs font-medium text-muted-foreground mb-1 block">Icon</label>
+                          <select
+                            value={stat.icon}
+                            onChange={(e) => {
+                              const updated = [...highlightStats];
+                              updated[i] = { ...stat, icon: e.target.value };
+                              setHighlightStats(updated);
+                            }}
+                            className="w-full h-10 rounded-xl border border-input bg-background px-3 text-sm"
+                          >
+                            {["Award", "TrendingUp", "Users", "Clock"].map((ic) => (
+                              <option key={ic} value={ic}>{ic}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-muted-foreground mb-1 block">Value (EN)</label>
+                          <Input
+                            value={stat.value_en}
+                            onChange={(e) => {
+                              const updated = [...highlightStats];
+                              updated[i] = { ...stat, value_en: e.target.value };
+                              setHighlightStats(updated);
+                            }}
+                            placeholder="e.g. 100%"
+                            className="rounded-xl"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-muted-foreground mb-1 block">Value (AR)</label>
+                          <Input
+                            value={stat.value_ar}
+                            onChange={(e) => {
+                              const updated = [...highlightStats];
+                              updated[i] = { ...stat, value_ar: e.target.value };
+                              setHighlightStats(updated);
+                            }}
+                            placeholder="e.g. ١٠٠٪"
+                            className="rounded-xl bg-muted/50"
+                            dir="rtl"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid md:grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-xs font-medium text-muted-foreground mb-1 block">Label (EN)</label>
+                          <Input
+                            value={stat.label_en}
+                            onChange={(e) => {
+                              const updated = [...highlightStats];
+                              updated[i] = { ...stat, label_en: e.target.value };
+                              setHighlightStats(updated);
+                            }}
+                            placeholder="e.g. Quality Assurance"
+                            className="rounded-xl"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-muted-foreground mb-1 block">Label (AR)</label>
+                          <Input
+                            value={stat.label_ar}
+                            onChange={(e) => {
+                              const updated = [...highlightStats];
+                              updated[i] = { ...stat, label_ar: e.target.value };
+                              setHighlightStats(updated);
+                            }}
+                            placeholder="e.g. ضمان الجودة"
+                            className="rounded-xl bg-muted/50"
+                            dir="rtl"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <Button
+                  onClick={async () => {
+                    try {
+                      await apiCall("content", "POST", storedPassword, {
+                        content_key: "highlight.stats",
+                        value_en: JSON.stringify(highlightStats),
+                        value_ar: JSON.stringify(highlightStats),
+                      });
+                      toast.success("Stats saved!");
+                    } catch (err: any) { toast.error(err.message); }
+                  }}
+                  className="gradient-accent text-accent-foreground rounded-xl border-0 mt-4"
+                >
+                  <Save className="w-4 h-4 mr-2" />Save Stats
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+
         {activeTab === "images" && (
           <div>
             <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
