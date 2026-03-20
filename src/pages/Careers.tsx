@@ -210,6 +210,9 @@ export default function Careers() {
                         <Clock className="w-3.5 h-3.5" />
                         {isAr ? selected.type_ar : selected.type_en}
                       </span>
+                      <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${selected.status === "open" ? "bg-emerald-500/15 text-emerald-600" : "bg-destructive/10 text-destructive"}`}>
+                        {selected.status === "open" ? (isAr ? "مفتوح" : "Open") : (isAr ? "مغلق" : "Closed")}
+                      </span>
                     </div>
                   </div>
                   <Button
