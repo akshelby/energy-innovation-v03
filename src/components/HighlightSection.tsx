@@ -85,12 +85,22 @@ export default function HighlightSection() {
     fetchData();
   }, []);
 
+  const statsRef = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = statsRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setInView(true); obs.disconnect(); } }, { threshold: 0.3 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
   const tagline = t("highlight.tagline");
   const title = t("highlight.title");
   const desc = t("highlight.desc");
   const subdesc = t("highlight.subdesc");
 
-  // Don't render if no content configured at all (fallback keys)
   const hasContent = tagline !== "highlight.tagline" || title !== "highlight.title";
 
   return (
