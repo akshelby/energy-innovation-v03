@@ -151,7 +151,7 @@ export default function Careers() {
 
         {/* Stats bar */}
         <div className="bg-card border-b border-border">
-          <div className={`max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-${Math.min(allStats.length, 4)} divide-x divide-border rtl:divide-x-reverse`}>
+          <div className={`max-w-5xl mx-auto grid grid-cols-${Math.min(allStats.length, 4)} divide-x divide-border rtl:divide-x-reverse`}>
             {allStats.map((stat, i) => (
               <div key={i} className="py-5 md:py-6 text-center">
                 <div className="text-2xl md:text-3xl font-bold text-foreground tabular-nums">{typeof stat.value === "number" || typeof stat.value === "string" ? stat.value : "—"}</div>
