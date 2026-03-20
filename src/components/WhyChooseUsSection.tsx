@@ -17,7 +17,7 @@ export default function WhyChooseUsSection() {
     <section className="py-14 md:py-24 px-6 gradient-primary overflow-hidden" ref={ref}>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-10 md:mb-16 scroll-reveal">
-          <span className="inline-block px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-accent-foreground bg-accent/20 rounded-full mb-4">
+          <span className="inline-block px-4 py-1.5 text-xs font-semibold tracking-wide text-accent-foreground bg-accent/20 rounded-full mb-4">
             {t("why.tag")}
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground mb-6">
@@ -60,7 +60,7 @@ export default function WhyChooseUsSection() {
 
                   {/* Learn more indicator */}
                   <div className="flex items-center gap-1.5 text-accent/60 group-hover:text-accent transition-colors duration-300">
-                    <span className="text-[11px] font-semibold uppercase tracking-wider">Learn more</span>
+                    <span className="text-[11px] font-semibold tracking-wide">Learn more</span>
                     <ArrowRight className="w-3 h-3 transition-transform duration-300 group-hover:translate-x-0.5" />
                   </div>
                 </div>

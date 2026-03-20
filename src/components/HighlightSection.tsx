@@ -112,7 +112,7 @@ export default function HighlightSection() {
           {/* Left — Text */}
           <div className="scroll-reveal">
             {tagline !== "highlight.tagline" && (
-              <h3 className="text-sm md:text-base font-bold uppercase tracking-wider text-accent mb-3">
+              <h3 className="text-sm md:text-base font-semibold tracking-wide text-accent mb-3">
                 {tagline}
               </h3>
             )}
