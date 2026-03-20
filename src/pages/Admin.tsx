@@ -419,6 +419,15 @@ export default function Admin() {
         vis[k] = entry ? entry.value_en !== "false" : true;
       });
       setHeroVisibility(vis);
+
+      // Load contact card visibility toggles
+      const cVisKeys = ["contact_phone_visible", "contact_email_visible", "contact_address_visible"];
+      const cVis: Record<string, boolean> = {};
+      cVisKeys.forEach((k) => {
+        const entry = data.find((d: ContentItem) => d.content_key === k);
+        cVis[k] = entry ? entry.value_en !== "false" : true;
+      });
+      setContactVisibility(cVis);
     } catch { /* ignore */ }
     const logoPublicUrl = `${STORAGE_BASE}/images/branding/logo`;
     try {
