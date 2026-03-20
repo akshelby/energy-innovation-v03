@@ -26,9 +26,6 @@ const buildHeroImageUrl = (fileName: string, version?: string) => {
   return version ? `${baseUrl}?v=${encodeURIComponent(version)}` : baseUrl;
 };
 
-const normalizeFileName = (fileName: string) =>
-  fileName.trim().replace(/\s+\.(?=[^.]+$)/, ".");
-
 export default function HeroSection() {
   const { t } = useLanguage();
   const parallaxBg = useParallax(0.15);
@@ -82,10 +79,7 @@ export default function HeroSection() {
 
         const selectedFiles = activeList.length > 0
           ? activeList
-              .map((name) => {
-                const normalizedTarget = normalizeFileName(name);
-                return filtered.find((file) => normalizeFileName(file.name) === normalizedTarget);
-              })
+              .map((name) => filtered.find((file) => file.name === name))
               .filter((file): file is typeof filtered[number] => Boolean(file))
           : Array.from(
               filtered.reduce((stemMap, file) => {
