@@ -1,9 +1,11 @@
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { useParallax } from "@/hooks/useParallax";
 
 export default function AboutSection() {
   const { t } = useLanguage();
   const ref = useScrollReveal();
+  const parallaxHeading = useParallax(-0.04);
 
   return (
     <section id="about" className="py-24 px-6 bg-background" ref={ref}>
