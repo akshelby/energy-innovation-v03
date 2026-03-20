@@ -136,7 +136,7 @@ export default function Header() {
     { label: t("nav.about"), href: "#about" },
     { label: t("nav.products"), href: "#products", hasDropdown: true },
     { label: t("nav.services"), href: "#services" },
-    { label: isAr ? "الوظائف" : "Careers", href: "/careers", isRoute: true },
+    { label: language === "ar" ? "الوظائف" : "Careers", href: "/careers", isRoute: true },
     { label: t("nav.contact"), href: "#contact" },
   ];
 
