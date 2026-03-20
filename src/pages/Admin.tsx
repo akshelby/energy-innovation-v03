@@ -260,6 +260,8 @@ export default function Admin() {
   const [whatsappMessageAr, setWhatsappMessageAr] = useState("مرحبًا، أنا مهتم بمنتجاتكم وخدماتكم.");
   const [floatingEmail, setFloatingEmail] = useState("");
   const [emailActive, setEmailActive] = useState(false);
+  const [linkedinUrl, setLinkedinUrl] = useState("");
+  const [linkedinActive, setLinkedinActive] = useState(false);
 
   // Contact addresses state
   const [contactAddresses, setContactAddresses] = useState<{ id: string; label_en: string; label_ar: string; is_active: boolean; sort_order: number }[]>([]);
