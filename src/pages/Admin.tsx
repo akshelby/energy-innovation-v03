@@ -421,7 +421,7 @@ export default function Admin() {
       if (selectedFolder.folder === "hero") {
         const stemMap = new Map<string, StorageFile>();
         for (const file of fileList) {
-          const stem = file.name.replace(/\.(png|jpe?g|webp|avif|svg)$/i, "");
+          const stem = file.name.replace(/\.[^.]+$/, "");
           const existing = stemMap.get(stem);
           if (!existing || file.name.endsWith(".webp")) {
             stemMap.set(stem, file);
@@ -908,9 +908,9 @@ export default function Admin() {
       for (const file of Array.from(fileList)) {
         // Prevent duplicate hero images (same stem, different extension)
         if (selectedFolder.folder === "hero") {
-          const stem = file.name.replace(/\.(png|jpe?g|webp|avif|svg)$/i, "");
+          const stem = file.name.replace(/\.[^.]+$/, "");
           const duplicate = files.find(
-            (f) => f.name !== file.name && f.name.replace(/\.(png|jpe?g|webp|avif|svg)$/i, "") === stem
+            (f) => f.name !== file.name && f.name.replace(/\.[^.]+$/, "") === stem
           );
           if (duplicate) {
             toast.error(`Skipped "${file.name}" — a similar image "${duplicate.name}" already exists.`);
@@ -933,7 +933,7 @@ export default function Admin() {
 
       // For hero folder, also delete duplicate variants (jpg/webp/png with same stem)
       if (folder === "hero") {
-        const stem = fileName.replace(/\.(png|jpe?g|webp|avif|svg)$/i, "");
+        const stem = fileName.replace(/\.[^.]+$/, "");
         // Fetch full file list to find all variants
         const allFiles = await apiCall(
           `files?bucket=${selectedFolder.bucket}&folder=${folder}`,
@@ -941,7 +941,7 @@ export default function Admin() {
           storedPassword
         );
         for (const f of allFiles) {
-          if (f.name !== fileName && f.name.replace(/\.(png|jpe?g|webp|avif|svg)$/i, "") === stem) {
+          if (f.name !== fileName && f.name.replace(/\.[^.]+$/, "") === stem) {
             pathsToDelete.push(folder ? `${folder}/${f.name}` : f.name);
           }
         }
