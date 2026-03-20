@@ -908,9 +908,9 @@ export default function Admin() {
       for (const file of Array.from(fileList)) {
         // Prevent duplicate hero images (same stem, different extension)
         if (selectedFolder.folder === "hero") {
-          const stem = file.name.replace(/\.(png|jpe?g|webp|avif)$/i, "");
+          const stem = file.name.replace(/\.(png|jpe?g|webp|avif|svg)$/i, "");
           const duplicate = files.find(
-            (f) => f.name !== file.name && f.name.replace(/\.(png|jpe?g|webp|avif)$/i, "") === stem
+            (f) => f.name !== file.name && f.name.replace(/\.(png|jpe?g|webp|avif|svg)$/i, "") === stem
           );
           if (duplicate) {
             toast.error(`Skipped "${file.name}" — a similar image "${duplicate.name}" already exists.`);
