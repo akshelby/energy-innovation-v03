@@ -134,7 +134,7 @@ export default function HighlightSection() {
           {/* Right — Image + Stats */}
           <div className="scroll-reveal relative" style={{ transitionDelay: "150ms" }}>
             {/* Main image */}
-            <div className="rounded-2xl overflow-hidden shadow-2xl shadow-primary/10">
+            <div ref={parallaxImage} className="rounded-2xl overflow-hidden shadow-2xl shadow-primary/10 will-change-transform">
               {imageUrl ? (
                 <img
                   src={imageUrl}

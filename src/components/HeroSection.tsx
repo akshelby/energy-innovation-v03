@@ -132,21 +132,23 @@ export default function HeroSection() {
 
   return (
     <section id="home" className="relative h-screen w-full overflow-hidden">
-      {images.map((img, i) => (
-        <div
-          key={i}
-          className={`absolute inset-0 transition-opacity duration-1000 ${
-            i === current ? "opacity-100" : "opacity-0"
-          }`}
-        >
-          <img
-            src={img}
-            alt={`Industrial scene ${i + 1}`}
-            className={`w-full h-full object-cover ${i === current ? "animate-ken-burns" : ""}`}
-            loading={i === 0 ? "eager" : "lazy"}
-          />
-        </div>
-      ))}
+      <div ref={parallaxBg} className="absolute inset-0 will-change-transform" style={{ top: "-10%", bottom: "-10%", height: "120%" }}>
+        {images.map((img, i) => (
+          <div
+            key={i}
+            className={`absolute inset-0 transition-opacity duration-1000 ${
+              i === current ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <img
+              src={img}
+              alt={`Industrial scene ${i + 1}`}
+              className={`w-full h-full object-cover ${i === current ? "animate-ken-burns" : ""}`}
+              loading={i === 0 ? "eager" : "lazy"}
+            />
+          </div>
+        ))}
+      </div>
 
       <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/30 to-black/80" />
 
