@@ -63,7 +63,7 @@ export default function ServicesSection() {
           </p>
         </div>
 
-        <StickyCardStack baseTop={80} offsetIncrement={20} scrollSpace="35vh" maxWidthClass="max-w-md">
+        <StickyCardStack baseTop={80} offsetIncrement={0} scrollSpace="35vh" maxWidthClass="max-w-md">
           {services.map((service, i) => {
             const isCustomIcon = service.icon?.startsWith("http") || service.icon?.startsWith("/") || service.icon?.startsWith("data:");
             const Icon = !isCustomIcon ? (iconMap[service.icon] || Wrench) : null;
