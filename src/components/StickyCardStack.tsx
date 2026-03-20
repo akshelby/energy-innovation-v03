@@ -116,7 +116,10 @@ export default function StickyCardStack({
               zIndex: i + 1,
             }}
           >
-            {child}
+            {/* Force child scroll-reveal to be visible inside sticky stack */}
+            <div className="[&>.scroll-reveal]:!opacity-100 [&>.scroll-reveal]:!translate-y-0 h-full">
+              {child}
+            </div>
           </div>
           {i < count - 1 && (
             <div style={{ height: fullHeight ? "70svh" : scrollSpace }} aria-hidden="true" />
