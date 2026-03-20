@@ -69,8 +69,8 @@ export default function WhyChooseUsSection() {
             return (
               <div
                 key={reason.key}
-                className="scroll-reveal group relative rounded-2xl overflow-hidden"
-                style={{ transitionDelay: `${i * 100}ms` }}
+                className="scroll-reveal group relative rounded-2xl overflow-hidden will-change-transform"
+                style={{ transitionDelay: `${i * 100}ms`, transform: `translateY(${offsets[i]}px)` }}
               >
                 {/* Left accent edge */}
                 <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-accent via-accent/40 to-transparent transition-all duration-500 group-hover:w-1.5 group-hover:from-accent group-hover:via-accent group-hover:to-accent/30" />
