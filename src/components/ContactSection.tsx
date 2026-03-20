@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Send, Phone, Mail, MapPin } from "lucide-react";
+import { Send, Phone, Mail, Globe } from "lucide-react";
 import PhoneInput from "@/components/PhoneInput";
 
 const contactSchema = z.object({
@@ -24,13 +24,18 @@ export default function ContactSection() {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", company: "", message: "" });
   const [contactInfo, setContactInfo] = useState({ phone: "", email: "", address: "" });
+  const [visibility, setVisibility] = useState({ phone: true, email: true, address: true });
+  const [addresses, setAddresses] = useState<{ id: string; label_en: string; label_ar: string }[]>([]);
 
   useEffect(() => {
     const fetchContactInfo = async () => {
       const { data } = await supabase
         .from("site_content")
         .select("content_key, value_en, value_ar")
-        .in("content_key", ["contact_phone", "contact_email", "contact_address"]);
+        .in("content_key", [
+          "contact_phone", "contact_email", "contact_address",
+          "contact_phone_visible", "contact_email_visible", "contact_address_visible",
+        ]);
       if (data) {
         const map: Record<string, { en: string; ar: string }> = {};
         data.forEach((r) => { map[r.content_key] = { en: r.value_en, ar: r.value_ar }; });
@@ -39,9 +44,25 @@ export default function ContactSection() {
           email: map.contact_email?.[language] || "",
           address: map.contact_address?.[language] || "",
         });
+        setVisibility({
+          phone: map.contact_phone_visible?.en !== "false",
+          email: map.contact_email_visible?.en !== "false",
+          address: map.contact_address_visible?.en !== "false",
+        });
       }
     };
+
+    const fetchAddresses = async () => {
+      const { data } = await supabase
+        .from("contact_addresses")
+        .select("*")
+        .eq("is_active", true)
+        .order("sort_order");
+      if (data) setAddresses(data);
+    };
+
     fetchContactInfo();
+    fetchAddresses();
   }, [language]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -72,6 +93,31 @@ export default function ContactSection() {
     }
   };
 
+  const isAr = language === "ar";
+
+  // Build contact cards based on visibility
+  const cards: { icon: typeof Phone; label: string; value: string; href?: string }[] = [];
+  if (visibility.phone && contactInfo.phone) {
+    cards.push({ icon: Phone, label: t("contact.phone"), value: contactInfo.phone, href: `tel:${contactInfo.phone.replace(/\s/g, "")}` });
+  }
+  if (visibility.email && contactInfo.email) {
+    cards.push({ icon: Mail, label: t("contact.email"), value: contactInfo.email, href: `mailto:${contactInfo.email}` });
+  }
+  // Show addresses from new table if visible, fallback to legacy contact_address
+  if (visibility.address) {
+    if (addresses.length > 0) {
+      addresses.forEach((addr) => {
+        cards.push({
+          icon: Globe,
+          label: t("footer.address"),
+          value: isAr ? addr.label_ar : addr.label_en,
+        });
+      });
+    } else if (contactInfo.address) {
+      cards.push({ icon: Globe, label: t("footer.address"), value: contactInfo.address });
+    }
+  }
+
   return (
     <section id="contact" className="py-24 px-6 bg-secondary/30" ref={ref}>
       <div className="max-w-6xl mx-auto">
@@ -87,32 +133,30 @@ export default function ContactSection() {
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Contact Info Cards */}
-          <div className="space-y-5 scroll-reveal">
-            {[
-              { icon: Phone, label: t("contact.phone"), value: contactInfo.phone, href: `tel:${contactInfo.phone.replace(/\s/g, "")}` },
-              { icon: Mail, label: t("contact.email"), value: contactInfo.email, href: `mailto:${contactInfo.email}` },
-              { icon: MapPin, label: t("footer.address"), value: contactInfo.address, href: undefined },
-            ].map(({ icon: Icon, label, value, href }) => (
-              <div key={label} className="bg-card rounded-2xl border border-border p-6 shadow-lg flex items-start gap-4">
-                <div className="shrink-0 w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center">
-                  <Icon className="w-5 h-5 text-accent" />
+          {cards.length > 0 && (
+            <div className="space-y-5 scroll-reveal">
+              {cards.map(({ icon: Icon, label, value, href }, idx) => (
+                <div key={idx} className="bg-card rounded-2xl border border-border p-6 shadow-lg flex items-start gap-4">
+                  <div className="shrink-0 w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center">
+                    <Icon className="w-5 h-5 text-accent" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-muted-foreground mb-1">{label}</p>
+                    {href ? (
+                      <a href={href} className="text-foreground font-semibold hover:text-accent transition-colors break-all">
+                        {value}
+                      </a>
+                    ) : (
+                      <p className="text-foreground font-semibold">{value}</p>
+                    )}
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-muted-foreground mb-1">{label}</p>
-                  {href ? (
-                    <a href={href} className="text-foreground font-semibold hover:text-accent transition-colors break-all">
-                      {value}
-                    </a>
-                  ) : (
-                    <p className="text-foreground font-semibold">{value}</p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
           {/* Contact Form */}
-          <form onSubmit={handleSubmit} className="scroll-reveal lg:col-span-2 space-y-5 bg-card rounded-2xl border border-border p-8 shadow-lg">
+          <form onSubmit={handleSubmit} className={`scroll-reveal space-y-5 bg-card rounded-2xl border border-border p-8 shadow-lg ${cards.length > 0 ? "lg:col-span-2" : "lg:col-span-3"}`}>
             <div className="grid sm:grid-cols-2 gap-5">
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">{t("contact.name")}</label>
