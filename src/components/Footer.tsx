@@ -1,10 +1,13 @@
+import { useEffect, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { useBranding } from "@/contexts/BrandingContext";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Footer() {
   const { t } = useLanguage();
   const { logoUrl, brandName, logoSize, ready: brandReady } = useBranding();
+  const [linkedinUrl, setLinkedinUrl] = useState("");
 
   const quickLinks = [
     { label: t("nav.home"), href: "#home" },
