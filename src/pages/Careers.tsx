@@ -5,8 +5,9 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FloatingButtons from "@/components/FloatingButtons";
 import { supabase } from "@/integrations/supabase/client";
-import { MapPin, Clock, Briefcase, ChevronRight, ArrowLeft } from "lucide-react";
+import { MapPin, Clock, Briefcase, ChevronRight, ArrowLeft, Users, TrendingUp, Heart, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import careersBanner from "@/assets/careers-banner.jpg";
 
 interface CareerListing {
   id: string;
@@ -28,7 +29,9 @@ interface CareerListing {
 
 export default function Careers() {
   const { language, t } = useLanguage();
-  const ref = useScrollReveal();
+  const heroRef = useScrollReveal();
+  const perksRef = useScrollReveal();
+  const listingsRef = useScrollReveal();
   const isAr = language === "ar";
   const [careers, setCareers] = useState<CareerListing[]>([]);
   const [selected, setSelected] = useState<CareerListing | null>(null);
@@ -49,30 +52,138 @@ export default function Careers() {
 
   const departments = [...new Set(careers.map(c => isAr ? c.department_ar : c.department_en))].filter(Boolean);
 
+  const perks = [
+    {
+      icon: TrendingUp,
+      title_en: "Career Growth",
+      title_ar: "النمو المهني",
+      desc_en: "Clear advancement paths with mentorship programs and continuous learning opportunities.",
+      desc_ar: "مسارات تقدم واضحة مع برامج إرشاد وفرص تعلم مستمرة.",
+    },
+    {
+      icon: Heart,
+      title_en: "Health & Wellbeing",
+      title_ar: "الصحة والرفاهية",
+      desc_en: "Comprehensive medical coverage and wellness programs for you and your family.",
+      desc_ar: "تغطية طبية شاملة وبرامج صحية لك ولعائلتك.",
+    },
+    {
+      icon: Users,
+      title_en: "Collaborative Culture",
+      title_ar: "ثقافة تعاونية",
+      desc_en: "Work alongside industry experts in a supportive, inclusive team environment.",
+      desc_ar: "اعمل جنباً إلى جنب مع خبراء الصناعة في بيئة فريق داعمة وشاملة.",
+    },
+    {
+      icon: Shield,
+      title_en: "Job Security",
+      title_ar: "الأمان الوظيفي",
+      desc_en: "Stable employment with competitive compensation and performance-based rewards.",
+      desc_ar: "توظيف مستقر مع تعويضات تنافسية ومكافآت قائمة على الأداء.",
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
 
-      {/* Hero */}
-      <section className="pt-28 pb-16 md:pt-36 md:pb-24 px-6 bg-gradient-to-b from-primary/5 to-background">
-        <div className="max-w-4xl mx-auto text-center scroll-reveal" ref={ref}>
-          <h1
-            className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-6"
-            style={{ textWrap: "balance" }}
+      {/* Hero Banner */}
+      <section className="relative pt-16 md:pt-20">
+        <div className="relative h-[320px] md:h-[420px] overflow-hidden">
+          <img
+            src={careersBanner}
+            alt="Careers at Energy Innovation"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-foreground/60" />
+          <div
+            className="absolute inset-0 flex items-center justify-center px-6"
+            ref={heroRef}
           >
-            {isAr ? "انضم إلى فريقنا" : "Join Our Team"}
-          </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            {isAr
-              ? "نبحث عن محترفين موهوبين يشاركوننا شغفنا بالابتكار الصناعي والتميز الهندسي."
-              : "We're looking for talented professionals who share our passion for industrial innovation and engineering excellence."}
-          </p>
+            <div className="max-w-3xl text-center scroll-reveal">
+              <span className="inline-block text-sm font-semibold tracking-wide text-white/80 mb-4">
+                {isAr ? "الوظائف" : "CAREERS"}
+              </span>
+              <h1
+                className="text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.1] mb-5"
+                style={{ textWrap: "balance" }}
+              >
+                {isAr ? "ابنِ مستقبلك معنا" : "Build Your Future With Us"}
+              </h1>
+              <p className="text-base md:text-lg text-white/85 max-w-xl mx-auto leading-relaxed">
+                {isAr
+                  ? "انضم إلى فريق رائد في الابتكار الصناعي والحلول الهندسية في منطقة الخليج."
+                  : "Join a leading team in industrial innovation and engineering solutions across the Gulf region."}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats bar */}
+        <div className="bg-card border-b border-border">
+          <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 divide-x divide-border rtl:divide-x-reverse">
+            {[
+              { value: careers.length || "—", label_en: "Open Positions", label_ar: "وظائف شاغرة" },
+              { value: departments.length || "—", label_en: "Departments", label_ar: "أقسام" },
+              { value: "5+", label_en: "Countries", label_ar: "دول" },
+              { value: "100%", label_en: "Growth Focus", label_ar: "تركيز على النمو" },
+            ].map((stat, i) => (
+              <div key={i} className="py-5 md:py-6 text-center">
+                <div className="text-2xl md:text-3xl font-bold text-foreground tabular-nums">{stat.value}</div>
+                <div className="text-xs md:text-sm text-muted-foreground mt-1">{isAr ? stat.label_ar : stat.label_en}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why Join Us */}
+      <section className="py-16 md:py-24 px-6">
+        <div className="max-w-5xl mx-auto scroll-reveal" ref={perksRef}>
+          <div className="text-center mb-12">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3" style={{ textWrap: "balance" }}>
+              {isAr ? "لماذا تنضم إلينا؟" : "Why Join Energy Innovation?"}
+            </h2>
+            <p className="text-muted-foreground max-w-lg mx-auto">
+              {isAr
+                ? "نقدم بيئة عمل محفزة تجمع بين التحدي والدعم لتحقيق أفضل أداء."
+                : "We offer an environment where challenge meets support, enabling you to do the best work of your career."}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {perks.map((perk, i) => (
+              <div
+                key={i}
+                className="bg-card border border-border rounded-2xl p-6 hover:border-accent/40 hover:shadow-lg hover:shadow-accent/5 transition-all duration-300 group"
+              >
+                <div className="w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center mb-4 group-hover:bg-accent/20 transition-colors">
+                  <perk.icon className="w-5 h-5 text-accent" />
+                </div>
+                <h3 className="text-base font-semibold text-foreground mb-2">
+                  {isAr ? perk.title_ar : perk.title_en}
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {isAr ? perk.desc_ar : perk.desc_en}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Listings */}
       <section className="pb-20 md:pb-32 px-6">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto scroll-reveal" ref={listingsRef}>
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2 text-center">
+            {isAr ? "الوظائف المتاحة" : "Open Positions"}
+          </h2>
+          <p className="text-muted-foreground text-center mb-10">
+            {isAr
+              ? "تصفح الفرص الحالية وابدأ رحلتك المهنية معنا."
+              : "Browse current opportunities and start your career journey with us."}
+          </p>
+
           {loading ? (
             <div className="space-y-4">
               {[1, 2, 3].map(i => (
@@ -81,12 +192,12 @@ export default function Careers() {
             </div>
           ) : selected ? (
             /* Detail View */
-            <div className="scroll-reveal">
+            <div>
               <button
                 onClick={() => setSelected(null)}
                 className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-8"
               >
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
                 {isAr ? "العودة إلى الوظائف" : "Back to all positions"}
               </button>
 
@@ -97,24 +208,24 @@ export default function Careers() {
                       {isAr ? selected.title_ar : selected.title_en}
                     </h2>
                     <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-                      <span className="inline-flex items-center gap-1.5">
-                        <Briefcase className="w-4 h-4" />
+                      <span className="inline-flex items-center gap-1.5 bg-secondary/60 px-3 py-1 rounded-full">
+                        <Briefcase className="w-3.5 h-3.5" />
                         {isAr ? selected.department_ar : selected.department_en}
                       </span>
-                      <span className="inline-flex items-center gap-1.5">
-                        <MapPin className="w-4 h-4" />
+                      <span className="inline-flex items-center gap-1.5 bg-secondary/60 px-3 py-1 rounded-full">
+                        <MapPin className="w-3.5 h-3.5" />
                         {isAr ? selected.location_ar : selected.location_en}
                       </span>
-                      <span className="inline-flex items-center gap-1.5">
-                        <Clock className="w-4 h-4" />
+                      <span className="inline-flex items-center gap-1.5 bg-secondary/60 px-3 py-1 rounded-full">
+                        <Clock className="w-3.5 h-3.5" />
                         {isAr ? selected.type_ar : selected.type_en}
                       </span>
                     </div>
                   </div>
                   <Button
                     onClick={() => {
-                      const el = document.querySelector("#contact");
-                      if (el) el.scrollIntoView({ behavior: "smooth" });
+                      window.location.href = "mailto:info@energyinnvo.com?subject=" +
+                        encodeURIComponent(`Application: ${selected.title_en}`);
                     }}
                     className="gradient-accent text-accent-foreground rounded-full px-6 font-semibold border-0 shrink-0"
                   >
@@ -155,8 +266,8 @@ export default function Careers() {
               </h3>
               <p className="text-muted-foreground max-w-md mx-auto">
                 {isAr
-                  ? "لا تتوفر وظائف شاغرة في الوقت الحالي. يرجى التحقق لاحقاً أو إرسال سيرتك الذاتية عبر نموذج الاتصال."
-                  : "There are no open positions at the moment. Please check back later or send your resume through our contact form."}
+                  ? "لا تتوفر وظائف شاغرة في الوقت الحالي. يرجى التحقق لاحقاً أو إرسال سيرتك الذاتية عبر البريد الإلكتروني."
+                  : "There are no open positions at the moment. Check back later or send your resume to info@energyinnvo.com."}
               </p>
             </div>
           ) : (
@@ -167,21 +278,21 @@ export default function Careers() {
                 );
                 return (
                   <div key={dept}>
-                    <h2 className="text-sm font-semibold tracking-wide text-accent mb-4">
+                    <h3 className="text-sm font-semibold tracking-wide text-accent mb-4">
                       {dept}
-                    </h2>
+                    </h3>
                     <div className="space-y-3">
                       {deptCareers.map((career) => (
                         <button
                           key={career.id}
-                          onClick={() => setSelected(career)}
+                          onClick={() => { setSelected(career); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                           className="w-full text-start bg-card border border-border rounded-2xl p-5 md:p-6 hover:border-accent/40 hover:shadow-lg hover:shadow-accent/5 transition-all duration-300 group active:scale-[0.98]"
                         >
                           <div className="flex items-center justify-between gap-4">
                             <div className="min-w-0">
-                              <h3 className="text-base md:text-lg font-semibold text-foreground group-hover:text-accent transition-colors mb-2 truncate">
+                              <h4 className="text-base md:text-lg font-semibold text-foreground group-hover:text-accent transition-colors mb-2 truncate">
                                 {isAr ? career.title_ar : career.title_en}
-                              </h3>
+                              </h4>
                               <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
                                 <span className="inline-flex items-center gap-1">
                                   <MapPin className="w-3.5 h-3.5" />
