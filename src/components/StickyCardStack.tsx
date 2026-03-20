@@ -119,7 +119,7 @@ export default function StickyCardStack({
             {child}
           </div>
           {i < count - 1 && (
-            <div style={{ height: fullHeight ? "100svh" : scrollSpace }} aria-hidden="true" />
+            <div style={{ height: fullHeight ? "70svh" : scrollSpace }} aria-hidden="true" />
           )}
         </Fragment>
       ))}
