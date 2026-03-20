@@ -1284,7 +1284,7 @@ export default function Admin() {
             <Button variant="outline" size="icon" onClick={toggleTheme} className="rounded-xl" title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}>
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </Button>
-            <Button variant="outline" size="sm" onClick={() => { sessionStorage.removeItem("admin_pw"); setAuthenticated(false); setPassword(""); }} className="rounded-xl">
+            <Button variant="outline" size="sm" onClick={() => { sessionStorage.removeItem("admin_pw"); sessionStorage.removeItem("admin_email"); setAuthenticated(false); setPassword(""); setAdminEmail(""); }} className="rounded-xl">
               <LogOut className="w-4 h-4 mr-2" />Logout
             </Button>
           </div>
