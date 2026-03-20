@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import {
   Lock, Trash2, Save, RefreshCw, Database, FileText, MessageSquare,
   LogOut, Image, Upload, Plus, Package, Briefcase, GripVertical, List, Palette, Languages, Sun, Moon,
+  Star, Award, TrendingUp, Users, Clock,
 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
@@ -116,6 +117,10 @@ const defaultContent: { content_key: string; value_en: string; value_ar: string 
   { content_key: "products.desc", value_en: "Explore our extensive range of industrial products designed to meet the demands of modern facilities.", value_ar: "اكتشف مجموعتنا الواسعة من المنتجات الصناعية المصممة لتلبية متطلبات المنشآت الحديثة." },
   { content_key: "services.title", value_en: "Expert Engineering Services", value_ar: "خدمات هندسية متخصصة" },
   { content_key: "services.desc", value_en: "We provide end-to-end industrial solutions from technical design to installation and ongoing support.", value_ar: "نقدم حلولاً صناعية شاملة من التصميم الفني إلى التركيب والدعم المستمر." },
+  { content_key: "highlight.tagline", value_en: "Proven Industrial Partner", value_ar: "شريك صناعي موثوق" },
+  { content_key: "highlight.title", value_en: "Driving Industrial Excellence Forward", value_ar: "قيادة التميز الصناعي نحو الأمام" },
+  { content_key: "highlight.desc", value_en: "Energy Innovation delivers cutting-edge industrial solutions that empower businesses to achieve operational excellence. From strategy to execution, we bring industry-leading expertise across engineering, automation, and safety systems.", value_ar: "تقدم Energy Innovation حلولاً صناعية متطورة تمكّن الشركات من تحقيق التميز التشغيلي. من الاستراتيجية إلى التنفيذ، نقدم خبرة رائدة في الهندسة والأتمتة وأنظمة السلامة." },
+  { content_key: "highlight.subdesc", value_en: "Your success is our priority. We welcome your inquiries as we partner on your industrial journey.", value_ar: "نجاحكم هو أولويتنا. نرحب باستفساراتكم ونتطلع للشراكة في رحلتكم الصناعية." },
   { content_key: "contact.title", value_en: "Let's Build Something Great", value_ar: "لنبني شيئاً رائعاً معاً" },
   { content_key: "contact.desc", value_en: "Ready to upgrade your industrial infrastructure? Send us a message and our team will respond within 24 hours.", value_ar: "هل أنت مستعد لتطوير بنيتك التحتية الصناعية؟ أرسل لنا رسالة وسيرد فريقنا خلال 24 ساعة." },
   { content_key: "contact_phone", value_en: "+966 XX XXX XXXX", value_ar: "+966 XX XXX XXXX" },
@@ -186,7 +191,7 @@ const emptyService: ServiceItem = {
   tag_en: "", tag_ar: "", image_url: null, pdf_url: null, icon: "Wrench", sort_order: 0,
 };
 
-type TabKey = "leads" | "content" | "products" | "services" | "menu-items" | "images" | "branding";
+type TabKey = "leads" | "content" | "products" | "services" | "menu-items" | "images" | "branding" | "highlight";
 
 const emptyMenuChild: MenuChildItem = {
   category_key: "cat.fire", parent_id: null, name_en: "", name_ar: "", pdf_url: null, sort_order: 0, is_active: true,
@@ -248,6 +253,15 @@ export default function Admin() {
   const [whatsappMessageAr, setWhatsappMessageAr] = useState("مرحبًا، أنا مهتم بمنتجاتكم وخدماتكم.");
   const [floatingEmail, setFloatingEmail] = useState("");
   const [emailActive, setEmailActive] = useState(false);
+
+  // Highlight section state
+  const [highlightImage, setHighlightImage] = useState("");
+  const [highlightStats, setHighlightStats] = useState<{ icon: string; value_en: string; value_ar: string; label_en: string; label_ar: string }[]>([
+    { icon: "Award", value_en: "100%", value_ar: "١٠٠٪", label_en: "Quality Assurance", label_ar: "ضمان الجودة" },
+    { icon: "TrendingUp", value_en: "20+", value_ar: "+٢٠", label_en: "Years of Experience", label_ar: "سنوات الخبرة" },
+    { icon: "Users", value_en: "500+", value_ar: "+٥٠٠", label_en: "Satisfied Clients", label_ar: "عملاء راضون" },
+  ]);
+  const highlightImageRef = useRef<HTMLInputElement>(null);
 
   // Hero visibility toggles
   const [heroVisibility, setHeroVisibility] = useState<Record<string, boolean>>({
@@ -406,6 +420,18 @@ export default function Admin() {
     } catch { setBrandLogoUrl(""); }
   }, [storedPassword]);
 
+  const fetchHighlight = useCallback(async () => {
+    try {
+      const data = await apiCall("content", "GET", storedPassword);
+      const imgEntry = data.find((d: ContentItem) => d.content_key === "highlight.image");
+      if (imgEntry) setHighlightImage(imgEntry.value_en);
+      const statsEntry = data.find((d: ContentItem) => d.content_key === "highlight.stats");
+      if (statsEntry?.value_en) {
+        try { setHighlightStats(JSON.parse(statsEntry.value_en)); } catch { /* keep defaults */ }
+      }
+    } catch { /* ignore */ }
+  }, [storedPassword]);
+
   useEffect(() => {
     if (authenticated) {
       if (activeTab === "leads") fetchLeads();
@@ -414,9 +440,10 @@ export default function Admin() {
       else if (activeTab === "services") fetchServices();
       else if (activeTab === "menu-items") { fetchMenuItems(); fetchCategories(); }
       else if (activeTab === "branding") fetchBranding();
+      else if (activeTab === "highlight") fetchHighlight();
       else fetchFiles();
     }
-  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding]);
+  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding, fetchHighlight]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1008,6 +1035,7 @@ export default function Admin() {
             { key: "content" as TabKey, icon: FileText, label: "Site Content" },
             { key: "products" as TabKey, icon: Package, label: `Products (${products.length})` },
             { key: "services" as TabKey, icon: Briefcase, label: `Services (${services.length})` },
+            { key: "highlight" as TabKey, icon: Star, label: "Highlight Section" },
             { key: "menu-items" as TabKey, icon: List, label: `Product Catalog (${menuItems.length})` },
             { key: "images" as TabKey, icon: Image, label: "Files & Images" },
           ]).map((tab) => (
@@ -1394,6 +1422,7 @@ export default function Admin() {
                     about: "About Section",
                     brand: "Brand",
                     hero: "Hero Section",
+                    highlight: "Highlight Section",
                     contact: "Contact Section",
                     footer: "Footer",
                     nav: "Navigation",
@@ -1960,7 +1989,212 @@ export default function Admin() {
           </div>
         )}
 
-        {/* ─── Images Tab ─────── */}
+        {/* ─── Highlight Tab ─────── */}
+        {activeTab === "highlight" && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-foreground">Highlight Section</h2>
+              <Button variant="outline" size="sm" onClick={fetchHighlight} disabled={loading} className="rounded-xl">
+                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
+              </Button>
+            </div>
+
+            <div className="space-y-6">
+              {/* Text Content — managed via Site Content tab */}
+              <div className="bg-card border border-border rounded-2xl p-6">
+                <h3 className="font-semibold text-foreground mb-2">Text Content</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Edit the highlight section text (tagline, title, description, sub-description) in the <button className="text-accent underline" onClick={() => setActiveTab("content")}>Site Content</button> tab under the "Highlight" group.
+                </p>
+              </div>
+
+              {/* Image Upload */}
+              <div className="bg-card border border-border rounded-2xl p-6">
+                <h3 className="font-semibold text-foreground mb-4">Section Image</h3>
+                <p className="text-sm text-muted-foreground mb-4">Upload an image that appears on the right side of the highlight section.</p>
+                
+                {highlightImage && (
+                  <div className="mb-4 rounded-xl overflow-hidden border border-border max-w-md">
+                    <img src={highlightImage} alt="Highlight" className="w-full aspect-[4/3] object-cover" />
+                  </div>
+                )}
+
+                <div className="flex items-center gap-3">
+                  <Input
+                    value={highlightImage}
+                    onChange={(e) => setHighlightImage(e.target.value)}
+                    placeholder="Image URL or upload"
+                    className="rounded-xl flex-1 max-w-md"
+                  />
+                  <input
+                    ref={highlightImageRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        try {
+                          setUploading(true);
+                          const url = await uploadFileAndGetUrl(file, "images", "highlight", storedPassword);
+                          setHighlightImage(url);
+                          toast.success("Image uploaded");
+                        } catch (err: any) { toast.error(err.message); }
+                        finally { setUploading(false); }
+                      }
+                    }}
+                  />
+                  <Button variant="outline" size="sm" onClick={() => highlightImageRef.current?.click()} disabled={uploading} className="rounded-xl">
+                    {uploading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                  </Button>
+                </div>
+                <Button
+                  onClick={async () => {
+                    try {
+                      await apiCall("content", "POST", storedPassword, {
+                        content_key: "highlight.image",
+                        value_en: highlightImage,
+                        value_ar: highlightImage,
+                      });
+                      toast.success("Image saved!");
+                    } catch (err: any) { toast.error(err.message); }
+                  }}
+                  className="gradient-accent text-accent-foreground rounded-xl border-0 mt-3"
+                >
+                  <Save className="w-4 h-4 mr-2" />Save Image
+                </Button>
+              </div>
+
+              {/* Stats Cards */}
+              <div className="bg-card border border-border rounded-2xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold text-foreground">Stat Cards</h3>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setHighlightStats([...highlightStats, { icon: "Award", value_en: "", value_ar: "", label_en: "", label_ar: "" }])}
+                    className="rounded-xl"
+                    disabled={highlightStats.length >= 4}
+                  >
+                    <Plus className="w-4 h-4 mr-1" />Add Stat
+                  </Button>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">These appear as overlay cards on the image. Maximum 4 stats recommended.</p>
+
+                <div className="space-y-4">
+                  {highlightStats.map((stat, i) => (
+                    <div key={i} className="border border-border rounded-xl p-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold text-muted-foreground">Stat #{i + 1}</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setHighlightStats(highlightStats.filter((_, idx) => idx !== i))}
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl h-7 w-7 p-0"
+                          disabled={highlightStats.length <= 1}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                      <div className="grid md:grid-cols-3 gap-3">
+                        <div>
+                          <label className="text-xs font-medium text-muted-foreground mb-1 block">Icon</label>
+                          <select
+                            value={stat.icon}
+                            onChange={(e) => {
+                              const updated = [...highlightStats];
+                              updated[i] = { ...stat, icon: e.target.value };
+                              setHighlightStats(updated);
+                            }}
+                            className="w-full h-10 rounded-xl border border-input bg-background px-3 text-sm"
+                          >
+                            {["Award", "TrendingUp", "Users", "Clock"].map((ic) => (
+                              <option key={ic} value={ic}>{ic}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-muted-foreground mb-1 block">Value (EN)</label>
+                          <Input
+                            value={stat.value_en}
+                            onChange={(e) => {
+                              const updated = [...highlightStats];
+                              updated[i] = { ...stat, value_en: e.target.value };
+                              setHighlightStats(updated);
+                            }}
+                            placeholder="e.g. 100%"
+                            className="rounded-xl"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-muted-foreground mb-1 block">Value (AR)</label>
+                          <Input
+                            value={stat.value_ar}
+                            onChange={(e) => {
+                              const updated = [...highlightStats];
+                              updated[i] = { ...stat, value_ar: e.target.value };
+                              setHighlightStats(updated);
+                            }}
+                            placeholder="e.g. ١٠٠٪"
+                            className="rounded-xl bg-muted/50"
+                            dir="rtl"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid md:grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-xs font-medium text-muted-foreground mb-1 block">Label (EN)</label>
+                          <Input
+                            value={stat.label_en}
+                            onChange={(e) => {
+                              const updated = [...highlightStats];
+                              updated[i] = { ...stat, label_en: e.target.value };
+                              setHighlightStats(updated);
+                            }}
+                            placeholder="e.g. Quality Assurance"
+                            className="rounded-xl"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-muted-foreground mb-1 block">Label (AR)</label>
+                          <Input
+                            value={stat.label_ar}
+                            onChange={(e) => {
+                              const updated = [...highlightStats];
+                              updated[i] = { ...stat, label_ar: e.target.value };
+                              setHighlightStats(updated);
+                            }}
+                            placeholder="e.g. ضمان الجودة"
+                            className="rounded-xl bg-muted/50"
+                            dir="rtl"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <Button
+                  onClick={async () => {
+                    try {
+                      await apiCall("content", "POST", storedPassword, {
+                        content_key: "highlight.stats",
+                        value_en: JSON.stringify(highlightStats),
+                        value_ar: JSON.stringify(highlightStats),
+                      });
+                      toast.success("Stats saved!");
+                    } catch (err: any) { toast.error(err.message); }
+                  }}
+                  className="gradient-accent text-accent-foreground rounded-xl border-0 mt-4"
+                >
+                  <Save className="w-4 h-4 mr-2" />Save Stats
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+
         {activeTab === "images" && (
           <div>
             <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
