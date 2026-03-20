@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
 import {
   Flame, DoorOpen, Droplets, Wind, Truck, Shield, Zap, Factory,
-  HardHat, Gauge, Cog, Building, PenTool, Wrench, Settings, MessageSquare, FileText,
+  HardHat, Gauge, Cog, Building, PenTool, Wrench, Settings, MessageSquare, FileText, ArrowUpRight,
 } from "lucide-react";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -61,15 +61,15 @@ export default function ServicesSection() {
             {t("services.desc")}
           </p>
         </div>
+
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {services.map((service, i) => {
             const isCustomIcon = service.icon?.startsWith("http") || service.icon?.startsWith("/") || service.icon?.startsWith("data:");
             const Icon = !isCustomIcon ? (iconMap[service.icon] || Wrench) : null;
-            const num = String(i + 1).padStart(2, "0");
             return (
               <div
                 key={i}
-                className="scroll-reveal group relative h-[280px] rounded-2xl cursor-pointer"
+                className="scroll-reveal group relative rounded-2xl cursor-pointer overflow-hidden"
                 style={{ transitionDelay: `${i * 100}ms` }}
                 onClick={() => {
                   if (service.pdf_url) {
@@ -78,69 +78,59 @@ export default function ServicesSection() {
                   }
                 }}
               >
-                {/* Resting state */}
-                <div className="absolute inset-0 rounded-2xl border border-border bg-gradient-to-b from-card to-transparent p-7 flex flex-col justify-between transition-all duration-500 group-hover:opacity-0 group-hover:scale-95">
-                  <span className="absolute -top-2 -right-1 text-[7rem] font-black leading-none text-accent/[0.04] select-none pointer-events-none">
-                    {num}
-                  </span>
+                {/* Top accent strip */}
+                <div className="h-1 w-full bg-gradient-to-r from-accent via-accent/60 to-transparent transition-all duration-500 group-hover:from-accent group-hover:via-accent group-hover:to-accent/40" />
 
+                <div className="border border-t-0 border-border group-hover:border-accent/20 rounded-b-2xl p-6 pb-7 bg-card transition-colors duration-300">
+                  {/* Tag */}
                   {(isAr ? service.tag_ar : service.tag_en) && (
-                    <span className="absolute top-4 right-4 text-[10px] font-semibold uppercase tracking-wider bg-accent/10 text-accent px-2.5 py-1 rounded-full">
+                    <span className="inline-block text-[10px] font-semibold uppercase tracking-wider bg-accent/10 text-accent px-2.5 py-1 rounded-full mb-4">
                       {isAr ? service.tag_ar : service.tag_en}
                     </span>
                   )}
 
-                  {service.image_url ? (
-                    <div className="w-12 h-12 rounded-2xl overflow-hidden">
-                      <img src={service.image_url} alt="" className="w-full h-full object-cover" />
-                    </div>
-                  ) : (
-                    <div className="w-12 h-12 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center">
-                      {isCustomIcon ? (
-                        <img src={service.icon} alt="" className="w-6 h-6 object-contain" />
-                      ) : Icon ? (
-                        <Icon className="w-6 h-6 text-accent" />
-                      ) : null}
-                    </div>
-                  )}
-
-                  <div>
-                    <h3 className="text-lg font-bold text-foreground leading-snug mb-2">
-                      {isAr ? service.name_ar : service.name_en}
-                    </h3>
-                    <div className="w-10 h-[2px] rounded-full bg-gradient-to-r from-accent to-accent/0" />
-                  </div>
-                </div>
-
-                {/* Hover state */}
-                <div className="absolute inset-0 rounded-2xl border border-accent/25 bg-gradient-to-br from-accent/[0.08] via-accent/[0.04] to-card backdrop-blur-sm p-7 flex flex-col justify-between opacity-0 scale-105 transition-all duration-500 group-hover:opacity-100 group-hover:scale-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-accent/15 border border-accent/25 flex items-center justify-center shrink-0">
-                      {isCustomIcon ? (
-                        <img src={service.icon} alt="" className="w-5 h-5 object-contain" />
-                      ) : Icon ? (
-                        <Icon className="w-5 h-5 text-accent" />
-                      ) : null}
-                    </div>
-                    <h3 className="text-base font-bold text-foreground leading-snug">
-                      {isAr ? service.name_ar : service.name_en}
-                    </h3>
+                  {/* Icon */}
+                  <div className="mb-5">
+                    {service.image_url ? (
+                      <div className="w-14 h-14 rounded-xl overflow-hidden">
+                        <img src={service.image_url} alt="" className="w-full h-full object-cover" />
+                      </div>
+                    ) : (
+                      <div className="w-14 h-14 rounded-xl bg-accent/8 flex items-center justify-center transition-colors duration-300 group-hover:bg-accent/15">
+                        {isCustomIcon ? (
+                          <img src={service.icon} alt="" className="w-7 h-7 object-contain" />
+                        ) : Icon ? (
+                          <Icon className="w-7 h-7 text-accent" />
+                        ) : null}
+                      </div>
+                    )}
                   </div>
 
-                  <p className="text-muted-foreground text-[13px] leading-relaxed">
+                  {/* Title */}
+                  <h3 className="text-base font-bold text-foreground leading-snug mb-2">
+                    {isAr ? service.name_ar : service.name_en}
+                  </h3>
+
+                  {/* Description */}
+                  <p className="text-muted-foreground text-[13px] leading-relaxed mb-5">
                     {isAr ? service.description_ar : service.description_en}
                   </p>
 
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-mono font-bold tracking-widest text-accent/50">
-                      {num} / {String(services.length).padStart(2, "0")}
-                    </span>
-                    {service.pdf_url && (
-                      <span className="flex items-center gap-1 text-xs text-accent">
-                        <FileText className="w-3 h-3" />
-                        View PDF
+                  {/* Footer */}
+                  <div className="flex items-center justify-between pt-4 border-t border-border/60">
+                    {service.pdf_url ? (
+                      <span className="flex items-center gap-1.5 text-xs font-medium text-accent">
+                        <FileText className="w-3.5 h-3.5" />
+                        View Details
+                      </span>
+                    ) : (
+                      <span className="text-[11px] text-muted-foreground/50 font-medium">
+                        {String(i + 1).padStart(2, "0")}
                       </span>
                     )}
+                    <div className="w-7 h-7 rounded-full border border-border group-hover:border-accent/30 flex items-center justify-center transition-colors duration-300">
+                      <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-accent transition-colors duration-300" />
+                    </div>
                   </div>
                 </div>
               </div>

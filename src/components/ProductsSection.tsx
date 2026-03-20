@@ -3,6 +3,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { supabase } from "@/integrations/supabase/client";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
+import { ArrowUpRight } from "lucide-react";
 import {
   Flame, DoorOpen, Droplets, Wind, Truck, Shield, Zap, Factory,
   HardHat, Gauge, Cog, Building, PenTool, Wrench, Settings, MessageSquare,
@@ -71,6 +72,7 @@ export default function ProductsSection() {
             {t("products.desc")}
           </p>
         </div>
+
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {products.map((product, i) => {
             const isCustomIcon = product.icon?.startsWith("http") || product.icon?.startsWith("/") || product.icon?.startsWith("data:");
@@ -78,7 +80,7 @@ export default function ProductsSection() {
             return (
               <div
                 key={i}
-                className="scroll-reveal group rounded-2xl bg-transparent border border-border hover:border-accent/25 transition-all duration-300 cursor-pointer overflow-hidden"
+                className="scroll-reveal group rounded-2xl cursor-pointer overflow-hidden bg-card border border-border hover:border-accent/20 transition-all duration-300"
                 style={{ transitionDelay: `${i * 80}ms` }}
                 onClick={() => {
                   if (product.pdf_url) {
@@ -87,12 +89,13 @@ export default function ProductsSection() {
                   }
                 }}
               >
-                <div className="relative h-64 overflow-hidden">
+                {/* Image area */}
+                <div className="relative h-56 overflow-hidden">
                   {product.image_url ? (
                     <img
                       src={product.image_url}
                       alt={isAr ? product.name_ar : product.name_en}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       loading="lazy"
                     />
                   ) : (
@@ -104,26 +107,33 @@ export default function ProductsSection() {
                       ) : null}
                     </div>
                   )}
-                  <div className="absolute bottom-3 left-3 w-10 h-10 rounded-xl bg-accent/15 border border-accent/25 backdrop-blur-sm flex items-center justify-center">
-                    {isCustomIcon ? (
-                      <img src={product.icon} alt="" className="w-5 h-5 object-contain" />
-                    ) : Icon ? (
-                      <Icon className="w-5 h-5 text-accent" />
-                    ) : null}
-                  </div>
+
+                  {/* Gradient overlay at bottom */}
+                  <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-card to-transparent" />
+
+                  {/* Tag */}
                   {(isAr ? product.tag_ar : product.tag_en) && (
-                    <span className="absolute top-3 right-3 text-[10px] font-semibold uppercase tracking-wider bg-accent/90 text-accent-foreground px-2.5 py-1 rounded-full">
+                    <span className="absolute top-3 right-3 text-[10px] font-semibold uppercase tracking-wider bg-foreground/80 text-background px-2.5 py-1 rounded-full backdrop-blur-sm">
                       {isAr ? product.tag_ar : product.tag_en}
                     </span>
                   )}
                 </div>
-                <div className="p-5">
-                  <h3 className="text-lg font-bold text-foreground mb-1.5 line-clamp-1">
-                    {isAr ? product.name_ar : product.name_en}
-                  </h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed line-clamp-2">
-                    {isAr ? product.description_ar : product.description_en}
-                  </p>
+
+                {/* Content */}
+                <div className="p-5 -mt-4 relative">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1">
+                      <h3 className="text-base font-bold text-foreground mb-1.5 line-clamp-1">
+                        {isAr ? product.name_ar : product.name_en}
+                      </h3>
+                      <p className="text-muted-foreground text-[13px] leading-relaxed line-clamp-2">
+                        {isAr ? product.description_ar : product.description_en}
+                      </p>
+                    </div>
+                    <div className="w-9 h-9 rounded-full border border-border group-hover:border-accent/30 group-hover:bg-accent/10 flex items-center justify-center shrink-0 transition-all duration-300 mt-0.5">
+                      <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-accent transition-colors duration-300" />
+                    </div>
+                  </div>
                 </div>
               </div>
             );
