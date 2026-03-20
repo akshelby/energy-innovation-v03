@@ -261,7 +261,7 @@ export default function Header() {
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 md:px-6">
           {/* Logo */}
           <a href="#home" onClick={() => scrollToSection("#home")} className="flex items-center shrink-0 py-1.5">
-            <img src={logoUrl} alt={brandName} className="w-auto object-contain" style={{ height: `${Math.round(logoSize * 0.8)}px` }} />
+            {brandReady && <img src={logoUrl} alt={brandName} className="w-auto object-contain" style={{ height: `${Math.round(logoSize * 0.8)}px` }} />}
           </a>
 
           {/* Desktop Nav - centered */}
