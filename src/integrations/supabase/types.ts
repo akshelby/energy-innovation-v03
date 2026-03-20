@@ -28,6 +28,7 @@ export type Database = {
           requirements_ar: string
           requirements_en: string
           sort_order: number
+          status: string
           title_ar: string
           title_en: string
           type_ar: string
@@ -47,6 +48,7 @@ export type Database = {
           requirements_ar?: string
           requirements_en?: string
           sort_order?: number
+          status?: string
           title_ar?: string
           title_en?: string
           type_ar?: string
@@ -66,6 +68,7 @@ export type Database = {
           requirements_ar?: string
           requirements_en?: string
           sort_order?: number
+          status?: string
           title_ar?: string
           title_en?: string
           type_ar?: string

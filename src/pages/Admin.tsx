@@ -304,12 +304,13 @@ export default function Admin() {
     requirements_ar: string;
     is_active: boolean;
     sort_order: number;
+    status: string;
   }
   const emptyCareer: CareerItem = {
     title_en: "", title_ar: "", department_en: "", department_ar: "",
     location_en: "", location_ar: "", type_en: "Full-time", type_ar: "دوام كامل",
     description_en: "", description_ar: "", requirements_en: "", requirements_ar: "",
-    is_active: true, sort_order: 0,
+    is_active: true, sort_order: 0, status: "open",
   };
   const [careersList, setCareersList] = useState<(CareerItem & { id: string })[]>([]);
   const [editingCareer, setEditingCareer] = useState<CareerItem | null>(null);
@@ -2886,6 +2887,24 @@ export default function Admin() {
                       />
                     </div>
                     <div className="flex items-center gap-3 pt-5">
+                      <label className="text-xs font-medium text-muted-foreground">Status</label>
+                      <div className="flex gap-1.5">
+                        {["open", "closed"].map((s) => (
+                          <button
+                            key={s}
+                            type="button"
+                            onClick={() => setEditingCareer({ ...editingCareer, status: s })}
+                            className={`text-xs px-3 py-1.5 rounded-full font-semibold transition-colors ${editingCareer.status === s
+                              ? s === "open" ? "bg-emerald-500/15 text-emerald-600 border border-emerald-500/30" : "bg-destructive/10 text-destructive border border-destructive/30"
+                              : "bg-muted text-muted-foreground border border-border hover:bg-accent"
+                            }`}
+                          >
+                            {s === "open" ? "Open" : "Closed"}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 pt-3">
                       <label className="text-xs font-medium text-muted-foreground">Active</label>
                       <button
                         onClick={() => setEditingCareer({ ...editingCareer, is_active: !editingCareer.is_active })}
@@ -2920,7 +2939,10 @@ export default function Admin() {
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-semibold text-foreground truncate">{career.title_en}</span>
-                          {!career.is_active && <span className="text-[10px] bg-destructive/10 text-destructive px-2 py-0.5 rounded-full font-medium">Inactive</span>}
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${career.status === "open" ? "bg-emerald-500/15 text-emerald-600" : "bg-destructive/10 text-destructive"}`}>
+                            {career.status === "open" ? "Open" : "Closed"}
+                          </span>
+                          {!career.is_active && <span className="text-[10px] bg-muted text-muted-foreground px-2 py-0.5 rounded-full font-medium">Inactive</span>}
                         </div>
                         <div className="flex flex-wrap gap-x-3 text-xs text-muted-foreground">
                           <span>{career.department_en}</span>

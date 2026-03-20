@@ -28,6 +28,7 @@ interface CareerListing {
   requirements_en: string;
   requirements_ar: string;
   is_active: boolean;
+  status: string;
   created_at: string;
 }
 
@@ -209,6 +210,9 @@ export default function Careers() {
                         <Clock className="w-3.5 h-3.5" />
                         {isAr ? selected.type_ar : selected.type_en}
                       </span>
+                      <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${selected.status === "open" ? "bg-emerald-500/15 text-emerald-600" : "bg-destructive/10 text-destructive"}`}>
+                        {selected.status === "open" ? (isAr ? "مفتوح" : "Open") : (isAr ? "مغلق" : "Closed")}
+                      </span>
                     </div>
                   </div>
                   <Button
@@ -287,6 +291,9 @@ export default function Careers() {
                         <span className="inline-flex items-center gap-1.5 bg-secondary/60 px-2.5 py-0.5 rounded-full">
                           <Clock className="w-3.5 h-3.5" />
                           {isAr ? career.type_ar : career.type_en}
+                        </span>
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${career.status === "open" ? "bg-emerald-500/15 text-emerald-600" : "bg-destructive/10 text-destructive"}`}>
+                          {career.status === "open" ? (isAr ? "مفتوح" : "Open") : (isAr ? "مغلق" : "Closed")}
                         </span>
                       </div>
                     </div>
