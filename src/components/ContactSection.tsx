@@ -156,7 +156,7 @@ export default function ContactSection() {
           )}
 
           {/* Contact Form */}
-          <form onSubmit={handleSubmit} className={`scroll-reveal space-y-5 bg-card rounded-2xl border border-border p-6 md:p-8 shadow-lg ${cards.length > 0 ? "lg:col-span-2" : "lg:col-span-3"}`}>
+          <form onSubmit={handleSubmit} className={`space-y-5 bg-card rounded-2xl border border-border p-6 md:p-8 shadow-lg ${cards.length > 0 ? "lg:col-span-2" : "lg:col-span-3"}`}>
             <div className="grid sm:grid-cols-2 gap-5">
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">{t("contact.name")}</label>
