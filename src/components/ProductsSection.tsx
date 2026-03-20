@@ -121,7 +121,7 @@ export default function ProductsSection() {
                 </div>
 
                 {/* Content */}
-                <div className="p-5 -mt-4 relative">
+                <div className="p-5 -mt-4 relative flex-1 flex flex-col justify-end">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">
                       <h3 className="text-base font-bold text-foreground mb-1.5 line-clamp-1">
