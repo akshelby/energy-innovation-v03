@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
+import { supabase } from "@/integrations/supabase/client";
 import PhoneInput from "@/components/PhoneInput";
 
 const TRANSLATE_URL = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/translate`;
