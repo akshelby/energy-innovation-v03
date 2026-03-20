@@ -81,7 +81,7 @@ export default function ProductsSection() {
             return (
               <div
                 key={i}
-                className="scroll-reveal group rounded-2xl cursor-pointer overflow-hidden bg-card border border-border hover:border-accent/20 transition-all duration-300"
+                className="scroll-reveal group rounded-2xl cursor-pointer overflow-hidden bg-card border border-border hover:border-accent/20 transition-all duration-300 h-full flex flex-col"
                 style={{ transitionDelay: `${i * 80}ms` }}
                 onClick={() => {
                   if (product.pdf_url) {
@@ -121,7 +121,7 @@ export default function ProductsSection() {
                 </div>
 
                 {/* Content */}
-                <div className="p-5 -mt-4 relative">
+                <div className="p-5 -mt-4 relative flex-1 flex flex-col justify-end">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">
                       <h3 className="text-base font-bold text-foreground mb-1.5 line-clamp-1">
