@@ -419,6 +419,18 @@ export default function Admin() {
     } catch { setBrandLogoUrl(""); }
   }, [storedPassword]);
 
+  const fetchHighlight = useCallback(async () => {
+    try {
+      const data = await apiCall("content", "GET", storedPassword);
+      const imgEntry = data.find((d: ContentItem) => d.content_key === "highlight.image");
+      if (imgEntry) setHighlightImage(imgEntry.value_en);
+      const statsEntry = data.find((d: ContentItem) => d.content_key === "highlight.stats");
+      if (statsEntry?.value_en) {
+        try { setHighlightStats(JSON.parse(statsEntry.value_en)); } catch { /* keep defaults */ }
+      }
+    } catch { /* ignore */ }
+  }, [storedPassword]);
+
   useEffect(() => {
     if (authenticated) {
       if (activeTab === "leads") fetchLeads();
@@ -427,9 +439,10 @@ export default function Admin() {
       else if (activeTab === "services") fetchServices();
       else if (activeTab === "menu-items") { fetchMenuItems(); fetchCategories(); }
       else if (activeTab === "branding") fetchBranding();
+      else if (activeTab === "highlight") fetchHighlight();
       else fetchFiles();
     }
-  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding]);
+  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding, fetchHighlight]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
