@@ -63,7 +63,7 @@ export default function ServicesSection() {
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <StickyCardStack baseTop={80} offsetIncrement={20} scrollSpace="35vh" maxWidthClass="max-w-md">
           {services.map((service, i) => {
             const isCustomIcon = service.icon?.startsWith("http") || service.icon?.startsWith("/") || service.icon?.startsWith("data:");
             const Icon = !isCustomIcon ? (iconMap[service.icon] || Wrench) : null;
@@ -137,7 +137,7 @@ export default function ServicesSection() {
               </div>
             );
           })}
-        </div>
+        </StickyCardStack>
       </div>
       <PdfViewerDialog open={pdfOpen} onOpenChange={setPdfOpen} src={pdfSrc} />
     </section>
