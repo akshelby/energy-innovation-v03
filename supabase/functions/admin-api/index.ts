@@ -19,10 +19,37 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Verify admin password
+  // Verify admin password OR admin email
   const password = req.headers.get("x-admin-password");
+  const adminEmail = req.headers.get("x-admin-email");
   const adminPassword = Deno.env.get("ADMIN_PASSWORD");
-  if (!password || password !== adminPassword) {
+
+  const supabaseAuth = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+  );
+
+  let isAuthorized = false;
+
+  // Check password auth
+  if (password && password === adminPassword) {
+    isAuthorized = true;
+  }
+
+  // Check email auth
+  if (!isAuthorized && adminEmail) {
+    const { data: emailEntry } = await supabaseAuth
+      .from("admin_emails")
+      .select("id")
+      .eq("email", adminEmail.toLowerCase())
+      .eq("is_active", true)
+      .maybeSingle();
+    if (emailEntry) {
+      isAuthorized = true;
+    }
+  }
+
+  if (!isAuthorized) {
     return json({ error: "Unauthorized" }, 401);
   }
 
