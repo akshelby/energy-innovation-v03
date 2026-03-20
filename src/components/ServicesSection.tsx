@@ -81,7 +81,7 @@ export default function ServicesSection() {
                 {/* Top accent strip */}
                 <div className="h-1 w-full bg-gradient-to-r from-accent via-accent/60 to-transparent transition-all duration-500 group-hover:from-accent group-hover:via-accent group-hover:to-accent/40" />
 
-                <div className="border border-t-0 border-border group-hover:border-accent/20 rounded-b-2xl p-6 pb-7 bg-card transition-colors duration-300">
+                <div className="border border-t-0 border-border group-hover:border-accent/20 rounded-b-2xl p-6 pb-7 bg-card transition-colors duration-300 flex flex-col h-full">
                   {/* Tag */}
                   {(isAr ? service.tag_ar : service.tag_en) && (
                     <span className="inline-block text-[10px] font-semibold uppercase tracking-wider bg-accent/10 text-accent px-2.5 py-1 rounded-full mb-4">
@@ -112,7 +112,7 @@ export default function ServicesSection() {
                   </h3>
 
                   {/* Description */}
-                  <p className="text-muted-foreground text-[13px] leading-relaxed mb-5">
+                  <p className="text-muted-foreground text-[13px] leading-relaxed mb-5 flex-1">
                     {isAr ? service.description_ar : service.description_en}
                   </p>
 
