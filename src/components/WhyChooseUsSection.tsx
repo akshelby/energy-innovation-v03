@@ -54,7 +54,7 @@ export default function WhyChooseUsSection() {
                   </h3>
 
                   {/* Description */}
-                  <p className="text-primary-foreground/60 text-[13px] leading-relaxed mb-5">
+                  <p className="text-primary-foreground/60 text-[13px] leading-relaxed mb-5 flex-1">
                     {t(reason.descKey)}
                   </p>
 
