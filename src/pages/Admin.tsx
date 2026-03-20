@@ -452,15 +452,10 @@ export default function Admin() {
 
   const fetchContactAddresses = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE}?resource=contact_addresses`, {
-        headers: { "x-admin-password": storedPassword },
-      });
-      const data = await res.json();
-      if (res.ok && Array.isArray(data)) {
-        setContactAddresses(data.sort((a: any, b: any) => a.sort_order - b.sort_order));
-      }
+      const { data } = await supabase.from("contact_addresses").select("*").order("sort_order");
+      if (data) setContactAddresses(data);
     } catch { /* ignore */ }
-  }, [storedPassword]);
+  }, []);
 
   useEffect(() => {
     if (authenticated) {
