@@ -1076,6 +1076,27 @@ export default function Admin() {
                 <div className="mt-6 pt-4 border-t border-border">
                   <h4 className="text-sm font-medium text-foreground mb-2">Logo Size</h4>
                   <p className="text-xs text-muted-foreground mb-3">Adjust the logo height across the website ({logoSize}px)</p>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {[
+                      { label: "Default (56px)", value: 56 },
+                      { label: "Medium (80px)", value: 80 },
+                      { label: "Large (100px)", value: 100 },
+                      { label: "Extra Large (120px)", value: 120 },
+                    ].map((preset) => (
+                      <button
+                        key={preset.value}
+                        type="button"
+                        onClick={() => setLogoSize(preset.value)}
+                        className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
+                          logoSize === preset.value
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-secondary text-foreground border-border hover:bg-accent"
+                        }`}
+                      >
+                        {preset.label}
+                      </button>
+                    ))}
+                  </div>
                   <div className="flex items-center gap-4">
                     <span className="text-xs text-muted-foreground w-8">32</span>
                     <input
