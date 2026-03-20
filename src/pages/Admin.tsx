@@ -192,7 +192,7 @@ const emptyService: ServiceItem = {
   tag_en: "", tag_ar: "", image_url: null, pdf_url: null, icon: "Wrench", sort_order: 0,
 };
 
-type TabKey = "leads" | "content" | "products" | "services" | "menu-items" | "images" | "branding" | "highlight";
+type TabKey = "leads" | "content" | "products" | "services" | "menu-items" | "images" | "branding" | "highlight" | "careers";
 
 const emptyMenuChild: MenuChildItem = {
   category_key: "cat.fire", parent_id: null, name_en: "", name_ar: "", pdf_url: null, sort_order: 0, is_active: true,
