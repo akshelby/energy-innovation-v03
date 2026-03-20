@@ -421,7 +421,7 @@ export default function Admin() {
       if (selectedFolder.folder === "hero") {
         const stemMap = new Map<string, StorageFile>();
         for (const file of fileList) {
-          const stem = file.name.replace(/\.(png|jpe?g|webp|avif|svg)$/i, "");
+          const stem = file.name.replace(/\.[^.]+$/, "");
           const existing = stemMap.get(stem);
           if (!existing || file.name.endsWith(".webp")) {
             stemMap.set(stem, file);
