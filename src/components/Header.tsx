@@ -137,7 +137,6 @@ export default function Header() {
     { label: t("nav.products"), href: "#products", hasDropdown: true },
     { label: t("nav.services"), href: "#services" },
     { label: language === "ar" ? "الوظائف" : "Careers", href: "/careers", isRoute: true },
-    { label: t("nav.contact"), href: "#contact" },
   ];
 
   const scrollToSection = (href: string) => {
