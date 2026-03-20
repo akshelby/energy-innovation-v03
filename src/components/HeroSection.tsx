@@ -14,7 +14,7 @@ import hero4Local from "@/assets/hero-4.webp";
 import hero5Local from "@/assets/hero-5.webp";
 
 const localImages = [hero1Local, hero2Local, hero3Local, hero4Local, hero5Local];
-const imageFilePattern = /\.(png|jpe?g|webp|avif|svg|gif|bmp|tiff?|ico|heic|heif)$/i;
+const imageFilePattern = /\.\w+$/i;
 
 const buildHeroImageUrl = (fileName: string, version?: string) => {
   const encodedPath = `hero/${fileName}`
