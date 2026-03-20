@@ -31,6 +31,10 @@ interface CategoryItem {
 export default function Header() {
   const { t, language, setLanguage, isRTL } = useLanguage();
   const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { logoUrl, brandName, logoSize, ready: brandReady } = useBranding();
+  const { theme, toggleTheme } = useTheme();
   const { logoUrl, brandName, logoSize, ready: brandReady } = useBranding();
   const [scrolled, setScrolled] = useState(false);
   const [pastHero, setPastHero] = useState(false);
