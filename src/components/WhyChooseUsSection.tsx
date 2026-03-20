@@ -40,8 +40,8 @@ export default function WhyChooseUsSection() {
                 <div className="pl-6 pr-6 py-7 bg-primary-foreground/[0.05] border border-primary-foreground/[0.08] border-l-0 rounded-r-2xl transition-colors duration-300 group-hover:bg-primary-foreground/[0.08] group-hover:border-primary-foreground/[0.12] flex flex-col h-full">
                   {/* Number + Icon row */}
                   <div className="flex items-center justify-between mb-5">
-                    <div className="w-12 h-12 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center transition-colors duration-300 group-hover:bg-accent/20 group-hover:border-accent/30">
-                      <Icon className="w-6 h-6 text-accent" />
+                    <div className="w-12 h-12 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center transition-colors duration-300 group-hover:bg-destructive/10 group-hover:border-destructive/20">
+                      <Icon className="w-6 h-6 text-accent transition-colors duration-300 group-hover:text-destructive" />
                     </div>
                     <span className="text-3xl font-black text-primary-foreground/[0.06] select-none">
                       {reason.num}
