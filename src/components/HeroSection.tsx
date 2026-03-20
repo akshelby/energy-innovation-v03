@@ -93,7 +93,7 @@ export default function HeroSection() {
         // If admin has set active images, filter by stem match
         if (activeList.length > 0) {
           const activeStems = new Set(
-            activeList.map((name) => name.replace(/\.(png|jpe?g|webp|avif|svg)$/i, ""))
+            activeList.map((name) => name.replace(/\.[^.]+$/, ""))
           );
           deduped = deduped.filter((file) => {
             const stem = file.name.replace(/\.(png|jpe?g|webp|avif|svg)$/i, "");
