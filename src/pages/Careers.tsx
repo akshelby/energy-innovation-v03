@@ -215,15 +215,24 @@ export default function Careers() {
                       </span>
                     </div>
                   </div>
-                  <Button
-                    onClick={() => {
-                      window.location.href = "mailto:info@energyinnvo.com?subject=" +
-                        encodeURIComponent(`Application: ${selected.title_en}`);
-                    }}
-                    className="gradient-accent text-accent-foreground rounded-full px-6 font-semibold border-0 shrink-0"
-                  >
-                    {isAr ? "قدم الآن" : "Apply Now"}
-                  </Button>
+                  {selected.status === "closed" ? (
+                    <Button
+                      disabled
+                      className="rounded-full px-6 font-semibold bg-muted text-muted-foreground cursor-not-allowed border-0 shrink-0"
+                    >
+                      {isAr ? "مغلق" : "Position Closed"}
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => {
+                        window.location.href = "mailto:info@energyinnvo.com?subject=" +
+                          encodeURIComponent(`Application: ${selected.title_en}`);
+                      }}
+                      className="gradient-accent text-accent-foreground rounded-full px-6 font-semibold border-0 shrink-0"
+                    >
+                      {isAr ? "قدم الآن" : "Apply Now"}
+                    </Button>
+                  )}
                 </div>
                 <div className="space-y-8">
                   {(isAr ? selected.description_ar : selected.description_en) && (
