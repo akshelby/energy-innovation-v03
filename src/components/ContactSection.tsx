@@ -134,7 +134,7 @@ export default function ContactSection() {
         <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
           {/* Contact Info Cards */}
           {cards.length > 0 && (
-            <div className="space-y-4 md:space-y-5 scroll-reveal">
+            <div className="space-y-4 md:space-y-5">
               {cards.map(({ icon: Icon, label, value, href }, idx) => (
                 <div key={idx} className="bg-card rounded-2xl border border-border p-5 md:p-6 shadow-lg flex items-start gap-4">
                   <div className="shrink-0 w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center">
