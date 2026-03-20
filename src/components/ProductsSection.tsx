@@ -130,8 +130,8 @@ export default function ProductsSection() {
                         {isAr ? product.description_ar : product.description_en}
                       </p>
                     </div>
-                    <div className="w-9 h-9 rounded-full border border-border group-hover:border-accent/30 group-hover:bg-accent/10 flex items-center justify-center shrink-0 transition-all duration-300 mt-0.5">
-                      <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-accent transition-colors duration-300" />
+                    <div className="w-9 h-9 rounded-full border border-border group-hover:border-destructive/30 group-hover:bg-destructive/10 flex items-center justify-center shrink-0 transition-all duration-300 mt-0.5">
+                      <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-destructive transition-colors duration-300" />
                     </div>
                   </div>
                 </div>
