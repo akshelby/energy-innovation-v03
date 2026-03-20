@@ -1430,7 +1430,201 @@ export default function Admin() {
               </div>
             </div>
 
-            {content.length === 0 ? (
+            {/* Contact Card Visibility Toggles */}
+            <div className="bg-card border border-border rounded-2xl p-6 mb-6">
+              <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Phone className="w-4 h-4 text-accent" />
+                Contact Card Visibility
+              </h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {[
+                  { key: "contact_phone_visible", label: "Phone Card", icon: Phone },
+                  { key: "contact_email_visible", label: "Email Card", icon: Mail },
+                  { key: "contact_address_visible", label: "Address Cards", icon: Globe },
+                ].map(({ key, label, icon: Ico }) => (
+                  <label
+                    key={key}
+                    className={`flex items-center gap-2.5 p-3 rounded-xl border cursor-pointer transition-colors ${
+                      contactVisibility[key]
+                        ? "bg-accent/10 border-accent/30"
+                        : "bg-muted/50 border-border"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={contactVisibility[key]}
+                      onChange={async () => {
+                        const newVal = !contactVisibility[key];
+                        setContactVisibility((prev) => ({ ...prev, [key]: newVal }));
+                        try {
+                          await apiCall("content", "POST", storedPassword, {
+                            content_key: key,
+                            value_en: String(newVal),
+                            value_ar: String(newVal),
+                          });
+                          toast.success(`${label} ${newVal ? "shown" : "hidden"}`);
+                        } catch (err: any) { toast.error(err.message); }
+                      }}
+                      className="w-4 h-4 accent-[hsl(var(--accent))] rounded"
+                    />
+                    <Ico className="w-4 h-4" />
+                    <span className={`text-sm font-medium ${contactVisibility[key] ? "text-foreground" : "text-muted-foreground line-through"}`}>
+                      {label}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Contact Addresses Management */}
+            <div className="bg-card border border-border rounded-2xl p-6 mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-accent" />
+                  Addresses
+                </h3>
+                <Button
+                  size="sm"
+                  onClick={() => setEditingAddress({ label_en: "", label_ar: "", is_active: true, sort_order: contactAddresses.length })}
+                  className="gradient-accent text-accent-foreground rounded-xl border-0"
+                >
+                  <Plus className="w-4 h-4 mr-1" />Add Address
+                </Button>
+              </div>
+
+              {editingAddress && (
+                <div className="bg-secondary/50 border border-border rounded-xl p-4 mb-4 space-y-3">
+                  <div className="grid md:grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">English</label>
+                      <Input
+                        value={editingAddress.label_en}
+                        onChange={(e) => setEditingAddress({ ...editingAddress, label_en: e.target.value })}
+                        placeholder="e.g. UAE & India"
+                        className="rounded-xl"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Arabic</label>
+                      <Input
+                        value={editingAddress.label_ar}
+                        onChange={(e) => setEditingAddress({ ...editingAddress, label_ar: e.target.value })}
+                        placeholder="e.g. الإمارات والهند"
+                        className="rounded-xl"
+                        dir="rtl"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Button
+                      size="sm"
+                      disabled={translating}
+                      variant="outline"
+                      onClick={async () => {
+                        if (!editingAddress.label_en) return;
+                        try {
+                          setTranslating(true);
+                          const result = await translateTexts({ label_en: editingAddress.label_en });
+                          if (result.label_en) setEditingAddress({ ...editingAddress, label_ar: result.label_en });
+                          toast.success("Translated");
+                        } catch (e: any) { toast.error(e.message); }
+                        finally { setTranslating(false); }
+                      }}
+                      className="rounded-xl"
+                    >
+                      <Languages className="w-4 h-4 mr-1" />{translating ? "..." : "Translate"}
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={async () => {
+                        try {
+                          if (editingAddress.id) {
+                            await supabase.from("contact_addresses").update({
+                              label_en: editingAddress.label_en,
+                              label_ar: editingAddress.label_ar,
+                              is_active: editingAddress.is_active,
+                              sort_order: editingAddress.sort_order,
+                            }).eq("id", editingAddress.id);
+                          } else {
+                            await supabase.from("contact_addresses").insert({
+                              label_en: editingAddress.label_en,
+                              label_ar: editingAddress.label_ar,
+                              is_active: editingAddress.is_active,
+                              sort_order: editingAddress.sort_order,
+                            });
+                          }
+                          toast.success("Address saved");
+                          setEditingAddress(null);
+                          fetchContactAddresses();
+                        } catch (e: any) { toast.error(e.message); }
+                      }}
+                      className="gradient-accent text-accent-foreground rounded-xl border-0"
+                    >
+                      <Save className="w-4 h-4 mr-1" />Save
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => setEditingAddress(null)} className="rounded-xl">Cancel</Button>
+                  </div>
+                </div>
+              )}
+
+              {contactAddresses.length === 0 && !editingAddress ? (
+                <p className="text-sm text-muted-foreground text-center py-4">No addresses yet. Add one above.</p>
+              ) : (
+                <div className="space-y-2">
+                  {contactAddresses.map((addr) => (
+                    <div key={addr.id} className="flex items-center justify-between p-3 rounded-xl border border-border bg-secondary/30">
+                      <div className="flex items-center gap-3">
+                        <Globe className="w-4 h-4 text-accent shrink-0" />
+                        <div>
+                          <p className="text-sm font-medium text-foreground">{addr.label_en}</p>
+                          <p className="text-xs text-muted-foreground" dir="rtl">{addr.label_ar}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <label className="flex items-center gap-1.5 cursor-pointer">
+                          <span className="text-xs text-muted-foreground">{addr.is_active ? "Active" : "Inactive"}</span>
+                          <input
+                            type="checkbox"
+                            checked={addr.is_active}
+                            onChange={async () => {
+                              try {
+                                await supabase.from("contact_addresses").update({ is_active: !addr.is_active }).eq("id", addr.id);
+                                fetchContactAddresses();
+                                toast.success(addr.is_active ? "Address hidden" : "Address shown");
+                              } catch (e: any) { toast.error(e.message); }
+                            }}
+                            className="w-4 h-4 accent-[hsl(var(--accent))]"
+                          />
+                        </label>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setEditingAddress(addr)}
+                          className="rounded-lg h-8 px-2"
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={async () => {
+                            try {
+                              await supabase.from("contact_addresses").delete().eq("id", addr.id);
+                              fetchContactAddresses();
+                              toast.success("Address deleted");
+                            } catch (e: any) { toast.error(e.message); }
+                          }}
+                          className="rounded-lg h-8 px-2 text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
               <div className="text-center py-16 text-muted-foreground">
                 <FileText className="w-12 h-12 mx-auto mb-4 opacity-30" /><p>No content yet. Click "Seed Defaults" to populate.</p>
               </div>
