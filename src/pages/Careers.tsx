@@ -215,24 +215,23 @@ export default function Careers() {
                       </span>
                     </div>
                   </div>
-                  {selected.status === "closed" ? (
-                    <Button
-                      disabled
-                      className="rounded-full px-6 font-semibold bg-muted text-muted-foreground cursor-not-allowed border-0 shrink-0"
-                    >
-                      {isAr ? "مغلق" : "Position Closed"}
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={() => {
-                        window.location.href = "mailto:info@energyinnvo.com?subject=" +
-                          encodeURIComponent(`Application: ${selected.title_en}`);
-                      }}
-                      className="gradient-accent text-accent-foreground rounded-full px-6 font-semibold border-0 shrink-0"
-                    >
-                      {isAr ? "قدم الآن" : "Apply Now"}
-                    </Button>
-                  )}
+                  <Button
+                    disabled={selected.status === "closed"}
+                    onClick={() => {
+                      if (selected.status === "closed") return;
+                      window.location.href = "mailto:info@energyinnvo.com?subject=" +
+                        encodeURIComponent(`Application: ${selected.title_en}`);
+                    }}
+                    className={`rounded-full px-6 font-semibold border-0 shrink-0 ${
+                      selected.status === "closed"
+                        ? "!bg-gray-300 !text-gray-500 !cursor-not-allowed !opacity-100 pointer-events-none"
+                        : "gradient-accent text-accent-foreground"
+                    }`}
+                  >
+                    {selected.status === "closed"
+                      ? (isAr ? "الوظيفة مغلقة" : "Position Closed")
+                      : (isAr ? "قدم الآن" : "Apply Now")}
+                  </Button>
                 </div>
                 <div className="space-y-8">
                   {(isAr ? selected.description_ar : selected.description_en) && (
