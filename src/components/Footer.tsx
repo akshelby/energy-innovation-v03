@@ -4,7 +4,7 @@ import { useBranding } from "@/contexts/BrandingContext";
 
 export default function Footer() {
   const { t } = useLanguage();
-  const { logoUrl, brandName, logoSize, logoReady } = useBranding();
+  const { logoUrl, brandName, logoSize } = useBranding();
 
   const quickLinks = [
     { label: t("nav.home"), href: "#home" },
@@ -33,7 +33,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <img src={logoUrl} alt={brandName} className={`w-auto object-contain transition-opacity duration-300 ${logoReady ? 'opacity-100' : 'opacity-0'}`} style={{ height: `${Math.round(logoSize * 0.7)}px` }} />
+              <img src={logoUrl} alt={brandName} className="w-auto object-contain" style={{ height: `${Math.round(logoSize * 0.7)}px` }} />
             </div>
             <p className="text-primary-foreground/60 text-sm leading-relaxed">
               {t("footer.desc")}
