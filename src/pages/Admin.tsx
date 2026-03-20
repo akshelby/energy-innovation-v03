@@ -468,7 +468,7 @@ export default function Admin() {
       else if (activeTab === "highlight") fetchHighlight();
       else fetchFiles();
     }
-  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding, fetchHighlight]);
+  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchContactAddresses, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding, fetchHighlight]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
