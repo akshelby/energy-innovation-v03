@@ -933,7 +933,7 @@ export default function Admin() {
 
       // For hero folder, also delete duplicate variants (jpg/webp/png with same stem)
       if (folder === "hero") {
-        const stem = fileName.replace(/\.(png|jpe?g|webp|avif|svg)$/i, "");
+        const stem = fileName.replace(/\.[^.]+$/, "");
         // Fetch full file list to find all variants
         const allFiles = await apiCall(
           `files?bucket=${selectedFolder.bucket}&folder=${folder}`,
