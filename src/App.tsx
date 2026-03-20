@@ -12,6 +12,7 @@ import NotFound from "./pages/NotFound.tsx";
 import CookieConsent from "@/components/CookieConsent";
 
 const Admin = lazy(() => import("./pages/Admin.tsx"));
+const Careers = lazy(() => import("./pages/Careers.tsx"));
 
 const queryClient = new QueryClient();
 
