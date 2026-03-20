@@ -265,6 +265,34 @@ Deno.serve(async (req) => {
       return json({ success: true, url: urlData.publicUrl });
     }
 
+    // CAREERS CRUD
+    if (path === "careers") {
+      if (method === "GET") {
+        const { data, error } = await supabase
+          .from("careers")
+          .select("*")
+          .order("sort_order", { ascending: true });
+        if (error) throw error;
+        return json(data);
+      }
+      if (method === "POST") {
+        const body = await req.json();
+        const { data, error } = await supabase
+          .from("careers")
+          .upsert(body, { onConflict: "id" })
+          .select()
+          .single();
+        if (error) throw error;
+        return json(data);
+      }
+      if (method === "DELETE") {
+        const { id } = await req.json();
+        const { error } = await supabase.from("careers").delete().eq("id", id);
+        if (error) throw error;
+        return json({ success: true });
+      }
+    }
+
     return json({ error: "Not found" }, 404);
   } catch (err) {
     return json({ error: err.message }, 500);

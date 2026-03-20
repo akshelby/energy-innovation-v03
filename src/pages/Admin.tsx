@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import {
   Lock, Trash2, Save, RefreshCw, Database, FileText, MessageSquare,
   LogOut, Image, Upload, Plus, Package, Briefcase, GripVertical, List, Palette, Languages, Sun, Moon,
-  Star, Award, TrendingUp, Users, Clock, Globe, Phone, Mail,
+  Star, Award, TrendingUp, Users, Clock, Globe, Phone, Mail, UserPlus,
 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
@@ -192,7 +192,7 @@ const emptyService: ServiceItem = {
   tag_en: "", tag_ar: "", image_url: null, pdf_url: null, icon: "Wrench", sort_order: 0,
 };
 
-type TabKey = "leads" | "content" | "products" | "services" | "menu-items" | "images" | "branding" | "highlight";
+type TabKey = "leads" | "content" | "products" | "services" | "menu-items" | "images" | "branding" | "highlight" | "careers";
 
 const emptyMenuChild: MenuChildItem = {
   category_key: "cat.fire", parent_id: null, name_en: "", name_ar: "", pdf_url: null, sort_order: 0, is_active: true,
@@ -285,6 +285,40 @@ export default function Admin() {
   const productPdfRef = useRef<HTMLInputElement>(null);
   const serviceImageRef = useRef<HTMLInputElement>(null);
   const servicePdfRef = useRef<HTMLInputElement>(null);
+
+  // Careers state
+  interface CareerItem {
+    id?: string;
+    title_en: string;
+    title_ar: string;
+    department_en: string;
+    department_ar: string;
+    location_en: string;
+    location_ar: string;
+    type_en: string;
+    type_ar: string;
+    description_en: string;
+    description_ar: string;
+    requirements_en: string;
+    requirements_ar: string;
+    is_active: boolean;
+    sort_order: number;
+  }
+  const emptyCareer: CareerItem = {
+    title_en: "", title_ar: "", department_en: "", department_ar: "",
+    location_en: "", location_ar: "", type_en: "Full-time", type_ar: "دوام كامل",
+    description_en: "", description_ar: "", requirements_en: "", requirements_ar: "",
+    is_active: true, sort_order: 0,
+  };
+  const [careersList, setCareersList] = useState<(CareerItem & { id: string })[]>([]);
+  const [editingCareer, setEditingCareer] = useState<CareerItem | null>(null);
+  const careerEditorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (editingCareer && careerEditorRef.current) {
+      setTimeout(() => careerEditorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 100);
+    }
+  }, [editingCareer]);
 
   const storedPassword = authenticated ? password : "";
 
@@ -457,6 +491,15 @@ export default function Admin() {
     } catch { /* ignore */ }
   }, []);
 
+  const fetchCareers = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await apiCall("careers", "GET", storedPassword);
+      setCareersList(data);
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  }, [storedPassword]);
+
   useEffect(() => {
     if (authenticated) {
       if (activeTab === "leads") fetchLeads();
@@ -466,9 +509,10 @@ export default function Admin() {
       else if (activeTab === "menu-items") { fetchMenuItems(); fetchCategories(); }
       else if (activeTab === "branding") fetchBranding();
       else if (activeTab === "highlight") fetchHighlight();
+      else if (activeTab === "careers") fetchCareers();
       else fetchFiles();
     }
-  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchContactAddresses, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding, fetchHighlight]);
+  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchContactAddresses, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding, fetchHighlight, fetchCareers]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -597,6 +641,47 @@ export default function Admin() {
       await apiCall("services", "DELETE", storedPassword, { id });
       setServices((prev) => prev.filter((s) => s.id !== id));
       toast.success("Service deleted");
+    } catch (e: any) { toast.error(e.message); }
+  };
+
+  // Careers CRUD
+  const handleSaveCareer = async (item: CareerItem) => {
+    try {
+      setLoading(true);
+      if (item.title_en && (!item.title_ar || !item.department_ar || !item.location_ar || !item.type_ar || !item.description_ar || !item.requirements_ar)) {
+        try {
+          const toTranslate: Record<string, string> = {};
+          if (item.title_en && !item.title_ar) toTranslate.title_en = item.title_en;
+          if (item.department_en && !item.department_ar) toTranslate.department_en = item.department_en;
+          if (item.location_en && !item.location_ar) toTranslate.location_en = item.location_en;
+          if (item.type_en && !item.type_ar) toTranslate.type_en = item.type_en;
+          if (item.description_en && !item.description_ar) toTranslate.description_en = item.description_en;
+          if (item.requirements_en && !item.requirements_ar) toTranslate.requirements_en = item.requirements_en;
+          const result = await translateTexts(toTranslate);
+          item = {
+            ...item,
+            title_ar: result.title_ar || item.title_ar,
+            department_ar: result.department_ar || item.department_ar,
+            location_ar: result.location_ar || item.location_ar,
+            type_ar: result.type_ar || item.type_ar,
+            description_ar: result.description_ar || item.description_ar,
+            requirements_ar: result.requirements_ar || item.requirements_ar,
+          };
+        } catch { /* proceed */ }
+      }
+      await apiCall("careers", "POST", storedPassword, item);
+      toast.success("Career listing saved");
+      setEditingCareer(null);
+      fetchCareers();
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  };
+
+  const handleDeleteCareer = async (id: string) => {
+    try {
+      await apiCall("careers", "DELETE", storedPassword, { id });
+      setCareersList((prev) => prev.filter((c) => c.id !== id));
+      toast.success("Career listing deleted");
     } catch (e: any) { toast.error(e.message); }
   };
 
@@ -1062,6 +1147,7 @@ export default function Admin() {
             { key: "services" as TabKey, icon: Briefcase, label: `Services (${services.length})` },
             { key: "highlight" as TabKey, icon: Star, label: "Highlight Section" },
             { key: "menu-items" as TabKey, icon: List, label: `Product Catalog (${menuItems.length})` },
+            { key: "careers" as TabKey, icon: UserPlus, label: `Careers (${careersList.length})` },
             { key: "images" as TabKey, icon: Image, label: "Files & Images" },
           ]).map((tab) => (
             <Button key={tab.key} variant={activeTab === tab.key ? "default" : "outline"} onClick={() => setActiveTab(tab.key)} className="rounded-xl">
@@ -2411,6 +2497,158 @@ export default function Admin() {
                 </Button>
               </div>
             </div>
+          </div>
+        )}
+
+
+        {/* ─── Careers Tab ──────── */}
+        {activeTab === "careers" && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-foreground">Career Listings</h2>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={() => setEditingCareer({ ...emptyCareer, sort_order: careersList.length })} className="rounded-xl">
+                  <Plus className="w-4 h-4 mr-2" />Add Position
+                </Button>
+                <Button variant="outline" size="sm" onClick={fetchCareers} disabled={loading} className="rounded-xl">
+                  <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
+                </Button>
+              </div>
+            </div>
+
+            <p className="text-xs text-muted-foreground mb-6">
+              Manage job openings displayed on the Careers page. Only active listings are shown publicly. Arabic fields are auto-translated from English.
+            </p>
+
+            {/* Career Editor */}
+            {editingCareer && (
+              <div ref={careerEditorRef} className="bg-secondary/40 border border-border rounded-2xl p-6 mb-6">
+                <h3 className="font-semibold text-foreground mb-4">
+                  {(editingCareer as any).id ? "Edit Position" : "New Position"}
+                </h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Job Title (English)</label>
+                    <Input
+                      value={editingCareer.title_en}
+                      onChange={(e) => setEditingCareer({ ...editingCareer, title_en: e.target.value })}
+                      placeholder="e.g. Senior Mechanical Engineer"
+                      className="rounded-xl"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Department (English)</label>
+                    <Input
+                      value={editingCareer.department_en}
+                      onChange={(e) => setEditingCareer({ ...editingCareer, department_en: e.target.value })}
+                      placeholder="e.g. Engineering"
+                      className="rounded-xl"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Location (English)</label>
+                    <Input
+                      value={editingCareer.location_en}
+                      onChange={(e) => setEditingCareer({ ...editingCareer, location_en: e.target.value })}
+                      placeholder="e.g. Riyadh, Saudi Arabia"
+                      className="rounded-xl"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Employment Type (English)</label>
+                    <Input
+                      value={editingCareer.type_en}
+                      onChange={(e) => setEditingCareer({ ...editingCareer, type_en: e.target.value })}
+                      placeholder="e.g. Full-time"
+                      className="rounded-xl"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Job Description (English)</label>
+                    <Textarea
+                      value={editingCareer.description_en}
+                      onChange={(e) => setEditingCareer({ ...editingCareer, description_en: e.target.value })}
+                      placeholder="Describe the role, responsibilities, and what the candidate will do..."
+                      rows={5}
+                      className="rounded-xl"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Requirements (English)</label>
+                    <Textarea
+                      value={editingCareer.requirements_en}
+                      onChange={(e) => setEditingCareer({ ...editingCareer, requirements_en: e.target.value })}
+                      placeholder="List qualifications, skills, and experience required..."
+                      rows={5}
+                      className="rounded-xl"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Sort Order</label>
+                    <Input
+                      type="number"
+                      value={editingCareer.sort_order}
+                      onChange={(e) => setEditingCareer({ ...editingCareer, sort_order: Number(e.target.value) })}
+                      className="rounded-xl"
+                    />
+                  </div>
+                  <div className="flex items-center gap-3 pt-5">
+                    <label className="text-xs font-medium text-muted-foreground">Active</label>
+                    <button
+                      onClick={() => setEditingCareer({ ...editingCareer, is_active: !editingCareer.is_active })}
+                      className={`w-10 h-6 rounded-full transition-colors ${editingCareer.is_active ? "bg-accent" : "bg-muted-foreground/30"} relative`}
+                    >
+                      <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-transform ${editingCareer.is_active ? "translate-x-5" : "translate-x-1"}`} />
+                    </button>
+                  </div>
+                </div>
+                <div className="flex gap-2 mt-4">
+                  <Button onClick={() => handleSaveCareer(editingCareer)} disabled={loading} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                    <Save className="w-4 h-4 mr-2" />{loading ? "Saving..." : "Save"}
+                  </Button>
+                  <Button variant="outline" onClick={() => setEditingCareer(null)} className="rounded-xl">Cancel</Button>
+                </div>
+              </div>
+            )}
+
+            {/* Career Listings */}
+            {careersList.length === 0 ? (
+              <div className="text-center py-16 text-muted-foreground">
+                <UserPlus className="w-12 h-12 mx-auto mb-4 opacity-30" />
+                <p>No career listings yet. Add your first position!</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {careersList.map((career) => (
+                  <div
+                    key={career.id}
+                    className={`bg-card border rounded-2xl p-4 flex items-center justify-between gap-4 ${career.is_active ? "border-border" : "border-border opacity-50"}`}
+                  >
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-semibold text-foreground truncate">{career.title_en}</span>
+                        {!career.is_active && <span className="text-[10px] bg-destructive/10 text-destructive px-2 py-0.5 rounded-full font-medium">Inactive</span>}
+                      </div>
+                      <div className="flex flex-wrap gap-x-3 text-xs text-muted-foreground">
+                        <span>{career.department_en}</span>
+                        <span>·</span>
+                        <span>{career.location_en}</span>
+                        <span>·</span>
+                        <span>{career.type_en}</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-1 shrink-0">
+                      <Button variant="ghost" size="sm" onClick={() => setEditingCareer(career)} className="rounded-lg h-8 w-8 p-0 text-muted-foreground hover:text-foreground">
+                        <FileText className="w-3.5 h-3.5" />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => handleDeleteCareer(career.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-lg h-8 w-8 p-0">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

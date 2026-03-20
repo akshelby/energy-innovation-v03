@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      careers: {
+        Row: {
+          created_at: string
+          department_ar: string
+          department_en: string
+          description_ar: string
+          description_en: string
+          id: string
+          is_active: boolean
+          location_ar: string
+          location_en: string
+          requirements_ar: string
+          requirements_en: string
+          sort_order: number
+          title_ar: string
+          title_en: string
+          type_ar: string
+          type_en: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          department_ar?: string
+          department_en?: string
+          description_ar?: string
+          description_en?: string
+          id?: string
+          is_active?: boolean
+          location_ar?: string
+          location_en?: string
+          requirements_ar?: string
+          requirements_en?: string
+          sort_order?: number
+          title_ar?: string
+          title_en?: string
+          type_ar?: string
+          type_en?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          department_ar?: string
+          department_en?: string
+          description_ar?: string
+          description_en?: string
+          id?: string
+          is_active?: boolean
+          location_ar?: string
+          location_en?: string
+          requirements_ar?: string
+          requirements_en?: string
+          sort_order?: number
+          title_ar?: string
+          title_en?: string
+          type_ar?: string
+          type_en?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       contact_addresses: {
         Row: {
           created_at: string

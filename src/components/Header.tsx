@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Menu, X, ChevronDown, ChevronRight, Sun, Moon } from "lucide-react";
@@ -30,6 +31,8 @@ interface CategoryItem {
 export default function Header() {
   const { t, language, setLanguage, isRTL } = useLanguage();
   const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { logoUrl, brandName, logoSize, ready: brandReady } = useBranding();
   const [scrolled, setScrolled] = useState(false);
   const [pastHero, setPastHero] = useState(false);
@@ -133,12 +136,26 @@ export default function Header() {
     { label: t("nav.about"), href: "#about" },
     { label: t("nav.products"), href: "#products", hasDropdown: true },
     { label: t("nav.services"), href: "#services" },
+    { label: language === "ar" ? "الوظائف" : "Careers", href: "/careers", isRoute: true },
     { label: t("nav.contact"), href: "#contact" },
   ];
 
   const scrollToSection = (href: string) => {
     setMobileOpen(false);
     setProductsOpen(false);
+    if (href.startsWith("/")) {
+      navigate(href);
+      return;
+    }
+    // If on a sub-page, navigate home first
+    if (location.pathname !== "/") {
+      navigate("/");
+      setTimeout(() => {
+        const el = document.querySelector(href);
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }, 300);
+      return;
+    }
     const el = document.querySelector(href);
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
