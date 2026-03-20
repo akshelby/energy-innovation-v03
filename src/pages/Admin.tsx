@@ -3106,6 +3106,106 @@ export default function Admin() {
             )}
           </div>
         )}
+
+        {/* ─── Admin Emails Tab ──────── */}
+        {activeTab === "admin-emails" && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-foreground">Admin Email Access</h2>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={fetchAdminEmails} disabled={loading} className="rounded-xl">
+                  <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
+                </Button>
+                <Button size="sm" onClick={() => setEditingAdminEmail({ email: "", label: "", is_active: true })} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                  <Plus className="w-4 h-4 mr-2" />Add Email
+                </Button>
+              </div>
+            </div>
+
+            <p className="text-sm text-muted-foreground mb-6">
+              Add email addresses that can access the admin panel. Users can log in using their email instead of the shared password.
+            </p>
+
+            {editingAdminEmail && (
+              <div className="bg-card border border-border rounded-2xl p-6 space-y-4 mb-6">
+                <h3 className="font-semibold text-foreground">{editingAdminEmail.id ? "Edit" : "New"} Admin Email</h3>
+                <Input
+                  type="email"
+                  value={editingAdminEmail.email}
+                  onChange={(e) => setEditingAdminEmail({ ...editingAdminEmail, email: e.target.value })}
+                  placeholder="admin@example.com"
+                  className="rounded-xl"
+                />
+                <Input
+                  value={editingAdminEmail.label}
+                  onChange={(e) => setEditingAdminEmail({ ...editingAdminEmail, label: e.target.value })}
+                  placeholder="Label (e.g. John - Manager)"
+                  className="rounded-xl"
+                />
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editingAdminEmail.is_active}
+                    onChange={(e) => setEditingAdminEmail({ ...editingAdminEmail, is_active: e.target.checked })}
+                    className="w-5 h-5 accent-primary"
+                  />
+                  <span className="text-sm text-foreground">Active</span>
+                </label>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={async () => {
+                      try {
+                        await apiCall("admin-emails", "POST", storedPassword, editingAdminEmail);
+                        toast.success("Admin email saved");
+                        setEditingAdminEmail(null);
+                        fetchAdminEmails();
+                      } catch (e: any) { toast.error(e.message); }
+                    }}
+                    className="gradient-accent text-accent-foreground rounded-xl border-0"
+                  >
+                    <Save className="w-4 h-4 mr-2" />Save
+                  </Button>
+                  <Button variant="outline" onClick={() => setEditingAdminEmail(null)} className="rounded-xl">Cancel</Button>
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-3">
+              {adminEmails.map((ae) => (
+                <div key={ae.id} className="bg-card border border-border rounded-2xl p-4 flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-muted-foreground" />
+                      <span className="font-medium text-foreground">{ae.email}</span>
+                      {!ae.is_active && <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">Inactive</span>}
+                    </div>
+                    {ae.label && <p className="text-sm text-muted-foreground mt-1">{ae.label}</p>}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => setEditingAdminEmail(ae)} className="rounded-xl">Edit</Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={async () => {
+                        try {
+                          await apiCall("admin-emails", "DELETE", storedPassword, { id: ae.id });
+                          toast.success("Email removed");
+                          fetchAdminEmails();
+                        } catch (e: any) { toast.error(e.message); }
+                      }}
+                      className="rounded-xl text-destructive"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+              {adminEmails.length === 0 && (
+                <p className="text-center text-muted-foreground py-8">No admin emails added yet. Only password login is available.</p>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       <PdfViewerDialog open={pdfPreviewOpen} onOpenChange={setPdfPreviewOpen} src={pdfPreviewUrl} />
