@@ -565,12 +565,36 @@ export default function Admin() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await apiCall("leads", "GET", password);
-      sessionStorage.setItem("admin_pw", password);
-      setAuthenticated(true);
-      toast.success("Logged in successfully");
-    } catch { toast.error("Invalid password"); }
+      if (loginMode === "password") {
+        await apiCall("leads", "GET", password);
+        sessionStorage.setItem("admin_pw", password);
+        setAuthenticated(true);
+        toast.success("Logged in successfully");
+      } else {
+        // Check email via public endpoint
+        const res = await fetch(`${FUNCTION_URL}/check-email`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: adminEmail.toLowerCase() }),
+        });
+        const data = await res.json();
+        if (data.authorized) {
+          sessionStorage.setItem("admin_email", adminEmail.toLowerCase());
+          setAuthenticated(true);
+          toast.success("Logged in successfully");
+        } else {
+          toast.error("Email not authorized");
+        }
+      }
+    } catch { toast.error(loginMode === "password" ? "Invalid password" : "Login failed"); }
   };
+
+  const fetchAdminEmails = useCallback(async () => {
+    try {
+      const data = await apiCall("admin-emails", "GET", storedPassword);
+      setAdminEmails(data);
+    } catch (e: any) { toast.error(e.message); }
+  }, [storedPassword]);
 
   const handleDeleteLead = async (id: string) => {
     try {
