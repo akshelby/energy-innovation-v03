@@ -109,10 +109,6 @@ export default function FloatingButtons() {
             </svg>
           </div>
         )
-      )}
-          </svg>
-        </a>
-      )}
       {showEmail && (
         <a
           href={`mailto:${config.floatingEmail}`}
