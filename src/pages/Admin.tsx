@@ -590,6 +590,13 @@ export default function Admin() {
     } catch { toast.error(loginMode === "password" ? "Invalid password" : "Login failed"); }
   };
 
+  const fetchAdminEmails = useCallback(async () => {
+    try {
+      const data = await apiCall("admin-emails", "GET", storedPassword);
+      setAdminEmails(data);
+    } catch (e: any) { toast.error(e.message); }
+  }, [storedPassword]);
+
 
   const handleDeleteLead = async (id: string) => {
     try {
