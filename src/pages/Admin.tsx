@@ -254,7 +254,15 @@ export default function Admin() {
   const [floatingEmail, setFloatingEmail] = useState("");
   const [emailActive, setEmailActive] = useState(false);
 
-  // Highlight section state
+  // Contact addresses state
+  const [contactAddresses, setContactAddresses] = useState<{ id: string; label_en: string; label_ar: string; is_active: boolean; sort_order: number }[]>([]);
+  const [editingAddress, setEditingAddress] = useState<{ id?: string; label_en: string; label_ar: string; is_active: boolean; sort_order: number } | null>(null);
+  const [contactVisibility, setContactVisibility] = useState<Record<string, boolean>>({
+    contact_phone_visible: true,
+    contact_email_visible: true,
+    contact_address_visible: true,
+  });
+
   const [highlightImage, setHighlightImage] = useState("");
   const [highlightStats, setHighlightStats] = useState<{ icon: string; value_en: string; value_ar: string; label_en: string; label_ar: string }[]>([
     { icon: "Award", value_en: "100%", value_ar: "١٠٠٪", label_en: "Quality Assurance", label_ar: "ضمان الجودة" },
