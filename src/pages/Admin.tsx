@@ -334,10 +334,13 @@ export default function Admin() {
   ]);
   const PERK_ICON_OPTIONS = ["TrendingUp", "Heart", "Users", "Shield", "Star", "Award", "Globe", "Zap", "Clock", "Briefcase", "Phone", "Mail", "UserPlus", "Package", "Sun", "Moon", "FileText", "MessageSquare", "Database", "Palette"];
 
+  const prevEditingCareerRef = useRef<boolean>(false);
   useEffect(() => {
-    if (editingCareer && careerEditorRef.current) {
+    const isEditing = !!editingCareer;
+    if (isEditing && !prevEditingCareerRef.current && careerEditorRef.current) {
       setTimeout(() => careerEditorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 100);
     }
+    prevEditingCareerRef.current = isEditing;
   }, [editingCareer]);
 
   const storedPassword = authenticated ? password : "";
