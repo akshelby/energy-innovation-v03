@@ -438,7 +438,11 @@ export default function Admin() {
           const contentData = await apiCall("content", "GET", storedPassword);
           const entry = contentData.find((d: ContentItem) => d.content_key === "hero.active_images");
           if (entry) {
-            setActiveHeroImages(JSON.parse(entry.value_en));
+            const parsed = JSON.parse(entry.value_en);
+            const validSelections = Array.isArray(parsed)
+              ? parsed.filter((name): name is string => typeof name === "string" && fileList.some((file) => file.name === name))
+              : [];
+            setActiveHeroImages(validSelections);
           } else {
             setActiveHeroImages([]);
           }
