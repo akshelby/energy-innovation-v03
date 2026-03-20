@@ -2696,13 +2696,22 @@ export default function Admin() {
                     <div className="grid md:grid-cols-3 gap-3">
                       <div>
                         <label className="text-xs font-medium text-muted-foreground mb-1 block">Icon</label>
-                        <select
-                          value={perk.icon}
-                          onChange={(e) => { const p = [...careersPerks]; p[i] = { ...p[i], icon: e.target.value }; setCareersPerks(p); }}
-                          className="w-full h-9 rounded-xl border border-input bg-background px-3 text-sm"
-                        >
-                          {PERK_ICON_OPTIONS.map((ic) => <option key={ic} value={ic}>{ic}</option>)}
-                        </select>
+                        <div className="flex flex-wrap gap-1.5">
+                          {PERK_ICON_OPTIONS.map((ic) => {
+                            const Ic = icons[ic as keyof typeof icons];
+                            return Ic ? (
+                              <button
+                                key={ic}
+                                type="button"
+                                title={ic}
+                                onClick={() => { const p = [...careersPerks]; p[i] = { ...p[i], icon: ic }; setCareersPerks(p); }}
+                                className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-colors ${perk.icon === ic ? "bg-primary text-primary-foreground border-primary" : "border-input bg-background hover:bg-accent text-muted-foreground hover:text-foreground"}`}
+                              >
+                                <Ic className="w-4 h-4" />
+                              </button>
+                            ) : null;
+                          })}
+                        </div>
                       </div>
                       <div>
                         <label className="text-xs font-medium text-muted-foreground mb-1 block">Title (EN)</label>
