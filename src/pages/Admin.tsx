@@ -1422,6 +1422,7 @@ export default function Admin() {
                     about: "About Section",
                     brand: "Brand",
                     hero: "Hero Section",
+                    highlight: "Highlight Section",
                     contact: "Contact Section",
                     footer: "Footer",
                     nav: "Navigation",
