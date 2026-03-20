@@ -1035,6 +1035,7 @@ export default function Admin() {
             { key: "content" as TabKey, icon: FileText, label: "Site Content" },
             { key: "products" as TabKey, icon: Package, label: `Products (${products.length})` },
             { key: "services" as TabKey, icon: Briefcase, label: `Services (${services.length})` },
+            { key: "highlight" as TabKey, icon: Star, label: "Highlight Section" },
             { key: "menu-items" as TabKey, icon: List, label: `Product Catalog (${menuItems.length})` },
             { key: "images" as TabKey, icon: Image, label: "Files & Images" },
           ]).map((tab) => (
