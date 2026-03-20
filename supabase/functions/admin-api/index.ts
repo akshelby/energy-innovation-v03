@@ -19,15 +19,34 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+  );
+
+  const url = new URL(req.url);
+  const path = url.pathname.split("/").pop();
+
+  // Public endpoint: check if an email is whitelisted (no auth needed)
+  if (path === "check-email" && req.method === "POST") {
+    try {
+      const { email } = await req.json();
+      const { data: emailEntry } = await supabase
+        .from("admin_emails")
+        .select("id")
+        .eq("email", (email || "").toLowerCase())
+        .eq("is_active", true)
+        .maybeSingle();
+      return json({ authorized: !!emailEntry });
+    } catch (err) {
+      return json({ error: err.message }, 500);
+    }
+  }
+
   // Verify admin password OR admin email
   const password = req.headers.get("x-admin-password");
   const adminEmail = req.headers.get("x-admin-email");
   const adminPassword = Deno.env.get("ADMIN_PASSWORD");
-
-  const supabaseAuth = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-  );
 
   let isAuthorized = false;
 
@@ -38,7 +57,7 @@ Deno.serve(async (req) => {
 
   // Check email auth
   if (!isAuthorized && adminEmail) {
-    const { data: emailEntry } = await supabaseAuth
+    const { data: emailEntry } = await supabase
       .from("admin_emails")
       .select("id")
       .eq("email", adminEmail.toLowerCase())
@@ -52,11 +71,6 @@ Deno.serve(async (req) => {
   if (!isAuthorized) {
     return json({ error: "Unauthorized" }, 401);
   }
-
-  const supabase = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-  );
 
   const url = new URL(req.url);
   const path = url.pathname.split("/").pop();
