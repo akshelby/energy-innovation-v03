@@ -48,7 +48,7 @@ export default function WhyChooseUsSection() {
   return (
     <section
       className="py-24 px-6 gradient-primary overflow-hidden"
-      ref={(el) => {
+      ref={(el: HTMLDivElement | null) => {
         (ref as React.MutableRefObject<HTMLElement | null>).current = el;
         (sectionRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
       }}
