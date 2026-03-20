@@ -14,7 +14,7 @@ import hero4Local from "@/assets/hero-4.webp";
 import hero5Local from "@/assets/hero-5.webp";
 
 const localImages = [hero1Local, hero2Local, hero3Local, hero4Local, hero5Local];
-const imageFilePattern = /\.(png|jpe?g|webp|avif)$/i;
+const imageFilePattern = /\.(png|jpe?g|webp|avif|svg)$/i;
 
 const buildHeroImageUrl = (fileName: string, version?: string) => {
   const encodedPath = `hero/${fileName}`
@@ -82,7 +82,7 @@ export default function HeroSection() {
         // Deduplicate by filename stem first, preferring .webp
         const stemMap = new Map<string, typeof filtered[0]>();
         for (const file of filtered) {
-          const stem = file.name.replace(/\.(png|jpe?g|webp|avif)$/i, "");
+          const stem = file.name.replace(/\.(png|jpe?g|webp|avif|svg)$/i, "");
           const existing = stemMap.get(stem);
           if (!existing || file.name.endsWith(".webp")) {
             stemMap.set(stem, file);
@@ -93,10 +93,10 @@ export default function HeroSection() {
         // If admin has set active images, filter by stem match
         if (activeList.length > 0) {
           const activeStems = new Set(
-            activeList.map((name) => name.replace(/\.(png|jpe?g|webp|avif)$/i, ""))
+            activeList.map((name) => name.replace(/\.(png|jpe?g|webp|avif|svg)$/i, ""))
           );
           deduped = deduped.filter((file) => {
-            const stem = file.name.replace(/\.(png|jpe?g|webp|avif)$/i, "");
+            const stem = file.name.replace(/\.(png|jpe?g|webp|avif|svg)$/i, "");
             return activeStems.has(stem);
           });
         }
