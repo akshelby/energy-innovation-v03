@@ -548,6 +548,13 @@ export default function Admin() {
     finally { setLoading(false); }
   }, [storedPassword]);
 
+  const fetchAdminEmails = useCallback(async () => {
+    try {
+      const data = await apiCall("admin-emails", "GET", storedPassword);
+      setAdminEmails(data);
+    } catch (e: any) { toast.error(e.message); }
+  }, [storedPassword]);
+
   useEffect(() => {
     if (authenticated) {
       if (activeTab === "leads") fetchLeads();
@@ -572,7 +579,6 @@ export default function Admin() {
         setAuthenticated(true);
         toast.success("Logged in successfully");
       } else {
-        // Check email via public endpoint
         const res = await fetch(`${FUNCTION_URL}/check-email`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -589,20 +595,6 @@ export default function Admin() {
       }
     } catch { toast.error(loginMode === "password" ? "Invalid password" : "Login failed"); }
   };
-
-  const fetchAdminEmails = useCallback(async () => {
-    try {
-      const data = await apiCall("admin-emails", "GET", storedPassword);
-      setAdminEmails(data);
-    } catch (e: any) { toast.error(e.message); }
-  }, [storedPassword]);
-
-  const fetchAdminEmails = useCallback(async () => {
-    try {
-      const data = await apiCall("admin-emails", "GET", storedPassword);
-      setAdminEmails(data);
-    } catch (e: any) { toast.error(e.message); }
-  }, [storedPassword]);
 
   const handleDeleteLead = async (id: string) => {
     try {
