@@ -155,15 +155,18 @@ export default function Careers() {
             {perks.map((perk, i) => (
               <div
                 key={i}
-                className="bg-card border border-border rounded-2xl p-6 hover:border-accent/40 hover:shadow-lg hover:shadow-accent/5 transition-all duration-300 group"
+                className="relative bg-card border-2 border-border rounded-2xl p-6 hover:border-accent/50 hover:shadow-xl hover:shadow-accent/5 transition-all duration-300 group overflow-hidden"
               >
-                <div className="w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center mb-4 group-hover:bg-accent/20 transition-colors">
-                  <perk.icon className="w-5 h-5 text-accent" />
+                {/* Top accent strip */}
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-accent to-accent/40 opacity-60 group-hover:opacity-100 transition-opacity" />
+
+                <div className="w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center mb-4 group-hover:bg-red-500/10 transition-colors">
+                  <perk.icon className="w-5 h-5 text-accent group-hover:text-red-500 transition-colors" />
                 </div>
                 <h3 className="text-base font-semibold text-foreground mb-2">
                   {isAr ? perk.title_ar : perk.title_en}
                 </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
                   {isAr ? perk.desc_ar : perk.desc_en}
                 </p>
               </div>
