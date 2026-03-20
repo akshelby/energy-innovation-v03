@@ -96,7 +96,7 @@ export default function HeroSection() {
             activeList.map((name) => name.replace(/\.(png|jpe?g|webp|avif|svg)$/i, ""))
           );
           deduped = deduped.filter((file) => {
-            const stem = file.name.replace(/\.(png|jpe?g|webp|avif)$/i, "");
+            const stem = file.name.replace(/\.(png|jpe?g|webp|avif|svg)$/i, "");
             return activeStems.has(stem);
           });
         }
