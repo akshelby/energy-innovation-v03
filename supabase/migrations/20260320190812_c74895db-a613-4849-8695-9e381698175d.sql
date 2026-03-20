@@ -1,0 +1,1 @@
+ALTER TABLE public.careers ADD COLUMN status text NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'closed'));
