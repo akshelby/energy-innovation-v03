@@ -1832,7 +1832,7 @@ export default function Admin() {
                       {categories.map((cat) => {
                         const catItems = menuItems.filter((m) => m.category_key === cat.key);
                         const topLevel = catItems.filter(m => !m.parent_id).sort((a, b) => a.sort_order - b.sort_order);
-                        const getChildren = (pid: string) => catItems.filter(m => m.parent_id === pid).sort((a, b) => a.sort_order - b.sort_order);
+                        const getChildren = (pid: string) => menuItems.filter(m => m.parent_id === pid).sort((a, b) => a.sort_order - b.sort_order);
                         const isEditorForThisCategory = editingMenuItem && editingMenuItem.category_key === cat.key;
 
                         const renderItem = (item: typeof menuItems[0], depth: number) => {
