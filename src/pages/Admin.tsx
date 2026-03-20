@@ -286,6 +286,40 @@ export default function Admin() {
   const serviceImageRef = useRef<HTMLInputElement>(null);
   const servicePdfRef = useRef<HTMLInputElement>(null);
 
+  // Careers state
+  interface CareerItem {
+    id?: string;
+    title_en: string;
+    title_ar: string;
+    department_en: string;
+    department_ar: string;
+    location_en: string;
+    location_ar: string;
+    type_en: string;
+    type_ar: string;
+    description_en: string;
+    description_ar: string;
+    requirements_en: string;
+    requirements_ar: string;
+    is_active: boolean;
+    sort_order: number;
+  }
+  const emptyCareer: CareerItem = {
+    title_en: "", title_ar: "", department_en: "", department_ar: "",
+    location_en: "", location_ar: "", type_en: "Full-time", type_ar: "دوام كامل",
+    description_en: "", description_ar: "", requirements_en: "", requirements_ar: "",
+    is_active: true, sort_order: 0,
+  };
+  const [careersList, setCareersList] = useState<(CareerItem & { id: string })[]>([]);
+  const [editingCareer, setEditingCareer] = useState<CareerItem | null>(null);
+  const careerEditorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (editingCareer && careerEditorRef.current) {
+      setTimeout(() => careerEditorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 100);
+    }
+  }, [editingCareer]);
+
   const storedPassword = authenticated ? password : "";
 
   const fetchLeads = useCallback(async () => {
