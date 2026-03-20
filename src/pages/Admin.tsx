@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import {
   Lock, Trash2, Save, RefreshCw, Database, FileText, MessageSquare,
   LogOut, Image, Upload, Plus, Package, Briefcase, GripVertical, List, Palette, Languages, Sun, Moon,
-  Star, Award, TrendingUp, Users, Clock, Globe, Phone, Mail,
+  Star, Award, TrendingUp, Users, Clock, Globe, Phone, Mail, UserPlus,
 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
