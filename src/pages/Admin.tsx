@@ -1678,7 +1678,7 @@ export default function Admin() {
                 <Phone className="w-4 h-4 text-accent" />
                 Contact Card Visibility
               </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
                 {[
                   { key: "contact_phone_visible", label: "Phone Card", icon: Phone },
                   { key: "contact_email_visible", label: "Email Card", icon: Mail },
@@ -1715,6 +1715,44 @@ export default function Admin() {
                     </span>
                   </label>
                 ))}
+              </div>
+
+              {/* Editable contact placeholders */}
+              <div className="space-y-3 border-t border-border pt-4">
+                {[
+                  { key: "contact_phone", label: "Phone Number", icon: Phone, placeholder: "+966 XX XXX XXXX" },
+                  { key: "contact_email", label: "Email Address", icon: Mail, placeholder: "info@example.com" },
+                ].map(({ key, label, icon: Ico, placeholder }) => {
+                  const item = content.find((c) => c.content_key === key);
+                  const edited = editedContent[key];
+                  return (
+                    <div key={key} className="flex flex-col sm:flex-row gap-2">
+                      <div className="flex items-center gap-2 min-w-[120px]">
+                        <Ico className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm font-medium text-foreground">{label}</span>
+                      </div>
+                      <Input
+                        value={edited?.value_en ?? item?.value_en ?? ""}
+                        onChange={(e) => setEditedContent((prev) => ({
+                          ...prev,
+                          [key]: { value_en: e.target.value, value_ar: prev[key]?.value_ar ?? item?.value_ar ?? e.target.value },
+                        }))}
+                        placeholder={placeholder}
+                        className="rounded-xl flex-1 text-sm"
+                      />
+                      {edited && (
+                        <Button
+                          size="sm"
+                          onClick={() => handleSaveContent(key)}
+                          disabled={loading}
+                          className="gradient-accent text-accent-foreground rounded-xl border-0"
+                        >
+                          <Save className="w-3 h-3 mr-1" />Save
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
