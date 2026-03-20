@@ -3,10 +3,10 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { Award, CheckCircle, Target, Headphones } from "lucide-react";
 
 const reasons = [
-  { key: "why.expertise", descKey: "why.expertise.desc", icon: Award },
-  { key: "why.quality", descKey: "why.quality.desc", icon: CheckCircle },
-  { key: "why.precision", descKey: "why.precision.desc", icon: Target },
-  { key: "why.support", descKey: "why.support.desc", icon: Headphones },
+  { key: "why.expertise", descKey: "why.expertise.desc", icon: Award, num: "01" },
+  { key: "why.quality", descKey: "why.quality.desc", icon: CheckCircle, num: "02" },
+  { key: "why.precision", descKey: "why.precision.desc", icon: Target, num: "03" },
+  { key: "why.support", descKey: "why.support.desc", icon: Headphones, num: "04" },
 ];
 
 export default function WhyChooseUsSection() {
@@ -24,20 +24,43 @@ export default function WhyChooseUsSection() {
             {t("why.title")}
           </h2>
         </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {reasons.map((reason, i) => {
             const Icon = reason.icon;
             return (
               <div
                 key={reason.key}
-                className="scroll-reveal text-center p-8 rounded-2xl bg-primary-foreground/10 border border-primary-foreground/10 hover:border-primary-foreground/30 hover:bg-primary-foreground/20 backdrop-blur-sm transition-all duration-300"
+                className="scroll-reveal group relative overflow-hidden rounded-2xl transition-all duration-300"
                 style={{ transitionDelay: `${i * 100}ms` }}
               >
-                <div className="w-14 h-14 rounded-2xl bg-accent/20 flex items-center justify-center mb-5 mx-auto">
-                  <Icon className="w-7 h-7 text-accent" />
+                {/* Card body */}
+                <div className="relative p-7 pb-8 h-full flex flex-col bg-primary-foreground/5 border border-primary-foreground/10 rounded-2xl hover:border-primary-foreground/25 transition-colors duration-300">
+                  {/* Step number — top right */}
+                  <span className="absolute top-5 right-5 text-[11px] font-bold tracking-widest text-primary-foreground/20 select-none">
+                    {reason.num}
+                  </span>
+
+                  {/* Icon with accent line */}
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="w-10 h-10 rounded-xl bg-accent/15 flex items-center justify-center shrink-0">
+                      <Icon className="w-5 h-5 text-accent" />
+                    </div>
+                    <div className="h-px flex-1 bg-gradient-to-r from-accent/30 to-transparent" />
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="text-base font-bold text-primary-foreground mb-2.5 leading-snug">
+                    {t(reason.key)}
+                  </h3>
+
+                  {/* Description */}
+                  <p className="text-primary-foreground/60 text-[13px] leading-relaxed flex-1">
+                    {t(reason.descKey)}
+                  </p>
+
+                  {/* Bottom accent bar — reveals on hover */}
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent/50 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
                 </div>
-                <h3 className="text-lg font-bold text-primary-foreground mb-3">{t(reason.key)}</h3>
-                <p className="text-primary-foreground/70 text-sm leading-relaxed">{t(reason.descKey)}</p>
               </div>
             );
           })}
