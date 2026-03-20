@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,6 +7,41 @@ import { Award, TrendingUp, Users, Clock } from "lucide-react";
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Award, TrendingUp, Users, Clock,
 };
+
+function useCountUp(end: number, duration = 1500, start = false) {
+  const [count, setCount] = useState(0);
+  const rafRef = useRef<number>();
+
+  useEffect(() => {
+    if (!start) { setCount(0); return; }
+    const startTime = performance.now();
+    const animate = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.round(eased * end));
+      if (progress < 1) rafRef.current = requestAnimationFrame(animate);
+    };
+    rafRef.current = requestAnimationFrame(animate);
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+  }, [end, duration, start]);
+
+  return count;
+}
+
+function parseNumericValue(val: string): { num: number; prefix: string; suffix: string } {
+  const match = val.match(/^([^\d]*)([\d.]+)([^\d]*)$/);
+  if (!match) return { num: 0, prefix: "", suffix: val };
+  return { num: parseFloat(match[2]), prefix: match[1], suffix: match[3] };
+}
+
+function CountUpStat({ value, inView }: { value: string; inView: boolean }) {
+  const { num, prefix, suffix } = parseNumericValue(value);
+  const count = useCountUp(num, 1500, inView);
+  if (num === 0) return <>{value}</>;
+  return <>{prefix}{count}{suffix}</>;
+}
 
 interface StatCard {
   icon: string;
@@ -50,12 +85,22 @@ export default function HighlightSection() {
     fetchData();
   }, []);
 
+  const statsRef = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = statsRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setInView(true); obs.disconnect(); } }, { threshold: 0.3 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
   const tagline = t("highlight.tagline");
   const title = t("highlight.title");
   const desc = t("highlight.desc");
   const subdesc = t("highlight.subdesc");
 
-  // Don't render if no content configured at all (fallback keys)
   const hasContent = tagline !== "highlight.tagline" || title !== "highlight.title";
 
   return (
@@ -103,7 +148,7 @@ export default function HighlightSection() {
 
             {/* Floating stats cards */}
             <div className="absolute -bottom-8 left-4 right-4 sm:left-6 sm:right-6 lg:-bottom-10 lg:-left-6 lg:right-6">
-              <div className="bg-foreground/95 backdrop-blur-sm rounded-2xl p-5 shadow-xl">
+              <div className="bg-foreground/95 backdrop-blur-sm rounded-2xl p-5 shadow-xl" ref={statsRef}>
                 <div className="grid grid-cols-3 divide-x divide-muted-foreground/20">
                   {stats.map((stat, i) => {
                     const Icon = iconMap[stat.icon] || Award;
@@ -111,7 +156,7 @@ export default function HighlightSection() {
                       <div key={i} className="flex flex-col items-center px-3 text-center">
                         <Icon className="w-5 h-5 text-accent mb-2" />
                         <span className="text-xl sm:text-2xl font-bold text-background">
-                          {isAr ? stat.value_ar : stat.value_en}
+                          <CountUpStat value={isAr ? stat.value_ar : stat.value_en} inView={inView} />
                         </span>
                         <span className="text-[11px] sm:text-xs text-background/60 mt-0.5 leading-tight">
                           {isAr ? stat.label_ar : stat.label_en}
