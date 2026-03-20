@@ -2887,6 +2887,24 @@ export default function Admin() {
                       />
                     </div>
                     <div className="flex items-center gap-3 pt-5">
+                      <label className="text-xs font-medium text-muted-foreground">Status</label>
+                      <div className="flex gap-1.5">
+                        {["open", "closed"].map((s) => (
+                          <button
+                            key={s}
+                            type="button"
+                            onClick={() => setEditingCareer({ ...editingCareer, status: s })}
+                            className={`text-xs px-3 py-1.5 rounded-full font-semibold transition-colors ${editingCareer.status === s
+                              ? s === "open" ? "bg-emerald-500/15 text-emerald-600 border border-emerald-500/30" : "bg-destructive/10 text-destructive border border-destructive/30"
+                              : "bg-muted text-muted-foreground border border-border hover:bg-accent"
+                            }`}
+                          >
+                            {s === "open" ? "Open" : "Closed"}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 pt-3">
                       <label className="text-xs font-medium text-muted-foreground">Active</label>
                       <button
                         onClick={() => setEditingCareer({ ...editingCareer, is_active: !editingCareer.is_active })}
