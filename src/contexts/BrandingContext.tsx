@@ -6,12 +6,14 @@ interface BrandingContextType {
   logoUrl: string;
   brandName: string;
   logoSize: number; // height in px
+  logoReady: boolean;
 }
 
 const BrandingContext = createContext<BrandingContextType>({
   logoUrl: defaultLogo,
   brandName: "Energy Innovation",
   logoSize: 56,
+  logoReady: false,
 });
 
 const LOGO_STORAGE_PATH = "branding/logo";
@@ -21,6 +23,7 @@ export function BrandingProvider({ children }: { children: ReactNode }) {
   const [logoUrl, setLogoUrl] = useState(defaultLogo);
   const [brandName, setBrandName] = useState("Energy Innovation");
   const [logoSize, setLogoSize] = useState(56);
+  const [logoReady, setLogoReady] = useState(false);
 
   useEffect(() => {
     // Try to load logo from Supabase storage
@@ -30,7 +33,10 @@ export function BrandingProvider({ children }: { children: ReactNode }) {
         .then((res) => {
           if (res.ok) setLogoUrl(data.publicUrl + "?t=" + Date.now());
         })
-        .catch(() => {});
+        .catch(() => {})
+        .finally(() => setLogoReady(true));
+    } else {
+      setLogoReady(true);
     }
 
     // Load brand name and logo size from site_content
@@ -49,7 +55,7 @@ export function BrandingProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <BrandingContext.Provider value={{ logoUrl, brandName, logoSize }}>
+    <BrandingContext.Provider value={{ logoUrl, brandName, logoSize, logoReady }}>
       {children}
     </BrandingContext.Provider>
   );
