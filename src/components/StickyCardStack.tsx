@@ -11,6 +11,8 @@ interface StickyCardStackProps {
   scrollSpace?: string;
   /** Max-width class for the card column */
   maxWidthClass?: string;
+  /** Whether mobile cards take full viewport height */
+  fullHeight?: boolean;
 }
 
 /**
