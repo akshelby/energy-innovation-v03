@@ -119,9 +119,9 @@ export default function ContactSection() {
   }
 
   return (
-    <section id="contact" className="py-24 px-6 bg-secondary/30" ref={ref}>
+    <section id="contact" className="py-12 md:py-24 px-6 bg-secondary/30" ref={ref}>
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12 scroll-reveal">
+        <div className="text-center mb-8 md:mb-12 scroll-reveal">
           <span className="inline-block px-5 py-2 text-sm font-semibold uppercase tracking-wider text-accent bg-accent/10 rounded-full mb-4">
             {t("contact.tag")}
           </span>
