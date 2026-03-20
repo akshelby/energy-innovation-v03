@@ -4,41 +4,28 @@ import { supabase } from "@/integrations/supabase/client";
 interface BrandingContextType {
   logoUrl: string;
   brandName: string;
-  logoSize: number; // height in px
-  logoReady: boolean;
+  logoSize: number;
 }
-
-const BrandingContext = createContext<BrandingContextType>({
-  logoUrl: "",
-  brandName: "Energy Innovation",
-  logoSize: 56,
-  logoReady: false,
-});
 
 const LOGO_STORAGE_PATH = "branding/logo";
 const BRAND_NAME_KEY = "brand.name";
 
+// Pre-compute the public URL so it's available immediately — no async needed
+const { data: logoData } = supabase.storage.from("images").getPublicUrl(LOGO_STORAGE_PATH);
+const INITIAL_LOGO_URL = logoData?.publicUrl || "";
+
+const BrandingContext = createContext<BrandingContextType>({
+  logoUrl: INITIAL_LOGO_URL,
+  brandName: "Energy Innovation",
+  logoSize: 56,
+});
+
 export function BrandingProvider({ children }: { children: ReactNode }) {
-  const [logoUrl, setLogoUrl] = useState("");
+  const [logoUrl] = useState(INITIAL_LOGO_URL);
   const [brandName, setBrandName] = useState("Energy Innovation");
   const [logoSize, setLogoSize] = useState(56);
-  const [logoReady, setLogoReady] = useState(false);
 
   useEffect(() => {
-    // Try to load logo from Supabase storage
-    const { data } = supabase.storage.from("images").getPublicUrl(LOGO_STORAGE_PATH);
-    if (data?.publicUrl) {
-      fetch(data.publicUrl, { method: "HEAD" })
-        .then((res) => {
-          if (res.ok) setLogoUrl(data.publicUrl + "?t=" + Date.now());
-        })
-        .catch(() => {})
-        .finally(() => setLogoReady(true));
-    } else {
-      setLogoReady(true);
-    }
-
-    // Load brand name and logo size from site_content
     supabase
       .from("site_content")
       .select("content_key, value_en")
@@ -54,7 +41,7 @@ export function BrandingProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <BrandingContext.Provider value={{ logoUrl, brandName, logoSize, logoReady }}>
+    <BrandingContext.Provider value={{ logoUrl, brandName, logoSize }}>
       {children}
     </BrandingContext.Provider>
   );
