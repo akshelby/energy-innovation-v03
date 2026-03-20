@@ -139,13 +139,13 @@ const IMAGE_FOLDERS = [
   { label: "PDFs", bucket: "pdfs", folder: "" },
 ];
 
-async function apiCall(path: string, method: string, password: string, body?: unknown) {
+async function apiCall(path: string, method: string, password: string, body?: unknown, email?: string) {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (password) headers["x-admin-password"] = password;
+  if (email) headers["x-admin-email"] = email;
   const res = await fetch(`${FUNCTION_URL}/${path}`, {
     method,
-    headers: {
-      "Content-Type": "application/json",
-      "x-admin-password": password,
-    },
+    headers,
     body: body ? JSON.stringify(body) : undefined,
   });
   const data = await res.json();
