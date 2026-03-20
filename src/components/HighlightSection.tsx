@@ -61,6 +61,7 @@ const defaultStats: StatCard[] = [
 export default function HighlightSection() {
   const { t, language } = useLanguage();
   const ref = useScrollReveal();
+  const parallaxImage = useParallax(0.06);
   const isAr = language === "ar";
 
   const [imageUrl, setImageUrl] = useState("");
