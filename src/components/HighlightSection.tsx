@@ -148,7 +148,7 @@ export default function HighlightSection() {
 
             {/* Floating stats cards */}
             <div className="absolute -bottom-8 left-4 right-4 sm:left-6 sm:right-6 lg:-bottom-10 lg:-left-6 lg:right-6">
-              <div className="bg-foreground/95 backdrop-blur-sm rounded-2xl p-5 shadow-xl">
+              <div className="bg-foreground/95 backdrop-blur-sm rounded-2xl p-5 shadow-xl" ref={statsRef}>
                 <div className="grid grid-cols-3 divide-x divide-muted-foreground/20">
                   {stats.map((stat, i) => {
                     const Icon = iconMap[stat.icon] || Award;
@@ -156,7 +156,7 @@ export default function HighlightSection() {
                       <div key={i} className="flex flex-col items-center px-3 text-center">
                         <Icon className="w-5 h-5 text-accent mb-2" />
                         <span className="text-xl sm:text-2xl font-bold text-background">
-                          {isAr ? stat.value_ar : stat.value_en}
+                          <CountUpStat value={isAr ? stat.value_ar : stat.value_en} inView={inView} />
                         </span>
                         <span className="text-[11px] sm:text-xs text-background/60 mt-0.5 leading-tight">
                           {isAr ? stat.label_ar : stat.label_en}
