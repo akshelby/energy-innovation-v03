@@ -5,9 +5,13 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FloatingButtons from "@/components/FloatingButtons";
 import { supabase } from "@/integrations/supabase/client";
-import { MapPin, Clock, Briefcase, ChevronRight, ArrowLeft, Users, TrendingUp, Heart, Shield } from "lucide-react";
+import { MapPin, Clock, Briefcase, ChevronRight, ArrowLeft, Users, TrendingUp, Heart, Shield, Star, Award, Globe, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import careersBanner from "@/assets/careers-banner.jpg";
+import careersBannerFallback from "@/assets/careers-banner.jpg";
+
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+  TrendingUp, Heart, Users, Shield, Star, Award, Globe, Zap, Clock, Briefcase,
+};
 
 interface CareerListing {
   id: string;
@@ -27,8 +31,23 @@ interface CareerListing {
   created_at: string;
 }
 
+interface StatItem {
+  value_en: string;
+  value_ar: string;
+  label_en: string;
+  label_ar: string;
+}
+
+interface PerkItem {
+  icon: string;
+  title_en: string;
+  title_ar: string;
+  desc_en: string;
+  desc_ar: string;
+}
+
 export default function Careers() {
-  const { language, t } = useLanguage();
+  const { language } = useLanguage();
   const heroRef = useScrollReveal();
   const perksRef = useScrollReveal();
   const listingsRef = useScrollReveal();
@@ -37,50 +56,62 @@ export default function Careers() {
   const [selected, setSelected] = useState<CareerListing | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Dynamic page content
+  const [heroTitle, setHeroTitle] = useState({ en: "Build Your Future With Us", ar: "ابنِ مستقبلك معنا" });
+  const [heroSubtitle, setHeroSubtitle] = useState({ en: "Join a leading team in industrial innovation and engineering solutions across the Gulf region.", ar: "انضم إلى فريق رائد في الابتكار الصناعي والحلول الهندسية في منطقة الخليج." });
+  const [bannerUrl, setBannerUrl] = useState("");
+  const [extraStats, setExtraStats] = useState<StatItem[]>([
+    { value_en: "5+", value_ar: "+٥", label_en: "Countries", label_ar: "دول" },
+    { value_en: "100%", value_ar: "١٠٠٪", label_en: "Growth Focus", label_ar: "تركيز على النمو" },
+  ]);
+  const [perks, setPerks] = useState<PerkItem[]>([
+    { icon: "TrendingUp", title_en: "Career Growth", title_ar: "النمو المهني", desc_en: "Clear advancement paths with mentorship programs and continuous learning opportunities.", desc_ar: "مسارات تقدم واضحة مع برامج إرشاد وفرص تعلم مستمرة." },
+    { icon: "Heart", title_en: "Health & Wellbeing", title_ar: "الصحة والرفاهية", desc_en: "Comprehensive medical coverage and wellness programs for you and your family.", desc_ar: "تغطية طبية شاملة وبرامج صحية لك ولعائلتك." },
+    { icon: "Users", title_en: "Collaborative Culture", title_ar: "ثقافة تعاونية", desc_en: "Work alongside industry experts in a supportive, inclusive team environment.", desc_ar: "اعمل جنباً إلى جنب مع خبراء الصناعة في بيئة فريق داعمة وشاملة." },
+    { icon: "Shield", title_en: "Job Security", title_ar: "الأمان الوظيفي", desc_en: "Stable employment with competitive compensation and performance-based rewards.", desc_ar: "توظيف مستقر مع تعويضات تنافسية ومكافآت قائمة على الأداء." },
+  ]);
+
   useEffect(() => {
-    const fetchCareers = async () => {
-      const { data } = await supabase
+    const fetchAll = async () => {
+      // Fetch careers
+      const { data: careersData } = await supabase
         .from("careers")
         .select("*")
         .eq("is_active", true)
         .order("sort_order", { ascending: true });
-      if (data) setCareers(data as CareerListing[]);
+      if (careersData) setCareers(careersData as CareerListing[]);
+
+      // Fetch page content
+      const { data: contentData } = await supabase
+        .from("site_content")
+        .select("*")
+        .in("content_key", ["careers.hero_title", "careers.hero_subtitle", "careers.banner_image", "careers.stats", "careers.perks"]);
+
+      if (contentData) {
+        for (const item of contentData) {
+          if (item.content_key === "careers.hero_title") setHeroTitle({ en: item.value_en, ar: item.value_ar });
+          else if (item.content_key === "careers.hero_subtitle") setHeroSubtitle({ en: item.value_en, ar: item.value_ar });
+          else if (item.content_key === "careers.banner_image" && item.value_en) setBannerUrl(item.value_en);
+          else if (item.content_key === "careers.stats" && item.value_en) {
+            try { setExtraStats(JSON.parse(item.value_en)); } catch { /* keep defaults */ }
+          }
+          else if (item.content_key === "careers.perks" && item.value_en) {
+            try { setPerks(JSON.parse(item.value_en)); } catch { /* keep defaults */ }
+          }
+        }
+      }
+
       setLoading(false);
     };
-    fetchCareers();
+    fetchAll();
   }, []);
 
   const departments = [...new Set(careers.map(c => isAr ? c.department_ar : c.department_en))].filter(Boolean);
 
-  const perks = [
-    {
-      icon: TrendingUp,
-      title_en: "Career Growth",
-      title_ar: "النمو المهني",
-      desc_en: "Clear advancement paths with mentorship programs and continuous learning opportunities.",
-      desc_ar: "مسارات تقدم واضحة مع برامج إرشاد وفرص تعلم مستمرة.",
-    },
-    {
-      icon: Heart,
-      title_en: "Health & Wellbeing",
-      title_ar: "الصحة والرفاهية",
-      desc_en: "Comprehensive medical coverage and wellness programs for you and your family.",
-      desc_ar: "تغطية طبية شاملة وبرامج صحية لك ولعائلتك.",
-    },
-    {
-      icon: Users,
-      title_en: "Collaborative Culture",
-      title_ar: "ثقافة تعاونية",
-      desc_en: "Work alongside industry experts in a supportive, inclusive team environment.",
-      desc_ar: "اعمل جنباً إلى جنب مع خبراء الصناعة في بيئة فريق داعمة وشاملة.",
-    },
-    {
-      icon: Shield,
-      title_en: "Job Security",
-      title_ar: "الأمان الوظيفي",
-      desc_en: "Stable employment with competitive compensation and performance-based rewards.",
-      desc_ar: "توظيف مستقر مع تعويضات تنافسية ومكافآت قائمة على الأداء.",
-    },
+  const allStats = [
+    { value: careers.length || "—", label_en: "Open Positions", label_ar: "وظائف شاغرة" },
+    { value: departments.length || "—", label_en: "Departments", label_ar: "أقسام" },
+    ...extraStats.map(s => ({ value: isAr ? (s.value_ar || s.value_en) : s.value_en, label_en: s.label_en, label_ar: s.label_ar })),
   ];
 
   return (
@@ -91,7 +122,7 @@ export default function Careers() {
       <section className="relative pt-16 md:pt-20">
         <div className="relative h-[320px] md:h-[420px] overflow-hidden">
           <img
-            src={careersBanner}
+            src={bannerUrl || careersBannerFallback}
             alt="Careers at Energy Innovation"
             className="w-full h-full object-cover"
           />
@@ -108,12 +139,10 @@ export default function Careers() {
                 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.1] mb-5"
                 style={{ textWrap: "balance" }}
               >
-                {isAr ? "ابنِ مستقبلك معنا" : "Build Your Future With Us"}
+                {isAr ? heroTitle.ar : heroTitle.en}
               </h1>
               <p className="text-base md:text-lg text-white/85 max-w-xl mx-auto leading-relaxed">
-                {isAr
-                  ? "انضم إلى فريق رائد في الابتكار الصناعي والحلول الهندسية في منطقة الخليج."
-                  : "Join a leading team in industrial innovation and engineering solutions across the Gulf region."}
+                {isAr ? heroSubtitle.ar : heroSubtitle.en}
               </p>
             </div>
           </div>
@@ -121,15 +150,10 @@ export default function Careers() {
 
         {/* Stats bar */}
         <div className="bg-card border-b border-border">
-          <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 divide-x divide-border rtl:divide-x-reverse">
-            {[
-              { value: careers.length || "—", label_en: "Open Positions", label_ar: "وظائف شاغرة" },
-              { value: departments.length || "—", label_en: "Departments", label_ar: "أقسام" },
-              { value: "5+", label_en: "Countries", label_ar: "دول" },
-              { value: "100%", label_en: "Growth Focus", label_ar: "تركيز على النمو" },
-            ].map((stat, i) => (
+          <div className={`max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-${Math.min(allStats.length, 4)} divide-x divide-border rtl:divide-x-reverse`}>
+            {allStats.map((stat, i) => (
               <div key={i} className="py-5 md:py-6 text-center">
-                <div className="text-2xl md:text-3xl font-bold text-foreground tabular-nums">{stat.value}</div>
+                <div className="text-2xl md:text-3xl font-bold text-foreground tabular-nums">{typeof stat.value === "number" || typeof stat.value === "string" ? stat.value : "—"}</div>
                 <div className="text-xs md:text-sm text-muted-foreground mt-1">{isAr ? stat.label_ar : stat.label_en}</div>
               </div>
             ))}
@@ -276,39 +300,44 @@ export default function Careers() {
       </section>
 
       {/* Why Join Us */}
-      <section className="pb-20 md:pb-32 px-6">
-        <div className="max-w-5xl mx-auto scroll-reveal" ref={perksRef}>
-          <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3" style={{ textWrap: "balance" }}>
-              {isAr ? "لماذا تنضم إلينا؟" : "Why Join Energy Innovation?"}
-            </h2>
-            <p className="text-muted-foreground max-w-lg mx-auto">
-              {isAr
-                ? "نقدم بيئة عمل محفزة تجمع بين التحدي والدعم لتحقيق أفضل أداء."
-                : "We offer an environment where challenge meets support, enabling you to do the best work of your career."}
-            </p>
+      {perks.length > 0 && (
+        <section className="pb-20 md:pb-32 px-6">
+          <div className="max-w-5xl mx-auto scroll-reveal" ref={perksRef}>
+            <div className="text-center mb-12">
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3" style={{ textWrap: "balance" }}>
+                {isAr ? "لماذا تنضم إلينا؟" : "Why Join Energy Innovation?"}
+              </h2>
+              <p className="text-muted-foreground max-w-lg mx-auto">
+                {isAr
+                  ? "نقدم بيئة عمل محفزة تجمع بين التحدي والدعم لتحقيق أفضل أداء."
+                  : "We offer an environment where challenge meets support, enabling you to do the best work of your career."}
+              </p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {perks.map((perk, i) => {
+                const IconComp = ICON_MAP[perk.icon] || Star;
+                return (
+                  <div
+                    key={i}
+                    className="relative bg-card border-2 border-border rounded-2xl p-6 hover:border-accent/50 hover:shadow-xl hover:shadow-accent/5 transition-all duration-300 group overflow-hidden"
+                  >
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-accent to-accent/40 opacity-60 group-hover:opacity-100 transition-opacity" />
+                    <div className="w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center mb-4 group-hover:bg-destructive/10 transition-colors">
+                      <IconComp className="w-5 h-5 text-accent group-hover:text-destructive transition-colors" />
+                    </div>
+                    <h3 className="text-base font-semibold text-foreground mb-2">
+                      {isAr ? perk.title_ar : perk.title_en}
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                      {isAr ? perk.desc_ar : perk.desc_en}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {perks.map((perk, i) => (
-              <div
-                key={i}
-                className="relative bg-card border-2 border-border rounded-2xl p-6 hover:border-accent/50 hover:shadow-xl hover:shadow-accent/5 transition-all duration-300 group overflow-hidden"
-              >
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-accent to-accent/40 opacity-60 group-hover:opacity-100 transition-opacity" />
-                <div className="w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center mb-4 group-hover:bg-destructive/10 transition-colors">
-                  <perk.icon className="w-5 h-5 text-accent group-hover:text-destructive transition-colors" />
-                </div>
-                <h3 className="text-base font-semibold text-foreground mb-2">
-                  {isAr ? perk.title_ar : perk.title_en}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
-                  {isAr ? perk.desc_ar : perk.desc_en}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <Footer />
       <FloatingButtons />
