@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import {
   Lock, Trash2, Save, RefreshCw, Database, FileText, MessageSquare,
   LogOut, Image, Upload, Plus, Package, Briefcase, GripVertical, List, Palette, Languages, Sun, Moon,
-  Star, Award, TrendingUp, Users, Clock, Globe, Phone, Mail, UserPlus,
+  Star, Award, TrendingUp, Users, Clock, Globe, Phone, Mail, UserPlus, Heart,
 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
@@ -314,6 +314,24 @@ export default function Admin() {
   const [editingCareer, setEditingCareer] = useState<CareerItem | null>(null);
   const careerEditorRef = useRef<HTMLDivElement>(null);
 
+  // Careers page content state
+  const [careersHeroTitle, setCareersHeroTitle] = useState("Build Your Future With Us");
+  const [careersHeroSubtitle, setCareersHeroSubtitle] = useState("Join a leading team in industrial innovation and engineering solutions across the Gulf region.");
+  const [careersBannerUrl, setCareersBannerUrl] = useState("");
+  const careersBannerRef = useRef<HTMLInputElement>(null);
+  const [careersBannerUploading, setCareersBannerUploading] = useState(false);
+  const [careersStats, setCareersStats] = useState<{ value_en: string; value_ar: string; label_en: string; label_ar: string }[]>([
+    { value_en: "5+", value_ar: "+٥", label_en: "Countries", label_ar: "دول" },
+    { value_en: "100%", value_ar: "١٠٠٪", label_en: "Growth Focus", label_ar: "تركيز على النمو" },
+  ]);
+  const [careersPerks, setCareersPerks] = useState<{ icon: string; title_en: string; title_ar: string; desc_en: string; desc_ar: string }[]>([
+    { icon: "TrendingUp", title_en: "Career Growth", title_ar: "النمو المهني", desc_en: "Clear advancement paths with mentorship programs and continuous learning opportunities.", desc_ar: "مسارات تقدم واضحة مع برامج إرشاد وفرص تعلم مستمرة." },
+    { icon: "Heart", title_en: "Health & Wellbeing", title_ar: "الصحة والرفاهية", desc_en: "Comprehensive medical coverage and wellness programs for you and your family.", desc_ar: "تغطية طبية شاملة وبرامج صحية لك ولعائلتك." },
+    { icon: "Users", title_en: "Collaborative Culture", title_ar: "ثقافة تعاونية", desc_en: "Work alongside industry experts in a supportive, inclusive team environment.", desc_ar: "اعمل جنباً إلى جنب مع خبراء الصناعة في بيئة فريق داعمة وشاملة." },
+    { icon: "Shield", title_en: "Job Security", title_ar: "الأمان الوظيفي", desc_en: "Stable employment with competitive compensation and performance-based rewards.", desc_ar: "توظيف مستقر مع تعويضات تنافسية ومكافآت قائمة على الأداء." },
+  ]);
+  const PERK_ICON_OPTIONS = ["TrendingUp", "Heart", "Users", "Shield", "Star", "Award", "Globe", "Zap", "Clock", "Briefcase"];
+
   useEffect(() => {
     if (editingCareer && careerEditorRef.current) {
       setTimeout(() => careerEditorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 100);
@@ -491,6 +509,26 @@ export default function Admin() {
     } catch { /* ignore */ }
   }, []);
 
+  const fetchCareersContent = useCallback(async () => {
+    try {
+      const data = await apiCall("content", "GET", storedPassword);
+      const titleEntry = data.find((d: ContentItem) => d.content_key === "careers.hero_title");
+      if (titleEntry) setCareersHeroTitle(titleEntry.value_en);
+      const subtitleEntry = data.find((d: ContentItem) => d.content_key === "careers.hero_subtitle");
+      if (subtitleEntry) setCareersHeroSubtitle(subtitleEntry.value_en);
+      const bannerEntry = data.find((d: ContentItem) => d.content_key === "careers.banner_image");
+      if (bannerEntry) setCareersBannerUrl(bannerEntry.value_en);
+      const statsEntry = data.find((d: ContentItem) => d.content_key === "careers.stats");
+      if (statsEntry?.value_en) {
+        try { setCareersStats(JSON.parse(statsEntry.value_en)); } catch { /* keep defaults */ }
+      }
+      const perksEntry = data.find((d: ContentItem) => d.content_key === "careers.perks");
+      if (perksEntry?.value_en) {
+        try { setCareersPerks(JSON.parse(perksEntry.value_en)); } catch { /* keep defaults */ }
+      }
+    } catch { /* ignore */ }
+  }, [storedPassword]);
+
   const fetchCareers = useCallback(async () => {
     setLoading(true);
     try {
@@ -509,10 +547,10 @@ export default function Admin() {
       else if (activeTab === "menu-items") { fetchMenuItems(); fetchCategories(); }
       else if (activeTab === "branding") fetchBranding();
       else if (activeTab === "highlight") fetchHighlight();
-      else if (activeTab === "careers") fetchCareers();
+      else if (activeTab === "careers") { fetchCareers(); fetchCareersContent(); }
       else fetchFiles();
     }
-  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchContactAddresses, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding, fetchHighlight, fetchCareers]);
+  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchContactAddresses, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding, fetchHighlight, fetchCareers, fetchCareersContent]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -685,7 +723,76 @@ export default function Admin() {
     } catch (e: any) { toast.error(e.message); }
   };
 
-  // Menu Items CRUD
+  // Careers page content save helpers
+  const saveCareersContentKey = async (key: string, value_en: string, value_ar: string = value_en) => {
+    await apiCall("content", "POST", storedPassword, { content_key: key, value_en, value_ar });
+  };
+
+  const handleSaveCareersHero = async () => {
+    try {
+      setLoading(true);
+      let titleAr = "", subtitleAr = "";
+      try {
+        const result = await translateTexts({ title: careersHeroTitle, subtitle: careersHeroSubtitle });
+        titleAr = result.title || "";
+        subtitleAr = result.subtitle || "";
+      } catch { /* proceed */ }
+      await saveCareersContentKey("careers.hero_title", careersHeroTitle, titleAr);
+      await saveCareersContentKey("careers.hero_subtitle", careersHeroSubtitle, subtitleAr);
+      toast.success("Hero text saved");
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  };
+
+  const handleUploadCareersBanner = async (files: FileList) => {
+    const file = files[0];
+    if (!file) return;
+    try {
+      setCareersBannerUploading(true);
+      const url = await uploadFileAndGetUrl(file, "images", "careers", storedPassword);
+      setCareersBannerUrl(url);
+      await saveCareersContentKey("careers.banner_image", url);
+      toast.success("Banner image updated");
+    } catch (e: any) { toast.error(e.message); }
+    finally { setCareersBannerUploading(false); }
+  };
+
+  const handleSaveCareersStats = async () => {
+    try {
+      setLoading(true);
+      await saveCareersContentKey("careers.stats", JSON.stringify(careersStats));
+      toast.success("Stats saved");
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  };
+
+  const handleSaveCareersPerks = async () => {
+    try {
+      setLoading(true);
+      // Auto-translate empty Arabic fields
+      for (let i = 0; i < careersPerks.length; i++) {
+        const p = careersPerks[i];
+        if (p.title_en && (!p.title_ar || !p.desc_ar)) {
+          try {
+            const toTranslate: Record<string, string> = {};
+            if (p.title_en && !p.title_ar) toTranslate[`t${i}`] = p.title_en;
+            if (p.desc_en && !p.desc_ar) toTranslate[`d${i}`] = p.desc_en;
+            const result = await translateTexts(toTranslate);
+            careersPerks[i] = {
+              ...p,
+              title_ar: result[`t${i}`] || p.title_ar,
+              desc_ar: result[`d${i}`] || p.desc_ar,
+            };
+          } catch { /* proceed */ }
+        }
+      }
+      await saveCareersContentKey("careers.perks", JSON.stringify(careersPerks));
+      toast.success("Perks cards saved");
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  };
+
+
   const handleSaveMenuItem = async (item: MenuChildItem) => {
     try {
       setLoading(true);
@@ -2503,152 +2610,269 @@ export default function Admin() {
 
         {/* ─── Careers Tab ──────── */}
         {activeTab === "careers" && (
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-foreground">Career Listings</h2>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={() => setEditingCareer({ ...emptyCareer, sort_order: careersList.length })} className="rounded-xl">
-                  <Plus className="w-4 h-4 mr-2" />Add Position
-                </Button>
-                <Button variant="outline" size="sm" onClick={fetchCareers} disabled={loading} className="rounded-xl">
-                  <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
+          <div className="space-y-8">
+
+            {/* ── Banner & Hero Text ── */}
+            <div className="bg-secondary/40 border border-border rounded-2xl p-6">
+              <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Image className="w-4 h-4" /> Banner & Hero Text
+              </h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">Banner Image</label>
+                  <div className="flex items-center gap-4">
+                    {careersBannerUrl && (
+                      <img src={careersBannerUrl} alt="Banner" className="w-32 h-20 object-cover rounded-xl border border-border" />
+                    )}
+                    <input ref={careersBannerRef} type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files && handleUploadCareersBanner(e.target.files)} />
+                    <Button variant="outline" size="sm" onClick={() => careersBannerRef.current?.click()} disabled={careersBannerUploading} className="rounded-xl">
+                      <Upload className={`w-4 h-4 mr-2 ${careersBannerUploading ? "animate-spin" : ""}`} />
+                      {careersBannerUploading ? "Uploading..." : "Upload Banner"}
+                    </Button>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">Hero Title (English)</label>
+                  <Input value={careersHeroTitle} onChange={(e) => setCareersHeroTitle(e.target.value)} className="rounded-xl" />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">Hero Subtitle (English)</label>
+                  <Textarea value={careersHeroSubtitle} onChange={(e) => setCareersHeroSubtitle(e.target.value)} rows={2} className="rounded-xl" />
+                </div>
+                <Button onClick={handleSaveCareersHero} disabled={loading} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                  <Save className="w-4 h-4 mr-2" />{loading ? "Saving..." : "Save Hero Text"}
                 </Button>
               </div>
             </div>
 
-            <p className="text-xs text-muted-foreground mb-6">
-              Manage job openings displayed on the Careers page. Only active listings are shown publicly. Arabic fields are auto-translated from English.
-            </p>
-
-            {/* Career Editor */}
-            {editingCareer && (
-              <div ref={careerEditorRef} className="bg-secondary/40 border border-border rounded-2xl p-6 mb-6">
-                <h3 className="font-semibold text-foreground mb-4">
-                  {(editingCareer as any).id ? "Edit Position" : "New Position"}
-                </h3>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Job Title (English)</label>
-                    <Input
-                      value={editingCareer.title_en}
-                      onChange={(e) => setEditingCareer({ ...editingCareer, title_en: e.target.value })}
-                      placeholder="e.g. Senior Mechanical Engineer"
-                      className="rounded-xl"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Department (English)</label>
-                    <Input
-                      value={editingCareer.department_en}
-                      onChange={(e) => setEditingCareer({ ...editingCareer, department_en: e.target.value })}
-                      placeholder="e.g. Engineering"
-                      className="rounded-xl"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Location (English)</label>
-                    <Input
-                      value={editingCareer.location_en}
-                      onChange={(e) => setEditingCareer({ ...editingCareer, location_en: e.target.value })}
-                      placeholder="e.g. Riyadh, Saudi Arabia"
-                      className="rounded-xl"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Employment Type (English)</label>
-                    <Input
-                      value={editingCareer.type_en}
-                      onChange={(e) => setEditingCareer({ ...editingCareer, type_en: e.target.value })}
-                      placeholder="e.g. Full-time"
-                      className="rounded-xl"
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Job Description (English)</label>
-                    <Textarea
-                      value={editingCareer.description_en}
-                      onChange={(e) => setEditingCareer({ ...editingCareer, description_en: e.target.value })}
-                      placeholder="Describe the role, responsibilities, and what the candidate will do..."
-                      rows={5}
-                      className="rounded-xl"
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Requirements (English)</label>
-                    <Textarea
-                      value={editingCareer.requirements_en}
-                      onChange={(e) => setEditingCareer({ ...editingCareer, requirements_en: e.target.value })}
-                      placeholder="List qualifications, skills, and experience required..."
-                      rows={5}
-                      className="rounded-xl"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Sort Order</label>
-                    <Input
-                      type="number"
-                      value={editingCareer.sort_order}
-                      onChange={(e) => setEditingCareer({ ...editingCareer, sort_order: Number(e.target.value) })}
-                      className="rounded-xl"
-                    />
-                  </div>
-                  <div className="flex items-center gap-3 pt-5">
-                    <label className="text-xs font-medium text-muted-foreground">Active</label>
-                    <button
-                      onClick={() => setEditingCareer({ ...editingCareer, is_active: !editingCareer.is_active })}
-                      className={`w-10 h-6 rounded-full transition-colors ${editingCareer.is_active ? "bg-accent" : "bg-muted-foreground/30"} relative`}
-                    >
-                      <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-transform ${editingCareer.is_active ? "translate-x-5" : "translate-x-1"}`} />
-                    </button>
-                  </div>
-                </div>
-                <div className="flex gap-2 mt-4">
-                  <Button onClick={() => handleSaveCareer(editingCareer)} disabled={loading} className="gradient-accent text-accent-foreground rounded-xl border-0">
-                    <Save className="w-4 h-4 mr-2" />{loading ? "Saving..." : "Save"}
-                  </Button>
-                  <Button variant="outline" onClick={() => setEditingCareer(null)} className="rounded-xl">Cancel</Button>
-                </div>
-              </div>
-            )}
-
-            {/* Career Listings */}
-            {careersList.length === 0 ? (
-              <div className="text-center py-16 text-muted-foreground">
-                <UserPlus className="w-12 h-12 mx-auto mb-4 opacity-30" />
-                <p>No career listings yet. Add your first position!</p>
-              </div>
-            ) : (
+            {/* ── Stats Bar ── */}
+            <div className="bg-secondary/40 border border-border rounded-2xl p-6">
+              <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                <TrendingUp className="w-4 h-4" /> Stats Bar
+              </h3>
+              <p className="text-xs text-muted-foreground mb-4">The first two stats (Open Positions & Departments) are auto-calculated. Manage the additional stats below.</p>
               <div className="space-y-3">
-                {careersList.map((career) => (
-                  <div
-                    key={career.id}
-                    className={`bg-card border rounded-2xl p-4 flex items-center justify-between gap-4 ${career.is_active ? "border-border" : "border-border opacity-50"}`}
-                  >
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-semibold text-foreground truncate">{career.title_en}</span>
-                        {!career.is_active && <span className="text-[10px] bg-destructive/10 text-destructive px-2 py-0.5 rounded-full font-medium">Inactive</span>}
-                      </div>
-                      <div className="flex flex-wrap gap-x-3 text-xs text-muted-foreground">
-                        <span>{career.department_en}</span>
-                        <span>·</span>
-                        <span>{career.location_en}</span>
-                        <span>·</span>
-                        <span>{career.type_en}</span>
-                      </div>
+                {careersStats.map((stat, i) => (
+                  <div key={i} className="grid grid-cols-[1fr_1fr_auto] gap-3 items-end">
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Value (EN)</label>
+                      <Input value={stat.value_en} onChange={(e) => { const s = [...careersStats]; s[i] = { ...s[i], value_en: e.target.value }; setCareersStats(s); }} className="rounded-xl" placeholder="e.g. 5+" />
                     </div>
-                    <div className="flex gap-1 shrink-0">
-                      <Button variant="ghost" size="sm" onClick={() => setEditingCareer(career)} className="rounded-lg h-8 w-8 p-0 text-muted-foreground hover:text-foreground">
-                        <FileText className="w-3.5 h-3.5" />
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleDeleteCareer(career.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-lg h-8 w-8 p-0">
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Label (EN)</label>
+                      <Input value={stat.label_en} onChange={(e) => { const s = [...careersStats]; s[i] = { ...s[i], label_en: e.target.value }; setCareersStats(s); }} className="rounded-xl" placeholder="e.g. Countries" />
+                    </div>
+                    <Button variant="ghost" size="sm" onClick={() => setCareersStats(careersStats.filter((_, j) => j !== i))} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-lg h-9 w-9 p-0">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-2 mt-4">
+                <Button variant="outline" size="sm" onClick={() => setCareersStats([...careersStats, { value_en: "", value_ar: "", label_en: "", label_ar: "" }])} className="rounded-xl">
+                  <Plus className="w-4 h-4 mr-2" />Add Stat
+                </Button>
+                <Button onClick={handleSaveCareersStats} disabled={loading} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                  <Save className="w-4 h-4 mr-2" />{loading ? "Saving..." : "Save Stats"}
+                </Button>
+              </div>
+            </div>
+
+            {/* ── Why Join Us Cards ── */}
+            <div className="bg-secondary/40 border border-border rounded-2xl p-6">
+              <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Heart className="w-4 h-4" /> Why Join Us Cards
+              </h3>
+              <div className="space-y-4">
+                {careersPerks.map((perk, i) => (
+                  <div key={i} className="bg-card border border-border rounded-xl p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm font-medium text-foreground">Card {i + 1}</span>
+                      <Button variant="ghost" size="sm" onClick={() => setCareersPerks(careersPerks.filter((_, j) => j !== i))} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-lg h-8 w-8 p-0">
                         <Trash2 className="w-3.5 h-3.5" />
                       </Button>
+                    </div>
+                    <div className="grid md:grid-cols-3 gap-3">
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1 block">Icon</label>
+                        <select
+                          value={perk.icon}
+                          onChange={(e) => { const p = [...careersPerks]; p[i] = { ...p[i], icon: e.target.value }; setCareersPerks(p); }}
+                          className="w-full h-9 rounded-xl border border-input bg-background px-3 text-sm"
+                        >
+                          {PERK_ICON_OPTIONS.map((ic) => <option key={ic} value={ic}>{ic}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1 block">Title (EN)</label>
+                        <Input value={perk.title_en} onChange={(e) => { const p = [...careersPerks]; p[i] = { ...p[i], title_en: e.target.value }; setCareersPerks(p); }} className="rounded-xl" />
+                      </div>
+                      <div className="md:col-span-1">
+                        <label className="text-xs font-medium text-muted-foreground mb-1 block">Description (EN)</label>
+                        <Input value={perk.desc_en} onChange={(e) => { const p = [...careersPerks]; p[i] = { ...p[i], desc_en: e.target.value }; setCareersPerks(p); }} className="rounded-xl" />
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
-            )}
+              <div className="flex gap-2 mt-4">
+                <Button variant="outline" size="sm" onClick={() => setCareersPerks([...careersPerks, { icon: "Star", title_en: "", title_ar: "", desc_en: "", desc_ar: "" }])} className="rounded-xl">
+                  <Plus className="w-4 h-4 mr-2" />Add Card
+                </Button>
+                <Button onClick={handleSaveCareersPerks} disabled={loading} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                  <Save className="w-4 h-4 mr-2" />{loading ? "Saving..." : "Save Cards"}
+                </Button>
+              </div>
+            </div>
+
+            {/* ── Job Listings ── */}
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold text-foreground">Career Listings</h2>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={() => setEditingCareer({ ...emptyCareer, sort_order: careersList.length })} className="rounded-xl">
+                    <Plus className="w-4 h-4 mr-2" />Add Position
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={fetchCareers} disabled={loading} className="rounded-xl">
+                    <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
+                  </Button>
+                </div>
+              </div>
+
+              <p className="text-xs text-muted-foreground mb-6">
+                Manage job openings displayed on the Careers page. Only active listings are shown publicly. Arabic fields are auto-translated from English.
+              </p>
+
+              {/* Career Editor */}
+              {editingCareer && (
+                <div ref={careerEditorRef} className="bg-secondary/40 border border-border rounded-2xl p-6 mb-6">
+                  <h3 className="font-semibold text-foreground mb-4">
+                    {(editingCareer as any).id ? "Edit Position" : "New Position"}
+                  </h3>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Job Title (English)</label>
+                      <Input
+                        value={editingCareer.title_en}
+                        onChange={(e) => setEditingCareer({ ...editingCareer, title_en: e.target.value })}
+                        placeholder="e.g. Senior Mechanical Engineer"
+                        className="rounded-xl"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Department (English)</label>
+                      <Input
+                        value={editingCareer.department_en}
+                        onChange={(e) => setEditingCareer({ ...editingCareer, department_en: e.target.value })}
+                        placeholder="e.g. Engineering"
+                        className="rounded-xl"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Location (English)</label>
+                      <Input
+                        value={editingCareer.location_en}
+                        onChange={(e) => setEditingCareer({ ...editingCareer, location_en: e.target.value })}
+                        placeholder="e.g. Riyadh, Saudi Arabia"
+                        className="rounded-xl"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Employment Type (English)</label>
+                      <Input
+                        value={editingCareer.type_en}
+                        onChange={(e) => setEditingCareer({ ...editingCareer, type_en: e.target.value })}
+                        placeholder="e.g. Full-time"
+                        className="rounded-xl"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Job Description (English)</label>
+                      <Textarea
+                        value={editingCareer.description_en}
+                        onChange={(e) => setEditingCareer({ ...editingCareer, description_en: e.target.value })}
+                        placeholder="Describe the role, responsibilities, and what the candidate will do..."
+                        rows={5}
+                        className="rounded-xl"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Requirements (English)</label>
+                      <Textarea
+                        value={editingCareer.requirements_en}
+                        onChange={(e) => setEditingCareer({ ...editingCareer, requirements_en: e.target.value })}
+                        placeholder="List qualifications, skills, and experience required..."
+                        rows={5}
+                        className="rounded-xl"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Sort Order</label>
+                      <Input
+                        type="number"
+                        value={editingCareer.sort_order}
+                        onChange={(e) => setEditingCareer({ ...editingCareer, sort_order: Number(e.target.value) })}
+                        className="rounded-xl"
+                      />
+                    </div>
+                    <div className="flex items-center gap-3 pt-5">
+                      <label className="text-xs font-medium text-muted-foreground">Active</label>
+                      <button
+                        onClick={() => setEditingCareer({ ...editingCareer, is_active: !editingCareer.is_active })}
+                        className={`w-10 h-6 rounded-full transition-colors ${editingCareer.is_active ? "bg-accent" : "bg-muted-foreground/30"} relative`}
+                      >
+                        <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-transform ${editingCareer.is_active ? "translate-x-5" : "translate-x-1"}`} />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 mt-4">
+                    <Button onClick={() => handleSaveCareer(editingCareer)} disabled={loading} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                      <Save className="w-4 h-4 mr-2" />{loading ? "Saving..." : "Save"}
+                    </Button>
+                    <Button variant="outline" onClick={() => setEditingCareer(null)} className="rounded-xl">Cancel</Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Career Listings */}
+              {careersList.length === 0 ? (
+                <div className="text-center py-16 text-muted-foreground">
+                  <UserPlus className="w-12 h-12 mx-auto mb-4 opacity-30" />
+                  <p>No career listings yet. Add your first position!</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {careersList.map((career) => (
+                    <div
+                      key={career.id}
+                      className={`bg-card border rounded-2xl p-4 flex items-center justify-between gap-4 ${career.is_active ? "border-border" : "border-border opacity-50"}`}
+                    >
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-semibold text-foreground truncate">{career.title_en}</span>
+                          {!career.is_active && <span className="text-[10px] bg-destructive/10 text-destructive px-2 py-0.5 rounded-full font-medium">Inactive</span>}
+                        </div>
+                        <div className="flex flex-wrap gap-x-3 text-xs text-muted-foreground">
+                          <span>{career.department_en}</span>
+                          <span>·</span>
+                          <span>{career.location_en}</span>
+                          <span>·</span>
+                          <span>{career.type_en}</span>
+                        </div>
+                      </div>
+                      <div className="flex gap-1 shrink-0">
+                        <Button variant="ghost" size="sm" onClick={() => setEditingCareer(career)} className="rounded-lg h-8 w-8 p-0 text-muted-foreground hover:text-foreground">
+                          <FileText className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleDeleteCareer(career.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-lg h-8 w-8 p-0">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
 
