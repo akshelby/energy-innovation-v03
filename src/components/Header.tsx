@@ -163,7 +163,7 @@ export default function Header() {
         <li key={pi.id}>
           <button
             type="button"
-            onClick={() => toggleExpanded(pi.id)}
+            onClick={(e) => { e.stopPropagation(); toggleExpanded(pi.id); }}
             className="text-[13.5px] font-semibold text-card-foreground hover:bg-accent/25 hover:text-red-500 px-2 py-1 rounded transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer w-full text-start"
           >
             <ChevronRight className={`w-3 h-3 shrink-0 transition-transform ${isExpanded ? 'rotate-90' : ''} ${isRTL ? 'rotate-180' : ''}`} />
