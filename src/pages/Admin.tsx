@@ -723,7 +723,76 @@ export default function Admin() {
     } catch (e: any) { toast.error(e.message); }
   };
 
-  // Menu Items CRUD
+  // Careers page content save helpers
+  const saveCareersContentKey = async (key: string, value_en: string, value_ar: string = value_en) => {
+    await apiCall("content", "POST", storedPassword, { content_key: key, value_en, value_ar });
+  };
+
+  const handleSaveCareersHero = async () => {
+    try {
+      setLoading(true);
+      let titleAr = "", subtitleAr = "";
+      try {
+        const result = await translateTexts({ title: careersHeroTitle, subtitle: careersHeroSubtitle });
+        titleAr = result.title || "";
+        subtitleAr = result.subtitle || "";
+      } catch { /* proceed */ }
+      await saveCareersContentKey("careers.hero_title", careersHeroTitle, titleAr);
+      await saveCareersContentKey("careers.hero_subtitle", careersHeroSubtitle, subtitleAr);
+      toast.success("Hero text saved");
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  };
+
+  const handleUploadCareersBanner = async (files: FileList) => {
+    const file = files[0];
+    if (!file) return;
+    try {
+      setCareersBannerUploading(true);
+      const url = await uploadFileAndGetUrl(file, "images", "careers", storedPassword);
+      setCareersBannerUrl(url);
+      await saveCareersContentKey("careers.banner_image", url);
+      toast.success("Banner image updated");
+    } catch (e: any) { toast.error(e.message); }
+    finally { setCareersBannerUploading(false); }
+  };
+
+  const handleSaveCareersStats = async () => {
+    try {
+      setLoading(true);
+      await saveCareersContentKey("careers.stats", JSON.stringify(careersStats));
+      toast.success("Stats saved");
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  };
+
+  const handleSaveCareersPerks = async () => {
+    try {
+      setLoading(true);
+      // Auto-translate empty Arabic fields
+      for (let i = 0; i < careersPerks.length; i++) {
+        const p = careersPerks[i];
+        if (p.title_en && (!p.title_ar || !p.desc_ar)) {
+          try {
+            const toTranslate: Record<string, string> = {};
+            if (p.title_en && !p.title_ar) toTranslate[`t${i}`] = p.title_en;
+            if (p.desc_en && !p.desc_ar) toTranslate[`d${i}`] = p.desc_en;
+            const result = await translateTexts(toTranslate);
+            careersPerks[i] = {
+              ...p,
+              title_ar: result[`t${i}`] || p.title_ar,
+              desc_ar: result[`d${i}`] || p.desc_ar,
+            };
+          } catch { /* proceed */ }
+        }
+      }
+      await saveCareersContentKey("careers.perks", JSON.stringify(careersPerks));
+      toast.success("Perks cards saved");
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  };
+
+
   const handleSaveMenuItem = async (item: MenuChildItem) => {
     try {
       setLoading(true);
