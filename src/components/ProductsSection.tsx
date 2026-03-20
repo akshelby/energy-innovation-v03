@@ -97,7 +97,8 @@ export default function ProductsSection() {
                       src={product.image_url}
                       alt={isAr ? product.name_ar : product.name_en}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      loading="lazy"
+                      loading={i === 0 ? "eager" : "lazy"}
+                      decoding="async"
                     />
                   ) : (
                     <div className="w-full h-full bg-muted flex items-center justify-center">
