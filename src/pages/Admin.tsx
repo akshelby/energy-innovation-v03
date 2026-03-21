@@ -3375,6 +3375,335 @@ export default function Admin() {
             </div>
           </div>
         )}
+
+        {/* ─── Product Pages Tab ──────── */}
+        {activeTab === "product-pages" && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-foreground">Product Pages</h2>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={fetchProductPages} disabled={loading} className="rounded-xl">
+                  <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
+                </Button>
+                <Button size="sm" onClick={() => setEditingPage({ product_item_id: "", headline_en: "", headline_ar: "", description_en: "", description_ar: "", sub_description_en: "", sub_description_ar: "", is_active: true })} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                  <Plus className="w-4 h-4 mr-2" />New Product Page
+                </Button>
+              </div>
+            </div>
+
+            {editingPage && (
+              <div ref={pageEditorRef} className="bg-card border border-border rounded-2xl p-6 space-y-4 mb-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-foreground">{editingPage.id ? "Edit" : "New"} Product Page</h3>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={translating || (!editingPage.headline_en && !editingPage.description_en)}
+                    onClick={async () => {
+                      try {
+                        setTranslating(true);
+                        const result = await translateTexts({
+                          headline_en: editingPage.headline_en,
+                          description_en: editingPage.description_en,
+                          sub_description_en: editingPage.sub_description_en,
+                        });
+                        setEditingPage({
+                          ...editingPage,
+                          headline_ar: result.headline_ar || editingPage.headline_ar,
+                          description_ar: result.description_ar || editingPage.description_ar,
+                          sub_description_ar: result.sub_description_ar || editingPage.sub_description_ar,
+                        });
+                        toast.success("Arabic translations generated");
+                      } catch (e: any) { toast.error(e.message); }
+                      finally { setTranslating(false); }
+                    }}
+                    className="rounded-xl"
+                  >
+                    <Languages className="w-4 h-4 mr-2" />
+                    {translating ? <RefreshCw className="w-4 h-4 animate-spin" /> : "Auto Translate"}
+                  </Button>
+                </div>
+
+                {/* Product Item Selector */}
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Attach to Product Item *</label>
+                  <select
+                    value={editingPage.product_item_id}
+                    onChange={(e) => setEditingPage({ ...editingPage, product_item_id: e.target.value })}
+                    className="w-full h-10 rounded-xl border border-input bg-background px-3 text-sm"
+                  >
+                    <option value="">-- Select a product item --</option>
+                    {categories.map((cat) => (
+                      <optgroup key={cat.id} label={cat.label_en}>
+                        {menuItems
+                          .filter((mi) => mi.category_key === cat.key && mi.is_active !== false)
+                          .map((mi) => {
+                            const indent = mi.parent_id ? "  └ " : "";
+                            const parentName = mi.parent_id ? menuItems.find(m => m.id === mi.parent_id)?.name_en : null;
+                            return (
+                              <option key={mi.id} value={mi.id}>
+                                {indent}{mi.name_en}{parentName ? ` (under ${parentName})` : ""}
+                              </option>
+                            );
+                          })}
+                      </optgroup>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Headline */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Headline (EN)</label>
+                    <Input value={editingPage.headline_en} onChange={(e) => setEditingPage({ ...editingPage, headline_en: e.target.value })} placeholder="Product headline" className="rounded-xl" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Headline (AR)</label>
+                    <Input value={editingPage.headline_ar} onChange={(e) => setEditingPage({ ...editingPage, headline_ar: e.target.value })} placeholder="auto-generated" className="rounded-xl bg-muted/50" dir="rtl" />
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Description (EN)</label>
+                    <Textarea value={editingPage.description_en} onChange={(e) => setEditingPage({ ...editingPage, description_en: e.target.value })} rows={3} className="rounded-xl resize-none" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Description (AR)</label>
+                    <Textarea value={editingPage.description_ar} onChange={(e) => setEditingPage({ ...editingPage, description_ar: e.target.value })} rows={3} className="rounded-xl resize-none bg-muted/50" dir="rtl" />
+                  </div>
+                </div>
+
+                {/* Sub Description */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Sub Description (EN)</label>
+                    <Textarea value={editingPage.sub_description_en} onChange={(e) => setEditingPage({ ...editingPage, sub_description_en: e.target.value })} rows={2} className="rounded-xl resize-none" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Sub Description (AR)</label>
+                    <Textarea value={editingPage.sub_description_ar} onChange={(e) => setEditingPage({ ...editingPage, sub_description_ar: e.target.value })} rows={2} className="rounded-xl resize-none bg-muted/50" dir="rtl" />
+                  </div>
+                </div>
+
+                {/* Active Toggle */}
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={editingPage.is_active} onChange={(e) => setEditingPage({ ...editingPage, is_active: e.target.checked })} className="rounded" />
+                  <span className="text-sm text-foreground">Active</span>
+                </label>
+
+                {/* Images Management (only for existing pages) */}
+                {editingPage.id && (
+                  <div className="border-t border-border pt-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="text-sm font-semibold text-foreground">Gallery Images (up to 4)</h4>
+                      <div>
+                        <input
+                          ref={pageImageRef}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file || !editingPage.id) return;
+                            try {
+                              setUploading(true);
+                              const url = await uploadFileAndGetUrl(file, "images", "product-pages", storedPassword);
+                              await apiCall("product-page-images", "POST", storedPassword, {
+                                product_page_id: editingPage.id,
+                                image_url: url,
+                                sort_order: pageImages.length,
+                              });
+                              toast.success("Image added");
+                              fetchPageImages(editingPage.id);
+                            } catch (err: any) { toast.error(err.message); }
+                            finally { setUploading(false); }
+                          }}
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => pageImageRef.current?.click()}
+                          disabled={uploading || pageImages.length >= 4}
+                          className="rounded-xl"
+                        >
+                          {uploading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                          <span className="ml-1">Add Image</span>
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-4 gap-3">
+                      {pageImages.map((img) => (
+                        <div key={img.id} className="relative group">
+                          <img src={img.image_url} alt="" className="w-full aspect-square object-cover rounded-xl border border-border" />
+                          <button
+                            onClick={async () => {
+                              try {
+                                await apiCall("product-page-images", "DELETE", storedPassword, { id: img.id });
+                                setPageImages((prev) => prev.filter((i) => i.id !== img.id));
+                                toast.success("Image removed");
+                              } catch (err: any) { toast.error(err.message); }
+                            }}
+                            className="absolute top-1 right-1 w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                      {pageImages.length === 0 && (
+                        <p className="col-span-4 text-sm text-muted-foreground py-4 text-center">No images yet. Upload up to 4 gallery images.</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex gap-2 pt-2">
+                  <Button
+                    onClick={async () => {
+                      if (!editingPage.product_item_id) {
+                        toast.error("Please select a product item");
+                        return;
+                      }
+                      try {
+                        setLoading(true);
+                        let page = { ...editingPage };
+                        if (page.headline_en && !page.headline_ar) {
+                          try {
+                            const result = await translateTexts({
+                              headline_en: page.headline_en,
+                              description_en: page.description_en,
+                              sub_description_en: page.sub_description_en,
+                            });
+                            page = {
+                              ...page,
+                              headline_ar: result.headline_ar || page.headline_ar,
+                              description_ar: result.description_ar || page.description_ar,
+                              sub_description_ar: result.sub_description_ar || page.sub_description_ar,
+                            };
+                          } catch { /* proceed */ }
+                        }
+                        const saved = await apiCall("product-pages", "POST", storedPassword, page);
+                        toast.success("Product page saved");
+                        // If new page, switch to editing it to enable image upload
+                        if (!editingPage.id && saved.id) {
+                          setEditingPage({ ...page, id: saved.id });
+                          fetchPageImages(saved.id);
+                        } else {
+                          setEditingPage(null);
+                        }
+                        fetchProductPages();
+                      } catch (e: any) { toast.error(e.message); }
+                      finally { setLoading(false); }
+                    }}
+                    disabled={loading}
+                    className="gradient-accent text-accent-foreground rounded-xl border-0"
+                  >
+                    <Save className="w-4 h-4 mr-2" />Save
+                  </Button>
+                  <Button variant="outline" onClick={() => setEditingPage(null)} className="rounded-xl">Cancel</Button>
+                </div>
+              </div>
+            )}
+
+            {/* Product Pages List */}
+            <div className="space-y-3">
+              {productPages.map((pp) => {
+                const itemName = pp.product_items?.name_en || "Unknown";
+                return (
+                  <div key={pp.id} className="bg-card border border-border rounded-2xl p-4 flex items-center justify-between flex-wrap gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-foreground">{pp.headline_en || itemName}</span>
+                        {!pp.is_active && <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">Inactive</span>}
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-0.5 truncate">Linked to: {itemName}</p>
+                    </div>
+                    <div className="flex gap-2 shrink-0">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setEditingPage(pp);
+                          fetchPageImages(pp.id);
+                        }}
+                        className="rounded-xl"
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={async () => {
+                          try {
+                            await apiCall("product-pages", "DELETE", storedPassword, { id: pp.id });
+                            toast.success("Product page deleted");
+                            fetchProductPages();
+                          } catch (e: any) { toast.error(e.message); }
+                        }}
+                        className="rounded-xl text-destructive"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+              {productPages.length === 0 && (
+                <p className="text-center text-muted-foreground py-8">No product pages created yet. Click "New Product Page" to get started.</p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ─── Product Enquiries Tab ──────── */}
+        {activeTab === "product-enquiries" && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-foreground">Product Enquiries</h2>
+              <Button variant="outline" size="sm" onClick={fetchProductEnquiries} disabled={loading} className="rounded-xl">
+                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
+              </Button>
+            </div>
+
+            <div className="space-y-3">
+              {productEnquiries.map((eq) => (
+                <div key={eq.id} className="bg-card border border-border rounded-2xl p-5">
+                  <div className="flex items-start justify-between gap-3 flex-wrap">
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-foreground">{eq.name}</span>
+                        <span className="text-xs text-muted-foreground">({eq.email})</span>
+                      </div>
+                      {eq.company && <p className="text-sm text-muted-foreground">Company: {eq.company}</p>}
+                      <p className="text-sm text-muted-foreground">Product: {eq.product_name || "N/A"}</p>
+                      <p className="text-sm text-foreground mt-2 whitespace-pre-wrap">{eq.requirement}</p>
+                      <p className="text-xs text-muted-foreground mt-2">{new Date(eq.created_at).toLocaleString()}</p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={async () => {
+                        try {
+                          await apiCall("product-enquiries", "DELETE", storedPassword, { id: eq.id });
+                          setProductEnquiries((prev) => prev.filter((e) => e.id !== eq.id));
+                          toast.success("Enquiry deleted");
+                        } catch (e: any) { toast.error(e.message); }
+                      }}
+                      className="rounded-xl text-destructive shrink-0"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+              {productEnquiries.length === 0 && (
+                <p className="text-center text-muted-foreground py-8">No enquiries received yet.</p>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       <PdfViewerDialog open={pdfPreviewOpen} onOpenChange={setPdfPreviewOpen} src={pdfPreviewUrl} />
