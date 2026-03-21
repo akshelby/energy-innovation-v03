@@ -1372,7 +1372,7 @@ export default function Admin() {
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Tabs */}
-        <div className="flex gap-2 mb-8 flex-wrap">
+        <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
           {([
             { key: "branding" as TabKey, icon: Palette, label: "Branding" },
             { key: "leads" as TabKey, icon: MessageSquare, label: `Leads (${leads.length})` },
