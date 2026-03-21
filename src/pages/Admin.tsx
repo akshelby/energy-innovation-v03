@@ -1894,6 +1894,7 @@ export default function Admin() {
                       {[
                         { key: "contact_phone", label: "Phone Number", icon: Phone, placeholder: "+966 XX XXX XXXX" },
                         { key: "contact_email", label: "Email Address", icon: Mail, placeholder: "info@example.com" },
+                        { key: "contact_address", label: "Primary Address", icon: Globe, placeholder: "Industrial District, Building 7" },
                       ].map(({ key, label, icon: Ico, placeholder }) => {
                         const item = content.find((c) => c.content_key === key);
                         const edited = editedContent[key];
