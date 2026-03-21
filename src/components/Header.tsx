@@ -17,6 +17,7 @@ interface ProductItem {
   sort_order: number;
   parent_id: string | null;
   is_active?: boolean;
+  has_page?: boolean;
 }
 
 interface CategoryItem {
