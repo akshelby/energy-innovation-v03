@@ -63,9 +63,7 @@ export default function FloatingButtons() {
 
   const showWhatsapp = config.whatsappActive && config.whatsappNumber;
   const showEmail = config.emailActive && config.floatingEmail;
-  const showLinkedin = config.linkedinActive;
-
-  if (!showWhatsapp && !showEmail && !showLinkedin) return null;
+  if (!showWhatsapp && !showEmail) return null;
 
   const clean = config.whatsappNumber.replace(/[^0-9+]/g, "").replace(/^\+/, "");
   const whatsappMsg = language === "ar" ? config.whatsappMessageAr : config.whatsappMessageEn;
