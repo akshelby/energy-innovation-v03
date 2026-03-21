@@ -49,10 +49,10 @@ export default function SubProductsPage() {
     setLoading(true);
 
     const fetchData = async () => {
-      // Fetch the parent product
+      // Fetch product first to get category_key
       const { data: prod } = await supabase
         .from("products")
-        .select("*")
+        .select("id,name_en,name_ar,description_en,description_ar,image_url,category_key")
         .eq("id", productId)
         .single();
 
@@ -62,65 +62,68 @@ export default function SubProductsPage() {
       }
       setProduct(prod as Product);
 
-      // Fetch top-level product_items for this category
-      if (prod.category_key) {
-        const { data: itemsData } = await supabase
+      if (!prod.category_key) {
+        setItems([]);
+        setLoading(false);
+        return;
+      }
+
+      // Fetch items + all pages for this category in parallel
+      const [{ data: itemsData }, { data: pages }] = await Promise.all([
+        supabase
           .from("product_items")
-          .select("*")
+          .select("id,name_en,name_ar,category_key,parent_id,is_active,has_page,sort_order,image_url")
           .eq("category_key", prod.category_key)
           .is("parent_id", null)
           .eq("is_active", true)
+          .order("sort_order"),
+        supabase
+          .from("product_pages")
+          .select("product_item_id,id")
+          .eq("is_active", true),
+      ]);
+
+      if (!itemsData || itemsData.length === 0) {
+        setItems([]);
+        setLoading(false);
+        return;
+      }
+
+      const itemIds = new Set(itemsData.map((i) => i.id));
+      const relevantPages = (pages || []).filter((p) => itemIds.has(p.product_item_id));
+      const pagesMap = new Map(relevantPages.map((p) => [p.product_item_id, p.id]));
+
+      // Only fetch images if needed
+      let imageMap = new Map<string, string>();
+      const pageIds = relevantPages.map((p) => p.id);
+      if (pageIds.length > 0) {
+        const { data: allImgData } = await supabase
+          .from("product_page_images")
+          .select("product_page_id,image_url,sort_order")
+          .in("product_page_id", pageIds)
           .order("sort_order");
 
-        if (itemsData && itemsData.length > 0) {
-          const itemIds = itemsData.map((i) => i.id);
-          
-          // Fetch pages first, then only their images
-          const { data: pages } = await supabase
-            .from("product_pages")
-            .select("product_item_id, id")
-            .in("product_item_id", itemIds)
-            .eq("is_active", true);
-
-          const pageIds = (pages || []).map((p) => p.id);
-          const { data: allImgData } = pageIds.length > 0
-            ? await supabase
-                .from("product_page_images")
-                .select("product_page_id, image_url, sort_order")
-                .in("product_page_id", pageIds)
-                .order("sort_order")
-            : { data: [] as any[] };
-
-          const pagesMap = new Map((pages || []).map((p) => [p.product_item_id, p.id]));
-
-          // Build item_id -> first image map
-          let imageMap = new Map<string, string>();
-          if (pages && allImgData) {
-            const pageIdSet = new Set(pages.map((p) => p.id));
-            const pageToImg = new Map<string, string>();
-            allImgData.forEach((img) => {
-              if (pageIdSet.has(img.product_page_id) && !pageToImg.has(img.product_page_id)) {
-                pageToImg.set(img.product_page_id, img.image_url);
-              }
-            });
-            pages.forEach((p) => {
-              const img = pageToImg.get(p.id);
-              if (img) imageMap.set(p.product_item_id, img);
-            });
-          }
-
-          setItems(
-            itemsData.map((i) => ({
-              ...i,
-              pageActive: pagesMap.has(i.id),
-              image_url: (i as any).image_url || imageMap.get(i.id) || null,
-            })) as any
-          );
-        } else {
-          setItems([]);
+        if (allImgData) {
+          const pageToImg = new Map<string, string>();
+          allImgData.forEach((img) => {
+            if (!pageToImg.has(img.product_page_id)) {
+              pageToImg.set(img.product_page_id, img.image_url);
+            }
+          });
+          relevantPages.forEach((p) => {
+            const img = pageToImg.get(p.id);
+            if (img) imageMap.set(p.product_item_id, img);
+          });
         }
       }
 
+      setItems(
+        itemsData.map((i) => ({
+          ...i,
+          pageActive: pagesMap.has(i.id),
+          image_url: i.image_url || imageMap.get(i.id) || null,
+        })) as any
+      );
       setLoading(false);
     };
 
