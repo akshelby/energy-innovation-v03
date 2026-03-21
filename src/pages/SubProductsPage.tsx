@@ -227,9 +227,12 @@ export default function SubProductsPage() {
                         <img
                           src={item.image_url}
                           alt={itemName}
+                          width={400}
+                          height={300}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                          loading="lazy"
+                          loading={items.indexOf(item) < 3 ? "eager" : "lazy"}
                           decoding="async"
+                          fetchPriority={items.indexOf(item) < 3 ? "high" : "low"}
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
