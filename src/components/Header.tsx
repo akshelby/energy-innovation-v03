@@ -293,7 +293,7 @@ export default function Header() {
       <header
         className={`fixed top-0 left-0 z-50 w-full bg-card transition-all duration-300 ${
           scrolled ? "shadow-md" : ""
-        }`}
+        } ${headerVisible ? "translate-y-0" : "-translate-y-full"}`}
       >
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 md:px-6">
           {/* Logo */}
