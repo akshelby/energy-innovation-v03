@@ -84,6 +84,21 @@ export default function ContactSection() {
       } as any);
 
       if (error) throw error;
+
+      // Send email notification (fire-and-forget)
+      supabase.functions.invoke("send-notification-email", {
+        body: {
+          type: "lead",
+          data: {
+            name: parsed.data.name,
+            email: parsed.data.email,
+            phone: parsed.data.phone || null,
+            company: parsed.data.company || null,
+            message: parsed.data.message,
+          },
+        },
+      }).catch((err) => console.error("Email notification failed:", err));
+
       toast.success(t("contact.success"));
       setForm({ name: "", email: "", phone: "", company: "", message: "" });
     } catch {

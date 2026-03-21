@@ -154,15 +154,31 @@ export default function ProductPageView() {
     }
     setFormLoading(true);
     try {
+      const productName = item ? (isAr ? item.name_ar : item.name_en) : "";
       const { error } = await supabase.from("product_enquiries").insert({
         product_item_id: id,
-        product_name: item ? (isAr ? item.name_ar : item.name_en) : "",
+        product_name: productName,
         name: parsed.data.name,
         email: parsed.data.email,
         company: parsed.data.company || null,
         requirement: parsed.data.requirement,
       } as any);
       if (error) throw error;
+
+      // Send email notification (fire-and-forget)
+      supabase.functions.invoke("send-notification-email", {
+        body: {
+          type: "enquiry",
+          data: {
+            product_name: productName,
+            name: parsed.data.name,
+            email: parsed.data.email,
+            company: parsed.data.company || null,
+            requirement: parsed.data.requirement,
+          },
+        },
+      }).catch((err) => console.error("Email notification failed:", err));
+
       toast.success(isAr ? "تم إرسال الاستفسار بنجاح!" : "Enquiry submitted successfully!");
       setForm({ name: "", email: "", company: "", requirement: "" });
     } catch {
