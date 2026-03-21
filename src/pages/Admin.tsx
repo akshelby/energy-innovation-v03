@@ -3792,11 +3792,11 @@ export default function Admin() {
                 <Phone className="w-4 h-4 text-accent" />
                 Contact Info
               </h3>
-              <p className="text-xs text-muted-foreground mb-4">These appear as info cards beside the contact form. Toggle visibility to show/hide each card.</p>
+              <p className="text-xs text-muted-foreground mb-4">Edit the exact contact text shown on the website here. The primary address field is the text like “Industrial District, Building 7”.</p>
               {[
+                { key: "contact_address", visKey: "contact_address_visible", label: "Primary Address", icon: Globe, placeholder: "Industrial District, Building 7" },
                 { key: "contact_phone", visKey: "contact_phone_visible", label: "Phone", icon: Phone, placeholder: "+971 XX XXX XXXX" },
                 { key: "contact_email", visKey: "contact_email_visible", label: "Email", icon: Mail, placeholder: "info@example.com" },
-                { key: "contact_address", visKey: "contact_address_visible", label: "Address", icon: Globe, placeholder: "Industrial District, Building 7" },
               ].map(({ key, visKey, label, placeholder }) => {
                 const item = content.find((c) => c.content_key === key);
                 const edited = editedContent[key];
