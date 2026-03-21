@@ -126,12 +126,22 @@ export default function Header() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-      setPastHero(window.scrollY > window.innerHeight - 100);
+      const currentScrollY = window.scrollY;
+      setScrolled(currentScrollY > 50);
+      setPastHero(currentScrollY > window.innerHeight - 100);
+      
+      if (currentScrollY < 50) {
+        setHeaderVisible(true);
+      } else if (currentScrollY < lastScrollY) {
+        setHeaderVisible(true);
+      } else if (currentScrollY > lastScrollY) {
+        setHeaderVisible(false);
+      }
+      setLastScrollY(currentScrollY);
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [lastScrollY]);
 
   useEffect(() => {
     if (mobileOpen) {
