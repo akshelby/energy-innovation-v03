@@ -144,6 +144,9 @@ const defaultContent: { content_key: string; value_en: string; value_ar: string 
   { content_key: "footer.address_1_body", value_en: "Office No. BC-891284, 26th Floor,\nAmber Gem Tower, Ajman, UAE.", value_ar: "مكتب رقم BC-891284، الطابق 26،\nبرج أمبر جيم، عجمان، الإمارات." },
   { content_key: "footer.address_2_heading", value_en: "India Branch:", value_ar: "فرع الهند:" },
   { content_key: "footer.address_2_body", value_en: "Office 167, Chetpet,\nTamil Nadu, India.", value_ar: "مكتب 167، شيتبيت،\nتاميل نادو، الهند." },
+  { content_key: "contact_phone_visible", value_en: "true", value_ar: "true" },
+  { content_key: "contact_email_visible", value_en: "true", value_ar: "true" },
+  { content_key: "contact_address_visible", value_en: "true", value_ar: "true" },
 ];
 
 const IMAGE_FOLDERS = [
