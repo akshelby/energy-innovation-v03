@@ -36,12 +36,12 @@ export default function HeroSection() {
   const [images, setImages] = useState<string[]>([]);
   const [speed, setSpeed] = useState(6000);
   const [visibility, setVisibility] = useState<Record<string, boolean>>({
-    "hero.show_headline": true,
-    "hero.show_subtext": true,
-    "hero.show_explore_btn": true,
-    "hero.show_contact_btn": true,
-    "hero.show_arrows": true,
-    "hero.show_dots": true,
+    "hero.show_headline": false,
+    "hero.show_subtext": false,
+    "hero.show_explore_btn": false,
+    "hero.show_contact_btn": false,
+    "hero.show_arrows": false,
+    "hero.show_dots": false,
   });
 
   useEffect(() => {
