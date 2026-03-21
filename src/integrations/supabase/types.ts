@@ -235,6 +235,7 @@ export type Database = {
           created_at: string
           has_page: boolean
           id: string
+          image_url: string | null
           is_active: boolean
           name_ar: string
           name_en: string
@@ -247,6 +248,7 @@ export type Database = {
           created_at?: string
           has_page?: boolean
           id?: string
+          image_url?: string | null
           is_active?: boolean
           name_ar?: string
           name_en?: string
@@ -259,6 +261,7 @@ export type Database = {
           created_at?: string
           has_page?: boolean
           id?: string
+          image_url?: string | null
           is_active?: boolean
           name_ar?: string
           name_en?: string
