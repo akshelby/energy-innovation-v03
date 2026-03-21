@@ -91,6 +91,7 @@ interface MenuChildItem {
   name_en: string;
   name_ar: string;
   pdf_url: string | null;
+  image_url: string | null;
   sort_order: number;
   is_active?: boolean;
 }
@@ -197,7 +198,7 @@ const emptyService: ServiceItem = {
 type TabKey = "leads" | "content" | "products" | "services" | "menu-items" | "images" | "branding" | "highlight" | "careers" | "admin-emails" | "product-pages" | "product-enquiries";
 
 const emptyMenuChild: MenuChildItem = {
-  category_key: "cat.fire", parent_id: null, name_en: "", name_ar: "", pdf_url: null, sort_order: 0, is_active: true,
+  category_key: "cat.fire", parent_id: null, name_en: "", name_ar: "", pdf_url: null, image_url: null, sort_order: 0, is_active: true,
 };
 
 export default function Admin() {
@@ -226,6 +227,7 @@ export default function Admin() {
   const [categories, setCategories] = useState<(CategoryItem & { id: string })[]>([]);
   const [editingCategory, setEditingCategory] = useState<CategoryItem | null>(null);
   const menuItemPdfRef = useRef<HTMLInputElement>(null);
+  const menuItemImgRef = useRef<HTMLInputElement>(null);
   const menuEditorRef = useRef<HTMLDivElement>(null);
 
   // Scroll to editor when it opens
@@ -2428,6 +2430,27 @@ export default function Admin() {
                         )}
                       </div>
                       <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Cover Image</label>
+                        <div className="flex items-center gap-2">
+                          <Input value={editingMenuItem.image_url || ""} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, image_url: e.target.value || null })} placeholder="Image URL or upload" className="rounded-xl flex-1" />
+                          <input ref={menuItemImgRef} type="file" accept="image/*" className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleFormFileUpload(file, "images", "product-items/", (url) => setEditingMenuItem({ ...editingMenuItem!, image_url: url }));
+                            }}
+                          />
+                          <Button variant="outline" size="sm" onClick={() => menuItemImgRef.current?.click()} disabled={uploading} className="rounded-xl shrink-0">
+                            <Upload className="w-4 h-4" />
+                          </Button>
+                        </div>
+                        {editingMenuItem.image_url && (
+                          <img src={editingMenuItem.image_url} alt="Preview" className="mt-2 w-20 h-14 object-cover rounded-lg border border-border" />
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
                         <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Sort Order</label>
                         <Input type="number" value={editingMenuItem.sort_order} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, sort_order: parseInt(e.target.value) || 0 })} className="rounded-xl" />
                       </div>
@@ -2500,6 +2523,9 @@ export default function Admin() {
                                         <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
                                           {children.length} sub-item{children.length > 1 ? "s" : ""}
                                         </span>
+                                      )}
+                                      {(item as any).image_url && (
+                                        <span className="text-[10px] bg-blue-500/10 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full font-medium">IMG ✓</span>
                                       )}
                                       {(item as any).is_active === false && (
                                         <span className="text-[10px] bg-destructive/10 text-destructive px-2 py-0.5 rounded-full font-medium">Inactive</span>
