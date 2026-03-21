@@ -262,7 +262,7 @@ Deno.serve(async (req) => {
       if (method === "GET") {
         const { data, error } = await supabase
           .from("product_pages")
-          .select("*, product_items!inner(name_en, name_ar, category_key, parent_id)")
+          .select("*, product_items!product_pages_product_item_id_fkey(name_en, name_ar, category_key, parent_id)")
           .order("created_at", { ascending: false });
         if (error) throw error;
         return json(data);
