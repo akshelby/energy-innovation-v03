@@ -63,7 +63,7 @@ export default function ProductsSection() {
     <section id="products" className="py-10 md:py-20 px-0 md:px-6 bg-secondary/30" ref={ref}>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-6 md:mb-16 scroll-reveal">
-          <span className="inline-block px-8 py-3.5 text-lg font-bold tracking-wide text-accent bg-accent/30 rounded-full mb-4">
+          <span className="inline-block px-8 py-3.5 text-lg font-bold tracking-wide text-white bg-accent rounded-full mb-4">
             {t("products.tag")}
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">

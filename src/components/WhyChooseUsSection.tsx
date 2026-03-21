@@ -17,7 +17,7 @@ export default function WhyChooseUsSection() {
     <section className="py-14 md:py-24 px-6 gradient-primary overflow-hidden" ref={ref}>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-10 md:mb-16 scroll-reveal">
-          <span className="inline-block px-8 py-3.5 text-lg font-bold tracking-wide text-accent bg-accent/30 rounded-full mb-4">
+          <span className="inline-block px-8 py-3.5 text-lg font-bold tracking-wide text-white bg-accent rounded-full mb-4">
             {t("why.tag")}
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground mb-6">
