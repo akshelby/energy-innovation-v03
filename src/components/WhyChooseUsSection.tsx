@@ -20,7 +20,7 @@ export default function WhyChooseUsSection() {
           <span className="inline-block px-4 py-1.5 text-xs font-semibold tracking-wide text-accent-foreground bg-accent/20 rounded-full mb-4">
             {t("why.tag")}
           </span>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground mb-6">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-primary-foreground mb-6">
             {t("why.title")}
           </h2>
         </div>
