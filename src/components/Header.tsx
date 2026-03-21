@@ -103,6 +103,14 @@ export default function Header() {
   };
 
   const handleItemClick = (item: ProductItem) => {
+    // If item has a dedicated product page, navigate to it
+    if (item.has_page) {
+      setProductsOpen(false);
+      setMobileOpen(false);
+      setMobileProductsOpen(false);
+      navigate(`/product/${item.id}`);
+      return;
+    }
     if (item.pdf_url) {
       setPdfSrc(item.pdf_url);
       setPdfOpen(true);
