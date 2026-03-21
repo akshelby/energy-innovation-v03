@@ -134,11 +134,28 @@ export default function SubProductsPage() {
     return (
       <main className="min-h-screen">
         <Header />
-        <div className="pt-24 pb-12 flex items-center justify-center min-h-[60vh]">
-          <div className="animate-pulse text-muted-foreground">
-            {isAr ? "جاري التحميل..." : "Loading..."}
+        <section className="pt-20 md:pt-24 pb-10 md:pb-16 bg-secondary/30">
+          <div className="max-w-6xl mx-auto px-6">
+            <div className="h-4 w-48 bg-muted animate-pulse rounded mt-4" />
+            <div className="text-center mt-10">
+              <div className="h-12 w-56 bg-muted animate-pulse rounded-full mx-auto mb-6" />
+              <div className="h-10 w-64 bg-muted animate-pulse rounded mx-auto mb-4" />
+            </div>
           </div>
-        </div>
+        </section>
+        <section className="py-6 md:py-10 px-6">
+          <div className="max-w-6xl mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-card rounded-2xl border border-border overflow-hidden">
+                <div className="aspect-[4/3] bg-muted animate-pulse" />
+                <div className="p-5 space-y-2">
+                  <div className="h-5 w-3/4 bg-muted animate-pulse rounded" />
+                  <div className="h-4 w-1/2 bg-muted animate-pulse rounded" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
         <Footer />
       </main>
     );
