@@ -83,8 +83,17 @@ export default function HeroSection() {
       setVisibility(vis);
 
       if (activeList.length > 0) {
+        const urls = activeList.map((fileName) => buildHeroImageUrl(fileName));
+        // Preload all hero images immediately for instant transitions
+        urls.forEach((url, i) => {
+          const link = document.createElement("link");
+          link.rel = i === 0 ? "preload" : "prefetch";
+          link.as = "image";
+          link.href = url;
+          document.head.appendChild(link);
+        });
         setCurrent(0);
-        setImages(activeList.map((fileName) => buildHeroImageUrl(fileName)));
+        setImages(urls);
         return;
       }
 
