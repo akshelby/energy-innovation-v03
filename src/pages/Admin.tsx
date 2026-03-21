@@ -3796,6 +3796,7 @@ export default function Admin() {
               {[
                 { key: "contact_phone", visKey: "contact_phone_visible", label: "Phone", icon: Phone, placeholder: "+971 XX XXX XXXX" },
                 { key: "contact_email", visKey: "contact_email_visible", label: "Email", icon: Mail, placeholder: "info@example.com" },
+                { key: "contact_address", visKey: "contact_address_visible", label: "Address", icon: Globe, placeholder: "Industrial District, Building 7" },
               ].map(({ key, visKey, label, placeholder }) => {
                 const item = content.find((c) => c.content_key === key);
                 const edited = editedContent[key];
