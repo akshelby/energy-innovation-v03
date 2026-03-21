@@ -36,7 +36,7 @@ export default function HeroSection() {
   const { t } = useLanguage();
   const parallaxBg = useParallax(0.15);
   const [current, setCurrent] = useState(0);
-  const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<string[]>([FIRST_HERO_IMAGE]);
   const [speed, setSpeed] = useState(6000);
   const [visibility, setVisibility] = useState<Record<string, boolean>>({
     "hero.show_headline": false,
