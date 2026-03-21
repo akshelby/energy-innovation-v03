@@ -129,23 +129,31 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact Info */}
+          {/* Contact Information */}
           <div>
-            <h4 className="font-bold mb-4">{t("footer.contactInfo")}</h4>
-            <ul className="space-y-3">
-              <li className="flex items-center gap-2 text-sm text-primary-foreground hover:bg-primary-foreground/10 px-2 py-1 rounded transition-colors">
-                <Mail className="w-4 h-4 shrink-0" />
-                {t("footer.email")}
+            <h4 className="font-bold mb-4 text-accent">{t("footer.contactInfo")}</h4>
+            <ul className="space-y-3 text-sm text-primary-foreground/80">
+              <li className="flex items-start gap-2">
+                <Mail className="w-4 h-4 shrink-0 mt-0.5" />
+                <a href="mailto:info@energyinnvo.com" className="hover:text-primary-foreground transition-colors">info@energyinnvo.com</a>
               </li>
-              <li className="flex items-center gap-2 text-sm text-primary-foreground hover:bg-primary-foreground/10 px-2 py-1 rounded transition-colors">
-                <Phone className="w-4 h-4 shrink-0" />
-                {t("footer.phone")}
-              </li>
-              <li className="flex items-center gap-2 text-sm text-primary-foreground hover:bg-primary-foreground/10 px-2 py-1 rounded transition-colors">
-                <MapPin className="w-4 h-4 shrink-0" />
-                {t("footer.address")}
+              <li className="flex items-start gap-2">
+                <MapPin className="w-4 h-4 shrink-0 mt-0.5" />
+                <span>www.energyinnvo.com</span>
               </li>
             </ul>
+
+            <h5 className="font-semibold mt-5 mb-2 text-accent">{t("footer.address") || "Address:"}</h5>
+            <p className="text-sm text-primary-foreground/80 leading-relaxed">
+              Office No. BC-891284, 26th Floor,<br />
+              Amber Gem Tower, Ajman, UAE.
+            </p>
+
+            <h5 className="font-semibold mt-5 mb-2 text-accent">India Branch:</h5>
+            <p className="text-sm text-primary-foreground/80 leading-relaxed">
+              Office 167, Chetpet,<br />
+              Tamil Nadu, India.
+            </p>
           </div>
         </div>
 
