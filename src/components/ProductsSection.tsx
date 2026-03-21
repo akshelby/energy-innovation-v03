@@ -81,7 +81,7 @@ export default function ProductsSection() {
             return (
               <div
                 key={i}
-                className="scroll-reveal md:!opacity-100 md:!translate-y-0 group rounded-none md:rounded-2xl cursor-pointer overflow-hidden bg-card border border-border hover:border-accent/20 transition-all duration-300 h-full flex flex-col"
+                className="scroll-reveal md:!opacity-100 md:!translate-y-0 group rounded-2xl cursor-pointer overflow-hidden bg-card border border-border hover:border-accent/20 transition-all duration-300 h-full flex flex-col"
                 style={{ transitionDelay: `${i * 80}ms` }}
                 onClick={() => {
                   if (product.pdf_url) {
@@ -91,7 +91,7 @@ export default function ProductsSection() {
                 }}
               >
                 {/* Image area */}
-                <div className="relative md:aspect-[4/3] flex-1 md:flex-none min-h-0 overflow-hidden">
+                <div className="relative aspect-[4/3] flex-1 md:flex-none min-h-0 overflow-hidden">
                   {product.image_url ? (
                     <img
                       src={product.image_url}

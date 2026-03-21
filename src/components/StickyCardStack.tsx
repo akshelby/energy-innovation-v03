@@ -105,12 +105,12 @@ export default function StickyCardStack({
 
   // Mobile: sticky stacking cards
   return (
-    <div ref={containerRef} className={`${maxWidthClass} mx-auto`}>
+    <div ref={containerRef} className={`${maxWidthClass} mx-auto px-4`}>
       {React.Children.map(children, (child, i) => (
         <Fragment key={i}>
           <div
             data-sticky-card
-            className={`sticky will-change-transform rounded-none transition-[transform,filter] duration-500 ease-out ${fullHeight ? "h-[calc(85svh-72px)]" : ""}`}
+            className={`sticky will-change-transform rounded-2xl overflow-hidden transition-[transform,filter] duration-500 ease-out ${fullHeight ? "h-[70svh]" : ""}`}
             style={{
               top: `${baseTop + i * offsetIncrement}px`,
               zIndex: i + 1,
