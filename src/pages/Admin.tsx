@@ -1793,394 +1793,329 @@ export default function Admin() {
               </div>
             </div>
 
-            {/* Hero Visibility Toggles */}
-            <div className="bg-card border border-border rounded-2xl p-6 mb-6">
-              <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
-                <Image className="w-4 h-4 text-accent" />
-                Hero Section Visibility
-              </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {[
-                  { key: "hero.show_headline", label: "Headline" },
-                  { key: "hero.show_subtext", label: "Subtext" },
-                  { key: "hero.show_explore_btn", label: "Explore Products Button" },
-                  { key: "hero.show_contact_btn", label: "Contact Us Button" },
-                  { key: "hero.show_arrows", label: "Navigation Arrows" },
-                  { key: "hero.show_dots", label: "Slide Dots" },
-                ].map(({ key, label }) => (
-                  <label
-                    key={key}
-                    className={`flex items-center gap-2.5 p-3 rounded-xl border cursor-pointer transition-colors ${
-                      heroVisibility[key]
-                        ? "bg-accent/10 border-accent/30"
-                        : "bg-muted/50 border-border"
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={heroVisibility[key]}
-                      onChange={() => handleToggleHeroVisibility(key)}
-                      className="w-4 h-4 accent-[hsl(var(--accent))] rounded"
-                    />
-                    <span className={`text-sm font-medium ${heroVisibility[key] ? "text-foreground" : "text-muted-foreground line-through"}`}>
-                      {label}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Contact Card Visibility Toggles */}
-            <div className="bg-card border border-border rounded-2xl p-6 mb-6">
-              <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
-                <Phone className="w-4 h-4 text-accent" />
-                Contact Card Visibility
-              </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
-                {[
-                  { key: "contact_phone_visible", label: "Phone Card", icon: Phone },
-                  { key: "contact_email_visible", label: "Email Card", icon: Mail },
-                  { key: "contact_address_visible", label: "Address Cards", icon: Globe },
-                ].map(({ key, label, icon: Ico }) => (
-                  <label
-                    key={key}
-                    className={`flex items-center gap-2.5 p-3 rounded-xl border cursor-pointer transition-colors ${
-                      contactVisibility[key]
-                        ? "bg-accent/10 border-accent/30"
-                        : "bg-muted/50 border-border"
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={contactVisibility[key]}
-                      onChange={async () => {
-                        const newVal = !contactVisibility[key];
-                        setContactVisibility((prev) => ({ ...prev, [key]: newVal }));
-                        try {
-                          await apiCall("content", "POST", storedPassword, {
-                            content_key: key,
-                            value_en: String(newVal),
-                            value_ar: String(newVal),
-                          });
-                          toast.success(`${label} ${newVal ? "shown" : "hidden"}`);
-                        } catch (err: any) { toast.error(err.message); }
-                      }}
-                      className="w-4 h-4 accent-[hsl(var(--accent))] rounded"
-                    />
-                    <Ico className="w-4 h-4" />
-                    <span className={`text-sm font-medium ${contactVisibility[key] ? "text-foreground" : "text-muted-foreground line-through"}`}>
-                      {label}
-                    </span>
-                  </label>
-                ))}
-              </div>
-
-              {/* Editable contact placeholders */}
-              <div className="space-y-3 border-t border-border pt-4">
-                {[
-                  { key: "contact_phone", label: "Phone Number", icon: Phone, placeholder: "+966 XX XXX XXXX" },
-                  { key: "contact_email", label: "Email Address", icon: Mail, placeholder: "info@example.com" },
-                ].map(({ key, label, icon: Ico, placeholder }) => {
-                  const item = content.find((c) => c.content_key === key);
-                  const edited = editedContent[key];
-                  return (
-                    <div key={key} className="flex flex-col sm:flex-row gap-2">
-                      <div className="flex items-center gap-2 min-w-[120px]">
-                        <Ico className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-sm font-medium text-foreground">{label}</span>
-                      </div>
-                      <Input
-                        value={edited?.value_en ?? item?.value_en ?? ""}
-                        onChange={(e) => setEditedContent((prev) => ({
-                          ...prev,
-                          [key]: { value_en: e.target.value, value_ar: prev[key]?.value_ar ?? item?.value_ar ?? e.target.value },
-                        }))}
-                        placeholder={placeholder}
-                        className="rounded-xl flex-1 text-sm"
-                      />
-                      {edited && (
-                        <Button
-                          size="sm"
-                          onClick={() => handleSaveContent(key)}
-                          disabled={loading}
-                          className="gradient-accent text-accent-foreground rounded-xl border-0"
-                        >
-                          <Save className="w-3 h-3 mr-1" />Save
-                        </Button>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Contact Addresses Management */}
-            <div className="bg-card border border-border rounded-2xl p-6 mb-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-accent" />
-                  Addresses
-                </h3>
-                <Button
-                  size="sm"
-                  onClick={() => setEditingAddress({ label_en: "", label_ar: "", is_active: true, sort_order: contactAddresses.length })}
-                  className="gradient-accent text-accent-foreground rounded-xl border-0"
-                >
-                  <Plus className="w-4 h-4 mr-1" />Add Address
-                </Button>
-              </div>
-
-              {editingAddress && (
-                <div className="bg-secondary/50 border border-border rounded-xl p-4 mb-4 space-y-3">
-                  <div className="grid md:grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-xs font-medium text-muted-foreground mb-1 block">English</label>
-                      <Input
-                        value={editingAddress.label_en}
-                        onChange={(e) => setEditingAddress({ ...editingAddress, label_en: e.target.value })}
-                        placeholder="e.g. UAE & India"
-                        className="rounded-xl"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Arabic</label>
-                      <Input
-                        value={editingAddress.label_ar}
-                        onChange={(e) => setEditingAddress({ ...editingAddress, label_ar: e.target.value })}
-                        placeholder="e.g. الإمارات والهند"
-                        className="rounded-xl"
-                        dir="rtl"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Button
-                      size="sm"
-                      disabled={translating}
-                      variant="outline"
-                      onClick={async () => {
-                        if (!editingAddress.label_en) return;
-                        try {
-                          setTranslating(true);
-                          const result = await translateTexts({ label_en: editingAddress.label_en });
-                          if (result.label_en) setEditingAddress({ ...editingAddress, label_ar: result.label_en });
-                          toast.success("Translated");
-                        } catch (e: any) { toast.error(e.message); }
-                        finally { setTranslating(false); }
-                      }}
-                      className="rounded-xl"
-                    >
-                      <Languages className="w-4 h-4 mr-1" />{translating ? "..." : "Translate"}
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={async () => {
-                        try {
-                          if (editingAddress.id) {
-                            await supabase.from("contact_addresses").update({
-                              label_en: editingAddress.label_en,
-                              label_ar: editingAddress.label_ar,
-                              is_active: editingAddress.is_active,
-                              sort_order: editingAddress.sort_order,
-                            }).eq("id", editingAddress.id);
-                          } else {
-                            await supabase.from("contact_addresses").insert({
-                              label_en: editingAddress.label_en,
-                              label_ar: editingAddress.label_ar,
-                              is_active: editingAddress.is_active,
-                              sort_order: editingAddress.sort_order,
-                            });
-                          }
-                          toast.success("Address saved");
-                          setEditingAddress(null);
-                          fetchContactAddresses();
-                        } catch (e: any) { toast.error(e.message); }
-                      }}
-                      className="gradient-accent text-accent-foreground rounded-xl border-0"
-                    >
-                      <Save className="w-4 h-4 mr-1" />Save
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => setEditingAddress(null)} className="rounded-xl">Cancel</Button>
-                  </div>
-                </div>
-              )}
-
-              {contactAddresses.length === 0 && !editingAddress ? (
-                <p className="text-sm text-muted-foreground text-center py-4">No addresses yet. Add one above.</p>
-              ) : (
-                <div className="space-y-2">
-                  {contactAddresses.map((addr) => (
-                    <div key={addr.id} className="flex items-center justify-between p-3 rounded-xl border border-border bg-secondary/30">
-                      <div className="flex items-center gap-3">
-                        <Globe className="w-4 h-4 text-accent shrink-0" />
-                        <div>
-                          <p className="text-sm font-medium text-foreground">{addr.label_en}</p>
-                          <p className="text-xs text-muted-foreground" dir="rtl">{addr.label_ar}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <label className="flex items-center gap-1.5 cursor-pointer">
-                          <span className="text-xs text-muted-foreground">{addr.is_active ? "Active" : "Inactive"}</span>
-                          <input
-                            type="checkbox"
-                            checked={addr.is_active}
-                            onChange={async () => {
-                              try {
-                                await supabase.from("contact_addresses").update({ is_active: !addr.is_active }).eq("id", addr.id);
-                                fetchContactAddresses();
-                                toast.success(addr.is_active ? "Address hidden" : "Address shown");
-                              } catch (e: any) { toast.error(e.message); }
-                            }}
-                            className="w-4 h-4 accent-[hsl(var(--accent))]"
-                          />
-                        </label>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setEditingAddress(addr)}
-                          className="rounded-lg h-8 px-2"
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={async () => {
-                            try {
-                              await supabase.from("contact_addresses").delete().eq("id", addr.id);
-                              fetchContactAddresses();
-                              toast.success("Address deleted");
-                            } catch (e: any) { toast.error(e.message); }
-                          }}
-                          className="rounded-lg h-8 px-2 text-destructive hover:text-destructive"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
             {content.length === 0 ? (
               <div className="text-center py-16 text-muted-foreground">
                 <FileText className="w-12 h-12 mx-auto mb-4 opacity-30" /><p>No content yet. Click "Seed Defaults" to populate.</p>
               </div>
             ) : (
               <div className="space-y-6">
-                {(() => {
-                  const grouped: Record<string, ContentItem[]> = {};
-                  const hiddenKeys = new Set(["contact", "contact_phone", "contact_email", "contact_address", "contact_phone_visible", "contact_email_visible", "contact_address_visible", "footer"]);
-                  content.forEach((item) => {
-                    const section = item.content_key.split(".")[0] || "other";
-                    // Hide keys managed by dedicated tabs (Contact Section, Footer)
-                    if (hiddenKeys.has(section) || hiddenKeys.has(item.content_key)) return;
-                    if (!grouped[section]) grouped[section] = [];
-                    grouped[section].push(item);
-                  });
-                  const sectionLabels: Record<string, string> = {
-                    about: "About Section",
-                    brand: "Brand",
-                    hero: "Hero Section",
-                    highlight: "Highlight Section",
-                    contact: "Contact Section",
-                    footer: "Footer",
-                    nav: "Navigation",
-                    why: "Why Choose Us",
-                    services: "Services",
-                    products: "Products",
-                  };
-                  return Object.entries(grouped).map(([section, items]) => (
-                    <div key={section} className="border border-border rounded-2xl overflow-hidden">
-                      <div className="bg-secondary/50 px-5 py-3 flex items-center gap-2 border-b border-border">
-                        <span className="text-sm font-semibold text-foreground capitalize">{sectionLabels[section] || section}</span>
-                        <span className="text-xs text-muted-foreground">({items.length})</span>
-                      </div>
-                      <div className="divide-y divide-border">
-                        {items.map((item) => (
-                          <div key={item.id} className="p-5">
-                            <div className="flex items-center justify-between mb-4">
-                              <span className="text-sm font-mono bg-secondary px-3 py-1 rounded-lg text-secondary-foreground">{item.content_key}</span>
-                              <div className="flex gap-2">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  disabled={translating || !editedContent[item.content_key]?.value_en}
-                                  onClick={async () => {
-                                    try {
-                                      setTranslating(true);
-                                      const result = await translateTexts({ value_en: editedContent[item.content_key]?.value_en || "" });
-                                      if (result.value_ar) {
-                                        updateEditedField(item.content_key, "value_ar", result.value_ar);
-                                        toast.success("Arabic translation generated");
-                                      }
-                                    } catch (e: any) { toast.error(e.message); }
-                                    finally { setTranslating(false); }
-                                  }}
-                                  className="rounded-xl"
-                                >
-                                  <Languages className="w-4 h-4 mr-1" />
-                                  {translating ? "..." : "Translate"}
-                                </Button>
-                                <Button size="sm" onClick={() => handleSaveContent(item.content_key)} className="gradient-accent text-accent-foreground rounded-xl border-0">
-                                  <Save className="w-4 h-4 mr-2" />Save
-                                </Button>
-                              </div>
-                            </div>
-                            {(() => {
-                              const isBooleanField = (editedContent[item.content_key]?.value_en || "").toLowerCase() === "true" || (editedContent[item.content_key]?.value_en || "").toLowerCase() === "false";
-                              if (isBooleanField) {
-                                const isActive = (editedContent[item.content_key]?.value_en || "").toLowerCase() === "true";
-                                return (
-                                  <div className="flex items-center gap-3">
-                                    <Switch
-                                      checked={isActive}
-                                      onCheckedChange={(checked) => {
-                                        const val = String(checked);
-                                        updateEditedField(item.content_key, "value_en", val);
-                                        updateEditedField(item.content_key, "value_ar", val);
-                                      }}
-                                    />
-                                    <span className={`text-sm font-medium ${isActive ? "text-green-500" : "text-muted-foreground"}`}>
-                                      {isActive ? "Active" : "Inactive"}
-                                    </span>
-                                  </div>
-                                );
-                              }
-                              return (
-                                <div className="grid md:grid-cols-2 gap-4">
-                                  <div>
-                                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">English</label>
-                                    {(editedContent[item.content_key]?.value_en?.length || 0) > 100 ? (
-                                      <Textarea value={editedContent[item.content_key]?.value_en || ""} onChange={(e) => updateEditedField(item.content_key, "value_en", e.target.value)} rows={3} className="rounded-xl resize-none" />
-                                    ) : (
-                                      <Input value={editedContent[item.content_key]?.value_en || ""} onChange={(e) => updateEditedField(item.content_key, "value_en", e.target.value)} className="rounded-xl" />
-                                    )}
-                                  </div>
-                                  <div>
-                                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Arabic</label>
-                                    {(editedContent[item.content_key]?.value_ar?.length || 0) > 100 ? (
-                                      <Textarea value={editedContent[item.content_key]?.value_ar || ""} onChange={(e) => updateEditedField(item.content_key, "value_ar", e.target.value)} rows={3} className="rounded-xl resize-none" dir="rtl" />
-                                    ) : (
-                                      <Input value={editedContent[item.content_key]?.value_ar || ""} onChange={(e) => updateEditedField(item.content_key, "value_ar", e.target.value)} className="rounded-xl" dir="rtl" />
-                                    )}
-                                  </div>
-                                </div>
-                              );
-                            })()}
+                {/* ── Hero Section ── */}
+                <div className="border border-border rounded-2xl overflow-hidden">
+                  <div className="bg-secondary/50 px-5 py-3 flex items-center gap-2 border-b border-border">
+                    <Image className="w-4 h-4 text-accent" />
+                    <span className="text-sm font-semibold text-foreground">Hero Section</span>
+                  </div>
+                  <div className="p-5 space-y-5">
+                    {/* Visibility toggles */}
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground mb-3 uppercase tracking-wide">Visibility</p>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {[
+                          { key: "hero.show_headline", label: "Headline" },
+                          { key: "hero.show_subtext", label: "Subtext" },
+                          { key: "hero.show_explore_btn", label: "Explore Products" },
+                          { key: "hero.show_contact_btn", label: "Contact Us" },
+                          { key: "hero.show_arrows", label: "Arrows" },
+                          { key: "hero.show_dots", label: "Dots" },
+                        ].map(({ key, label }) => (
+                          <div key={key} className="flex items-center justify-between p-3 rounded-xl border border-border bg-secondary/30">
+                            <span className={`text-sm font-medium ${heroVisibility[key] ? "text-foreground" : "text-muted-foreground"}`}>{label}</span>
+                            <Switch checked={heroVisibility[key]} onCheckedChange={() => handleToggleHeroVisibility(key)} />
                           </div>
                         ))}
                       </div>
                     </div>
-                  ));
+                    {/* Text content */}
+                    <div className="border-t border-border pt-5">
+                      <p className="text-xs font-medium text-muted-foreground mb-3 uppercase tracking-wide">Text Content</p>
+                      <div className="space-y-4">
+                        {content.filter(c => c.content_key.startsWith("hero.") && !c.content_key.startsWith("hero.show_")).map((item) => (
+                          <div key={item.id} className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-medium text-muted-foreground capitalize">{item.content_key.replace("hero.", "").replace(/_/g, " ")}</span>
+                              <div className="flex gap-2">
+                                <Button variant="outline" size="sm" disabled={translating || !editedContent[item.content_key]?.value_en} onClick={async () => { try { setTranslating(true); const r = await translateTexts({ v: editedContent[item.content_key]?.value_en || "" }); if (r.v) { updateEditedField(item.content_key, "value_ar", r.v); toast.success("Translated"); } } catch (e: any) { toast.error(e.message); } finally { setTranslating(false); } }} className="rounded-xl h-7 text-xs">
+                                  <Languages className="w-3 h-3 mr-1" />{translating ? "..." : "Translate"}
+                                </Button>
+                                <Button size="sm" onClick={() => handleSaveContent(item.content_key)} className="gradient-accent text-accent-foreground rounded-xl border-0 h-7 text-xs">
+                                  <Save className="w-3 h-3 mr-1" />Save
+                                </Button>
+                              </div>
+                            </div>
+                            <div className="grid md:grid-cols-2 gap-3">
+                              <Input value={editedContent[item.content_key]?.value_en || ""} onChange={(e) => updateEditedField(item.content_key, "value_en", e.target.value)} placeholder="English" className="rounded-xl text-sm" />
+                              <Input value={editedContent[item.content_key]?.value_ar || ""} onChange={(e) => updateEditedField(item.content_key, "value_ar", e.target.value)} placeholder="Arabic" className="rounded-xl text-sm" dir="rtl" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* ── Contact Section ── */}
+                <div className="border border-border rounded-2xl overflow-hidden">
+                  <div className="bg-secondary/50 px-5 py-3 flex items-center gap-2 border-b border-border">
+                    <Phone className="w-4 h-4 text-accent" />
+                    <span className="text-sm font-semibold text-foreground">Contact Section</span>
+                  </div>
+                  <div className="p-5 space-y-5">
+                    {/* Card visibility */}
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground mb-3 uppercase tracking-wide">Card Visibility</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {[
+                          { key: "contact_phone_visible", label: "Phone Card", icon: Phone },
+                          { key: "contact_email_visible", label: "Email Card", icon: Mail },
+                          { key: "contact_address_visible", label: "Address Cards", icon: Globe },
+                        ].map(({ key, label, icon: Ico }) => (
+                          <div key={key} className="flex items-center justify-between p-3 rounded-xl border border-border bg-secondary/30">
+                            <div className="flex items-center gap-2">
+                              <Ico className="w-4 h-4 text-muted-foreground" />
+                              <span className={`text-sm font-medium ${contactVisibility[key] ? "text-foreground" : "text-muted-foreground"}`}>{label}</span>
+                            </div>
+                            <Switch
+                              checked={contactVisibility[key]}
+                              onCheckedChange={async (val) => {
+                                setContactVisibility((prev) => ({ ...prev, [key]: val }));
+                                try {
+                                  await apiCall("content", "POST", storedPassword, { content_key: key, value_en: String(val), value_ar: String(val) });
+                                  toast.success(`${label} ${val ? "shown" : "hidden"}`);
+                                } catch (err: any) { toast.error(err.message); }
+                              }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    {/* Contact values */}
+                    <div className="border-t border-border pt-4 space-y-3">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Contact Info</p>
+                      {[
+                        { key: "contact_phone", label: "Phone Number", icon: Phone, placeholder: "+966 XX XXX XXXX" },
+                        { key: "contact_email", label: "Email Address", icon: Mail, placeholder: "info@example.com" },
+                      ].map(({ key, label, icon: Ico, placeholder }) => {
+                        const item = content.find((c) => c.content_key === key);
+                        const edited = editedContent[key];
+                        return (
+                          <div key={key} className="flex flex-col sm:flex-row gap-2">
+                            <div className="flex items-center gap-2 min-w-[120px]">
+                              <Ico className="w-4 h-4 text-muted-foreground" />
+                              <span className="text-sm font-medium text-foreground">{label}</span>
+                            </div>
+                            <Input value={edited?.value_en ?? item?.value_en ?? ""} onChange={(e) => setEditedContent((prev) => ({ ...prev, [key]: { value_en: e.target.value, value_ar: prev[key]?.value_ar ?? item?.value_ar ?? e.target.value } }))} placeholder={placeholder} className="rounded-xl flex-1 text-sm" />
+                            {edited && (
+                              <Button size="sm" onClick={() => handleSaveContent(key)} disabled={loading} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                                <Save className="w-3 h-3 mr-1" />Save
+                              </Button>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {/* Text content for contact */}
+                    <div className="border-t border-border pt-4 space-y-4">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Section Text</p>
+                      {content.filter(c => c.content_key.startsWith("contact.")).map((item) => (
+                        <div key={item.id} className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-medium text-muted-foreground capitalize">{item.content_key.replace("contact.", "").replace(/_/g, " ")}</span>
+                            <div className="flex gap-2">
+                              <Button variant="outline" size="sm" disabled={translating || !editedContent[item.content_key]?.value_en} onClick={async () => { try { setTranslating(true); const r = await translateTexts({ v: editedContent[item.content_key]?.value_en || "" }); if (r.v) { updateEditedField(item.content_key, "value_ar", r.v); toast.success("Translated"); } } catch (e: any) { toast.error(e.message); } finally { setTranslating(false); } }} className="rounded-xl h-7 text-xs">
+                                <Languages className="w-3 h-3 mr-1" />{translating ? "..." : "Translate"}
+                              </Button>
+                              <Button size="sm" onClick={() => handleSaveContent(item.content_key)} className="gradient-accent text-accent-foreground rounded-xl border-0 h-7 text-xs">
+                                <Save className="w-3 h-3 mr-1" />Save
+                              </Button>
+                            </div>
+                          </div>
+                          <div className="grid md:grid-cols-2 gap-3">
+                            <Input value={editedContent[item.content_key]?.value_en || ""} onChange={(e) => updateEditedField(item.content_key, "value_en", e.target.value)} placeholder="English" className="rounded-xl text-sm" />
+                            <Input value={editedContent[item.content_key]?.value_ar || ""} onChange={(e) => updateEditedField(item.content_key, "value_ar", e.target.value)} placeholder="Arabic" className="rounded-xl text-sm" dir="rtl" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {/* Addresses */}
+                    <div className="border-t border-border pt-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Addresses</p>
+                        <Button size="sm" onClick={() => setEditingAddress({ label_en: "", label_ar: "", is_active: true, sort_order: contactAddresses.length })} className="gradient-accent text-accent-foreground rounded-xl border-0 h-7 text-xs">
+                          <Plus className="w-3 h-3 mr-1" />Add
+                        </Button>
+                      </div>
+                      {editingAddress && (
+                        <div className="bg-secondary/50 border border-border rounded-xl p-4 mb-3 space-y-3">
+                          <div className="grid md:grid-cols-2 gap-3">
+                            <div>
+                              <label className="text-xs font-medium text-muted-foreground mb-1 block">English</label>
+                              <Input value={editingAddress.label_en} onChange={(e) => setEditingAddress({ ...editingAddress, label_en: e.target.value })} placeholder="e.g. UAE & India" className="rounded-xl" />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-muted-foreground mb-1 block">Arabic</label>
+                              <Input value={editingAddress.label_ar} onChange={(e) => setEditingAddress({ ...editingAddress, label_ar: e.target.value })} placeholder="e.g. الإمارات والهند" className="rounded-xl" dir="rtl" />
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button size="sm" disabled={translating} variant="outline" onClick={async () => { if (!editingAddress.label_en) return; try { setTranslating(true); const result = await translateTexts({ label_en: editingAddress.label_en }); if (result.label_en) setEditingAddress({ ...editingAddress, label_ar: result.label_en }); toast.success("Translated"); } catch (e: any) { toast.error(e.message); } finally { setTranslating(false); } }} className="rounded-xl h-7 text-xs">
+                              <Languages className="w-3 h-3 mr-1" />{translating ? "..." : "Translate"}
+                            </Button>
+                            <Button size="sm" onClick={async () => { try { if (editingAddress.id) { await supabase.from("contact_addresses").update({ label_en: editingAddress.label_en, label_ar: editingAddress.label_ar, is_active: editingAddress.is_active, sort_order: editingAddress.sort_order }).eq("id", editingAddress.id); } else { await supabase.from("contact_addresses").insert({ label_en: editingAddress.label_en, label_ar: editingAddress.label_ar, is_active: editingAddress.is_active, sort_order: editingAddress.sort_order }); } toast.success("Address saved"); setEditingAddress(null); fetchContactAddresses(); } catch (e: any) { toast.error(e.message); } }} className="gradient-accent text-accent-foreground rounded-xl border-0 h-7 text-xs">
+                              <Save className="w-3 h-3 mr-1" />Save
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={() => setEditingAddress(null)} className="rounded-xl h-7 text-xs">Cancel</Button>
+                          </div>
+                        </div>
+                      )}
+                      {contactAddresses.length === 0 && !editingAddress ? (
+                        <p className="text-sm text-muted-foreground text-center py-3">No addresses yet.</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {contactAddresses.map((addr) => (
+                            <div key={addr.id} className="flex items-center justify-between p-3 rounded-xl border border-border bg-secondary/30">
+                              <div className="flex items-center gap-3">
+                                <Globe className="w-4 h-4 text-accent shrink-0" />
+                                <div>
+                                  <p className="text-sm font-medium text-foreground">{addr.label_en}</p>
+                                  <p className="text-xs text-muted-foreground" dir="rtl">{addr.label_ar}</p>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-xs text-muted-foreground">{addr.is_active ? "Active" : "Inactive"}</span>
+                                  <Switch checked={addr.is_active} onCheckedChange={async () => { try { await supabase.from("contact_addresses").update({ is_active: !addr.is_active }).eq("id", addr.id); fetchContactAddresses(); toast.success(addr.is_active ? "Address hidden" : "Address shown"); } catch (e: any) { toast.error(e.message); } }} />
+                                </div>
+                                <Button size="sm" variant="outline" onClick={() => setEditingAddress(addr)} className="rounded-lg h-7 px-2 text-xs">Edit</Button>
+                                <Button size="sm" variant="outline" onClick={async () => { try { await supabase.from("contact_addresses").delete().eq("id", addr.id); fetchContactAddresses(); toast.success("Address deleted"); } catch (e: any) { toast.error(e.message); } }} className="rounded-lg h-7 px-2 text-xs text-destructive hover:text-destructive">
+                                  <Trash2 className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* ── Generic Sections (ordered by site layout) ── */}
+                {(() => {
+                  const grouped: Record<string, ContentItem[]> = {};
+                  const managedPrefixes = new Set(["hero", "contact", "footer"]);
+                  const managedKeys = new Set(["contact_phone", "contact_email", "contact_address", "contact_phone_visible", "contact_email_visible", "contact_address_visible"]);
+                  content.forEach((item) => {
+                    const section = item.content_key.split(".")[0] || "other";
+                    if (managedPrefixes.has(section) || managedKeys.has(item.content_key)) return;
+                    if (!grouped[section]) grouped[section] = [];
+                    grouped[section].push(item);
+                  });
+                  const sectionOrder = ["brand", "nav", "about", "products", "services", "highlight", "why", "whatsapp", "linkedin", "email", "floating"];
+                  const sectionLabels: Record<string, string> = {
+                    about: "About Section",
+                    brand: "Brand",
+                    highlight: "Highlight Section",
+                    nav: "Navigation",
+                    why: "Why Choose Us",
+                    services: "Services",
+                    products: "Products",
+                    whatsapp: "WhatsApp",
+                    linkedin: "LinkedIn",
+                    email: "Email (Floating)",
+                    floating: "Floating Buttons",
+                  };
+                  const sectionIcons: Record<string, typeof Star> = {
+                    about: Users,
+                    brand: Palette,
+                    highlight: Star,
+                    nav: Globe,
+                    why: Award,
+                    services: Briefcase,
+                    products: Package,
+                    whatsapp: Phone,
+                    linkedin: Globe,
+                    email: Mail,
+                    floating: Zap,
+                  };
+                  const sortedSections = Object.keys(grouped).sort((a, b) => {
+                    const ai = sectionOrder.indexOf(a);
+                    const bi = sectionOrder.indexOf(b);
+                    return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+                  });
+                  return sortedSections.map((section) => {
+                    const items = grouped[section];
+                    const SectionIcon = sectionIcons[section] || FileText;
+                    return (
+                      <div key={section} className="border border-border rounded-2xl overflow-hidden">
+                        <div className="bg-secondary/50 px-5 py-3 flex items-center gap-2 border-b border-border">
+                          <SectionIcon className="w-4 h-4 text-accent" />
+                          <span className="text-sm font-semibold text-foreground">{sectionLabels[section] || section}</span>
+                          <span className="text-xs text-muted-foreground">({items.length})</span>
+                        </div>
+                        <div className="divide-y divide-border">
+                          {items.map((item) => {
+                            const isBool = (editedContent[item.content_key]?.value_en || "").toLowerCase() === "true" || (editedContent[item.content_key]?.value_en || "").toLowerCase() === "false";
+                            const isActive = (editedContent[item.content_key]?.value_en || "").toLowerCase() === "true";
+                            const friendlyLabel = item.content_key.replace(/^[^.]+\./, "").replace(/^[^_]+_/, "").replace(/_/g, " ");
+                            return (
+                              <div key={item.id} className="p-5">
+                                <div className="flex items-center justify-between mb-3">
+                                  <span className="text-xs font-medium text-muted-foreground capitalize">{friendlyLabel || item.content_key}</span>
+                                  {isBool ? (
+                                    <div className="flex items-center gap-2">
+                                      <span className={`text-xs font-medium ${isActive ? "text-accent" : "text-muted-foreground"}`}>{isActive ? "Active" : "Inactive"}</span>
+                                      <Switch
+                                        checked={isActive}
+                                        onCheckedChange={(checked) => {
+                                          updateEditedField(item.content_key, "value_en", String(checked));
+                                          updateEditedField(item.content_key, "value_ar", String(checked));
+                                        }}
+                                      />
+                                      <Button size="sm" onClick={() => handleSaveContent(item.content_key)} className="gradient-accent text-accent-foreground rounded-xl border-0 h-7 text-xs">
+                                        <Save className="w-3 h-3 mr-1" />Save
+                                      </Button>
+                                    </div>
+                                  ) : (
+                                    <div className="flex gap-2">
+                                      <Button variant="outline" size="sm" disabled={translating || !editedContent[item.content_key]?.value_en} onClick={async () => { try { setTranslating(true); const r = await translateTexts({ v: editedContent[item.content_key]?.value_en || "" }); if (r.v) { updateEditedField(item.content_key, "value_ar", r.v); toast.success("Translated"); } } catch (e: any) { toast.error(e.message); } finally { setTranslating(false); } }} className="rounded-xl h-7 text-xs">
+                                        <Languages className="w-3 h-3 mr-1" />{translating ? "..." : "Translate"}
+                                      </Button>
+                                      <Button size="sm" onClick={() => handleSaveContent(item.content_key)} className="gradient-accent text-accent-foreground rounded-xl border-0 h-7 text-xs">
+                                        <Save className="w-3 h-3 mr-1" />Save
+                                      </Button>
+                                    </div>
+                                  )}
+                                </div>
+                                {!isBool && (
+                                  <div className="grid md:grid-cols-2 gap-3">
+                                    <div>
+                                      <label className="text-xs text-muted-foreground mb-1 block">English</label>
+                                      {(editedContent[item.content_key]?.value_en?.length || 0) > 100 ? (
+                                        <Textarea value={editedContent[item.content_key]?.value_en || ""} onChange={(e) => updateEditedField(item.content_key, "value_en", e.target.value)} rows={3} className="rounded-xl resize-none text-sm" />
+                                      ) : (
+                                        <Input value={editedContent[item.content_key]?.value_en || ""} onChange={(e) => updateEditedField(item.content_key, "value_en", e.target.value)} className="rounded-xl text-sm" />
+                                      )}
+                                    </div>
+                                    <div>
+                                      <label className="text-xs text-muted-foreground mb-1 block">Arabic</label>
+                                      {(editedContent[item.content_key]?.value_ar?.length || 0) > 100 ? (
+                                        <Textarea value={editedContent[item.content_key]?.value_ar || ""} onChange={(e) => updateEditedField(item.content_key, "value_ar", e.target.value)} rows={3} className="rounded-xl resize-none text-sm" dir="rtl" />
+                                      ) : (
+                                        <Input value={editedContent[item.content_key]?.value_ar || ""} onChange={(e) => updateEditedField(item.content_key, "value_ar", e.target.value)} className="rounded-xl text-sm" dir="rtl" />
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  });
                 })()}
               </div>
             )}
           </div>
-        )}
-
-        {/* ─── Products Tab ─────── */}
         {activeTab === "products" && (
           <div>
             <div className="flex items-center justify-between mb-6">
