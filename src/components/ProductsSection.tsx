@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -97,17 +97,24 @@ export default function ProductsSection() {
                 }}
               >
                 {/* Image area */}
-                <div className="relative aspect-[16/10] md:aspect-[4/3] md:flex-none min-h-0 overflow-hidden">
+                <div className="relative aspect-[16/10] md:aspect-[4/3] md:flex-none min-h-0 overflow-hidden bg-muted">
+                  {/* Shimmer skeleton shown until image loads */}
+                  <div className="absolute inset-0 bg-muted animate-pulse" />
+
                   {product.image_url ? (
                     <img
                       src={product.image_url}
                       alt={isAr ? product.name_ar : product.name_en}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      loading={i === 0 ? "eager" : "lazy"}
-                      decoding="async"
+                      className="relative w-full h-full object-cover transition-all duration-500 group-hover:scale-105 opacity-0"
+                      loading={i < 3 ? "eager" : "lazy"}
+                      decoding={i < 3 ? "sync" : "async"}
+                      onLoad={(e) => {
+                        (e.target as HTMLImageElement).classList.remove("opacity-0");
+                        (e.target as HTMLImageElement).classList.add("opacity-100");
+                      }}
                     />
                   ) : (
-                    <div className="w-full h-full bg-muted flex items-center justify-center">
+                    <div className="relative w-full h-full flex items-center justify-center">
                       {isCustomIcon ? (
                         <img src={product.icon} alt="" className="w-12 h-12 object-contain opacity-30" />
                       ) : Icon ? (
@@ -116,11 +123,9 @@ export default function ProductsSection() {
                     </div>
                   )}
 
-                  {/* No overlay — clean image */}
-
                   {/* Tag */}
                   {(isAr ? product.tag_ar : product.tag_en) && (
-                    <span className="absolute top-3 right-3 text-[11px] font-bold uppercase tracking-widest bg-foreground/75 text-background px-3 py-1.5 rounded-full backdrop-blur-md shadow-sm">
+                    <span className="absolute top-3 right-3 text-[11px] font-bold uppercase tracking-widest bg-foreground/75 text-background px-3 py-1.5 rounded-full backdrop-blur-md shadow-sm z-10">
                       {isAr ? product.tag_ar : product.tag_en}
                     </span>
                   )}
