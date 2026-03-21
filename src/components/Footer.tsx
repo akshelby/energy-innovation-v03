@@ -39,7 +39,15 @@ export default function Footer() {
   ];
 
   const scrollTo = (href: string) => {
-    document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+    const el = document.querySelector(href);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    } else {
+      // Fallback: retry after a short delay in case sections haven't mounted yet
+      requestAnimationFrame(() => {
+        document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+      });
+    }
   };
 
   return (
