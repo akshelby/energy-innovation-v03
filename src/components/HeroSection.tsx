@@ -16,6 +16,10 @@ import hero5Local from "@/assets/hero-5.webp";
 const localImages = [hero1Local, hero2Local, hero3Local, hero4Local, hero5Local];
 const imageFilePattern = /\.\w+$/i;
 
+// Pre-compute the first hero image URL synchronously from the known DB value
+// so the image renders on the very first paint (no waiting for fetch).
+const FIRST_HERO_IMAGE = buildHeroImageUrl("Untitled design .svg");
+
 const normalizeFileName = (fileName: string) =>
   fileName.trim().replace(/\s+\.(?=[^.]+$)/, ".");
 
