@@ -1381,6 +1381,8 @@ export default function Admin() {
             { key: "services" as TabKey, icon: Briefcase, label: `Services (${services.length})` },
             { key: "highlight" as TabKey, icon: Star, label: "Highlight Section" },
             { key: "menu-items" as TabKey, icon: List, label: `Product Catalog (${menuItems.length})` },
+            { key: "product-pages" as TabKey, icon: FileImage, label: `Product Pages (${productPages.length})` },
+            { key: "product-enquiries" as TabKey, icon: Inbox, label: `Enquiries (${productEnquiries.length})` },
             { key: "careers" as TabKey, icon: UserPlus, label: `Careers (${careersList.length})` },
             { key: "images" as TabKey, icon: Image, label: "Files & Images" },
             { key: "admin-emails" as TabKey, icon: Shield, label: `Admin Access (${adminEmails.length})` },
