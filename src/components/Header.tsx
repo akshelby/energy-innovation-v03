@@ -37,6 +37,8 @@ export default function Header() {
   const { logoUrl, brandName, logoSize, ready: brandReady } = useBranding();
   const [scrolled, setScrolled] = useState(false);
   const [pastHero, setPastHero] = useState(false);
+  const [headerVisible, setHeaderVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
@@ -124,12 +126,22 @@ export default function Header() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-      setPastHero(window.scrollY > window.innerHeight - 100);
+      const currentScrollY = window.scrollY;
+      setScrolled(currentScrollY > 50);
+      setPastHero(currentScrollY > window.innerHeight - 100);
+      
+      if (currentScrollY < 50) {
+        setHeaderVisible(true);
+      } else if (currentScrollY < lastScrollY) {
+        setHeaderVisible(true);
+      } else if (currentScrollY > lastScrollY) {
+        setHeaderVisible(false);
+      }
+      setLastScrollY(currentScrollY);
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [lastScrollY]);
 
   useEffect(() => {
     if (mobileOpen) {
@@ -281,7 +293,7 @@ export default function Header() {
       <header
         className={`fixed top-0 left-0 z-50 w-full bg-card transition-all duration-300 ${
           scrolled ? "shadow-md" : ""
-        }`}
+        } ${headerVisible ? "translate-y-0" : "-translate-y-full"}`}
       >
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 md:px-6">
           {/* Logo */}
