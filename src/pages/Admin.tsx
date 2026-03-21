@@ -227,6 +227,7 @@ export default function Admin() {
   const [categories, setCategories] = useState<(CategoryItem & { id: string })[]>([]);
   const [editingCategory, setEditingCategory] = useState<CategoryItem | null>(null);
   const menuItemPdfRef = useRef<HTMLInputElement>(null);
+  const menuItemImgRef = useRef<HTMLInputElement>(null);
   const menuEditorRef = useRef<HTMLDivElement>(null);
 
   // Scroll to editor when it opens
