@@ -27,6 +27,7 @@ interface ProductItem {
   is_active: boolean;
   has_page: boolean;
   sort_order: number;
+  image_url: string | null;
 }
 
 export default function SubProductsPage() {
