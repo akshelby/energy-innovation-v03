@@ -2116,6 +2116,7 @@ export default function Admin() {
               </div>
             )}
           </div>
+        )}
         {activeTab === "products" && (
           <div>
             <div className="flex items-center justify-between mb-6">
