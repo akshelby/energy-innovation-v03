@@ -9,6 +9,8 @@ export default function Footer() {
   const { t } = useLanguage();
   const { logoUrl, brandName, logoSize, ready: brandReady } = useBranding();
   const [linkedinUrl, setLinkedinUrl] = useState("");
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     supabase
@@ -39,17 +41,22 @@ export default function Footer() {
     t("cat.loading"),
   ];
 
-  const scrollTo = (href: string) => {
+  const scrollTo = useCallback((href: string) => {
+    // If not on the home page, navigate there first with the hash
+    if (location.pathname !== "/") {
+      navigate("/" + href);
+      return;
+    }
     const el = document.querySelector(href);
     if (el) {
       el.scrollIntoView({ behavior: "smooth" });
     } else {
-      // Fallback: retry after a short delay in case sections haven't mounted yet
-      requestAnimationFrame(() => {
+      // Retry after a frame in case DOM isn't ready yet
+      setTimeout(() => {
         document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
-      });
+      }, 100);
     }
-  };
+  }, [location.pathname, navigate]);
 
   return (
     <footer className="gradient-primary text-primary-foreground pt-16 pb-8 px-6">
