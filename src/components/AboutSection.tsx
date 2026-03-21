@@ -11,7 +11,7 @@ export default function AboutSection() {
     <section id="about" className="py-14 md:py-24 px-6 bg-background" ref={ref}>
       <div className="max-w-6xl mx-auto">
         <div ref={parallaxHeading} className="text-center scroll-reveal will-change-transform">
-          <span className="inline-block px-8 py-3.5 text-lg font-bold tracking-wide text-primary bg-accent/30 rounded-full mb-4">
+          <span className="inline-block px-8 py-3.5 text-lg font-bold tracking-wide text-accent bg-accent/30 rounded-full mb-4">
             {t("about.tag")}
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
