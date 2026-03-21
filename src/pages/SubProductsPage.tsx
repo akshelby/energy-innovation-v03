@@ -192,7 +192,7 @@ export default function SubProductsPage() {
           </nav>
 
           <div className="text-center mt-6 md:mt-10">
-            <span className="inline-block px-8 py-3.5 text-lg font-bold tracking-wide text-white bg-accent rounded-full mb-4">
+            <span className="inline-block px-8 py-3.5 text-lg font-bold tracking-wide text-white bg-accent rounded-full mb-6">
               {productName}
             </span>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
