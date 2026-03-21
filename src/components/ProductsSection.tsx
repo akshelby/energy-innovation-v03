@@ -34,6 +34,7 @@ const fallbackProducts = [
 ];
 
 interface Product {
+  id: string;
   name_en: string;
   name_ar: string;
   description_en: string;
@@ -43,6 +44,7 @@ interface Product {
   pdf_url: string | null;
   tag_en: string;
   tag_ar: string;
+  category_key: string;
 }
 
 export default function ProductsSection() {
