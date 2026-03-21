@@ -110,7 +110,7 @@ export default function StickyCardStack({
         <Fragment key={i}>
           <div
             data-sticky-card
-            className={`sticky will-change-transform rounded-2xl overflow-hidden transition-[transform,filter] duration-500 ease-out ${fullHeight ? "h-[70svh]" : ""}`}
+            className={`sticky will-change-transform rounded-2xl overflow-hidden transition-[transform,filter] duration-500 ease-out ${fullHeight ? "min-h-fit" : ""}`}
             style={{
               top: `${baseTop + i * offsetIncrement}px`,
               zIndex: i + 1,
