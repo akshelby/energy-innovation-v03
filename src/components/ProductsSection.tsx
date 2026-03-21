@@ -97,7 +97,7 @@ export default function ProductsSection() {
                 }}
               >
                 {/* Image area */}
-                <div className="relative aspect-[4/3] md:flex-none min-h-0 overflow-hidden bg-muted">
+                <div className="relative aspect-[16/10] md:aspect-[4/3] md:flex-none min-h-0 overflow-hidden">
                   {product.image_url ? (
                     <img
                       src={product.image_url}
