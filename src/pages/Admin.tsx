@@ -339,6 +339,48 @@ export default function Admin() {
     { icon: "Users", title_en: "Collaborative Culture", title_ar: "ثقافة تعاونية", desc_en: "Work alongside industry experts in a supportive, inclusive team environment.", desc_ar: "اعمل جنباً إلى جنب مع خبراء الصناعة في بيئة فريق داعمة وشاملة." },
     { icon: "Shield", title_en: "Job Security", title_ar: "الأمان الوظيفي", desc_en: "Stable employment with competitive compensation and performance-based rewards.", desc_ar: "توظيف مستقر مع تعويضات تنافسية ومكافآت قائمة على الأداء." },
   ]);
+
+  // Product Pages state
+  interface ProductPageItem {
+    id?: string;
+    product_item_id: string;
+    headline_en: string;
+    headline_ar: string;
+    description_en: string;
+    description_ar: string;
+    sub_description_en: string;
+    sub_description_ar: string;
+    is_active: boolean;
+    product_items?: { name_en: string; name_ar: string; category_key: string; parent_id: string | null };
+  }
+  interface PageImageItem {
+    id?: string;
+    product_page_id: string;
+    image_url: string;
+    sort_order: number;
+  }
+  interface ProductEnquiryItem {
+    id: string;
+    product_item_id: string | null;
+    product_name: string;
+    name: string;
+    email: string;
+    company: string | null;
+    requirement: string;
+    created_at: string;
+  }
+  const [productPages, setProductPages] = useState<(ProductPageItem & { id: string })[]>([]);
+  const [editingPage, setEditingPage] = useState<ProductPageItem | null>(null);
+  const [pageImages, setPageImages] = useState<(PageImageItem & { id: string })[]>([]);
+  const [productEnquiries, setProductEnquiries] = useState<ProductEnquiryItem[]>([]);
+  const pageImageRef = useRef<HTMLInputElement>(null);
+  const pageEditorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (editingPage && pageEditorRef.current) {
+      setTimeout(() => pageEditorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 100);
+    }
+  }, [editingPage]);
   const PERK_ICON_OPTIONS = ["TrendingUp", "Heart", "Users", "Shield", "Star", "Award", "Globe", "Zap", "Clock", "Briefcase", "Phone", "Mail", "UserPlus", "Package", "Sun", "Moon", "FileText", "MessageSquare", "Database", "Palette"];
 
   const prevEditingCareerRef = useRef<boolean>(false);
