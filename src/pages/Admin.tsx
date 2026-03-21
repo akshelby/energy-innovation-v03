@@ -3749,6 +3749,273 @@ export default function Admin() {
             </div>
           </div>
         )}
+
+        {/* ─── Footer Tab ──────── */}
+        {activeTab === "footer" && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-foreground">Footer Settings</h2>
+              <Button variant="outline" size="sm" onClick={fetchContent} disabled={loading} className="rounded-xl">
+                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
+              </Button>
+            </div>
+
+            {/* Social Media Links */}
+            <div className="bg-card border border-border rounded-2xl p-6 mb-6">
+              <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Globe className="w-4 h-4 text-accent" />
+                Social Media Links
+              </h3>
+              <p className="text-xs text-muted-foreground mb-4">Leave a URL empty to hide that social icon from the footer.</p>
+              <div className="space-y-3">
+                {[
+                  { key: "footer.social_linkedin", label: "LinkedIn", placeholder: "https://linkedin.com/company/..." },
+                  { key: "footer.social_twitter", label: "X / Twitter", placeholder: "https://x.com/..." },
+                  { key: "footer.social_facebook", label: "Facebook", placeholder: "https://facebook.com/..." },
+                  { key: "footer.social_instagram", label: "Instagram", placeholder: "https://instagram.com/..." },
+                  { key: "footer.social_youtube", label: "YouTube", placeholder: "https://youtube.com/..." },
+                ].map(({ key, label, placeholder }) => {
+                  const item = content.find((c) => c.content_key === key);
+                  const edited = editedContent[key];
+                  return (
+                    <div key={key} className="flex flex-col sm:flex-row gap-2">
+                      <div className="flex items-center gap-2 min-w-[120px]">
+                        <span className="text-sm font-medium text-foreground">{label}</span>
+                      </div>
+                      <Input
+                        value={edited?.value_en ?? item?.value_en ?? ""}
+                        onChange={(e) => setEditedContent((prev) => ({
+                          ...prev,
+                          [key]: { value_en: e.target.value, value_ar: e.target.value },
+                        }))}
+                        placeholder={placeholder}
+                        className="rounded-xl flex-1 text-sm"
+                      />
+                      {edited && (
+                        <Button
+                          size="sm"
+                          onClick={() => handleSaveContent(key)}
+                          disabled={loading}
+                          className="gradient-accent text-accent-foreground rounded-xl border-0"
+                        >
+                          <Save className="w-3 h-3 mr-1" />Save
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Contact Info */}
+            <div className="bg-card border border-border rounded-2xl p-6 mb-6">
+              <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Mail className="w-4 h-4 text-accent" />
+                Footer Contact Info
+              </h3>
+              <div className="space-y-3">
+                {[
+                  { key: "footer.contact_email", label: "Email", placeholder: "info@example.com" },
+                  { key: "footer.contact_website", label: "Website", placeholder: "www.example.com" },
+                ].map(({ key, label, placeholder }) => {
+                  const item = content.find((c) => c.content_key === key);
+                  const edited = editedContent[key];
+                  return (
+                    <div key={key} className="flex flex-col sm:flex-row gap-2">
+                      <div className="flex items-center gap-2 min-w-[120px]">
+                        <span className="text-sm font-medium text-foreground">{label}</span>
+                      </div>
+                      <Input
+                        value={edited?.value_en ?? item?.value_en ?? ""}
+                        onChange={(e) => setEditedContent((prev) => ({
+                          ...prev,
+                          [key]: { value_en: e.target.value, value_ar: e.target.value },
+                        }))}
+                        placeholder={placeholder}
+                        className="rounded-xl flex-1 text-sm"
+                      />
+                      {edited && (
+                        <Button
+                          size="sm"
+                          onClick={() => handleSaveContent(key)}
+                          disabled={loading}
+                          className="gradient-accent text-accent-foreground rounded-xl border-0"
+                        >
+                          <Save className="w-3 h-3 mr-1" />Save
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Footer Description */}
+            <div className="bg-card border border-border rounded-2xl p-6 mb-6">
+              <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+                <FileText className="w-4 h-4 text-accent" />
+                Footer Description
+              </h3>
+              {(() => {
+                const key = "footer.desc";
+                const item = content.find((c) => c.content_key === key);
+                const edited = editedContent[key];
+                return (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1.5 block">English</label>
+                      <Textarea
+                        value={edited?.value_en ?? item?.value_en ?? ""}
+                        onChange={(e) => updateEditedField(key, "value_en", e.target.value)}
+                        rows={2}
+                        className="rounded-xl resize-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Arabic</label>
+                      <Textarea
+                        value={edited?.value_ar ?? item?.value_ar ?? ""}
+                        onChange={(e) => updateEditedField(key, "value_ar", e.target.value)}
+                        rows={2}
+                        className="rounded-xl resize-none"
+                        dir="rtl"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={translating || !editedContent[key]?.value_en}
+                        onClick={async () => {
+                          try {
+                            setTranslating(true);
+                            const result = await translateTexts({ value_en: editedContent[key]?.value_en || "" });
+                            if (result.value_en) updateEditedField(key, "value_ar", result.value_en);
+                            toast.success("Translated");
+                          } catch (e: any) { toast.error(e.message); }
+                          finally { setTranslating(false); }
+                        }}
+                        className="rounded-xl"
+                      >
+                        <Languages className="w-4 h-4 mr-1" />{translating ? "..." : "Translate"}
+                      </Button>
+                      <Button size="sm" onClick={() => handleSaveContent(key)} disabled={!edited} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                        <Save className="w-3 h-3 mr-1" />Save
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Address Blocks */}
+            <div className="bg-card border border-border rounded-2xl p-6 mb-6">
+              <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Globe className="w-4 h-4 text-accent" />
+                Address Blocks
+              </h3>
+              <p className="text-xs text-muted-foreground mb-4">Two address blocks shown in the footer contact column. Use line breaks for multi-line content.</p>
+              {[
+                { headingKey: "footer.address_1_heading", bodyKey: "footer.address_1_body", label: "Address Block 1" },
+                { headingKey: "footer.address_2_heading", bodyKey: "footer.address_2_body", label: "Address Block 2" },
+              ].map(({ headingKey, bodyKey, label }) => {
+                const headingItem = content.find((c) => c.content_key === headingKey);
+                const bodyItem = content.find((c) => c.content_key === bodyKey);
+                const headingEdited = editedContent[headingKey];
+                const bodyEdited = editedContent[bodyKey];
+                return (
+                  <div key={headingKey} className="mb-6 last:mb-0 border border-border rounded-xl p-4">
+                    <h4 className="text-sm font-semibold text-foreground mb-3">{label}</h4>
+                    <div className="grid md:grid-cols-2 gap-3 mb-3">
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1 block">Heading (EN)</label>
+                        <Input
+                          value={headingEdited?.value_en ?? headingItem?.value_en ?? ""}
+                          onChange={(e) => setEditedContent((prev) => ({
+                            ...prev,
+                            [headingKey]: { value_en: e.target.value, value_ar: prev[headingKey]?.value_ar ?? headingItem?.value_ar ?? "" },
+                          }))}
+                          className="rounded-xl"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1 block">Heading (AR)</label>
+                        <Input
+                          value={headingEdited?.value_ar ?? headingItem?.value_ar ?? ""}
+                          onChange={(e) => setEditedContent((prev) => ({
+                            ...prev,
+                            [headingKey]: { value_en: prev[headingKey]?.value_en ?? headingItem?.value_en ?? "", value_ar: e.target.value },
+                          }))}
+                          className="rounded-xl"
+                          dir="rtl"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-3 mb-3">
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1 block">Body (EN)</label>
+                        <Textarea
+                          value={bodyEdited?.value_en ?? bodyItem?.value_en ?? ""}
+                          onChange={(e) => setEditedContent((prev) => ({
+                            ...prev,
+                            [bodyKey]: { value_en: e.target.value, value_ar: prev[bodyKey]?.value_ar ?? bodyItem?.value_ar ?? "" },
+                          }))}
+                          rows={3}
+                          className="rounded-xl resize-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1 block">Body (AR)</label>
+                        <Textarea
+                          value={bodyEdited?.value_ar ?? bodyItem?.value_ar ?? ""}
+                          onChange={(e) => setEditedContent((prev) => ({
+                            ...prev,
+                            [bodyKey]: { value_en: prev[bodyKey]?.value_en ?? bodyItem?.value_en ?? "", value_ar: e.target.value },
+                          }))}
+                          rows={3}
+                          className="rounded-xl resize-none"
+                          dir="rtl"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={translating}
+                        onClick={async () => {
+                          try {
+                            setTranslating(true);
+                            const hEn = editedContent[headingKey]?.value_en || headingItem?.value_en || "";
+                            const bEn = editedContent[bodyKey]?.value_en || bodyItem?.value_en || "";
+                            const result = await translateTexts({ heading: hEn, body: bEn });
+                            if (result.heading) setEditedContent((prev) => ({ ...prev, [headingKey]: { value_en: prev[headingKey]?.value_en ?? headingItem?.value_en ?? "", value_ar: result.heading } }));
+                            if (result.body) setEditedContent((prev) => ({ ...prev, [bodyKey]: { value_en: prev[bodyKey]?.value_en ?? bodyItem?.value_en ?? "", value_ar: result.body } }));
+                            toast.success("Translated");
+                          } catch (e: any) { toast.error(e.message); }
+                          finally { setTranslating(false); }
+                        }}
+                        className="rounded-xl"
+                      >
+                        <Languages className="w-4 h-4 mr-1" />{translating ? "..." : "Translate"}
+                      </Button>
+                      {headingEdited && (
+                        <Button size="sm" onClick={() => handleSaveContent(headingKey)} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                          <Save className="w-3 h-3 mr-1" />Save Heading
+                        </Button>
+                      )}
+                      {bodyEdited && (
+                        <Button size="sm" onClick={() => handleSaveContent(bodyKey)} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                          <Save className="w-3 h-3 mr-1" />Save Body
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       <PdfViewerDialog open={pdfPreviewOpen} onOpenChange={setPdfPreviewOpen} src={pdfPreviewUrl} />
