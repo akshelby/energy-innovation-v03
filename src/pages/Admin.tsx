@@ -132,6 +132,18 @@ const defaultContent: { content_key: string; value_en: string; value_ar: string 
   { content_key: "footer.email", value_en: "info@energyinnovation.com", value_ar: "info@energyinnovation.com" },
   { content_key: "footer.phone", value_en: "+1 (555) 000-0000", value_ar: "+1 (555) 000-0000" },
   { content_key: "footer.address", value_en: "Industrial District, Building 7", value_ar: "المنطقة الصناعية، مبنى 7" },
+  { content_key: "footer.desc", value_en: "Premium industrial technology solutions for modern facilities worldwide.", value_ar: "حلول تكنولوجيا صناعية متميزة للمنشآت الحديثة حول العالم." },
+  { content_key: "footer.social_linkedin", value_en: "https://linkedin.com", value_ar: "https://linkedin.com" },
+  { content_key: "footer.social_twitter", value_en: "https://x.com", value_ar: "https://x.com" },
+  { content_key: "footer.social_facebook", value_en: "https://facebook.com", value_ar: "https://facebook.com" },
+  { content_key: "footer.social_instagram", value_en: "https://instagram.com", value_ar: "https://instagram.com" },
+  { content_key: "footer.social_youtube", value_en: "https://youtube.com", value_ar: "https://youtube.com" },
+  { content_key: "footer.contact_email", value_en: "info@energyinnvo.com", value_ar: "info@energyinnvo.com" },
+  { content_key: "footer.contact_website", value_en: "www.energyinnvo.com", value_ar: "www.energyinnvo.com" },
+  { content_key: "footer.address_1_heading", value_en: "Industrial District, Building 7", value_ar: "المنطقة الصناعية، مبنى 7" },
+  { content_key: "footer.address_1_body", value_en: "Office No. BC-891284, 26th Floor,\nAmber Gem Tower, Ajman, UAE.", value_ar: "مكتب رقم BC-891284، الطابق 26،\nبرج أمبر جيم، عجمان، الإمارات." },
+  { content_key: "footer.address_2_heading", value_en: "India Branch:", value_ar: "فرع الهند:" },
+  { content_key: "footer.address_2_body", value_en: "Office 167, Chetpet,\nTamil Nadu, India.", value_ar: "مكتب 167، شيتبيت،\nتاميل نادو، الهند." },
 ];
 
 const IMAGE_FOLDERS = [
@@ -198,7 +210,7 @@ const emptyService: ServiceItem = {
   tag_en: "", tag_ar: "", image_url: null, pdf_url: null, icon: "Wrench", sort_order: 0,
 };
 
-type TabKey = "leads" | "content" | "products" | "services" | "menu-items" | "images" | "branding" | "highlight" | "careers" | "admin-emails" | "product-pages" | "product-enquiries";
+type TabKey = "leads" | "content" | "products" | "services" | "menu-items" | "images" | "branding" | "highlight" | "careers" | "admin-emails" | "product-pages" | "product-enquiries" | "footer";
 
 const emptyMenuChild: MenuChildItem = {
   category_key: "cat.fire", parent_id: null, name_en: "", name_ar: "", pdf_url: null, image_url: null, sort_order: 0, is_active: true,
@@ -650,6 +662,7 @@ export default function Admin() {
       else if (activeTab === "admin-emails") fetchAdminEmails();
       else if (activeTab === "product-pages") { fetchProductPages(); fetchMenuItems(); fetchCategories(); }
       else if (activeTab === "product-enquiries") fetchProductEnquiries();
+      else if (activeTab === "footer") fetchContent();
       else fetchFiles();
     }
   }, [authenticated, activeTab, fetchLeads, fetchContent, fetchContactAddresses, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding, fetchHighlight, fetchCareers, fetchCareersContent, fetchAdminEmails, fetchProductPages, fetchProductEnquiries]);
@@ -1390,6 +1403,7 @@ export default function Admin() {
             { key: "product-enquiries" as TabKey, icon: Inbox, label: `Enquiries (${productEnquiries.length})` },
             { key: "careers" as TabKey, icon: UserPlus, label: `Careers (${careersList.length})` },
             { key: "images" as TabKey, icon: Image, label: "Files & Images" },
+            { key: "footer" as TabKey, icon: Globe, label: "Footer" },
             { key: "admin-emails" as TabKey, icon: Shield, label: `Admin Access (${adminEmails.length})` },
           ]).map((tab) => (
             <Button key={tab.key} variant={activeTab === tab.key ? "default" : "outline"} onClick={() => setActiveTab(tab.key)} className="rounded-xl">
@@ -3732,6 +3746,273 @@ export default function Admin() {
               {productEnquiries.length === 0 && (
                 <p className="text-center text-muted-foreground py-8">No enquiries received yet.</p>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* ─── Footer Tab ──────── */}
+        {activeTab === "footer" && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-foreground">Footer Settings</h2>
+              <Button variant="outline" size="sm" onClick={fetchContent} disabled={loading} className="rounded-xl">
+                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
+              </Button>
+            </div>
+
+            {/* Social Media Links */}
+            <div className="bg-card border border-border rounded-2xl p-6 mb-6">
+              <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Globe className="w-4 h-4 text-accent" />
+                Social Media Links
+              </h3>
+              <p className="text-xs text-muted-foreground mb-4">Leave a URL empty to hide that social icon from the footer.</p>
+              <div className="space-y-3">
+                {[
+                  { key: "footer.social_linkedin", label: "LinkedIn", placeholder: "https://linkedin.com/company/..." },
+                  { key: "footer.social_twitter", label: "X / Twitter", placeholder: "https://x.com/..." },
+                  { key: "footer.social_facebook", label: "Facebook", placeholder: "https://facebook.com/..." },
+                  { key: "footer.social_instagram", label: "Instagram", placeholder: "https://instagram.com/..." },
+                  { key: "footer.social_youtube", label: "YouTube", placeholder: "https://youtube.com/..." },
+                ].map(({ key, label, placeholder }) => {
+                  const item = content.find((c) => c.content_key === key);
+                  const edited = editedContent[key];
+                  return (
+                    <div key={key} className="flex flex-col sm:flex-row gap-2">
+                      <div className="flex items-center gap-2 min-w-[120px]">
+                        <span className="text-sm font-medium text-foreground">{label}</span>
+                      </div>
+                      <Input
+                        value={edited?.value_en ?? item?.value_en ?? ""}
+                        onChange={(e) => setEditedContent((prev) => ({
+                          ...prev,
+                          [key]: { value_en: e.target.value, value_ar: e.target.value },
+                        }))}
+                        placeholder={placeholder}
+                        className="rounded-xl flex-1 text-sm"
+                      />
+                      {edited && (
+                        <Button
+                          size="sm"
+                          onClick={() => handleSaveContent(key)}
+                          disabled={loading}
+                          className="gradient-accent text-accent-foreground rounded-xl border-0"
+                        >
+                          <Save className="w-3 h-3 mr-1" />Save
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Contact Info */}
+            <div className="bg-card border border-border rounded-2xl p-6 mb-6">
+              <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Mail className="w-4 h-4 text-accent" />
+                Footer Contact Info
+              </h3>
+              <div className="space-y-3">
+                {[
+                  { key: "footer.contact_email", label: "Email", placeholder: "info@example.com" },
+                  { key: "footer.contact_website", label: "Website", placeholder: "www.example.com" },
+                ].map(({ key, label, placeholder }) => {
+                  const item = content.find((c) => c.content_key === key);
+                  const edited = editedContent[key];
+                  return (
+                    <div key={key} className="flex flex-col sm:flex-row gap-2">
+                      <div className="flex items-center gap-2 min-w-[120px]">
+                        <span className="text-sm font-medium text-foreground">{label}</span>
+                      </div>
+                      <Input
+                        value={edited?.value_en ?? item?.value_en ?? ""}
+                        onChange={(e) => setEditedContent((prev) => ({
+                          ...prev,
+                          [key]: { value_en: e.target.value, value_ar: e.target.value },
+                        }))}
+                        placeholder={placeholder}
+                        className="rounded-xl flex-1 text-sm"
+                      />
+                      {edited && (
+                        <Button
+                          size="sm"
+                          onClick={() => handleSaveContent(key)}
+                          disabled={loading}
+                          className="gradient-accent text-accent-foreground rounded-xl border-0"
+                        >
+                          <Save className="w-3 h-3 mr-1" />Save
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Footer Description */}
+            <div className="bg-card border border-border rounded-2xl p-6 mb-6">
+              <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+                <FileText className="w-4 h-4 text-accent" />
+                Footer Description
+              </h3>
+              {(() => {
+                const key = "footer.desc";
+                const item = content.find((c) => c.content_key === key);
+                const edited = editedContent[key];
+                return (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1.5 block">English</label>
+                      <Textarea
+                        value={edited?.value_en ?? item?.value_en ?? ""}
+                        onChange={(e) => updateEditedField(key, "value_en", e.target.value)}
+                        rows={2}
+                        className="rounded-xl resize-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Arabic</label>
+                      <Textarea
+                        value={edited?.value_ar ?? item?.value_ar ?? ""}
+                        onChange={(e) => updateEditedField(key, "value_ar", e.target.value)}
+                        rows={2}
+                        className="rounded-xl resize-none"
+                        dir="rtl"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={translating || !editedContent[key]?.value_en}
+                        onClick={async () => {
+                          try {
+                            setTranslating(true);
+                            const result = await translateTexts({ value_en: editedContent[key]?.value_en || "" });
+                            if (result.value_en) updateEditedField(key, "value_ar", result.value_en);
+                            toast.success("Translated");
+                          } catch (e: any) { toast.error(e.message); }
+                          finally { setTranslating(false); }
+                        }}
+                        className="rounded-xl"
+                      >
+                        <Languages className="w-4 h-4 mr-1" />{translating ? "..." : "Translate"}
+                      </Button>
+                      <Button size="sm" onClick={() => handleSaveContent(key)} disabled={!edited} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                        <Save className="w-3 h-3 mr-1" />Save
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Address Blocks */}
+            <div className="bg-card border border-border rounded-2xl p-6 mb-6">
+              <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Globe className="w-4 h-4 text-accent" />
+                Address Blocks
+              </h3>
+              <p className="text-xs text-muted-foreground mb-4">Two address blocks shown in the footer contact column. Use line breaks for multi-line content.</p>
+              {[
+                { headingKey: "footer.address_1_heading", bodyKey: "footer.address_1_body", label: "Address Block 1" },
+                { headingKey: "footer.address_2_heading", bodyKey: "footer.address_2_body", label: "Address Block 2" },
+              ].map(({ headingKey, bodyKey, label }) => {
+                const headingItem = content.find((c) => c.content_key === headingKey);
+                const bodyItem = content.find((c) => c.content_key === bodyKey);
+                const headingEdited = editedContent[headingKey];
+                const bodyEdited = editedContent[bodyKey];
+                return (
+                  <div key={headingKey} className="mb-6 last:mb-0 border border-border rounded-xl p-4">
+                    <h4 className="text-sm font-semibold text-foreground mb-3">{label}</h4>
+                    <div className="grid md:grid-cols-2 gap-3 mb-3">
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1 block">Heading (EN)</label>
+                        <Input
+                          value={headingEdited?.value_en ?? headingItem?.value_en ?? ""}
+                          onChange={(e) => setEditedContent((prev) => ({
+                            ...prev,
+                            [headingKey]: { value_en: e.target.value, value_ar: prev[headingKey]?.value_ar ?? headingItem?.value_ar ?? "" },
+                          }))}
+                          className="rounded-xl"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1 block">Heading (AR)</label>
+                        <Input
+                          value={headingEdited?.value_ar ?? headingItem?.value_ar ?? ""}
+                          onChange={(e) => setEditedContent((prev) => ({
+                            ...prev,
+                            [headingKey]: { value_en: prev[headingKey]?.value_en ?? headingItem?.value_en ?? "", value_ar: e.target.value },
+                          }))}
+                          className="rounded-xl"
+                          dir="rtl"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-3 mb-3">
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1 block">Body (EN)</label>
+                        <Textarea
+                          value={bodyEdited?.value_en ?? bodyItem?.value_en ?? ""}
+                          onChange={(e) => setEditedContent((prev) => ({
+                            ...prev,
+                            [bodyKey]: { value_en: e.target.value, value_ar: prev[bodyKey]?.value_ar ?? bodyItem?.value_ar ?? "" },
+                          }))}
+                          rows={3}
+                          className="rounded-xl resize-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1 block">Body (AR)</label>
+                        <Textarea
+                          value={bodyEdited?.value_ar ?? bodyItem?.value_ar ?? ""}
+                          onChange={(e) => setEditedContent((prev) => ({
+                            ...prev,
+                            [bodyKey]: { value_en: prev[bodyKey]?.value_en ?? bodyItem?.value_en ?? "", value_ar: e.target.value },
+                          }))}
+                          rows={3}
+                          className="rounded-xl resize-none"
+                          dir="rtl"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={translating}
+                        onClick={async () => {
+                          try {
+                            setTranslating(true);
+                            const hEn = editedContent[headingKey]?.value_en || headingItem?.value_en || "";
+                            const bEn = editedContent[bodyKey]?.value_en || bodyItem?.value_en || "";
+                            const result = await translateTexts({ heading: hEn, body: bEn });
+                            if (result.heading) setEditedContent((prev) => ({ ...prev, [headingKey]: { value_en: prev[headingKey]?.value_en ?? headingItem?.value_en ?? "", value_ar: result.heading } }));
+                            if (result.body) setEditedContent((prev) => ({ ...prev, [bodyKey]: { value_en: prev[bodyKey]?.value_en ?? bodyItem?.value_en ?? "", value_ar: result.body } }));
+                            toast.success("Translated");
+                          } catch (e: any) { toast.error(e.message); }
+                          finally { setTranslating(false); }
+                        }}
+                        className="rounded-xl"
+                      >
+                        <Languages className="w-4 h-4 mr-1" />{translating ? "..." : "Translate"}
+                      </Button>
+                      {headingEdited && (
+                        <Button size="sm" onClick={() => handleSaveContent(headingKey)} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                          <Save className="w-3 h-3 mr-1" />Save Heading
+                        </Button>
+                      )}
+                      {bodyEdited && (
+                        <Button size="sm" onClick={() => handleSaveContent(bodyKey)} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                          <Save className="w-3 h-3 mr-1" />Save Body
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
