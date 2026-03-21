@@ -2070,8 +2070,11 @@ export default function Admin() {
               <div className="space-y-6">
                 {(() => {
                   const grouped: Record<string, ContentItem[]> = {};
+                  const hiddenKeys = new Set(["contact", "contact_phone", "contact_email", "contact_address", "contact_phone_visible", "contact_email_visible", "contact_address_visible", "footer"]);
                   content.forEach((item) => {
                     const section = item.content_key.split(".")[0] || "other";
+                    // Hide keys managed by dedicated tabs (Contact Section, Footer)
+                    if (hiddenKeys.has(section) || hiddenKeys.has(item.content_key)) return;
                     if (!grouped[section]) grouped[section] = [];
                     grouped[section].push(item);
                   });
