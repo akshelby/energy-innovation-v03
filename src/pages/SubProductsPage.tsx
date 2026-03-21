@@ -220,13 +220,33 @@ export default function SubProductsPage() {
                     onClick={() => {
                       if (hasDetailPage) navigate(`/product/${item.id}`);
                     }}
-                    className={`group bg-card rounded-2xl border border-border overflow-hidden transition-all duration-300 hover:border-accent/20 hover:shadow-lg ${
+                    className={`group bg-card rounded-2xl border border-border overflow-hidden transition-all duration-300 hover:border-destructive/30 hover:shadow-lg ${
                       hasDetailPage ? "cursor-pointer" : ""
                     }`}
                   >
-                    <div className="p-6 flex items-start justify-between gap-3">
+                    {/* Image */}
+                    <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+                      {item.image_url ? (
+                        <img
+                          src={item.image_url}
+                          alt={itemName}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span className="text-muted-foreground/40 text-4xl font-bold">
+                            {itemName.charAt(0)}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-5 flex items-start justify-between gap-3">
                       <div className="flex-1">
-                        <h3 className="text-lg font-bold text-foreground mb-2 line-clamp-2">
+                        <h3 className="text-base font-bold text-foreground mb-1.5 line-clamp-1">
                           {itemName}
                         </h3>
                         {hasDetailPage ? (
