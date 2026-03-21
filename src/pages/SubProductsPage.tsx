@@ -75,18 +75,21 @@ export default function SubProductsPage() {
         if (itemsData && itemsData.length > 0) {
           const itemIds = itemsData.map((i) => i.id);
           
-          // Parallel fetch: pages + images in one go
-          const [{ data: pages }, { data: allImgData }] = await Promise.all([
-            supabase
-              .from("product_pages")
-              .select("product_item_id, id")
-              .in("product_item_id", itemIds)
-              .eq("is_active", true),
-            supabase
-              .from("product_page_images")
-              .select("product_page_id, image_url, sort_order")
-              .order("sort_order"),
-          ]);
+          // Fetch pages first, then only their images
+          const { data: pages } = await supabase
+            .from("product_pages")
+            .select("product_item_id, id")
+            .in("product_item_id", itemIds)
+            .eq("is_active", true);
+
+          const pageIds = (pages || []).map((p) => p.id);
+          const { data: allImgData } = pageIds.length > 0
+            ? await supabase
+                .from("product_page_images")
+                .select("product_page_id, image_url, sort_order")
+                .in("product_page_id", pageIds)
+                .order("sort_order")
+            : { data: [] as any[] };
 
           const pagesMap = new Map((pages || []).map((p) => [p.product_item_id, p.id]));
 
