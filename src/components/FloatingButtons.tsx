@@ -88,9 +88,9 @@ export default function FloatingButtons() {
         <a
           href={`mailto:${config.floatingEmail}`}
           aria-label="Send Email"
-          className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:opacity-90 transition-all hover:scale-110 active:scale-95 duration-200"
+          className="flex h-11 w-11 md:h-14 md:w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:opacity-90 transition-all hover:scale-110 active:scale-95 duration-200"
         >
-          <Mail className="w-7 h-7" />
+          <Mail className="w-5.5 h-5.5 md:w-7 md:h-7" />
         </a>
       )}
     </div>
