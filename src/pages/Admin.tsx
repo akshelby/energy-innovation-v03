@@ -2430,6 +2430,27 @@ export default function Admin() {
                         )}
                       </div>
                       <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Cover Image</label>
+                        <div className="flex items-center gap-2">
+                          <Input value={editingMenuItem.image_url || ""} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, image_url: e.target.value || null })} placeholder="Image URL or upload" className="rounded-xl flex-1" />
+                          <input ref={menuItemImgRef} type="file" accept="image/*" className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleFormFileUpload(file, "images", "product-items/", (url) => setEditingMenuItem({ ...editingMenuItem!, image_url: url }));
+                            }}
+                          />
+                          <Button variant="outline" size="sm" onClick={() => menuItemImgRef.current?.click()} disabled={uploading} className="rounded-xl shrink-0">
+                            <Upload className="w-4 h-4" />
+                          </Button>
+                        </div>
+                        {editingMenuItem.image_url && (
+                          <img src={editingMenuItem.image_url} alt="Preview" className="mt-2 w-20 h-14 object-cover rounded-lg border border-border" />
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
                         <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Sort Order</label>
                         <Input type="number" value={editingMenuItem.sort_order} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, sort_order: parseInt(e.target.value) || 0 })} className="rounded-xl" />
                       </div>
