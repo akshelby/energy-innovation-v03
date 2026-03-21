@@ -68,6 +68,22 @@ export default function Footer() {
   return (
     <footer className="gradient-primary text-primary-foreground pt-16 pb-8 px-6">
       <div className="max-w-6xl mx-auto">
+        {socialItems.length > 0 && (
+          <div className="flex items-center justify-center gap-4 mb-10">
+            {socialItems.map((s) => (
+              <a
+                key={s.label}
+                href={s.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={s.label}
+                className="text-primary-foreground/60 hover:text-primary-foreground transition-colors"
+              >
+                {s.icon}
+              </a>
+            ))}
+          </div>
+        )}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           {/* Brand */}
           <div>
