@@ -132,6 +132,18 @@ const defaultContent: { content_key: string; value_en: string; value_ar: string 
   { content_key: "footer.email", value_en: "info@energyinnovation.com", value_ar: "info@energyinnovation.com" },
   { content_key: "footer.phone", value_en: "+1 (555) 000-0000", value_ar: "+1 (555) 000-0000" },
   { content_key: "footer.address", value_en: "Industrial District, Building 7", value_ar: "المنطقة الصناعية، مبنى 7" },
+  { content_key: "footer.desc", value_en: "Premium industrial technology solutions for modern facilities worldwide.", value_ar: "حلول تكنولوجيا صناعية متميزة للمنشآت الحديثة حول العالم." },
+  { content_key: "footer.social_linkedin", value_en: "https://linkedin.com", value_ar: "https://linkedin.com" },
+  { content_key: "footer.social_twitter", value_en: "https://x.com", value_ar: "https://x.com" },
+  { content_key: "footer.social_facebook", value_en: "https://facebook.com", value_ar: "https://facebook.com" },
+  { content_key: "footer.social_instagram", value_en: "https://instagram.com", value_ar: "https://instagram.com" },
+  { content_key: "footer.social_youtube", value_en: "https://youtube.com", value_ar: "https://youtube.com" },
+  { content_key: "footer.contact_email", value_en: "info@energyinnvo.com", value_ar: "info@energyinnvo.com" },
+  { content_key: "footer.contact_website", value_en: "www.energyinnvo.com", value_ar: "www.energyinnvo.com" },
+  { content_key: "footer.address_1_heading", value_en: "Industrial District, Building 7", value_ar: "المنطقة الصناعية، مبنى 7" },
+  { content_key: "footer.address_1_body", value_en: "Office No. BC-891284, 26th Floor,\nAmber Gem Tower, Ajman, UAE.", value_ar: "مكتب رقم BC-891284، الطابق 26،\nبرج أمبر جيم، عجمان، الإمارات." },
+  { content_key: "footer.address_2_heading", value_en: "India Branch:", value_ar: "فرع الهند:" },
+  { content_key: "footer.address_2_body", value_en: "Office 167, Chetpet,\nTamil Nadu, India.", value_ar: "مكتب 167، شيتبيت،\nتاميل نادو، الهند." },
 ];
 
 const IMAGE_FOLDERS = [
