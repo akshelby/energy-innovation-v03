@@ -10,6 +10,7 @@ import { BrandingProvider } from "@/contexts/BrandingContext";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import Careers from "./pages/Careers.tsx";
+import ProductPageView from "./pages/ProductPage.tsx";
 import CookieConsent from "@/components/CookieConsent";
 
 const Admin = lazy(() => import("./pages/Admin.tsx"));
@@ -28,6 +29,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/careers" element={<Careers />} />
+              <Route path="/product/:id" element={<ProductPageView />} />
               <Route path="/admin" element={<Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading…</div>}><Admin /></Suspense>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
