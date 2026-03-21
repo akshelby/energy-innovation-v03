@@ -50,6 +50,7 @@ interface Product {
 export default function ProductsSection() {
   const { t, language } = useLanguage();
   const ref = useScrollReveal();
+  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>(fallbackProducts);
   const [pdfOpen, setPdfOpen] = useState(false);
   const [pdfSrc, setPdfSrc] = useState("");
