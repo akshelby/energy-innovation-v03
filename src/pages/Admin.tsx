@@ -666,6 +666,7 @@ export default function Admin() {
       else if (activeTab === "product-pages") { fetchProductPages(); fetchMenuItems(); fetchCategories(); }
       else if (activeTab === "product-enquiries") fetchProductEnquiries();
       else if (activeTab === "footer") fetchContent();
+      else if (activeTab === "contact") { fetchContent(); fetchContactAddresses(); }
       else fetchFiles();
     }
   }, [authenticated, activeTab, fetchLeads, fetchContent, fetchContactAddresses, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding, fetchHighlight, fetchCareers, fetchCareersContent, fetchAdminEmails, fetchProductPages, fetchProductEnquiries]);
