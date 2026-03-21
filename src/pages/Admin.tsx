@@ -1860,6 +1860,50 @@ export default function Admin() {
                     <span className="text-sm font-semibold text-foreground">Contact Section</span>
                   </div>
                   <div className="p-5 space-y-5">
+                    {(() => {
+                      const addressItem = content.find((c) => c.content_key === "contact_address");
+                      const addressEdited = editedContent.contact_address;
+                      const addressEn = addressEdited?.value_en ?? addressItem?.value_en ?? "";
+                      const addressAr = addressEdited?.value_ar ?? addressItem?.value_ar ?? "";
+
+                      return (
+                        <div className="rounded-2xl border border-border bg-secondary/30 p-4 space-y-3">
+                          <div className="flex items-center justify-between gap-3 flex-wrap">
+                            <div className="flex items-center gap-2">
+                              <Globe className="w-4 h-4 text-accent" />
+                              <div>
+                                <p className="text-sm font-semibold text-foreground">Primary Address</p>
+                                <p className="text-xs text-muted-foreground">Edit the address text shown on the website here.</p>
+                              </div>
+                            </div>
+                            <Button
+                              size="sm"
+                              onClick={() => handleSaveContent("contact_address")}
+                              disabled={loading || !addressEdited}
+                              className="gradient-accent text-accent-foreground rounded-xl border-0"
+                            >
+                              <Save className="w-3 h-3 mr-1" />Save Address
+                            </Button>
+                          </div>
+                          <div className="grid md:grid-cols-2 gap-3">
+                            <Input
+                              value={addressEn}
+                              onChange={(e) => updateEditedField("contact_address", "value_en", e.target.value)}
+                              placeholder="Industrial District, Building 7"
+                              className="rounded-xl text-sm"
+                            />
+                            <Input
+                              value={addressAr}
+                              onChange={(e) => updateEditedField("contact_address", "value_ar", e.target.value)}
+                              placeholder="المنطقة الصناعية، مبنى 7"
+                              className="rounded-xl text-sm"
+                              dir="rtl"
+                            />
+                          </div>
+                        </div>
+                      );
+                    })()}
+
                     {/* Card visibility */}
                     <div>
                       <p className="text-xs font-medium text-muted-foreground mb-3 uppercase tracking-wide">Card Visibility</p>
@@ -1894,7 +1938,6 @@ export default function Admin() {
                       {[
                         { key: "contact_phone", label: "Phone Number", icon: Phone, placeholder: "+966 XX XXX XXXX" },
                         { key: "contact_email", label: "Email Address", icon: Mail, placeholder: "info@example.com" },
-                        { key: "contact_address", label: "Primary Address", icon: Globe, placeholder: "Industrial District, Building 7" },
                       ].map(({ key, label, icon: Ico, placeholder }) => {
                         const item = content.find((c) => c.content_key === key);
                         const edited = editedContent[key];
