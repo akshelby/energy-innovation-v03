@@ -2524,6 +2524,9 @@ export default function Admin() {
                                           {children.length} sub-item{children.length > 1 ? "s" : ""}
                                         </span>
                                       )}
+                                      {(item as any).image_url && (
+                                        <span className="text-[10px] bg-blue-500/10 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full font-medium">IMG ✓</span>
+                                      )}
                                       {(item as any).is_active === false && (
                                         <span className="text-[10px] bg-destructive/10 text-destructive px-2 py-0.5 rounded-full font-medium">Inactive</span>
                                       )}
