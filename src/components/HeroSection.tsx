@@ -16,10 +16,6 @@ import hero5Local from "@/assets/hero-5.webp";
 const localImages = [hero1Local, hero2Local, hero3Local, hero4Local, hero5Local];
 const imageFilePattern = /\.\w+$/i;
 
-// Pre-compute the first hero image URL synchronously from the known DB value
-// so the image renders on the very first paint (no waiting for fetch).
-const FIRST_HERO_IMAGE = buildHeroImageUrl("Untitled design .svg");
-
 const normalizeFileName = (fileName: string) =>
   fileName.trim().replace(/\s+\.(?=[^.]+$)/, ".");
 
@@ -32,6 +28,9 @@ const buildHeroImageUrl = (fileName: string, version?: string) => {
   const baseUrl = getStorageUrl("images", encodedPath);
   return version ? `${baseUrl}?v=${encodeURIComponent(version)}` : baseUrl;
 };
+
+// Pre-compute the first hero image URL synchronously so it renders on first paint
+const FIRST_HERO_IMAGE = buildHeroImageUrl("Untitled design .svg");
 
 export default function HeroSection() {
   const { t } = useLanguage();
