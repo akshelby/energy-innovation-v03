@@ -188,10 +188,52 @@ export type Database = {
         }
         Relationships: []
       }
+      product_enquiries: {
+        Row: {
+          company: string | null
+          created_at: string
+          email: string
+          id: string
+          name: string
+          product_item_id: string | null
+          product_name: string
+          requirement: string
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          product_item_id?: string | null
+          product_name?: string
+          requirement: string
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          product_item_id?: string | null
+          product_name?: string
+          requirement?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_enquiries_product_item_id_fkey"
+            columns: ["product_item_id"]
+            isOneToOne: false
+            referencedRelation: "product_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_items: {
         Row: {
           category_key: string
           created_at: string
+          has_page: boolean
           id: string
           is_active: boolean
           name_ar: string
@@ -203,6 +245,7 @@ export type Database = {
         Insert: {
           category_key?: string
           created_at?: string
+          has_page?: boolean
           id?: string
           is_active?: boolean
           name_ar?: string
@@ -214,6 +257,7 @@ export type Database = {
         Update: {
           category_key?: string
           created_at?: string
+          has_page?: boolean
           id?: string
           is_active?: boolean
           name_ar?: string
@@ -227,6 +271,88 @@ export type Database = {
             foreignKeyName: "product_items_parent_id_fkey"
             columns: ["parent_id"]
             isOneToOne: false
+            referencedRelation: "product_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_page_images: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          product_page_id: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          product_page_id: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          product_page_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_page_images_product_page_id_fkey"
+            columns: ["product_page_id"]
+            isOneToOne: false
+            referencedRelation: "product_pages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_pages: {
+        Row: {
+          created_at: string
+          description_ar: string
+          description_en: string
+          headline_ar: string
+          headline_en: string
+          id: string
+          is_active: boolean
+          product_item_id: string
+          sub_description_ar: string
+          sub_description_en: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description_ar?: string
+          description_en?: string
+          headline_ar?: string
+          headline_en?: string
+          id?: string
+          is_active?: boolean
+          product_item_id: string
+          sub_description_ar?: string
+          sub_description_en?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description_ar?: string
+          description_en?: string
+          headline_ar?: string
+          headline_en?: string
+          id?: string
+          is_active?: boolean
+          product_item_id?: string
+          sub_description_ar?: string
+          sub_description_en?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_pages_product_item_id_fkey"
+            columns: ["product_item_id"]
+            isOneToOne: true
             referencedRelation: "product_items"
             referencedColumns: ["id"]
           },

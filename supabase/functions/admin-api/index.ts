@@ -257,6 +257,100 @@ Deno.serve(async (req) => {
       }
     }
 
+    // PRODUCT PAGES CRUD
+    if (path === "product-pages") {
+      if (method === "GET") {
+        const { data, error } = await supabase
+          .from("product_pages")
+          .select("*, product_items!inner(name_en, name_ar, category_key, parent_id)")
+          .order("created_at", { ascending: false });
+        if (error) throw error;
+        return json(data);
+      }
+      if (method === "POST") {
+        const body = await req.json();
+        const { data, error } = await supabase
+          .from("product_pages")
+          .upsert(body, { onConflict: "id" })
+          .select()
+          .single();
+        if (error) throw error;
+        // Update has_page on product_items
+        if (body.product_item_id) {
+          await supabase
+            .from("product_items")
+            .update({ has_page: true })
+            .eq("id", body.product_item_id);
+        }
+        return json(data);
+      }
+      if (method === "DELETE") {
+        const { id } = await req.json();
+        // Get product_item_id before deleting
+        const { data: pageData } = await supabase
+          .from("product_pages")
+          .select("product_item_id")
+          .eq("id", id)
+          .single();
+        const { error } = await supabase.from("product_pages").delete().eq("id", id);
+        if (error) throw error;
+        // Update has_page on product_items
+        if (pageData?.product_item_id) {
+          await supabase
+            .from("product_items")
+            .update({ has_page: false })
+            .eq("id", pageData.product_item_id);
+        }
+        return json({ success: true });
+      }
+    }
+
+    // PRODUCT PAGE IMAGES CRUD
+    if (path === "product-page-images") {
+      if (method === "GET") {
+        const pageId = url.searchParams.get("page_id");
+        let query = supabase.from("product_page_images").select("*").order("sort_order");
+        if (pageId) query = query.eq("product_page_id", pageId);
+        const { data, error } = await query;
+        if (error) throw error;
+        return json(data);
+      }
+      if (method === "POST") {
+        const body = await req.json();
+        const { data, error } = await supabase
+          .from("product_page_images")
+          .upsert(body, { onConflict: "id" })
+          .select()
+          .single();
+        if (error) throw error;
+        return json(data);
+      }
+      if (method === "DELETE") {
+        const { id } = await req.json();
+        const { error } = await supabase.from("product_page_images").delete().eq("id", id);
+        if (error) throw error;
+        return json({ success: true });
+      }
+    }
+
+    // PRODUCT ENQUIRIES
+    if (path === "product-enquiries") {
+      if (method === "GET") {
+        const { data, error } = await supabase
+          .from("product_enquiries")
+          .select("*")
+          .order("created_at", { ascending: false });
+        if (error) throw error;
+        return json(data);
+      }
+      if (method === "DELETE") {
+        const { id } = await req.json();
+        const { error } = await supabase.from("product_enquiries").delete().eq("id", id);
+        if (error) throw error;
+        return json({ success: true });
+      }
+    }
+
     // STORAGE - List files in a bucket/folder
     if (path === "files") {
       if (method === "GET") {
