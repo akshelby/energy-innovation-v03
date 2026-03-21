@@ -360,6 +360,7 @@ export type Database = {
       }
       products: {
         Row: {
+          category_key: string | null
           created_at: string
           description_ar: string
           description_en: string
@@ -374,6 +375,7 @@ export type Database = {
           tag_en: string
         }
         Insert: {
+          category_key?: string | null
           created_at?: string
           description_ar?: string
           description_en?: string
@@ -388,6 +390,7 @@ export type Database = {
           tag_en?: string
         }
         Update: {
+          category_key?: string | null
           created_at?: string
           description_ar?: string
           description_en?: string
