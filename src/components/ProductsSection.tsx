@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import StickyCardStack from "@/components/StickyCardStack";
@@ -23,16 +24,17 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   HardHat, Gauge, Cog, Building, PenTool, Wrench, Settings, MessageSquare,
 };
 
-const fallbackProducts = [
-  { name_en: "Fire & Smoke Safety", name_ar: "السلامة من الحريق", description_en: "Advanced fire curtains and smoke management systems for complete building protection.", description_ar: "أنظمة ستائر حريق ودخان متقدمة لحماية المباني بالكامل.", icon: "Flame", image_url: productFireLocal, pdf_url: null, tag_en: "", tag_ar: "" },
-  { name_en: "Roller Shutters & Doors", name_ar: "الأبواب والشتر", description_en: "Industrial, commercial, residential, high-speed, and steel door solutions.", description_ar: "حلول أبواب صناعية وتجارية وسكنية وعالية السرعة وفولاذية.", icon: "DoorOpen", image_url: productRollerLocal, pdf_url: null, tag_en: "", tag_ar: "" },
-  { name_en: "Oil & Gas Equipment", name_ar: "معدات النفط والغاز", description_en: "Precision well equipment, sensors, and spare parts for energy operations.", description_ar: "معدات الآبار الدقيقة وأجهزة الاستشعار وقطع الغيار لعمليات الطاقة.", icon: "Droplets", image_url: productOilLocal, pdf_url: null, tag_en: "", tag_ar: "" },
-  { name_en: "HVAC & Ventilation", name_ar: "التهوية والتكييف", description_en: "Industrial ventilators, exhaust systems, thermostats, and dampers.", description_ar: "مراوح صناعية وأنظمة عادم وثرموستات ومخمدات.", icon: "Wind", image_url: productHvacLocal, pdf_url: null, tag_en: "", tag_ar: "" },
-  { name_en: "Loading Bay Equipment", name_ar: "معدات التحميل", description_en: "Dock levelers and shelters for efficient material handling.", description_ar: "مسويات ومظلات الرصيف لمناولة المواد بكفاءة.", icon: "Truck", image_url: productLoadingLocal, pdf_url: null, tag_en: "", tag_ar: "" },
-  { name_en: "Louvers & Steel Doors", name_ar: "الفتحات والأبواب الفولاذية", description_en: "Heavy-duty louvers and steel security doors for industrial applications.", description_ar: "فتحات وأبواب فولاذية للتطبيقات الصناعية.", icon: "Shield", image_url: productLouversLocal, pdf_url: null, tag_en: "", tag_ar: "" },
+const fallbackProducts: Product[] = [
+  { id: "1", name_en: "Fire & Smoke Safety", name_ar: "السلامة من الحريق", description_en: "Advanced fire curtains and smoke management systems for complete building protection.", description_ar: "أنظمة ستائر حريق ودخان متقدمة لحماية المباني بالكامل.", icon: "Flame", image_url: productFireLocal, pdf_url: null, tag_en: "", tag_ar: "", category_key: "" },
+  { id: "2", name_en: "Roller Shutters & Doors", name_ar: "الأبواب والشتر", description_en: "Industrial, commercial, residential, high-speed, and steel door solutions.", description_ar: "حلول أبواب صناعية وتجارية وسكنية وعالية السرعة وفولاذية.", icon: "DoorOpen", image_url: productRollerLocal, pdf_url: null, tag_en: "", tag_ar: "", category_key: "" },
+  { id: "3", name_en: "Oil & Gas Equipment", name_ar: "معدات النفط والغاز", description_en: "Precision well equipment, sensors, and spare parts for energy operations.", description_ar: "معدات الآبار الدقيقة وأجهزة الاستشعار وقطع الغيار لعمليات الطاقة.", icon: "Droplets", image_url: productOilLocal, pdf_url: null, tag_en: "", tag_ar: "", category_key: "" },
+  { id: "4", name_en: "HVAC & Ventilation", name_ar: "التهوية والتكييف", description_en: "Industrial ventilators, exhaust systems, thermostats, and dampers.", description_ar: "مراوح صناعية وأنظمة عادم وثرموستات ومخمدات.", icon: "Wind", image_url: productHvacLocal, pdf_url: null, tag_en: "", tag_ar: "", category_key: "" },
+  { id: "5", name_en: "Loading Bay Equipment", name_ar: "معدات التحميل", description_en: "Dock levelers and shelters for efficient material handling.", description_ar: "مسويات ومظلات الرصيف لمناولة المواد بكفاءة.", icon: "Truck", image_url: productLoadingLocal, pdf_url: null, tag_en: "", tag_ar: "", category_key: "" },
+  { id: "6", name_en: "Louvers & Steel Doors", name_ar: "الفتحات والأبواب الفولاذية", description_en: "Heavy-duty louvers and steel security doors for industrial applications.", description_ar: "فتحات وأبواب فولاذية للتطبيقات الصناعية.", icon: "Shield", image_url: productLouversLocal, pdf_url: null, tag_en: "", tag_ar: "", category_key: "" },
 ];
 
 interface Product {
+  id: string;
   name_en: string;
   name_ar: string;
   description_en: string;
@@ -42,11 +44,13 @@ interface Product {
   pdf_url: string | null;
   tag_en: string;
   tag_ar: string;
+  category_key: string;
 }
 
 export default function ProductsSection() {
   const { t, language } = useLanguage();
   const ref = useScrollReveal();
+  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>(fallbackProducts);
   const [pdfOpen, setPdfOpen] = useState(false);
   const [pdfSrc, setPdfSrc] = useState("");
@@ -84,7 +88,9 @@ export default function ProductsSection() {
                 className="scroll-reveal md:!opacity-100 md:!translate-y-0 group rounded-2xl cursor-pointer overflow-hidden bg-card border border-border hover:border-accent/20 transition-all duration-300 h-full flex flex-col"
                 style={{ transitionDelay: `${i * 80}ms` }}
                 onClick={() => {
-                  if (product.pdf_url) {
+                  if (product.category_key) {
+                    navigate(`/products/${product.id}`);
+                  } else if (product.pdf_url) {
                     setPdfSrc(product.pdf_url);
                     setPdfOpen(true);
                   }
