@@ -49,10 +49,10 @@ export default function SubProductsPage() {
     setLoading(true);
 
     const fetchData = async () => {
-      // Fetch the parent product
+      // Fetch product first to get category_key
       const { data: prod } = await supabase
         .from("products")
-        .select("*")
+        .select("id,name_en,name_ar,description_en,description_ar,image_url,category_key")
         .eq("id", productId)
         .single();
 
@@ -62,65 +62,68 @@ export default function SubProductsPage() {
       }
       setProduct(prod as Product);
 
-      // Fetch top-level product_items for this category
-      if (prod.category_key) {
-        const { data: itemsData } = await supabase
+      if (!prod.category_key) {
+        setItems([]);
+        setLoading(false);
+        return;
+      }
+
+      // Fetch items + all pages for this category in parallel
+      const [{ data: itemsData }, { data: pages }] = await Promise.all([
+        supabase
           .from("product_items")
-          .select("*")
+          .select("id,name_en,name_ar,category_key,parent_id,is_active,has_page,sort_order,image_url")
           .eq("category_key", prod.category_key)
           .is("parent_id", null)
           .eq("is_active", true)
+          .order("sort_order"),
+        supabase
+          .from("product_pages")
+          .select("product_item_id,id")
+          .eq("is_active", true),
+      ]);
+
+      if (!itemsData || itemsData.length === 0) {
+        setItems([]);
+        setLoading(false);
+        return;
+      }
+
+      const itemIds = new Set(itemsData.map((i) => i.id));
+      const relevantPages = (pages || []).filter((p) => itemIds.has(p.product_item_id));
+      const pagesMap = new Map(relevantPages.map((p) => [p.product_item_id, p.id]));
+
+      // Only fetch images if needed
+      let imageMap = new Map<string, string>();
+      const pageIds = relevantPages.map((p) => p.id);
+      if (pageIds.length > 0) {
+        const { data: allImgData } = await supabase
+          .from("product_page_images")
+          .select("product_page_id,image_url,sort_order")
+          .in("product_page_id", pageIds)
           .order("sort_order");
 
-        if (itemsData && itemsData.length > 0) {
-          const itemIds = itemsData.map((i) => i.id);
-          
-          // Fetch pages first, then only their images
-          const { data: pages } = await supabase
-            .from("product_pages")
-            .select("product_item_id, id")
-            .in("product_item_id", itemIds)
-            .eq("is_active", true);
-
-          const pageIds = (pages || []).map((p) => p.id);
-          const { data: allImgData } = pageIds.length > 0
-            ? await supabase
-                .from("product_page_images")
-                .select("product_page_id, image_url, sort_order")
-                .in("product_page_id", pageIds)
-                .order("sort_order")
-            : { data: [] as any[] };
-
-          const pagesMap = new Map((pages || []).map((p) => [p.product_item_id, p.id]));
-
-          // Build item_id -> first image map
-          let imageMap = new Map<string, string>();
-          if (pages && allImgData) {
-            const pageIdSet = new Set(pages.map((p) => p.id));
-            const pageToImg = new Map<string, string>();
-            allImgData.forEach((img) => {
-              if (pageIdSet.has(img.product_page_id) && !pageToImg.has(img.product_page_id)) {
-                pageToImg.set(img.product_page_id, img.image_url);
-              }
-            });
-            pages.forEach((p) => {
-              const img = pageToImg.get(p.id);
-              if (img) imageMap.set(p.product_item_id, img);
-            });
-          }
-
-          setItems(
-            itemsData.map((i) => ({
-              ...i,
-              pageActive: pagesMap.has(i.id),
-              image_url: (i as any).image_url || imageMap.get(i.id) || null,
-            })) as any
-          );
-        } else {
-          setItems([]);
+        if (allImgData) {
+          const pageToImg = new Map<string, string>();
+          allImgData.forEach((img) => {
+            if (!pageToImg.has(img.product_page_id)) {
+              pageToImg.set(img.product_page_id, img.image_url);
+            }
+          });
+          relevantPages.forEach((p) => {
+            const img = pageToImg.get(p.id);
+            if (img) imageMap.set(p.product_item_id, img);
+          });
         }
       }
 
+      setItems(
+        itemsData.map((i) => ({
+          ...i,
+          pageActive: pagesMap.has(i.id),
+          image_url: i.image_url || imageMap.get(i.id) || null,
+        })) as any
+      );
       setLoading(false);
     };
 
@@ -131,11 +134,28 @@ export default function SubProductsPage() {
     return (
       <main className="min-h-screen">
         <Header />
-        <div className="pt-24 pb-12 flex items-center justify-center min-h-[60vh]">
-          <div className="animate-pulse text-muted-foreground">
-            {isAr ? "جاري التحميل..." : "Loading..."}
+        <section className="pt-20 md:pt-24 pb-10 md:pb-16 bg-secondary/30">
+          <div className="max-w-6xl mx-auto px-6">
+            <div className="h-4 w-48 bg-muted animate-pulse rounded mt-4" />
+            <div className="text-center mt-10">
+              <div className="h-12 w-56 bg-muted animate-pulse rounded-full mx-auto mb-6" />
+              <div className="h-10 w-64 bg-muted animate-pulse rounded mx-auto mb-4" />
+            </div>
           </div>
-        </div>
+        </section>
+        <section className="py-6 md:py-10 px-6">
+          <div className="max-w-6xl mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-card rounded-2xl border border-border overflow-hidden">
+                <div className="aspect-[4/3] bg-muted animate-pulse" />
+                <div className="p-5 space-y-2">
+                  <div className="h-5 w-3/4 bg-muted animate-pulse rounded" />
+                  <div className="h-4 w-1/2 bg-muted animate-pulse rounded" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
         <Footer />
       </main>
     );
