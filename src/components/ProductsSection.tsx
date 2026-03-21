@@ -97,12 +97,12 @@ export default function ProductsSection() {
                 }}
               >
                 {/* Image area */}
-                <div className="relative aspect-[4/3] md:flex-none min-h-0 overflow-hidden bg-muted">
+                <div className="relative aspect-[16/10] md:aspect-[4/3] md:flex-none min-h-0 overflow-hidden">
                   {product.image_url ? (
                     <img
                       src={product.image_url}
                       alt={isAr ? product.name_ar : product.name_en}
-                      className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       loading={i === 0 ? "eager" : "lazy"}
                       decoding="async"
                     />
