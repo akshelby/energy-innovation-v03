@@ -298,18 +298,19 @@ Deno.serve(async (req) => {
       }
       if (method === "POST") {
         const body = await req.json();
+        const { product_items: _productItems, ...pagePayload } = body ?? {};
         const { data, error } = await supabase
           .from("product_pages")
-          .upsert(body, { onConflict: "id" })
+          .upsert(pagePayload, { onConflict: "id" })
           .select()
           .single();
         if (error) throw error;
         // Update has_page on product_items
-        if (body.product_item_id) {
+        if (pagePayload.product_item_id) {
           await supabase
             .from("product_items")
             .update({ has_page: true })
-            .eq("id", body.product_item_id);
+            .eq("id", pagePayload.product_item_id);
         }
         return json(data);
       }
