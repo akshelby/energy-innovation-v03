@@ -93,22 +93,6 @@ export default function Footer() {
             <p className="text-primary-foreground/60 text-sm leading-relaxed mb-4">
               {t("footer.desc")}
             </p>
-            {socialItems.length > 0 && (
-              <div className="flex items-center gap-3">
-                {socialItems.map((s) => (
-                  <a
-                    key={s.label}
-                    href={s.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={s.label}
-                    className="text-primary-foreground/50 hover:text-primary-foreground transition-colors"
-                  >
-                    {s.icon}
-                  </a>
-                ))}
-              </div>
-            )}
           </div>
 
           {/* Quick Links */}
