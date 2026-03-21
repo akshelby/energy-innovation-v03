@@ -144,6 +144,9 @@ const defaultContent: { content_key: string; value_en: string; value_ar: string 
   { content_key: "footer.address_1_body", value_en: "Office No. BC-891284, 26th Floor,\nAmber Gem Tower, Ajman, UAE.", value_ar: "مكتب رقم BC-891284، الطابق 26،\nبرج أمبر جيم، عجمان، الإمارات." },
   { content_key: "footer.address_2_heading", value_en: "India Branch:", value_ar: "فرع الهند:" },
   { content_key: "footer.address_2_body", value_en: "Office 167, Chetpet,\nTamil Nadu, India.", value_ar: "مكتب 167، شيتبيت،\nتاميل نادو، الهند." },
+  { content_key: "contact_phone_visible", value_en: "true", value_ar: "true" },
+  { content_key: "contact_email_visible", value_en: "true", value_ar: "true" },
+  { content_key: "contact_address_visible", value_en: "true", value_ar: "true" },
 ];
 
 const IMAGE_FOLDERS = [
@@ -210,7 +213,7 @@ const emptyService: ServiceItem = {
   tag_en: "", tag_ar: "", image_url: null, pdf_url: null, icon: "Wrench", sort_order: 0,
 };
 
-type TabKey = "leads" | "content" | "products" | "services" | "menu-items" | "images" | "branding" | "highlight" | "careers" | "admin-emails" | "product-pages" | "product-enquiries" | "footer";
+type TabKey = "leads" | "content" | "products" | "services" | "menu-items" | "images" | "branding" | "highlight" | "careers" | "admin-emails" | "product-pages" | "product-enquiries" | "footer" | "contact";
 
 const emptyMenuChild: MenuChildItem = {
   category_key: "cat.fire", parent_id: null, name_en: "", name_ar: "", pdf_url: null, image_url: null, sort_order: 0, is_active: true,
@@ -663,6 +666,7 @@ export default function Admin() {
       else if (activeTab === "product-pages") { fetchProductPages(); fetchMenuItems(); fetchCategories(); }
       else if (activeTab === "product-enquiries") fetchProductEnquiries();
       else if (activeTab === "footer") fetchContent();
+      else if (activeTab === "contact") { fetchContent(); fetchContactAddresses(); }
       else fetchFiles();
     }
   }, [authenticated, activeTab, fetchLeads, fetchContent, fetchContactAddresses, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding, fetchHighlight, fetchCareers, fetchCareersContent, fetchAdminEmails, fetchProductPages, fetchProductEnquiries]);
@@ -1403,6 +1407,7 @@ export default function Admin() {
             { key: "product-enquiries" as TabKey, icon: Inbox, label: `Enquiries (${productEnquiries.length})` },
             { key: "careers" as TabKey, icon: UserPlus, label: `Careers (${careersList.length})` },
             { key: "images" as TabKey, icon: Image, label: "Files & Images" },
+            { key: "contact" as TabKey, icon: Phone, label: "Contact Section" },
             { key: "footer" as TabKey, icon: Globe, label: "Footer" },
             { key: "admin-emails" as TabKey, icon: Shield, label: `Admin Access (${adminEmails.length})` },
           ]).map((tab) => (
@@ -3745,6 +3750,273 @@ export default function Admin() {
               ))}
               {productEnquiries.length === 0 && (
                 <p className="text-center text-muted-foreground py-8">No enquiries received yet.</p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ─── Contact Section Tab ──────── */}
+        {activeTab === "contact" && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-foreground">Contact Section Settings</h2>
+              <Button variant="outline" size="sm" onClick={() => { fetchContent(); fetchContactAddresses(); }} disabled={loading} className="rounded-xl">
+                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
+              </Button>
+            </div>
+
+            {/* Section Title & Description */}
+            <div className="bg-card border border-border rounded-2xl p-6 mb-6">
+              <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+                <FileText className="w-4 h-4 text-accent" />
+                Section Title & Description
+              </h3>
+              {[
+                { key: "contact.title", label: "Title" },
+                { key: "contact.desc", label: "Description" },
+              ].map(({ key, label }) => {
+                const item = content.find((c) => c.content_key === key);
+                const edited = editedContent[key];
+                const isLong = (edited?.value_en ?? item?.value_en ?? "").length > 80;
+                return (
+                  <div key={key} className="mb-5 last:mb-0">
+                    <h4 className="text-sm font-medium text-foreground mb-2">{label}</h4>
+                    <div className="grid md:grid-cols-2 gap-3 mb-2">
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1 block">English</label>
+                        {isLong ? (
+                          <Textarea value={edited?.value_en ?? item?.value_en ?? ""} onChange={(e) => updateEditedField(key, "value_en", e.target.value)} rows={2} className="rounded-xl resize-none" />
+                        ) : (
+                          <Input value={edited?.value_en ?? item?.value_en ?? ""} onChange={(e) => updateEditedField(key, "value_en", e.target.value)} className="rounded-xl" />
+                        )}
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1 block">Arabic</label>
+                        {isLong ? (
+                          <Textarea value={edited?.value_ar ?? item?.value_ar ?? ""} onChange={(e) => updateEditedField(key, "value_ar", e.target.value)} rows={2} className="rounded-xl resize-none" dir="rtl" />
+                        ) : (
+                          <Input value={edited?.value_ar ?? item?.value_ar ?? ""} onChange={(e) => updateEditedField(key, "value_ar", e.target.value)} className="rounded-xl" dir="rtl" />
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" disabled={translating || !edited?.value_en} onClick={async () => {
+                        try {
+                          setTranslating(true);
+                          const result = await translateTexts({ value_en: edited?.value_en || "" });
+                          if (result.value_en) updateEditedField(key, "value_ar", result.value_en);
+                          toast.success("Translated");
+                        } catch (e: any) { toast.error(e.message); }
+                        finally { setTranslating(false); }
+                      }} className="rounded-xl">
+                        <Languages className="w-4 h-4 mr-1" />{translating ? "..." : "Translate"}
+                      </Button>
+                      {edited && (
+                        <Button size="sm" onClick={() => handleSaveContent(key)} disabled={loading} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                          <Save className="w-3 h-3 mr-1" />Save
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Contact Info (Phone, Email) */}
+            <div className="bg-card border border-border rounded-2xl p-6 mb-6">
+              <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Phone className="w-4 h-4 text-accent" />
+                Contact Info
+              </h3>
+              <p className="text-xs text-muted-foreground mb-4">These appear as info cards beside the contact form. Toggle visibility to show/hide each card.</p>
+              {[
+                { key: "contact_phone", visKey: "contact_phone_visible", label: "Phone", icon: Phone, placeholder: "+971 XX XXX XXXX" },
+                { key: "contact_email", visKey: "contact_email_visible", label: "Email", icon: Mail, placeholder: "info@example.com" },
+              ].map(({ key, visKey, label, placeholder }) => {
+                const item = content.find((c) => c.content_key === key);
+                const edited = editedContent[key];
+                const visItem = content.find((c) => c.content_key === visKey);
+                const visEdited = editedContent[visKey];
+                const isVisible = (visEdited?.value_en ?? visItem?.value_en ?? "true") !== "false";
+                return (
+                  <div key={key} className="mb-4 last:mb-0 p-4 border border-border rounded-xl">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm font-medium text-foreground">{label}</span>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <span className="text-xs text-muted-foreground">{isVisible ? "Visible" : "Hidden"}</span>
+                        <input
+                          type="checkbox"
+                          checked={isVisible}
+                          onChange={async () => {
+                            const newVal = isVisible ? "false" : "true";
+                            setEditedContent((prev) => ({ ...prev, [visKey]: { value_en: newVal, value_ar: newVal } }));
+                            // Auto-save visibility toggle
+                            try {
+                              const existing = content.find((c) => c.content_key === visKey);
+                              if (existing) {
+                                await apiCall("content", "PUT", storedPassword, { id: existing.id, value_en: newVal, value_ar: newVal });
+                              } else {
+                                await apiCall("content", "POST", storedPassword, { content_key: visKey, value_en: newVal, value_ar: newVal });
+                              }
+                              fetchContent();
+                              toast.success(`${label} ${newVal === "true" ? "shown" : "hidden"}`);
+                            } catch (e: any) { toast.error(e.message); }
+                          }}
+                          className="w-4 h-4 accent-[hsl(var(--accent))]"
+                        />
+                      </label>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <Input
+                        value={edited?.value_en ?? item?.value_en ?? ""}
+                        onChange={(e) => setEditedContent((prev) => ({
+                          ...prev,
+                          [key]: { value_en: e.target.value, value_ar: e.target.value },
+                        }))}
+                        placeholder={placeholder}
+                        className="rounded-xl flex-1 text-sm"
+                      />
+                      {edited && (
+                        <Button size="sm" onClick={() => handleSaveContent(key)} disabled={loading} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                          <Save className="w-3 h-3 mr-1" />Save
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Address Visibility Toggle */}
+            <div className="bg-card border border-border rounded-2xl p-6 mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-accent" />
+                  Addresses
+                </h3>
+                <div className="flex items-center gap-3">
+                  {(() => {
+                    const visKey = "contact_address_visible";
+                    const visItem = content.find((c) => c.content_key === visKey);
+                    const visEdited = editedContent[visKey];
+                    const isVisible = (visEdited?.value_en ?? visItem?.value_en ?? "true") !== "false";
+                    return (
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <span className="text-xs text-muted-foreground">{isVisible ? "Visible" : "Hidden"}</span>
+                        <input
+                          type="checkbox"
+                          checked={isVisible}
+                          onChange={async () => {
+                            const newVal = isVisible ? "false" : "true";
+                            setEditedContent((prev) => ({ ...prev, [visKey]: { value_en: newVal, value_ar: newVal } }));
+                            try {
+                              const existing = content.find((c) => c.content_key === visKey);
+                              if (existing) {
+                                await apiCall("content", "PUT", storedPassword, { id: existing.id, value_en: newVal, value_ar: newVal });
+                              } else {
+                                await apiCall("content", "POST", storedPassword, { content_key: visKey, value_en: newVal, value_ar: newVal });
+                              }
+                              fetchContent();
+                              toast.success(`Addresses ${newVal === "true" ? "shown" : "hidden"}`);
+                            } catch (e: any) { toast.error(e.message); }
+                          }}
+                          className="w-4 h-4 accent-[hsl(var(--accent))]"
+                        />
+                      </label>
+                    );
+                  })()}
+                  <Button
+                    size="sm"
+                    onClick={() => setEditingAddress({ label_en: "", label_ar: "", is_active: true, sort_order: contactAddresses.length })}
+                    className="gradient-accent text-accent-foreground rounded-xl border-0"
+                  >
+                    <Plus className="w-4 h-4 mr-1" />Add Address
+                  </Button>
+                </div>
+              </div>
+
+              {editingAddress && (
+                <div className="bg-secondary/50 border border-border rounded-xl p-4 mb-4 space-y-3">
+                  <div className="grid md:grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">English</label>
+                      <Input value={editingAddress.label_en} onChange={(e) => setEditingAddress({ ...editingAddress, label_en: e.target.value })} placeholder="e.g. UAE & India" className="rounded-xl" />
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Arabic</label>
+                      <Input value={editingAddress.label_ar} onChange={(e) => setEditingAddress({ ...editingAddress, label_ar: e.target.value })} placeholder="e.g. الإمارات والهند" className="rounded-xl" dir="rtl" />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Button size="sm" disabled={translating} variant="outline" onClick={async () => {
+                      if (!editingAddress.label_en) return;
+                      try {
+                        setTranslating(true);
+                        const result = await translateTexts({ label_en: editingAddress.label_en });
+                        if (result.label_en) setEditingAddress({ ...editingAddress, label_ar: result.label_en });
+                        toast.success("Translated");
+                      } catch (e: any) { toast.error(e.message); }
+                      finally { setTranslating(false); }
+                    }} className="rounded-xl">
+                      <Languages className="w-4 h-4 mr-1" />{translating ? "..." : "Translate"}
+                    </Button>
+                    <Button size="sm" onClick={async () => {
+                      try {
+                        if (editingAddress.id) {
+                          await supabase.from("contact_addresses").update({ label_en: editingAddress.label_en, label_ar: editingAddress.label_ar, is_active: editingAddress.is_active, sort_order: editingAddress.sort_order }).eq("id", editingAddress.id);
+                        } else {
+                          await supabase.from("contact_addresses").insert({ label_en: editingAddress.label_en, label_ar: editingAddress.label_ar, is_active: editingAddress.is_active, sort_order: editingAddress.sort_order });
+                        }
+                        toast.success("Address saved");
+                        setEditingAddress(null);
+                        fetchContactAddresses();
+                      } catch (e: any) { toast.error(e.message); }
+                    }} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                      <Save className="w-4 h-4 mr-1" />Save
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => setEditingAddress(null)} className="rounded-xl">Cancel</Button>
+                  </div>
+                </div>
+              )}
+
+              {contactAddresses.length === 0 && !editingAddress ? (
+                <p className="text-sm text-muted-foreground text-center py-4">No addresses yet. Add one above.</p>
+              ) : (
+                <div className="space-y-2">
+                  {contactAddresses.map((addr) => (
+                    <div key={addr.id} className="flex items-center justify-between p-3 rounded-xl border border-border bg-secondary/30">
+                      <div className="flex items-center gap-3">
+                        <Globe className="w-4 h-4 text-accent shrink-0" />
+                        <div>
+                          <p className="text-sm font-medium text-foreground">{addr.label_en}</p>
+                          <p className="text-xs text-muted-foreground" dir="rtl">{addr.label_ar}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <label className="flex items-center gap-1.5 cursor-pointer">
+                          <span className="text-xs text-muted-foreground">{addr.is_active ? "Active" : "Inactive"}</span>
+                          <input type="checkbox" checked={addr.is_active} onChange={async () => {
+                            try {
+                              await supabase.from("contact_addresses").update({ is_active: !addr.is_active }).eq("id", addr.id);
+                              fetchContactAddresses();
+                              toast.success(addr.is_active ? "Address hidden" : "Address shown");
+                            } catch (e: any) { toast.error(e.message); }
+                          }} className="w-4 h-4 accent-[hsl(var(--accent))]" />
+                        </label>
+                        <Button size="sm" variant="outline" onClick={() => setEditingAddress(addr)} className="rounded-lg h-8 px-2">Edit</Button>
+                        <Button size="sm" variant="outline" onClick={async () => {
+                          try {
+                            await supabase.from("contact_addresses").delete().eq("id", addr.id);
+                            fetchContactAddresses();
+                            toast.success("Address deleted");
+                          } catch (e: any) { toast.error(e.message); }
+                        }} className="rounded-lg h-8 px-2 text-destructive hover:text-destructive">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </div>
