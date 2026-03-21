@@ -102,7 +102,7 @@ export default function ProductsSection() {
                     <img
                       src={product.image_url}
                       alt={isAr ? product.name_ar : product.name_en}
-                      className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       loading={i === 0 ? "eager" : "lazy"}
                       decoding="async"
                     />
