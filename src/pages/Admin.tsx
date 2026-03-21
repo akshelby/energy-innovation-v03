@@ -91,6 +91,7 @@ interface MenuChildItem {
   name_en: string;
   name_ar: string;
   pdf_url: string | null;
+  image_url: string | null;
   sort_order: number;
   is_active?: boolean;
 }
