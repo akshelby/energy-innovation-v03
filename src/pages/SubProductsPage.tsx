@@ -232,7 +232,16 @@ export default function SubProductsPage() {
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                           loading={items.indexOf(item) < 3 ? "eager" : "lazy"}
                           decoding="async"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = "none";
+                            (e.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
+                          }}
                         />
+                        <div className="hidden w-full h-full flex items-center justify-center absolute inset-0">
+                          <span className="text-muted-foreground/40 text-4xl font-bold">
+                            {itemName.charAt(0)}
+                          </span>
+                        </div>
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
                           <span className="text-muted-foreground/40 text-4xl font-bold">
