@@ -53,6 +53,8 @@ export default function Careers() {
   const perksRef = useScrollReveal();
   const listingsRef = useScrollReveal();
   const isAr = language === "ar";
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+
   const [careers, setCareers] = useState<CareerListing[]>([]);
   const [selected, setSelected] = useState<CareerListing | null>(null);
   const [loading, setLoading] = useState(true);

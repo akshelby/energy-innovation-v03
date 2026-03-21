@@ -63,6 +63,10 @@ export default function ProductPageView() {
   const [form, setForm] = useState({ name: "", email: "", company: "", requirement: "" });
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
+
+  useEffect(() => {
     if (!id) return;
     setLoading(true);
     setActiveImage(0);
