@@ -11,6 +11,7 @@ import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import Careers from "./pages/Careers.tsx";
 import ProductPageView from "./pages/ProductPage.tsx";
+import SubProductsPage from "./pages/SubProductsPage.tsx";
 import CookieConsent from "@/components/CookieConsent";
 
 const Admin = lazy(() => import("./pages/Admin.tsx"));
