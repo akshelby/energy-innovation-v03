@@ -16,34 +16,15 @@ interface SocialLinks {
 export default function Footer() {
   const { t } = useLanguage();
   const { logoUrl, brandName, logoSize, ready: brandReady } = useBranding();
-  const [social, setSocial] = useState<SocialLinks>({ linkedin: "", twitter: "", facebook: "", instagram: "", youtube: "" });
+  const social: SocialLinks = {
+    linkedin: "https://linkedin.com",
+    twitter: "https://x.com",
+    facebook: "https://facebook.com",
+    instagram: "https://instagram.com",
+    youtube: "https://youtube.com",
+  };
   const location = useLocation();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    supabase
-      .from("site_content")
-      .select("content_key, value_en")
-      .in("content_key", [
-        "linkedin_url", "linkedin_active",
-        "twitter_url", "twitter_active",
-        "facebook_url", "facebook_active",
-        "instagram_url", "instagram_active",
-        "youtube_url", "youtube_active",
-      ])
-      .then(({ data }) => {
-        if (!data) return;
-        const map: Record<string, string> = {};
-        data.forEach((d) => { map[d.content_key] = d.value_en; });
-        setSocial({
-          linkedin: map["linkedin_active"] === "true" ? map["linkedin_url"] || "" : "",
-          twitter: map["twitter_active"] === "true" ? map["twitter_url"] || "" : "",
-          facebook: map["facebook_active"] === "true" ? map["facebook_url"] || "" : "",
-          instagram: map["instagram_active"] === "true" ? map["instagram_url"] || "" : "",
-          youtube: map["youtube_active"] === "true" ? map["youtube_url"] || "" : "",
-        });
-      });
-  }, []);
 
   const quickLinks = [
     { label: t("nav.home"), href: "#home" },
