@@ -1430,13 +1430,15 @@ export default function Admin() {
                     if (!file) return;
                     setBrandLogoUploading(true);
                     try {
-                      // Upload as branding/logo (no extension, upsert)
-                      const base64 = await fileToBase64(file);
+                      // Convert to WebP and upload as branding/logo
+                      const { convertToWebP } = await import("@/lib/image-utils");
+                      const optimized = await convertToWebP(file);
+                      const base64 = await fileToBase64(optimized);
                       await apiCall("upload", "POST", storedPassword, {
                         bucket: "images",
                         filePath: "branding/logo",
                         base64,
-                        contentType: file.type,
+                        contentType: optimized.type,
                       });
                       toast.success("Logo uploaded! Refresh the main site to see changes.");
                       fetchBranding();
