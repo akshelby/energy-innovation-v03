@@ -2128,24 +2128,47 @@ export default function Admin() {
                                 </Button>
                               </div>
                             </div>
-                            <div className="grid md:grid-cols-2 gap-4">
-                              <div>
-                                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">English</label>
-                                {(editedContent[item.content_key]?.value_en?.length || 0) > 100 ? (
-                                  <Textarea value={editedContent[item.content_key]?.value_en || ""} onChange={(e) => updateEditedField(item.content_key, "value_en", e.target.value)} rows={3} className="rounded-xl resize-none" />
-                                ) : (
-                                  <Input value={editedContent[item.content_key]?.value_en || ""} onChange={(e) => updateEditedField(item.content_key, "value_en", e.target.value)} className="rounded-xl" />
-                                )}
-                              </div>
-                              <div>
-                                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Arabic</label>
-                                {(editedContent[item.content_key]?.value_ar?.length || 0) > 100 ? (
-                                  <Textarea value={editedContent[item.content_key]?.value_ar || ""} onChange={(e) => updateEditedField(item.content_key, "value_ar", e.target.value)} rows={3} className="rounded-xl resize-none" dir="rtl" />
-                                ) : (
-                                  <Input value={editedContent[item.content_key]?.value_ar || ""} onChange={(e) => updateEditedField(item.content_key, "value_ar", e.target.value)} className="rounded-xl" dir="rtl" />
-                                )}
-                              </div>
-                            </div>
+                            {(() => {
+                              const isBooleanField = (editedContent[item.content_key]?.value_en || "").toLowerCase() === "true" || (editedContent[item.content_key]?.value_en || "").toLowerCase() === "false";
+                              if (isBooleanField) {
+                                const isActive = (editedContent[item.content_key]?.value_en || "").toLowerCase() === "true";
+                                return (
+                                  <div className="flex items-center gap-3">
+                                    <Switch
+                                      checked={isActive}
+                                      onCheckedChange={(checked) => {
+                                        const val = String(checked);
+                                        updateEditedField(item.content_key, "value_en", val);
+                                        updateEditedField(item.content_key, "value_ar", val);
+                                      }}
+                                    />
+                                    <span className={`text-sm font-medium ${isActive ? "text-green-500" : "text-muted-foreground"}`}>
+                                      {isActive ? "Active" : "Inactive"}
+                                    </span>
+                                  </div>
+                                );
+                              }
+                              return (
+                                <div className="grid md:grid-cols-2 gap-4">
+                                  <div>
+                                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">English</label>
+                                    {(editedContent[item.content_key]?.value_en?.length || 0) > 100 ? (
+                                      <Textarea value={editedContent[item.content_key]?.value_en || ""} onChange={(e) => updateEditedField(item.content_key, "value_en", e.target.value)} rows={3} className="rounded-xl resize-none" />
+                                    ) : (
+                                      <Input value={editedContent[item.content_key]?.value_en || ""} onChange={(e) => updateEditedField(item.content_key, "value_en", e.target.value)} className="rounded-xl" />
+                                    )}
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Arabic</label>
+                                    {(editedContent[item.content_key]?.value_ar?.length || 0) > 100 ? (
+                                      <Textarea value={editedContent[item.content_key]?.value_ar || ""} onChange={(e) => updateEditedField(item.content_key, "value_ar", e.target.value)} rows={3} className="rounded-xl resize-none" dir="rtl" />
+                                    ) : (
+                                      <Input value={editedContent[item.content_key]?.value_ar || ""} onChange={(e) => updateEditedField(item.content_key, "value_ar", e.target.value)} className="rounded-xl" dir="rtl" />
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })()}
                           </div>
                         ))}
                       </div>
