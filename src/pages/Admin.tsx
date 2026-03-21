@@ -1407,6 +1407,7 @@ export default function Admin() {
             { key: "product-enquiries" as TabKey, icon: Inbox, label: `Enquiries (${productEnquiries.length})` },
             { key: "careers" as TabKey, icon: UserPlus, label: `Careers (${careersList.length})` },
             { key: "images" as TabKey, icon: Image, label: "Files & Images" },
+            { key: "contact" as TabKey, icon: Phone, label: "Contact Section" },
             { key: "footer" as TabKey, icon: Globe, label: "Footer" },
             { key: "admin-emails" as TabKey, icon: Shield, label: `Admin Access (${adminEmails.length})` },
           ]).map((tab) => (
