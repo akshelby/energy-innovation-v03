@@ -260,11 +260,40 @@ Deno.serve(async (req) => {
     // PRODUCT PAGES CRUD
     if (path === "product-pages") {
       if (method === "GET") {
-        const { data, error } = await supabase
+        const { data: pages, error: pagesError } = await supabase
           .from("product_pages")
-          .select("*, product_items!product_pages_product_item_id_fkey(name_en, name_ar, category_key, parent_id)")
+          .select("*")
           .order("created_at", { ascending: false });
-        if (error) throw error;
+        if (pagesError) throw pagesError;
+
+        const productItemIds = [...new Set((pages ?? []).map((page) => page.product_item_id).filter(Boolean))];
+        let productItemsById: Record<string, { name_en: string; name_ar: string; category_key: string; parent_id: string | null }> = {};
+
+        if (productItemIds.length > 0) {
+          const { data: productItems, error: productItemsError } = await supabase
+            .from("product_items")
+            .select("id, name_en, name_ar, category_key, parent_id")
+            .in("id", productItemIds);
+          if (productItemsError) throw productItemsError;
+
+          productItemsById = Object.fromEntries(
+            (productItems ?? []).map((item) => [
+              item.id,
+              {
+                name_en: item.name_en,
+                name_ar: item.name_ar,
+                category_key: item.category_key,
+                parent_id: item.parent_id,
+              },
+            ]),
+          );
+        }
+
+        const data = (pages ?? []).map((page) => ({
+          ...page,
+          product_items: productItemsById[page.product_item_id] ?? null,
+        }));
+
         return json(data);
       }
       if (method === "POST") {
