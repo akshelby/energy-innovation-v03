@@ -167,20 +167,23 @@ function fileToBase64(file: File): Promise<string> {
   });
 }
 
-// Upload a file and return the public URL
+// Upload a file and return the public URL (auto-converts images to WebP)
 async function uploadFileAndGetUrl(
   file: File,
   bucket: string,
   folder: string,
   password: string
 ): Promise<string> {
-  const base64 = await fileToBase64(file);
-  const filePath = folder ? `${folder}/${file.name}` : file.name;
+  // Convert images to WebP for smaller file sizes & faster loading
+  const { convertToWebP } = await import("@/lib/image-utils");
+  const optimized = await convertToWebP(file);
+  const base64 = await fileToBase64(optimized);
+  const filePath = folder ? `${folder}/${optimized.name}` : optimized.name;
   const result = await apiCall("upload", "POST", password, {
     bucket,
     filePath,
     base64,
-    contentType: file.type,
+    contentType: optimized.type,
   });
   return result.url;
 }
@@ -1427,13 +1430,15 @@ export default function Admin() {
                     if (!file) return;
                     setBrandLogoUploading(true);
                     try {
-                      // Upload as branding/logo (no extension, upsert)
-                      const base64 = await fileToBase64(file);
+                      // Convert to WebP and upload as branding/logo
+                      const { convertToWebP } = await import("@/lib/image-utils");
+                      const optimized = await convertToWebP(file);
+                      const base64 = await fileToBase64(optimized);
                       await apiCall("upload", "POST", storedPassword, {
                         bucket: "images",
                         filePath: "branding/logo",
                         base64,
-                        contentType: file.type,
+                        contentType: optimized.type,
                       });
                       toast.success("Logo uploaded! Refresh the main site to see changes.");
                       fetchBranding();
