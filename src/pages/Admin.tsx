@@ -607,6 +607,31 @@ export default function Admin() {
     } catch (e: any) { toast.error(e.message); }
   }, [storedPassword]);
 
+  const fetchProductPages = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await apiCall("product-pages", "GET", storedPassword);
+      setProductPages(data);
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  }, [storedPassword]);
+
+  const fetchProductEnquiries = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await apiCall("product-enquiries", "GET", storedPassword);
+      setProductEnquiries(data);
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  }, [storedPassword]);
+
+  const fetchPageImages = useCallback(async (pageId: string) => {
+    try {
+      const data = await apiCall(`product-page-images?page_id=${pageId}`, "GET", storedPassword);
+      setPageImages(data);
+    } catch (e: any) { toast.error(e.message); }
+  }, [storedPassword]);
+
   useEffect(() => {
     if (authenticated) {
       if (activeTab === "leads") fetchLeads();
@@ -618,9 +643,11 @@ export default function Admin() {
       else if (activeTab === "highlight") fetchHighlight();
       else if (activeTab === "careers") { fetchCareers(); fetchCareersContent(); }
       else if (activeTab === "admin-emails") fetchAdminEmails();
+      else if (activeTab === "product-pages") { fetchProductPages(); fetchMenuItems(); fetchCategories(); }
+      else if (activeTab === "product-enquiries") fetchProductEnquiries();
       else fetchFiles();
     }
-  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchContactAddresses, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding, fetchHighlight, fetchCareers, fetchCareersContent, fetchAdminEmails]);
+  }, [authenticated, activeTab, fetchLeads, fetchContent, fetchContactAddresses, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding, fetchHighlight, fetchCareers, fetchCareersContent, fetchAdminEmails, fetchProductPages, fetchProductEnquiries]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
