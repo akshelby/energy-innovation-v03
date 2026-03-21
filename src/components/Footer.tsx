@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Mail, Globe } from "lucide-react";
@@ -13,18 +13,55 @@ interface SocialLinks {
   youtube: string;
 }
 
+interface FooterAddress {
+  heading_en: string;
+  heading_ar: string;
+  body_en: string;
+  body_ar: string;
+}
+
+const SOCIAL_KEYS = ["footer.social_linkedin", "footer.social_twitter", "footer.social_facebook", "footer.social_instagram", "footer.social_youtube"] as const;
+const ADDRESS_KEYS = ["footer.address_1_heading", "footer.address_1_body", "footer.address_2_heading", "footer.address_2_body"] as const;
+
 export default function Footer() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { logoUrl, brandName, logoSize, ready: brandReady } = useBranding();
-  const social: SocialLinks = {
-    linkedin: "https://linkedin.com",
-    twitter: "https://x.com",
-    facebook: "https://facebook.com",
-    instagram: "https://instagram.com",
-    youtube: "https://youtube.com",
-  };
   const location = useLocation();
   const navigate = useNavigate();
+
+  const [footerData, setFooterData] = useState<Record<string, { en: string; ar: string }>>({});
+
+  useEffect(() => {
+    const fetchFooterContent = async () => {
+      try {
+        const { data } = await supabase
+          .from("site_content")
+          .select("content_key, value_en, value_ar")
+          .like("content_key", "footer.%");
+        if (data) {
+          const map: Record<string, { en: string; ar: string }> = {};
+          data.forEach((item: any) => {
+            map[item.content_key] = { en: item.value_en, ar: item.value_ar };
+          });
+          setFooterData(map);
+        }
+      } catch { /* fallback to t() */ }
+    };
+    fetchFooterContent();
+  }, []);
+
+  const ft = (key: string, fallback?: string): string => {
+    if (footerData[key]) return footerData[key][language] || fallback || "";
+    return fallback || t(key) || "";
+  };
+
+  const social: SocialLinks = {
+    linkedin: ft("footer.social_linkedin", "https://linkedin.com"),
+    twitter: ft("footer.social_twitter", "https://x.com"),
+    facebook: ft("footer.social_facebook", "https://facebook.com"),
+    instagram: ft("footer.social_instagram", "https://instagram.com"),
+    youtube: ft("footer.social_youtube", "https://youtube.com"),
+  };
 
   const quickLinks = [
     { label: t("nav.home"), href: "#home" },
@@ -56,6 +93,24 @@ export default function Footer() {
       }, 100);
     }
   }, [location.pathname, navigate]);
+
+  const contactEmail = ft("footer.contact_email", "info@energyinnvo.com");
+  const contactWebsite = ft("footer.contact_website", "www.energyinnvo.com");
+
+  const addresses: FooterAddress[] = [
+    {
+      heading_en: footerData["footer.address_1_heading"]?.en || "Industrial District, Building 7",
+      heading_ar: footerData["footer.address_1_heading"]?.ar || "المنطقة الصناعية، مبنى 7",
+      body_en: footerData["footer.address_1_body"]?.en || "Office No. BC-891284, 26th Floor,\nAmber Gem Tower, Ajman, UAE.",
+      body_ar: footerData["footer.address_1_body"]?.ar || "مكتب رقم BC-891284، الطابق 26،\nبرج أمبر جيم، عجمان، الإمارات.",
+    },
+    {
+      heading_en: footerData["footer.address_2_heading"]?.en || "India Branch:",
+      heading_ar: footerData["footer.address_2_heading"]?.ar || "فرع الهند:",
+      body_en: footerData["footer.address_2_body"]?.en || "Office 167, Chetpet,\nTamil Nadu, India.",
+      body_ar: footerData["footer.address_2_body"]?.ar || "مكتب 167، شيتبيت،\nتاميل نادو، الهند.",
+    },
+  ];
 
   const socialItems = [
     { url: social.linkedin, label: "LinkedIn", icon: <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg> },
@@ -138,25 +193,29 @@ export default function Footer() {
             <ul className="space-y-3 text-sm text-primary-foreground/70">
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4 shrink-0 text-primary-foreground/50" />
-                <a href="mailto:info@energyinnvo.com" className="hover:text-primary-foreground transition-colors">info@energyinnvo.com</a>
+                <a href={`mailto:${contactEmail}`} className="hover:text-primary-foreground transition-colors">{contactEmail}</a>
               </li>
               <li className="flex items-center gap-2">
                 <Globe className="w-4 h-4 shrink-0 text-primary-foreground/50" />
-                <span>www.energyinnvo.com</span>
+                <span>{contactWebsite}</span>
               </li>
             </ul>
 
-            <h5 className="font-semibold mt-6 mb-1.5 text-accent text-sm">Industrial District, Building 7</h5>
-            <p className="text-sm text-primary-foreground/70 leading-relaxed">
-              Office No. BC-891284, 26th Floor,<br />
-              Amber Gem Tower, Ajman, UAE.
-            </p>
-
-            <h5 className="font-semibold mt-5 mb-1.5 text-accent text-sm">India Branch:</h5>
-            <p className="text-sm text-primary-foreground/70 leading-relaxed">
-              Office 167, Chetpet,<br />
-              Tamil Nadu, India.
-            </p>
+            {addresses.filter(a => {
+              const heading = language === "ar" ? a.heading_ar : a.heading_en;
+              return heading && heading.trim();
+            }).map((addr, i) => {
+              const heading = language === "ar" ? addr.heading_ar : addr.heading_en;
+              const body = language === "ar" ? addr.body_ar : addr.body_en;
+              return (
+                <div key={i} className={i === 0 ? "mt-6" : "mt-5"}>
+                  <h5 className="font-semibold mb-1.5 text-accent text-sm">{heading}</h5>
+                  <p className="text-sm text-primary-foreground/70 leading-relaxed whitespace-pre-line">
+                    {body}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
 
