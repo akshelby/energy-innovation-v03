@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import SEOHead from "@/components/SEOHead";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
@@ -182,9 +183,26 @@ export default function SubProductsPage() {
 
   const productName = isAr ? product.name_ar : product.name_en;
   const productDesc = isAr ? product.description_ar : product.description_en;
+  const productNameEn = product.name_en;
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": product.name_en,
+    "description": product.description_en,
+    "brand": { "@type": "Brand", "name": "Energy Innovation" },
+    "url": `https://mivora.com/products/${productId}`,
+    ...(product.image_url ? { "image": product.image_url } : {}),
+  };
   return (
     <main className="min-h-screen">
+      <SEOHead
+        title={productNameEn}
+        description={`${product.description_en.slice(0, 150)} — Energy Innovation`}
+        path={`/products/${productId}`}
+        image={product.image_url || undefined}
+      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Header />
 
       {/* Hero */}
