@@ -1857,7 +1857,14 @@ export default function Admin() {
                 {(() => {
                   const grouped: Record<string, ContentItem[]> = {};
                   const managedPrefixes = new Set(["hero", "contact", "footer", "highlight", "careers"]);
-                  const managedKeys = new Set(["contact_phone", "contact_email", "contact_address", "contact_phone_visible", "contact_email_visible", "contact_address_visible"]);
+                  const managedKeys = new Set([
+                    "contact_phone", "contact_email", "contact_address",
+                    "contact_phone_visible", "contact_email_visible", "contact_address_visible",
+                    "whatsapp_number", "whatsapp_message", "whatsapp_active",
+                    "floating_email", "email_active",
+                    "linkedin_url", "linkedin_active",
+                    "logo.size", "brand.name",
+                  ]);
                   content.forEach((item) => {
                     const section = item.content_key.split(".")[0] || "other";
                     if (managedPrefixes.has(section) || managedKeys.has(item.content_key)) return;
