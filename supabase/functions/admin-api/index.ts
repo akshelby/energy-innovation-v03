@@ -43,32 +43,11 @@ Deno.serve(async (req) => {
     }
   }
 
-  // Verify admin password OR admin email
+  // Verify admin password (required for all admin operations)
   const password = req.headers.get("x-admin-password");
-  const adminEmail = req.headers.get("x-admin-email");
   const adminPassword = Deno.env.get("ADMIN_PASSWORD");
 
-  let isAuthorized = false;
-
-  // Check password auth
-  if (password && password === adminPassword) {
-    isAuthorized = true;
-  }
-
-  // Check email auth
-  if (!isAuthorized && adminEmail) {
-    const { data: emailEntry } = await supabase
-      .from("admin_emails")
-      .select("id")
-      .eq("email", adminEmail.toLowerCase())
-      .eq("is_active", true)
-      .maybeSingle();
-    if (emailEntry) {
-      isAuthorized = true;
-    }
-  }
-
-  if (!isAuthorized) {
+  if (!password || !adminPassword || password !== adminPassword) {
     return json({ error: "Unauthorized" }, 401);
   }
 

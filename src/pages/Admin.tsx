@@ -222,9 +222,7 @@ const emptyMenuChild: MenuChildItem = {
 export default function Admin() {
   const { theme, toggleTheme } = useTheme();
   const [password, setPassword] = useState(() => sessionStorage.getItem("admin_pw") || "");
-  const [adminEmail, setAdminEmail] = useState(() => sessionStorage.getItem("admin_email") || "");
-  const [loginMode, setLoginMode] = useState<"password" | "email">("password");
-  const [authenticated, setAuthenticated] = useState(() => !!(sessionStorage.getItem("admin_pw") || sessionStorage.getItem("admin_email")));
+  const [authenticated, setAuthenticated] = useState(() => !!sessionStorage.getItem("admin_pw"));
   const [activeTab, setActiveTab] = useState<TabKey>("leads");
   const [adminEmails, setAdminEmails] = useState<{ id: string; email: string; label: string; is_active: boolean }[]>([]);
   const [editingAdminEmail, setEditingAdminEmail] = useState<{ id?: string; email: string; label: string; is_active: boolean } | null>(null);
