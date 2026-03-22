@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import SEOHead from "@/components/SEOHead";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import Header from "@/components/Header";
@@ -119,6 +120,7 @@ export default function Careers() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead title="Careers" description="Join Energy Innovation — explore open positions and build the future of industrial technology." path="/careers" />
       <Header />
 
       {/* Hero Banner */}

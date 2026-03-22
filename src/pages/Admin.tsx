@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import SEOHead from "@/components/SEOHead";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -1109,6 +1110,7 @@ export default function Admin() {
   if (!authenticated) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center px-6">
+        <SEOHead title="Admin" noindex />
         <form onSubmit={handleLogin} className="w-full max-w-sm space-y-6">
           <div className="text-center">
             <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-4">
@@ -1377,8 +1379,9 @@ export default function Admin() {
   );
 
   // ─── Main Layout ─────────────────────────────────────────
-  return (
+    return (
     <div className="min-h-screen bg-background">
+      <SEOHead title="Admin" noindex />
       <header className="border-b border-border bg-card px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <h1 className="text-xl font-bold text-foreground">Energy Innovation Admin</h1>
