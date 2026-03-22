@@ -1379,8 +1379,9 @@ export default function Admin() {
   );
 
   // ─── Main Layout ─────────────────────────────────────────
-  return (
+    return (
     <div className="min-h-screen bg-background">
+      <SEOHead title="Admin" noindex />
       <header className="border-b border-border bg-card px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <h1 className="text-xl font-bold text-foreground">Energy Innovation Admin</h1>
