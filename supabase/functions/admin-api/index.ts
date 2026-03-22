@@ -27,48 +27,11 @@ Deno.serve(async (req) => {
   const url = new URL(req.url);
   const path = url.pathname.split("/").pop();
 
-  // Public endpoint: check if an email is whitelisted (no auth needed)
-  if (path === "check-email" && req.method === "POST") {
-    try {
-      const { email } = await req.json();
-      const { data: emailEntry } = await supabase
-        .from("admin_emails")
-        .select("id")
-        .eq("email", (email || "").toLowerCase())
-        .eq("is_active", true)
-        .maybeSingle();
-      return json({ authorized: !!emailEntry });
-    } catch (err) {
-      return json({ error: err.message }, 500);
-    }
-  }
-
-  // Verify admin password OR admin email
+  // Verify admin password (required for all admin operations)
   const password = req.headers.get("x-admin-password");
-  const adminEmail = req.headers.get("x-admin-email");
   const adminPassword = Deno.env.get("ADMIN_PASSWORD");
 
-  let isAuthorized = false;
-
-  // Check password auth
-  if (password && password === adminPassword) {
-    isAuthorized = true;
-  }
-
-  // Check email auth
-  if (!isAuthorized && adminEmail) {
-    const { data: emailEntry } = await supabase
-      .from("admin_emails")
-      .select("id")
-      .eq("email", adminEmail.toLowerCase())
-      .eq("is_active", true)
-      .maybeSingle();
-    if (emailEntry) {
-      isAuthorized = true;
-    }
-  }
-
-  if (!isAuthorized) {
+  if (!password || !adminPassword || password !== adminPassword) {
     return json({ error: "Unauthorized" }, 401);
   }
 

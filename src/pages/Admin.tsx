@@ -160,8 +160,6 @@ const IMAGE_FOLDERS = [
 async function apiCall(path: string, method: string, password: string, body?: unknown) {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (password) headers["x-admin-password"] = password;
-  const storedEmail = sessionStorage.getItem("admin_email");
-  if (storedEmail) headers["x-admin-email"] = storedEmail;
   const res = await fetch(`${FUNCTION_URL}/${path}`, {
     method,
     headers,
@@ -224,9 +222,7 @@ const emptyMenuChild: MenuChildItem = {
 export default function Admin() {
   const { theme, toggleTheme } = useTheme();
   const [password, setPassword] = useState(() => sessionStorage.getItem("admin_pw") || "");
-  const [adminEmail, setAdminEmail] = useState(() => sessionStorage.getItem("admin_email") || "");
-  const [loginMode, setLoginMode] = useState<"password" | "email">("password");
-  const [authenticated, setAuthenticated] = useState(() => !!(sessionStorage.getItem("admin_pw") || sessionStorage.getItem("admin_email")));
+  const [authenticated, setAuthenticated] = useState(() => !!sessionStorage.getItem("admin_pw"));
   const [activeTab, setActiveTab] = useState<TabKey>("leads");
   const [adminEmails, setAdminEmails] = useState<{ id: string; email: string; label: string; is_active: boolean }[]>([]);
   const [editingAdminEmail, setEditingAdminEmail] = useState<{ id?: string; email: string; label: string; is_active: boolean } | null>(null);
@@ -676,27 +672,11 @@ export default function Admin() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (loginMode === "password") {
-        await apiCall("leads", "GET", password);
-        sessionStorage.setItem("admin_pw", password);
-        setAuthenticated(true);
-        toast.success("Logged in successfully");
-      } else {
-        const res = await fetch(`${FUNCTION_URL}/check-email`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: adminEmail.toLowerCase() }),
-        });
-        const data = await res.json();
-        if (data.authorized) {
-          sessionStorage.setItem("admin_email", adminEmail.toLowerCase());
-          setAuthenticated(true);
-          toast.success("Logged in successfully");
-        } else {
-          toast.error("Email not authorized");
-        }
-      }
-    } catch { toast.error(loginMode === "password" ? "Invalid password" : "Login failed"); }
+      await apiCall("leads", "GET", password);
+      sessionStorage.setItem("admin_pw", password);
+      setAuthenticated(true);
+      toast.success("Logged in successfully");
+    } catch { toast.error("Invalid password"); }
   };
 
   const handleDeleteLead = async (id: string) => {
@@ -1117,23 +1097,9 @@ export default function Admin() {
               <Lock className="w-8 h-8 text-primary-foreground" />
             </div>
             <h1 className="text-2xl font-bold text-foreground">Admin Panel</h1>
-            <p className="text-muted-foreground mt-2">
-              {loginMode === "password" ? "Enter admin password to continue" : "Enter your authorized email"}
-            </p>
+            <p className="text-muted-foreground mt-2">Enter admin password to continue</p>
           </div>
-          <div className="flex gap-2">
-            <Button type="button" variant={loginMode === "password" ? "default" : "outline"} className="flex-1 rounded-xl" onClick={() => setLoginMode("password")}>
-              <Lock className="w-4 h-4 mr-1" /> Password
-            </Button>
-            <Button type="button" variant={loginMode === "email" ? "default" : "outline"} className="flex-1 rounded-xl" onClick={() => setLoginMode("email")}>
-              <Mail className="w-4 h-4 mr-1" /> Email
-            </Button>
-          </div>
-          {loginMode === "password" ? (
-            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className="rounded-xl" required />
-          ) : (
-            <Input type="email" value={adminEmail} onChange={(e) => setAdminEmail(e.target.value)} placeholder="admin@example.com" className="rounded-xl" required />
-          )}
+          <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className="rounded-xl" required />
           <Button type="submit" className="w-full gradient-accent text-accent-foreground rounded-xl border-0">Login</Button>
         </form>
       </div>
@@ -1389,7 +1355,7 @@ export default function Admin() {
             <Button variant="outline" size="icon" onClick={toggleTheme} className="rounded-xl" title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}>
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </Button>
-            <Button variant="outline" size="sm" onClick={() => { sessionStorage.removeItem("admin_pw"); sessionStorage.removeItem("admin_email"); setAuthenticated(false); setPassword(""); setAdminEmail(""); }} className="rounded-xl">
+            <Button variant="outline" size="sm" onClick={() => { sessionStorage.removeItem("admin_pw"); setAuthenticated(false); setPassword(""); }} className="rounded-xl">
               <LogOut className="w-4 h-4 mr-2" />Logout
             </Button>
           </div>
