@@ -160,8 +160,6 @@ const IMAGE_FOLDERS = [
 async function apiCall(path: string, method: string, password: string, body?: unknown) {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (password) headers["x-admin-password"] = password;
-  const storedEmail = sessionStorage.getItem("admin_email");
-  if (storedEmail) headers["x-admin-email"] = storedEmail;
   const res = await fetch(`${FUNCTION_URL}/${path}`, {
     method,
     headers,
