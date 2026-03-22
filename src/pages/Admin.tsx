@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import SEOHead from "@/components/SEOHead";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
