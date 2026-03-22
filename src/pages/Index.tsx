@@ -8,10 +8,12 @@ import WhyChooseUsSection from "@/components/WhyChooseUsSection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 import FloatingButtons from "@/components/FloatingButtons";
+import SEOHead from "@/components/SEOHead";
 
 const Index = () => {
   return (
     <main className="min-h-screen">
+      <SEOHead />
       <Header />
       <HeroSection />
       <AboutSection />
