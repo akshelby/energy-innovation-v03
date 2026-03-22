@@ -1110,6 +1110,7 @@ export default function Admin() {
   if (!authenticated) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center px-6">
+        <SEOHead title="Admin" noindex />
         <form onSubmit={handleLogin} className="w-full max-w-sm space-y-6">
           <div className="text-center">
             <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-4">
