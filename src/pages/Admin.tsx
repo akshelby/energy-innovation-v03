@@ -672,27 +672,11 @@ export default function Admin() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (loginMode === "password") {
-        await apiCall("leads", "GET", password);
-        sessionStorage.setItem("admin_pw", password);
-        setAuthenticated(true);
-        toast.success("Logged in successfully");
-      } else {
-        const res = await fetch(`${FUNCTION_URL}/check-email`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: adminEmail.toLowerCase() }),
-        });
-        const data = await res.json();
-        if (data.authorized) {
-          sessionStorage.setItem("admin_email", adminEmail.toLowerCase());
-          setAuthenticated(true);
-          toast.success("Logged in successfully");
-        } else {
-          toast.error("Email not authorized");
-        }
-      }
-    } catch { toast.error(loginMode === "password" ? "Invalid password" : "Login failed"); }
+      await apiCall("leads", "GET", password);
+      sessionStorage.setItem("admin_pw", password);
+      setAuthenticated(true);
+      toast.success("Logged in successfully");
+    } catch { toast.error("Invalid password"); }
   };
 
   const handleDeleteLead = async (id: string) => {
