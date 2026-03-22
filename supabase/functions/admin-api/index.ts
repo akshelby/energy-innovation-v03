@@ -27,22 +27,6 @@ Deno.serve(async (req) => {
   const url = new URL(req.url);
   const path = url.pathname.split("/").pop();
 
-  // Public endpoint: check if an email is whitelisted (no auth needed)
-  if (path === "check-email" && req.method === "POST") {
-    try {
-      const { email } = await req.json();
-      const { data: emailEntry } = await supabase
-        .from("admin_emails")
-        .select("id")
-        .eq("email", (email || "").toLowerCase())
-        .eq("is_active", true)
-        .maybeSingle();
-      return json({ authorized: !!emailEntry });
-    } catch (err) {
-      return json({ error: err.message }, 500);
-    }
-  }
-
   // Verify admin password (required for all admin operations)
   const password = req.headers.get("x-admin-password");
   const adminPassword = Deno.env.get("ADMIN_PASSWORD");
