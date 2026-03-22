@@ -1097,23 +1097,9 @@ export default function Admin() {
               <Lock className="w-8 h-8 text-primary-foreground" />
             </div>
             <h1 className="text-2xl font-bold text-foreground">Admin Panel</h1>
-            <p className="text-muted-foreground mt-2">
-              {loginMode === "password" ? "Enter admin password to continue" : "Enter your authorized email"}
-            </p>
+            <p className="text-muted-foreground mt-2">Enter admin password to continue</p>
           </div>
-          <div className="flex gap-2">
-            <Button type="button" variant={loginMode === "password" ? "default" : "outline"} className="flex-1 rounded-xl" onClick={() => setLoginMode("password")}>
-              <Lock className="w-4 h-4 mr-1" /> Password
-            </Button>
-            <Button type="button" variant={loginMode === "email" ? "default" : "outline"} className="flex-1 rounded-xl" onClick={() => setLoginMode("email")}>
-              <Mail className="w-4 h-4 mr-1" /> Email
-            </Button>
-          </div>
-          {loginMode === "password" ? (
-            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className="rounded-xl" required />
-          ) : (
-            <Input type="email" value={adminEmail} onChange={(e) => setAdminEmail(e.target.value)} placeholder="admin@example.com" className="rounded-xl" required />
-          )}
+          <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className="rounded-xl" required />
           <Button type="submit" className="w-full gradient-accent text-accent-foreground rounded-xl border-0">Login</Button>
         </form>
       </div>
