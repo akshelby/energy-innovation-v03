@@ -120,6 +120,7 @@ export default function Careers() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead title="Careers" description="Join Energy Innovation — explore open positions and build the future of industrial technology." path="/careers" />
       <Header />
 
       {/* Hero Banner */}
