@@ -196,6 +196,13 @@ export default function SubProductsPage() {
   };
   return (
     <main className="min-h-screen">
+      <SEOHead
+        title={productNameEn}
+        description={`${product.description_en.slice(0, 150)} — Energy Innovation`}
+        path={`/products/${productId}`}
+        image={product.image_url || undefined}
+      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Header />
 
       {/* Hero */}

@@ -223,11 +223,26 @@ export default function ProductPageView() {
   const description = page ? (isAr ? page.description_ar : page.description_en) : "";
   const subDescription = page ? (isAr ? page.sub_description_ar : page.sub_description_en) : "";
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": item.name_en,
+    "description": page?.description_en || item.name_en,
+    "brand": { "@type": "Brand", "name": "Energy Innovation" },
+    "url": `https://mivora.com/product/${id}`,
+    ...(images[0]?.image_url ? { "image": images[0].image_url } : {}),
+  };
+
   return (
     <main className="min-h-screen">
+      <SEOHead
+        title={item.name_en}
+        description={`${(page?.description_en || item.name_en).slice(0, 150)} — Energy Innovation`}
+        path={`/product/${id}`}
+        image={images[0]?.image_url || undefined}
+      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Header />
-
-      {/* Hero Section */}
       <section className="pt-20 md:pt-24">
         <div className="max-w-6xl mx-auto px-6">
           {/* Breadcrumb */}
