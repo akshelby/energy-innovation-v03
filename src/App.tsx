@@ -20,6 +20,7 @@ const Admin = lazy(() => import("./pages/Admin.tsx"));
 const queryClient = new QueryClient();
 
 const App = () => (
+  <HelmetProvider>
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <ThemeProvider>
