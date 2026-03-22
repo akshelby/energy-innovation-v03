@@ -1829,7 +1829,7 @@ export default function Admin() {
                     <div className="border-t border-border pt-5">
                       <p className="text-xs font-medium text-muted-foreground mb-3 uppercase tracking-wide">Text Content</p>
                       <div className="space-y-4">
-                        {content.filter(c => c.content_key.startsWith("hero.") && !c.content_key.startsWith("hero.show_")).map((item) => (
+                        {content.filter(c => c.content_key.startsWith("hero.") && !c.content_key.startsWith("hero.show_") && c.content_key !== "hero.active_images" && c.content_key !== "hero.speed").map((item) => (
                           <div key={item.id} className="space-y-2">
                             <div className="flex items-center justify-between">
                               <span className="text-xs font-medium text-muted-foreground capitalize">{item.content_key.replace("hero.", "").replace(/_/g, " ")}</span>
