@@ -1856,7 +1856,7 @@ export default function Admin() {
                 {/* ── Generic Sections (ordered by site layout) ── */}
                 {(() => {
                   const grouped: Record<string, ContentItem[]> = {};
-                  const managedPrefixes = new Set(["hero", "contact", "footer"]);
+                  const managedPrefixes = new Set(["hero", "contact", "footer", "highlight"]);
                   const managedKeys = new Set(["contact_phone", "contact_email", "contact_address", "contact_phone_visible", "contact_email_visible", "contact_address_visible"]);
                   content.forEach((item) => {
                     const section = item.content_key.split(".")[0] || "other";
