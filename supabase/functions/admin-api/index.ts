@@ -28,14 +28,12 @@ Deno.serve(async (req) => {
   const path = url.pathname.split("/").pop();
 
   // Verify admin password (required for all admin operations)
-  const password = req.headers.get("x-admin-password");
-  const adminPassword = Deno.env.get("ADMIN_PASSWORD");
-  const viewerPassword = Deno.env.get("ADMIN_VIEWER_PASSWORD");
+  const password = req.headers.get("x-admin-password")?.trim();
+  const adminPassword = Deno.env.get("ADMIN_PASSWORD")?.trim();
+  const viewerPassword = Deno.env.get("ADMIN_VIEWER_PASSWORD")?.trim();
 
-  console.log("Auth check:", { password: password?.substring(0, 3), adminPw: adminPassword?.substring(0, 3), viewerPw: viewerPassword?.substring(0, 3), viewerMatch: password === viewerPassword, adminMatch: password === adminPassword });
-
-  const isAdmin = password && adminPassword && password === adminPassword;
-  const isViewer = password && viewerPassword && password === viewerPassword;
+  const isAdmin = !!password && !!adminPassword && password === adminPassword;
+  const isViewer = !!password && !!viewerPassword && password === viewerPassword;
 
   if (!isAdmin && !isViewer) {
     return json({ error: "Unauthorized" }, 401);
