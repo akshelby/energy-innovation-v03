@@ -3806,39 +3806,85 @@ export default function Admin() {
                 <p className="text-sm text-muted-foreground text-center py-4">No addresses yet. Add one above.</p>
               ) : (
                 <div className="space-y-2">
-                  {contactAddresses.map((addr) => (
-                    <div key={addr.id} className="flex items-center justify-between p-3 rounded-xl border border-border bg-secondary/30">
-                      <div className="flex items-center gap-3">
-                        <Globe className="w-4 h-4 text-accent shrink-0" />
-                        <div>
-                          <p className="text-sm font-medium text-foreground">{addr.label_en}</p>
-                          <p className="text-xs text-muted-foreground" dir="rtl">{addr.label_ar}</p>
+                  {contactAddresses.map((addr) => {
+                    const isInlineEditing = editingAddress?.id === addr.id;
+                    return (
+                      <div key={addr.id} className="p-3 rounded-xl border border-border bg-secondary/30">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <Globe className="w-4 h-4 text-accent shrink-0" />
+                            <span className="text-xs font-medium text-muted-foreground">Address Card</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <label className="flex items-center gap-1.5 cursor-pointer">
+                              <span className="text-xs text-muted-foreground">{addr.is_active ? "Active" : "Inactive"}</span>
+                              <input type="checkbox" checked={addr.is_active} onChange={async () => {
+                                try {
+                                  await supabase.from("contact_addresses").update({ is_active: !addr.is_active }).eq("id", addr.id);
+                                  fetchContactAddresses();
+                                  toast.success(addr.is_active ? "Address hidden" : "Address shown");
+                                } catch (e: any) { toast.error(e.message); }
+                              }} className="w-4 h-4 accent-[hsl(var(--accent))]" />
+                            </label>
+                            <Button size="sm" variant="outline" onClick={async () => {
+                              try {
+                                await supabase.from("contact_addresses").delete().eq("id", addr.id);
+                                fetchContactAddresses();
+                                toast.success("Address deleted");
+                              } catch (e: any) { toast.error(e.message); }
+                            }} className="rounded-lg h-8 px-2 text-destructive hover:text-destructive">
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
                         </div>
+                        {isInlineEditing ? (
+                          <div className="space-y-2">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              <div>
+                                <label className="text-xs text-muted-foreground mb-1 block">English</label>
+                                <Input value={editingAddress.label_en} onChange={(e) => setEditingAddress({ ...editingAddress, label_en: e.target.value })} className="rounded-xl text-sm" />
+                              </div>
+                              <div>
+                                <label className="text-xs text-muted-foreground mb-1 block">Arabic</label>
+                                <Input value={editingAddress.label_ar} onChange={(e) => setEditingAddress({ ...editingAddress, label_ar: e.target.value })} className="rounded-xl text-sm" dir="rtl" />
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button size="sm" variant="outline" disabled={translating} onClick={async () => {
+                                if (!editingAddress.label_en) return;
+                                try {
+                                  setTranslating(true);
+                                  const result = await translateTexts({ label_en: editingAddress.label_en });
+                                  if (result.label_en) setEditingAddress({ ...editingAddress, label_ar: result.label_en });
+                                  toast.success("Translated");
+                                } catch (e: any) { toast.error(e.message); }
+                                finally { setTranslating(false); }
+                              }} className="rounded-xl">
+                                <Languages className="w-4 h-4 mr-1" />{translating ? "..." : "Translate"}
+                              </Button>
+                              <Button size="sm" onClick={async () => {
+                                try {
+                                  await supabase.from("contact_addresses").update({ label_en: editingAddress.label_en, label_ar: editingAddress.label_ar }).eq("id", addr.id);
+                                  toast.success("Address saved");
+                                  setEditingAddress(null);
+                                  fetchContactAddresses();
+                                } catch (e: any) { toast.error(e.message); }
+                              }} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                                <Save className="w-3 h-3 mr-1" />Save
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={() => setEditingAddress(null)} className="rounded-xl">Cancel</Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="cursor-pointer hover:bg-secondary/50 rounded-lg p-2 -m-1 transition-colors" onClick={() => setEditingAddress(addr)}>
+                            <p className="text-sm font-medium text-foreground">{addr.label_en}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5" dir="rtl">{addr.label_ar}</p>
+                            <p className="text-[10px] text-muted-foreground/60 mt-1 italic">Click to edit</p>
+                          </div>
+                        )}
                       </div>
-                      <div className="flex items-center gap-2">
-                        <label className="flex items-center gap-1.5 cursor-pointer">
-                          <span className="text-xs text-muted-foreground">{addr.is_active ? "Active" : "Inactive"}</span>
-                          <input type="checkbox" checked={addr.is_active} onChange={async () => {
-                            try {
-                              await supabase.from("contact_addresses").update({ is_active: !addr.is_active }).eq("id", addr.id);
-                              fetchContactAddresses();
-                              toast.success(addr.is_active ? "Address hidden" : "Address shown");
-                            } catch (e: any) { toast.error(e.message); }
-                          }} className="w-4 h-4 accent-[hsl(var(--accent))]" />
-                        </label>
-                        <Button size="sm" variant="outline" onClick={() => setEditingAddress(addr)} className="rounded-lg h-8 px-2">Edit</Button>
-                        <Button size="sm" variant="outline" onClick={async () => {
-                          try {
-                            await supabase.from("contact_addresses").delete().eq("id", addr.id);
-                            fetchContactAddresses();
-                            toast.success("Address deleted");
-                          } catch (e: any) { toast.error(e.message); }
-                        }} className="rounded-lg h-8 px-2 text-destructive hover:text-destructive">
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
