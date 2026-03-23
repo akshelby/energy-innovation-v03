@@ -3866,7 +3866,7 @@ export default function Admin() {
                               </Button>
                               <Button size="sm" onClick={async () => {
                                 try {
-                                  await supabase.from("contact_addresses").update({ label_en: editingAddress.label_en, label_ar: editingAddress.label_ar }).eq("id", addr.id);
+                                  await apiCall("contact-addresses", "POST", storedPassword, { id: addr.id, label_en: editingAddress.label_en, label_ar: editingAddress.label_ar });
                                   toast.success("Address saved");
                                   setEditingAddress(null);
                                   fetchContactAddresses();
