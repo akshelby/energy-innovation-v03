@@ -3199,16 +3199,30 @@ export default function Admin() {
 
             <div className="space-y-3">
               {adminEmails.map((ae) => (
-                <div key={ae.id} className="bg-card border border-border rounded-2xl p-4 flex items-center justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <Mail className="w-4 h-4 text-muted-foreground" />
-                      <span className="font-medium text-foreground">{ae.email}</span>
-                      {!ae.is_active && <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">Inactive</span>}
+                <div key={ae.id} className={`bg-card border rounded-2xl p-4 flex items-center justify-between ${ae.is_active ? 'border-border' : 'border-border opacity-60'}`}>
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <Mail className={`w-4 h-4 shrink-0 ${ae.is_active ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <div className="min-w-0">
+                      <span className="font-medium text-foreground block truncate">{ae.email}</span>
+                      {ae.label && <p className="text-sm text-muted-foreground mt-0.5">{ae.label}</p>}
                     </div>
-                    {ae.label && <p className="text-sm text-muted-foreground mt-1">{ae.label}</p>}
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex items-center gap-3 shrink-0">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs font-medium ${ae.is_active ? 'text-green-600' : 'text-muted-foreground'}`}>
+                        {ae.is_active ? 'Active' : 'Inactive'}
+                      </span>
+                      <Switch
+                        checked={ae.is_active}
+                        onCheckedChange={async (checked) => {
+                          try {
+                            await apiCall("admin-emails", "POST", storedPassword, { ...ae, is_active: checked });
+                            toast.success(`Email ${checked ? 'activated' : 'deactivated'}`);
+                            fetchAdminEmails();
+                          } catch (e: any) { toast.error(e.message); }
+                        }}
+                      />
+                    </div>
                     <Button variant="outline" size="sm" onClick={() => setEditingAdminEmail(ae)} className="rounded-xl">Edit</Button>
                     <Button
                       variant="outline"
