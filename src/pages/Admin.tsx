@@ -1367,17 +1367,31 @@ export default function Admin() {
       <SEOHead title="Admin" noindex />
       <header className="border-b border-border bg-card px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <h1 className="text-xl font-bold text-foreground">Energy Innovation Admin</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl font-bold text-foreground">Energy Innovation Admin</h1>
+            {isViewer && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full bg-muted text-muted-foreground border border-border">
+                👁 View Only
+              </span>
+            )}
+          </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="icon" onClick={toggleTheme} className="rounded-xl" title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}>
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </Button>
-            <Button variant="outline" size="sm" onClick={() => { sessionStorage.removeItem("admin_pw"); setAuthenticated(false); setPassword(""); }} className="rounded-xl">
+            <Button variant="outline" size="sm" onClick={() => { sessionStorage.removeItem("admin_pw"); sessionStorage.removeItem("admin_role"); setAuthenticated(false); setIsViewer(false); setPassword(""); }} className="rounded-xl">
               <LogOut className="w-4 h-4 mr-2" />Logout
             </Button>
           </div>
         </div>
       </header>
+      {isViewer && (
+        <div className="bg-muted border-b border-border px-6 py-2">
+          <div className="max-w-7xl mx-auto">
+            <p className="text-sm text-muted-foreground text-center">🔒 You have <strong>view-only</strong> access. All edit, save, and delete actions are disabled.</p>
+          </div>
+        </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Tabs */}
