@@ -39,6 +39,8 @@ Deno.serve(async (req) => {
   const adminPassword = normalizeSecret(Deno.env.get("ADMIN_PASSWORD"));
   const viewerPassword = normalizeSecret(Deno.env.get("ADMIN_VIEWER_PASSWORD"));
 
+  
+
   const isAdmin = password.length > 0 && adminPassword.length > 0 && password === adminPassword;
   const isViewer = password.length > 0 && viewerPassword.length > 0 && password === viewerPassword;
 
