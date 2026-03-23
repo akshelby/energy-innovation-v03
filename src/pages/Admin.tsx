@@ -597,10 +597,10 @@ export default function Admin() {
 
   const fetchContactAddresses = useCallback(async () => {
     try {
-      const { data } = await supabase.from("contact_addresses").select("*").order("sort_order");
-      if (data) setContactAddresses(data);
+      const data = await apiCall("contact-addresses", "GET", storedPassword);
+      setContactAddresses(data);
     } catch { /* ignore */ }
-  }, []);
+  }, [storedPassword]);
 
   const fetchCareersContent = useCallback(async () => {
     try {
