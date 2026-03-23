@@ -1419,6 +1419,9 @@ export default function Admin() {
           ))}
         </div>
 
+        {/* Tab content - disable all edit controls in viewer mode */}
+        <div className={isViewer ? "viewer-readonly" : ""}>
+
         {/* ─── Branding Tab ──────── */}
         {activeTab === "branding" && (
           <div>
