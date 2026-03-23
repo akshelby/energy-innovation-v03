@@ -4097,6 +4097,188 @@ export default function Admin() {
             </div>
           </div>
         )}
+
+        {/* ─── Email Templates Tab ──────── */}
+        {activeTab === "email-templates" && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-foreground">Email Templates</h2>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={fetchContent} disabled={loading} className="rounded-xl">
+                  <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
+                </Button>
+                <Button size="sm" onClick={handleSeedContent} disabled={loading} className="rounded-xl gradient-accent text-accent-foreground border-0">
+                  <Database className="w-4 h-4 mr-2" />Seed Defaults
+                </Button>
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground mb-6">
+              Customize confirmation emails sent to visitors. Use <code className="bg-muted px-1 rounded">{"{{name}}"}</code> for visitor name and <code className="bg-muted px-1 rounded">{"{{product}}"}</code> for product name.
+            </p>
+
+            {/* Brand Settings */}
+            <div className="bg-card border border-border rounded-xl p-5 mb-6">
+              <h3 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Palette className="w-4 h-4" />Brand Settings (shared across all emails)
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[
+                  { key: "email.brand_name", label: "Brand Name" },
+                  { key: "email.tagline", label: "Tagline" },
+                  { key: "email.primary_color", label: "Primary Color (hex)" },
+                ].map(({ key, label }) => {
+                  const val = editedContent[key] || { value_en: "", value_ar: "" };
+                  const original = content.find((c) => c.content_key === key);
+                  const edited = original && (val.value_en !== original.value_en);
+                  return (
+                    <div key={key}>
+                      <label className="text-sm font-medium text-foreground">{label}</label>
+                      <div className="flex gap-2 mt-1">
+                        <Input
+                          value={val.value_en}
+                          onChange={(e) => updateEditedField(key, "value_en", e.target.value)}
+                          className="rounded-xl"
+                        />
+                        {edited && (
+                          <Button size="sm" onClick={() => handleSaveContent(key)} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                            <Save className="w-3 h-3" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+                {/* Logo URL */}
+                {(() => {
+                  const key = "email.logo_url";
+                  const val = editedContent[key] || { value_en: "", value_ar: "" };
+                  const original = content.find((c) => c.content_key === key);
+                  const edited = original && (val.value_en !== original.value_en);
+                  return (
+                    <div>
+                      <label className="text-sm font-medium text-foreground">Logo URL</label>
+                      <div className="flex gap-2 mt-1">
+                        <Input
+                          value={val.value_en}
+                          onChange={(e) => updateEditedField(key, "value_en", e.target.value)}
+                          placeholder="https://... (paste logo image URL)"
+                          className="rounded-xl"
+                        />
+                        {edited && (
+                          <Button size="sm" onClick={() => handleSaveContent(key)} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                            <Save className="w-3 h-3" />
+                          </Button>
+                        )}
+                      </div>
+                      {val.value_en && (
+                        <div className="mt-2 p-2 bg-muted rounded-lg inline-block">
+                          <img src={val.value_en} alt="Logo preview" className="h-10 object-contain" />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+                {/* Banner URL */}
+                {(() => {
+                  const key = "email.banner_url";
+                  const val = editedContent[key] || { value_en: "", value_ar: "" };
+                  const original = content.find((c) => c.content_key === key);
+                  const edited = original && (val.value_en !== original.value_en);
+                  return (
+                    <div className="md:col-span-2">
+                      <label className="text-sm font-medium text-foreground">Promotion Banner Image URL</label>
+                      <div className="flex gap-2 mt-1">
+                        <Input
+                          value={val.value_en}
+                          onChange={(e) => updateEditedField(key, "value_en", e.target.value)}
+                          placeholder="https://... (optional banner image)"
+                          className="rounded-xl"
+                        />
+                        {edited && (
+                          <Button size="sm" onClick={() => handleSaveContent(key)} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                            <Save className="w-3 h-3" />
+                          </Button>
+                        )}
+                      </div>
+                      {val.value_en && (
+                        <div className="mt-2 p-2 bg-muted rounded-lg">
+                          <img src={val.value_en} alt="Banner preview" className="max-h-24 object-contain rounded" />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+
+            {/* Template Cards */}
+            {[
+              { id: "lead", title: "Contact Form Confirmation", subjectKey: "email.lead_subject", headingKey: "email.lead_heading", bodyKey: "email.lead_body", placeholders: "{{name}}" },
+              { id: "enquiry", title: "Product Enquiry Confirmation", subjectKey: "email.enquiry_subject", headingKey: "email.enquiry_heading", bodyKey: "email.enquiry_body", placeholders: "{{name}}, {{product}}" },
+            ].map((tmpl) => (
+              <div key={tmpl.id} className="bg-card border border-border rounded-xl p-5 mb-6">
+                <h3 className="text-base font-semibold text-foreground mb-1 flex items-center gap-2">
+                  <Mail className="w-4 h-4" />{tmpl.title}
+                </h3>
+                <p className="text-xs text-muted-foreground mb-4">Placeholders: {tmpl.placeholders}</p>
+                {[
+                  { key: tmpl.subjectKey, label: "Subject Line", isTextarea: false },
+                  { key: tmpl.headingKey, label: "Heading", isTextarea: false },
+                  { key: tmpl.bodyKey, label: "Body Text", isTextarea: true },
+                ].map(({ key, label, isTextarea }) => {
+                  const val = editedContent[key] || { value_en: "", value_ar: "" };
+                  const original = content.find((c) => c.content_key === key);
+                  const edited = original && (val.value_en !== original.value_en || val.value_ar !== original.value_ar);
+                  return (
+                    <div key={key} className="mb-4">
+                      <label className="text-sm font-medium text-foreground">{label}</label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-1">
+                        <div>
+                          <span className="text-xs text-muted-foreground">English</span>
+                          {isTextarea ? (
+                            <Textarea value={val.value_en} onChange={(e) => updateEditedField(key, "value_en", e.target.value)} className="rounded-xl mt-1" rows={3} />
+                          ) : (
+                            <Input value={val.value_en} onChange={(e) => updateEditedField(key, "value_en", e.target.value)} className="rounded-xl mt-1" />
+                          )}
+                        </div>
+                        <div>
+                          <span className="text-xs text-muted-foreground">Arabic</span>
+                          {isTextarea ? (
+                            <Textarea value={val.value_ar} onChange={(e) => updateEditedField(key, "value_ar", e.target.value)} className="rounded-xl mt-1" rows={3} dir="rtl" />
+                          ) : (
+                            <Input value={val.value_ar} onChange={(e) => updateEditedField(key, "value_ar", e.target.value)} className="rounded-xl mt-1" dir="rtl" />
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex gap-2 mt-2">
+                        <Button
+                          size="sm" variant="outline" disabled={translating || !val.value_en}
+                          onClick={async () => {
+                            setTranslating(true);
+                            try {
+                              const result = await translateTexts({ [key]: val.value_en });
+                              if (result[key]) updateEditedField(key, "value_ar", result[key]);
+                              toast.success("Translated");
+                            } catch (e: any) { toast.error(e.message); }
+                            finally { setTranslating(false); }
+                          }}
+                          className="rounded-xl"
+                        >
+                          <Languages className="w-3 h-3 mr-1" />{translating ? "..." : "Translate"}
+                        </Button>
+                        {edited && (
+                          <Button size="sm" onClick={() => handleSaveContent(key)} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                            <Save className="w-3 h-3 mr-1" />Save
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <PdfViewerDialog open={pdfPreviewOpen} onOpenChange={setPdfPreviewOpen} src={pdfPreviewUrl} />
