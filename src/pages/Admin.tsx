@@ -3788,9 +3788,9 @@ export default function Admin() {
                     <Button size="sm" onClick={async () => {
                       try {
                         if (editingAddress.id) {
-                          await supabase.from("contact_addresses").update({ label_en: editingAddress.label_en, label_ar: editingAddress.label_ar, is_active: editingAddress.is_active, sort_order: editingAddress.sort_order }).eq("id", editingAddress.id);
+                          await apiCall("contact-addresses", "POST", storedPassword, { id: editingAddress.id, label_en: editingAddress.label_en, label_ar: editingAddress.label_ar, is_active: editingAddress.is_active, sort_order: editingAddress.sort_order });
                         } else {
-                          await supabase.from("contact_addresses").insert({ label_en: editingAddress.label_en, label_ar: editingAddress.label_ar, is_active: editingAddress.is_active, sort_order: editingAddress.sort_order });
+                          await apiCall("contact-addresses", "POST", storedPassword, { label_en: editingAddress.label_en, label_ar: editingAddress.label_ar, is_active: editingAddress.is_active, sort_order: editingAddress.sort_order });
                         }
                         toast.success("Address saved");
                         setEditingAddress(null);
