@@ -149,6 +149,18 @@ const defaultContent: { content_key: string; value_en: string; value_ar: string 
   { content_key: "contact_phone_visible", value_en: "true", value_ar: "true" },
   { content_key: "contact_email_visible", value_en: "true", value_ar: "true" },
   { content_key: "contact_address_visible", value_en: "true", value_ar: "true" },
+  // Email template settings
+  { content_key: "email.brand_name", value_en: "Energy Innvo", value_ar: "Energy Innvo" },
+  { content_key: "email.tagline", value_en: "Industrial Solutions & Innovation", value_ar: "حلول صناعية وابتكار" },
+  { content_key: "email.logo_url", value_en: "", value_ar: "" },
+  { content_key: "email.banner_url", value_en: "", value_ar: "" },
+  { content_key: "email.lead_subject", value_en: "Thank you for contacting Energy Innvo, {{name}}!", value_ar: "شكراً لتواصلك مع Energy Innvo، {{name}}!" },
+  { content_key: "email.lead_heading", value_en: "Thank You for Reaching Out!", value_ar: "شكراً لتواصلك معنا!" },
+  { content_key: "email.lead_body", value_en: "We have received your message and our team will get back to you as soon as possible. We appreciate your interest in Energy Innvo and look forward to assisting you.", value_ar: "لقد تلقينا رسالتك وسيقوم فريقنا بالرد عليك في أقرب وقت ممكن. نقدر اهتمامك بـ Energy Innvo ونتطلع لمساعدتك." },
+  { content_key: "email.enquiry_subject", value_en: "Your enquiry about {{product}} has been received!", value_ar: "تم استلام استفسارك حول {{product}}!" },
+  { content_key: "email.enquiry_heading", value_en: "Product Enquiry Received!", value_ar: "تم استلام استفسار المنتج!" },
+  { content_key: "email.enquiry_body", value_en: "Thank you for your interest in {{product}}. Our team has received your enquiry and will review your requirements shortly. We'll get back to you with the information you need.", value_ar: "شكراً لاهتمامك بـ {{product}}. لقد تلقى فريقنا استفسارك وسيراجع متطلباتك قريباً. سنتواصل معك بالمعلومات التي تحتاجها." },
+  { content_key: "email.primary_color", value_en: "#f97316", value_ar: "#f97316" },
 ];
 
 const IMAGE_FOLDERS = [
