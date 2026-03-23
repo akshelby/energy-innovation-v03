@@ -14,6 +14,13 @@ function json(data: unknown, status = 200) {
   });
 }
 
+function normalizeSecret(value: string | null) {
+  return (value ?? "")
+    .normalize("NFKC")
+    .replace(/[\u200B-\u200D\uFEFF]/g, "")
+    .replace(/^[\s"'`]+|[\s"'`]+$/g, "");
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -28,14 +35,12 @@ Deno.serve(async (req) => {
   const path = url.pathname.split("/").pop();
 
   // Verify admin password (required for all admin operations)
-  const password = req.headers.get("x-admin-password");
-  const adminPassword = Deno.env.get("ADMIN_PASSWORD");
-  const viewerPassword = Deno.env.get("ADMIN_VIEWER_PASSWORD");
+  const password = normalizeSecret(req.headers.get("x-admin-password"));
+  const adminPassword = normalizeSecret(Deno.env.get("ADMIN_PASSWORD"));
+  const viewerPassword = normalizeSecret(Deno.env.get("ADMIN_VIEWER_PASSWORD"));
 
-  console.log("Auth check:", { password: password?.substring(0, 3), adminPw: adminPassword?.substring(0, 3), viewerPw: viewerPassword?.substring(0, 3), viewerMatch: password === viewerPassword, adminMatch: password === adminPassword });
-
-  const isAdmin = password && adminPassword && password === adminPassword;
-  const isViewer = password && viewerPassword && password === viewerPassword;
+  const isAdmin = password.length > 0 && adminPassword.length > 0 && password === adminPassword;
+  const isViewer = password.length > 0 && viewerPassword.length > 0 && password === viewerPassword;
 
   if (!isAdmin && !isViewer) {
     return json({ error: "Unauthorized" }, 401);
