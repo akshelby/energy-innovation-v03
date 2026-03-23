@@ -687,10 +687,12 @@ export default function Admin() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await apiCall("leads", "GET", password);
+      const roleData = await apiCall("auth-role", "GET", password);
       sessionStorage.setItem("admin_pw", password);
+      sessionStorage.setItem("admin_role", roleData.role);
       setAuthenticated(true);
-      toast.success("Logged in successfully");
+      setIsViewer(roleData.role === "viewer");
+      toast.success(roleData.role === "viewer" ? "Logged in (View Only)" : "Logged in successfully");
     } catch { toast.error("Invalid password"); }
   };
 
