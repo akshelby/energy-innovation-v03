@@ -3822,7 +3822,7 @@ export default function Admin() {
                               <span className="text-xs text-muted-foreground">{addr.is_active ? "Active" : "Inactive"}</span>
                               <input type="checkbox" checked={addr.is_active} onChange={async () => {
                                 try {
-                                  await supabase.from("contact_addresses").update({ is_active: !addr.is_active }).eq("id", addr.id);
+                                  await apiCall("contact-addresses", "POST", storedPassword, { id: addr.id, is_active: !addr.is_active });
                                   fetchContactAddresses();
                                   toast.success(addr.is_active ? "Address hidden" : "Address shown");
                                 } catch (e: any) { toast.error(e.message); }
