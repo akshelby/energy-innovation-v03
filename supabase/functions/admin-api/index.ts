@@ -14,6 +14,13 @@ function json(data: unknown, status = 200) {
   });
 }
 
+function normalizeSecret(value: string | null) {
+  return (value ?? "")
+    .normalize("NFKC")
+    .replace(/[\u200B-\u200D\uFEFF]/g, "")
+    .replace(/^[\s"'`]+|[\s"'`]+$/g, "");
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
