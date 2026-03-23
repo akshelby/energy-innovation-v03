@@ -32,7 +32,7 @@ Deno.serve(async (req) => {
   const adminPassword = Deno.env.get("ADMIN_PASSWORD");
   const viewerPassword = Deno.env.get("ADMIN_VIEWER_PASSWORD");
 
-  console.log("Auth check:", { hasPassword: !!password, hasAdminPw: !!adminPassword, hasViewerPw: !!viewerPassword });
+  console.log("Auth check:", { password: password?.substring(0, 3), adminPw: adminPassword?.substring(0, 3), viewerPw: viewerPassword?.substring(0, 3), viewerMatch: password === viewerPassword, adminMatch: password === adminPassword });
 
   const isAdmin = password && adminPassword && password === adminPassword;
   const isViewer = password && viewerPassword && password === viewerPassword;
