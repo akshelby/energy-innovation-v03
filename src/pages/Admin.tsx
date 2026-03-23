@@ -3830,7 +3830,7 @@ export default function Admin() {
                             </label>
                             <Button size="sm" variant="outline" onClick={async () => {
                               try {
-                                await supabase.from("contact_addresses").delete().eq("id", addr.id);
+                                await apiCall("contact-addresses", "DELETE", storedPassword, { id: addr.id });
                                 fetchContactAddresses();
                                 toast.success("Address deleted");
                               } catch (e: any) { toast.error(e.message); }
