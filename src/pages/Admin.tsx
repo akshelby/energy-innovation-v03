@@ -236,7 +236,7 @@ export default function Admin() {
   const { theme, toggleTheme } = useTheme();
   const [password, setPassword] = useState(() => sessionStorage.getItem("admin_pw") || "");
   const [authenticated, setAuthenticated] = useState(() => !!sessionStorage.getItem("admin_pw"));
-  const [isViewer, setIsViewer] = useState(false);
+  const [isViewer, setIsViewer] = useState(() => sessionStorage.getItem("admin_role") === "viewer");
   const [activeTab, setActiveTab] = useState<TabKey>("leads");
   const [adminEmails, setAdminEmails] = useState<{ id: string; email: string; label: string; is_active: boolean }[]>([]);
   const [editingAdminEmail, setEditingAdminEmail] = useState<{ id?: string; email: string; label: string; is_active: boolean } | null>(null);
