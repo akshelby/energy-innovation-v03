@@ -295,9 +295,9 @@ export default function Header() {
           scrolled ? "shadow-md" : ""
         } ${headerVisible ? "translate-y-0" : "-translate-y-full"}`}
       >
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 md:px-6">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-2 md:px-6">
           {/* Logo */}
-          <a href="#home" onClick={() => scrollToSection("#home")} className="flex items-center shrink-0 py-1.5">
+          <a href="#home" onClick={() => scrollToSection("#home")} className="flex items-center shrink-0">
             {brandReady && <img src={logoUrl} alt={brandName} className="w-auto object-contain" style={{ height: `${Math.round(logoSize * 0.8)}px` }} />}
           </a>
 
@@ -340,8 +340,8 @@ export default function Header() {
                           ))}
                         </div>
                       )}
-          </div>
-        </div>
+                    </div>
+                  </div>
                 )}
               </div>
             ))}
@@ -364,6 +364,13 @@ export default function Header() {
               {language === "en" ? "عربي" : "EN"}
             </button>
 
+            <Button
+              onClick={() => scrollToSection("#contact")}
+              className="hidden md:inline-flex gradient-accent text-accent-foreground rounded-full px-5 text-[15px] font-semibold transition-all border-0 shrink-0"
+            >
+              {t("nav.contact")}
+            </Button>
+
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
               className={`md:hidden p-2 rounded-full ${textColor} hover:bg-muted transition-colors duration-300`}
@@ -371,13 +378,6 @@ export default function Header() {
               {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
-
-          <Button
-            onClick={() => scrollToSection("#contact")}
-            className="hidden md:inline-flex gradient-accent text-accent-foreground rounded-full px-5 text-[15px] font-semibold transition-all border-0 shrink-0"
-          >
-            {t("nav.contact")}
-          </Button>
         </div>
       </header>
 
