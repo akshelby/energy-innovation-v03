@@ -47,6 +47,11 @@ Deno.serve(async (req) => {
   const method = req.method;
 
   try {
+    // AUTH ROLE CHECK
+    if (path === "auth-role") {
+      return json({ role: isAdmin ? "admin" : "viewer" });
+    }
+
     // LEADS
     if (path === "leads") {
       if (method === "GET") {
