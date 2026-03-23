@@ -3595,6 +3595,7 @@ export default function Admin() {
                 Section Title & Description
               </h3>
               {[
+                { key: "contact.tag", label: "Section Tag (Eyebrow)" },
                 { key: "contact.title", label: "Title" },
                 { key: "contact.desc", label: "Description" },
               ].map(({ key, label }) => {
