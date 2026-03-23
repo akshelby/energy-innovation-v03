@@ -126,6 +126,7 @@ const defaultContent: { content_key: string; value_en: string; value_ar: string 
   { content_key: "highlight.title", value_en: "Driving Industrial Excellence Forward", value_ar: "قيادة التميز الصناعي نحو الأمام" },
   { content_key: "highlight.desc", value_en: "Energy Innovation delivers cutting-edge industrial solutions that empower businesses to achieve operational excellence. From strategy to execution, we bring industry-leading expertise across engineering, automation, and safety systems.", value_ar: "تقدم Energy Innovation حلولاً صناعية متطورة تمكّن الشركات من تحقيق التميز التشغيلي. من الاستراتيجية إلى التنفيذ، نقدم خبرة رائدة في الهندسة والأتمتة وأنظمة السلامة." },
   { content_key: "highlight.subdesc", value_en: "Your success is our priority. We welcome your inquiries as we partner on your industrial journey.", value_ar: "نجاحكم هو أولويتنا. نرحب باستفساراتكم ونتطلع للشراكة في رحلتكم الصناعية." },
+  { content_key: "contact.tag", value_en: "Get in Touch", value_ar: "تواصل معنا" },
   { content_key: "contact.title", value_en: "Let's Build Something Great", value_ar: "لنبني شيئاً رائعاً معاً" },
   { content_key: "contact.desc", value_en: "Ready to upgrade your industrial infrastructure? Send us a message and our team will respond within 24 hours.", value_ar: "هل أنت مستعد لتطوير بنيتك التحتية الصناعية؟ أرسل لنا رسالة وسيرد فريقنا خلال 24 ساعة." },
   { content_key: "contact_phone", value_en: "+966 XX XXX XXXX", value_ar: "+966 XX XXX XXXX" },
@@ -3594,6 +3595,7 @@ export default function Admin() {
                 Section Title & Description
               </h3>
               {[
+                { key: "contact.tag", label: "Section Tag (Eyebrow)" },
                 { key: "contact.title", label: "Title" },
                 { key: "contact.desc", label: "Description" },
               ].map(({ key, label }) => {
