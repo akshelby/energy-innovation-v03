@@ -3150,7 +3150,7 @@ export default function Admin() {
             </div>
 
             <p className="text-sm text-muted-foreground mb-6">
-              Add email addresses that can access the admin panel. Users can log in using their email instead of the shared password.
+              Manage email addresses that receive enquiry notifications from contact forms and product enquiries. Toggle active/inactive to control which emails receive notifications.
             </p>
 
             {editingAdminEmail && (
