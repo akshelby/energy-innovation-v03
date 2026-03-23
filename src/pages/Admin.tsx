@@ -149,6 +149,18 @@ const defaultContent: { content_key: string; value_en: string; value_ar: string 
   { content_key: "contact_phone_visible", value_en: "true", value_ar: "true" },
   { content_key: "contact_email_visible", value_en: "true", value_ar: "true" },
   { content_key: "contact_address_visible", value_en: "true", value_ar: "true" },
+  // Email template settings
+  { content_key: "email.brand_name", value_en: "Energy Innvo", value_ar: "Energy Innvo" },
+  { content_key: "email.tagline", value_en: "Industrial Solutions & Innovation", value_ar: "حلول صناعية وابتكار" },
+  { content_key: "email.logo_url", value_en: "", value_ar: "" },
+  { content_key: "email.banner_url", value_en: "", value_ar: "" },
+  { content_key: "email.lead_subject", value_en: "Thank you for contacting Energy Innvo, {{name}}!", value_ar: "شكراً لتواصلك مع Energy Innvo، {{name}}!" },
+  { content_key: "email.lead_heading", value_en: "Thank You for Reaching Out!", value_ar: "شكراً لتواصلك معنا!" },
+  { content_key: "email.lead_body", value_en: "We have received your message and our team will get back to you as soon as possible. We appreciate your interest in Energy Innvo and look forward to assisting you.", value_ar: "لقد تلقينا رسالتك وسيقوم فريقنا بالرد عليك في أقرب وقت ممكن. نقدر اهتمامك بـ Energy Innvo ونتطلع لمساعدتك." },
+  { content_key: "email.enquiry_subject", value_en: "Your enquiry about {{product}} has been received!", value_ar: "تم استلام استفسارك حول {{product}}!" },
+  { content_key: "email.enquiry_heading", value_en: "Product Enquiry Received!", value_ar: "تم استلام استفسار المنتج!" },
+  { content_key: "email.enquiry_body", value_en: "Thank you for your interest in {{product}}. Our team has received your enquiry and will review your requirements shortly. We'll get back to you with the information you need.", value_ar: "شكراً لاهتمامك بـ {{product}}. لقد تلقى فريقنا استفسارك وسيراجع متطلباتك قريباً. سنتواصل معك بالمعلومات التي تحتاجها." },
+  { content_key: "email.primary_color", value_en: "#f97316", value_ar: "#f97316" },
 ];
 
 const IMAGE_FOLDERS = [
@@ -213,7 +225,7 @@ const emptyService: ServiceItem = {
   tag_en: "", tag_ar: "", image_url: null, pdf_url: null, icon: "Wrench", sort_order: 0,
 };
 
-type TabKey = "leads" | "content" | "products" | "services" | "menu-items" | "images" | "branding" | "highlight" | "careers" | "admin-emails" | "product-pages" | "product-enquiries" | "footer" | "contact";
+type TabKey = "leads" | "content" | "products" | "services" | "menu-items" | "images" | "branding" | "highlight" | "careers" | "admin-emails" | "product-pages" | "product-enquiries" | "footer" | "contact" | "email-templates";
 
 const emptyMenuChild: MenuChildItem = {
   category_key: "cat.fire", parent_id: null, name_en: "", name_ar: "", pdf_url: null, image_url: null, sort_order: 0, is_active: true,
@@ -665,6 +677,7 @@ export default function Admin() {
       else if (activeTab === "product-enquiries") fetchProductEnquiries();
       else if (activeTab === "footer") fetchContent();
       else if (activeTab === "contact") { fetchContent(); fetchContactAddresses(); }
+      else if (activeTab === "email-templates") fetchContent();
       else fetchFiles();
     }
   }, [authenticated, activeTab, fetchLeads, fetchContent, fetchContactAddresses, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding, fetchHighlight, fetchCareers, fetchCareersContent, fetchAdminEmails, fetchProductPages, fetchProductEnquiries]);
@@ -1380,6 +1393,7 @@ export default function Admin() {
             { key: "contact" as TabKey, icon: Phone, label: "Contact Section" },
             { key: "footer" as TabKey, icon: Globe, label: "Footer" },
             { key: "admin-emails" as TabKey, icon: Shield, label: `Admin Access (${adminEmails.length})` },
+            { key: "email-templates" as TabKey, icon: Mail, label: "Email Templates" },
           ]).map((tab) => (
             <Button key={tab.key} variant={activeTab === tab.key ? "default" : "outline"} onClick={() => setActiveTab(tab.key)} className="rounded-xl">
               <tab.icon className="w-4 h-4 mr-2" />{tab.label}
@@ -4081,6 +4095,188 @@ export default function Admin() {
                 );
               })}
             </div>
+          </div>
+        )}
+
+        {/* ─── Email Templates Tab ──────── */}
+        {activeTab === "email-templates" && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-foreground">Email Templates</h2>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={fetchContent} disabled={loading} className="rounded-xl">
+                  <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
+                </Button>
+                <Button size="sm" onClick={handleSeedContent} disabled={loading} className="rounded-xl gradient-accent text-accent-foreground border-0">
+                  <Database className="w-4 h-4 mr-2" />Seed Defaults
+                </Button>
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground mb-6">
+              Customize confirmation emails sent to visitors. Use <code className="bg-muted px-1 rounded">{"{{name}}"}</code> for visitor name and <code className="bg-muted px-1 rounded">{"{{product}}"}</code> for product name.
+            </p>
+
+            {/* Brand Settings */}
+            <div className="bg-card border border-border rounded-xl p-5 mb-6">
+              <h3 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Palette className="w-4 h-4" />Brand Settings (shared across all emails)
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[
+                  { key: "email.brand_name", label: "Brand Name" },
+                  { key: "email.tagline", label: "Tagline" },
+                  { key: "email.primary_color", label: "Primary Color (hex)" },
+                ].map(({ key, label }) => {
+                  const val = editedContent[key] || { value_en: "", value_ar: "" };
+                  const original = content.find((c) => c.content_key === key);
+                  const edited = original && (val.value_en !== original.value_en);
+                  return (
+                    <div key={key}>
+                      <label className="text-sm font-medium text-foreground">{label}</label>
+                      <div className="flex gap-2 mt-1">
+                        <Input
+                          value={val.value_en}
+                          onChange={(e) => updateEditedField(key, "value_en", e.target.value)}
+                          className="rounded-xl"
+                        />
+                        {edited && (
+                          <Button size="sm" onClick={() => handleSaveContent(key)} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                            <Save className="w-3 h-3" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+                {/* Logo URL */}
+                {(() => {
+                  const key = "email.logo_url";
+                  const val = editedContent[key] || { value_en: "", value_ar: "" };
+                  const original = content.find((c) => c.content_key === key);
+                  const edited = original && (val.value_en !== original.value_en);
+                  return (
+                    <div>
+                      <label className="text-sm font-medium text-foreground">Logo URL</label>
+                      <div className="flex gap-2 mt-1">
+                        <Input
+                          value={val.value_en}
+                          onChange={(e) => updateEditedField(key, "value_en", e.target.value)}
+                          placeholder="https://... (paste logo image URL)"
+                          className="rounded-xl"
+                        />
+                        {edited && (
+                          <Button size="sm" onClick={() => handleSaveContent(key)} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                            <Save className="w-3 h-3" />
+                          </Button>
+                        )}
+                      </div>
+                      {val.value_en && (
+                        <div className="mt-2 p-2 bg-muted rounded-lg inline-block">
+                          <img src={val.value_en} alt="Logo preview" className="h-10 object-contain" />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+                {/* Banner URL */}
+                {(() => {
+                  const key = "email.banner_url";
+                  const val = editedContent[key] || { value_en: "", value_ar: "" };
+                  const original = content.find((c) => c.content_key === key);
+                  const edited = original && (val.value_en !== original.value_en);
+                  return (
+                    <div className="md:col-span-2">
+                      <label className="text-sm font-medium text-foreground">Promotion Banner Image URL</label>
+                      <div className="flex gap-2 mt-1">
+                        <Input
+                          value={val.value_en}
+                          onChange={(e) => updateEditedField(key, "value_en", e.target.value)}
+                          placeholder="https://... (optional banner image)"
+                          className="rounded-xl"
+                        />
+                        {edited && (
+                          <Button size="sm" onClick={() => handleSaveContent(key)} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                            <Save className="w-3 h-3" />
+                          </Button>
+                        )}
+                      </div>
+                      {val.value_en && (
+                        <div className="mt-2 p-2 bg-muted rounded-lg">
+                          <img src={val.value_en} alt="Banner preview" className="max-h-24 object-contain rounded" />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+
+            {/* Template Cards */}
+            {[
+              { id: "lead", title: "Contact Form Confirmation", subjectKey: "email.lead_subject", headingKey: "email.lead_heading", bodyKey: "email.lead_body", placeholders: "{{name}}" },
+              { id: "enquiry", title: "Product Enquiry Confirmation", subjectKey: "email.enquiry_subject", headingKey: "email.enquiry_heading", bodyKey: "email.enquiry_body", placeholders: "{{name}}, {{product}}" },
+            ].map((tmpl) => (
+              <div key={tmpl.id} className="bg-card border border-border rounded-xl p-5 mb-6">
+                <h3 className="text-base font-semibold text-foreground mb-1 flex items-center gap-2">
+                  <Mail className="w-4 h-4" />{tmpl.title}
+                </h3>
+                <p className="text-xs text-muted-foreground mb-4">Placeholders: {tmpl.placeholders}</p>
+                {[
+                  { key: tmpl.subjectKey, label: "Subject Line", isTextarea: false },
+                  { key: tmpl.headingKey, label: "Heading", isTextarea: false },
+                  { key: tmpl.bodyKey, label: "Body Text", isTextarea: true },
+                ].map(({ key, label, isTextarea }) => {
+                  const val = editedContent[key] || { value_en: "", value_ar: "" };
+                  const original = content.find((c) => c.content_key === key);
+                  const edited = original && (val.value_en !== original.value_en || val.value_ar !== original.value_ar);
+                  return (
+                    <div key={key} className="mb-4">
+                      <label className="text-sm font-medium text-foreground">{label}</label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-1">
+                        <div>
+                          <span className="text-xs text-muted-foreground">English</span>
+                          {isTextarea ? (
+                            <Textarea value={val.value_en} onChange={(e) => updateEditedField(key, "value_en", e.target.value)} className="rounded-xl mt-1" rows={3} />
+                          ) : (
+                            <Input value={val.value_en} onChange={(e) => updateEditedField(key, "value_en", e.target.value)} className="rounded-xl mt-1" />
+                          )}
+                        </div>
+                        <div>
+                          <span className="text-xs text-muted-foreground">Arabic</span>
+                          {isTextarea ? (
+                            <Textarea value={val.value_ar} onChange={(e) => updateEditedField(key, "value_ar", e.target.value)} className="rounded-xl mt-1" rows={3} dir="rtl" />
+                          ) : (
+                            <Input value={val.value_ar} onChange={(e) => updateEditedField(key, "value_ar", e.target.value)} className="rounded-xl mt-1" dir="rtl" />
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex gap-2 mt-2">
+                        <Button
+                          size="sm" variant="outline" disabled={translating || !val.value_en}
+                          onClick={async () => {
+                            setTranslating(true);
+                            try {
+                              const result = await translateTexts({ [key]: val.value_en });
+                              if (result[key]) updateEditedField(key, "value_ar", result[key]);
+                              toast.success("Translated");
+                            } catch (e: any) { toast.error(e.message); }
+                            finally { setTranslating(false); }
+                          }}
+                          className="rounded-xl"
+                        >
+                          <Languages className="w-3 h-3 mr-1" />{translating ? "..." : "Translate"}
+                        </Button>
+                        {edited && (
+                          <Button size="sm" onClick={() => handleSaveContent(key)} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                            <Save className="w-3 h-3 mr-1" />Save
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
           </div>
         )}
       </div>
