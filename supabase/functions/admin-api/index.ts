@@ -448,6 +448,44 @@ Deno.serve(async (req) => {
       }
     }
 
+    // CONTACT ADDRESSES
+    if (path === "contact-addresses") {
+      if (method === "GET") {
+        const { data, error } = await supabase
+          .from("contact_addresses")
+          .select("*")
+          .order("sort_order");
+        if (error) throw error;
+        return json(data);
+      }
+      if (method === "POST") {
+        const body = await req.json();
+        if (body.id) {
+          // Update
+          const { id, ...updates } = body;
+          const { error } = await supabase.from("contact_addresses").update(updates).eq("id", id);
+          if (error) throw error;
+          return json({ success: true });
+        } else {
+          // Insert
+          const { error } = await supabase.from("contact_addresses").insert({
+            label_en: body.label_en,
+            label_ar: body.label_ar,
+            is_active: body.is_active ?? true,
+            sort_order: body.sort_order ?? 0,
+          });
+          if (error) throw error;
+          return json({ success: true });
+        }
+      }
+      if (method === "DELETE") {
+        const { id } = await req.json();
+        const { error } = await supabase.from("contact_addresses").delete().eq("id", id);
+        if (error) throw error;
+        return json({ success: true });
+      }
+    }
+
     return json({ error: "Not found" }, 404);
   } catch (err) {
     return json({ error: err.message }, 500);

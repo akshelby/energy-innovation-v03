@@ -597,10 +597,10 @@ export default function Admin() {
 
   const fetchContactAddresses = useCallback(async () => {
     try {
-      const { data } = await supabase.from("contact_addresses").select("*").order("sort_order");
-      if (data) setContactAddresses(data);
+      const data = await apiCall("contact-addresses", "GET", storedPassword);
+      setContactAddresses(data);
     } catch { /* ignore */ }
-  }, []);
+  }, [storedPassword]);
 
   const fetchCareersContent = useCallback(async () => {
     try {
@@ -3788,9 +3788,9 @@ export default function Admin() {
                     <Button size="sm" onClick={async () => {
                       try {
                         if (editingAddress.id) {
-                          await supabase.from("contact_addresses").update({ label_en: editingAddress.label_en, label_ar: editingAddress.label_ar, is_active: editingAddress.is_active, sort_order: editingAddress.sort_order }).eq("id", editingAddress.id);
+                          await apiCall("contact-addresses", "POST", storedPassword, { id: editingAddress.id, label_en: editingAddress.label_en, label_ar: editingAddress.label_ar, is_active: editingAddress.is_active, sort_order: editingAddress.sort_order });
                         } else {
-                          await supabase.from("contact_addresses").insert({ label_en: editingAddress.label_en, label_ar: editingAddress.label_ar, is_active: editingAddress.is_active, sort_order: editingAddress.sort_order });
+                          await apiCall("contact-addresses", "POST", storedPassword, { label_en: editingAddress.label_en, label_ar: editingAddress.label_ar, is_active: editingAddress.is_active, sort_order: editingAddress.sort_order });
                         }
                         toast.success("Address saved");
                         setEditingAddress(null);
@@ -3822,7 +3822,7 @@ export default function Admin() {
                               <span className="text-xs text-muted-foreground">{addr.is_active ? "Active" : "Inactive"}</span>
                               <input type="checkbox" checked={addr.is_active} onChange={async () => {
                                 try {
-                                  await supabase.from("contact_addresses").update({ is_active: !addr.is_active }).eq("id", addr.id);
+                                  await apiCall("contact-addresses", "POST", storedPassword, { id: addr.id, is_active: !addr.is_active });
                                   fetchContactAddresses();
                                   toast.success(addr.is_active ? "Address hidden" : "Address shown");
                                 } catch (e: any) { toast.error(e.message); }
@@ -3830,7 +3830,7 @@ export default function Admin() {
                             </label>
                             <Button size="sm" variant="outline" onClick={async () => {
                               try {
-                                await supabase.from("contact_addresses").delete().eq("id", addr.id);
+                                await apiCall("contact-addresses", "DELETE", storedPassword, { id: addr.id });
                                 fetchContactAddresses();
                                 toast.success("Address deleted");
                               } catch (e: any) { toast.error(e.message); }
@@ -3866,7 +3866,7 @@ export default function Admin() {
                               </Button>
                               <Button size="sm" onClick={async () => {
                                 try {
-                                  await supabase.from("contact_addresses").update({ label_en: editingAddress.label_en, label_ar: editingAddress.label_ar }).eq("id", addr.id);
+                                  await apiCall("contact-addresses", "POST", storedPassword, { id: addr.id, label_en: editingAddress.label_en, label_ar: editingAddress.label_ar });
                                   toast.success("Address saved");
                                   setEditingAddress(null);
                                   fetchContactAddresses();
