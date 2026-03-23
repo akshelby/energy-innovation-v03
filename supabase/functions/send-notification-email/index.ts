@@ -126,10 +126,10 @@ Deno.serve(async (req) => {
     }
 
     // 2. Visitor confirmation
-    emailPromises.push(
-      sendEmail(RESEND_API_KEY, {
-        from: "Energy Innvo <info@energyinnvo.com>",
-        to: [visitorEmail],
+      emailPromises.push(
+        sendEmail(RESEND_API_KEY, {
+          from: "Energy Innvo <sales@energyinnvo.com>",
+          to: [visitorEmail],
         subject: visitorSubject,
         html: visitorHtml,
       })
