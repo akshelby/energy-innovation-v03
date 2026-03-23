@@ -236,6 +236,7 @@ export default function Admin() {
   const { theme, toggleTheme } = useTheme();
   const [password, setPassword] = useState(() => sessionStorage.getItem("admin_pw") || "");
   const [authenticated, setAuthenticated] = useState(() => !!sessionStorage.getItem("admin_pw"));
+  const [isViewer, setIsViewer] = useState(() => sessionStorage.getItem("admin_role") === "viewer");
   const [activeTab, setActiveTab] = useState<TabKey>("leads");
   const [adminEmails, setAdminEmails] = useState<{ id: string; email: string; label: string; is_active: boolean }[]>([]);
   const [editingAdminEmail, setEditingAdminEmail] = useState<{ id?: string; email: string; label: string; is_active: boolean } | null>(null);
@@ -686,10 +687,12 @@ export default function Admin() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await apiCall("leads", "GET", password);
+      const roleData = await apiCall("auth-role", "GET", password);
       sessionStorage.setItem("admin_pw", password);
+      sessionStorage.setItem("admin_role", roleData.role);
       setAuthenticated(true);
-      toast.success("Logged in successfully");
+      setIsViewer(roleData.role === "viewer");
+      toast.success(roleData.role === "viewer" ? "Logged in (View Only)" : "Logged in successfully");
     } catch { toast.error("Invalid password"); }
   };
 
@@ -1364,17 +1367,31 @@ export default function Admin() {
       <SEOHead title="Admin" noindex />
       <header className="border-b border-border bg-card px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <h1 className="text-xl font-bold text-foreground">Energy Innovation Admin</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl font-bold text-foreground">Energy Innovation Admin</h1>
+            {isViewer && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full bg-muted text-muted-foreground border border-border">
+                👁 View Only
+              </span>
+            )}
+          </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="icon" onClick={toggleTheme} className="rounded-xl" title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}>
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </Button>
-            <Button variant="outline" size="sm" onClick={() => { sessionStorage.removeItem("admin_pw"); setAuthenticated(false); setPassword(""); }} className="rounded-xl">
+            <Button variant="outline" size="sm" onClick={() => { sessionStorage.removeItem("admin_pw"); sessionStorage.removeItem("admin_role"); setAuthenticated(false); setIsViewer(false); setPassword(""); }} className="rounded-xl">
               <LogOut className="w-4 h-4 mr-2" />Logout
             </Button>
           </div>
         </div>
       </header>
+      {isViewer && (
+        <div className="bg-muted border-b border-border px-6 py-2">
+          <div className="max-w-7xl mx-auto">
+            <p className="text-sm text-muted-foreground text-center">🔒 You have <strong>view-only</strong> access. All edit, save, and delete actions are disabled.</p>
+          </div>
+        </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Tabs */}
@@ -1401,6 +1418,9 @@ export default function Admin() {
             </Button>
           ))}
         </div>
+
+        {/* Tab content - disable all edit controls in viewer mode */}
+        <div className={isViewer ? "viewer-readonly" : ""}>
 
         {/* ─── Branding Tab ──────── */}
         {activeTab === "branding" && (
@@ -4341,6 +4361,7 @@ export default function Admin() {
             ))}
           </div>
         )}
+        </div>
       </div>
 
       <PdfViewerDialog open={pdfPreviewOpen} onOpenChange={setPdfPreviewOpen} src={pdfPreviewUrl} />

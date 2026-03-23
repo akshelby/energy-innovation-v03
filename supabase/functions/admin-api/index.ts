@@ -30,14 +30,28 @@ Deno.serve(async (req) => {
   // Verify admin password (required for all admin operations)
   const password = req.headers.get("x-admin-password");
   const adminPassword = Deno.env.get("ADMIN_PASSWORD");
+  const viewerPassword = Deno.env.get("ADMIN_VIEWER_PASSWORD");
 
-  if (!password || !adminPassword || password !== adminPassword) {
+  const isAdmin = password && adminPassword && password === adminPassword;
+  const isViewer = password && viewerPassword && password === viewerPassword;
+
+  if (!isAdmin && !isViewer) {
     return json({ error: "Unauthorized" }, 401);
+  }
+
+  // Viewers can only GET
+  if (isViewer && req.method !== "GET") {
+    return json({ error: "Read-only access. Contact admin for edit permissions." }, 403);
   }
 
   const method = req.method;
 
   try {
+    // AUTH ROLE CHECK
+    if (path === "auth-role") {
+      return json({ role: isAdmin ? "admin" : "viewer" });
+    }
+
     // LEADS
     if (path === "leads") {
       if (method === "GET") {
