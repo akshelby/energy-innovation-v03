@@ -3,7 +3,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { getStorageUrl } from "@/lib/storage";
+import { getStorageUrl, getOptimizedImageUrl } from "@/lib/storage";
 import { useParallax } from "@/hooks/useParallax";
 
 // Fallback local imports in case Supabase images aren't uploaded yet
@@ -30,7 +30,7 @@ const buildHeroImageUrl = (fileName: string, version?: string) => {
 };
 
 // Pre-compute the first hero image URL synchronously so it renders on first paint
-const FIRST_HERO_IMAGE = buildHeroImageUrl("Untitled design .svg");
+const FIRST_HERO_IMAGE = getOptimizedImageUrl(buildHeroImageUrl("Untitled design .svg"), { width: 1920, quality: 80 });
 
 export default function HeroSection() {
   const { t } = useLanguage();
@@ -86,9 +86,11 @@ export default function HeroSection() {
       setVisibility(vis);
 
       if (activeList.length > 0) {
-        const urls = activeList.map((fileName) => buildHeroImageUrl(fileName));
-        // Preload all hero images immediately for instant transitions
-        urls.forEach((url, i) => {
+        const urls = activeList.map((fileName) =>
+          getOptimizedImageUrl(buildHeroImageUrl(fileName), { width: 1920, quality: 80 })
+        );
+        // Preload only the first slide; prefetch the next one for fast transition
+        urls.slice(0, 2).forEach((url, i) => {
           const link = document.createElement("link");
           link.rel = i === 0 ? "preload" : "prefetch";
           link.as = "image";
@@ -121,7 +123,10 @@ export default function HeroSection() {
         );
 
         const urls = selectedFiles.map((file) =>
-          buildHeroImageUrl(file.name, file.updated_at ?? file.created_at ?? undefined)
+          getOptimizedImageUrl(
+            buildHeroImageUrl(file.name, file.updated_at ?? file.created_at ?? undefined),
+            { width: 1920, quality: 80 }
+          )
         );
 
         setCurrent(0);
@@ -170,6 +175,8 @@ export default function HeroSection() {
             <img
               src={img}
               alt={`Industrial scene ${i + 1}`}
+              width={1920}
+              height={1080}
               className={`w-full h-full object-cover ${i === current ? "animate-ken-burns" : ""}`}
               loading={i === 0 ? "eager" : "lazy"}
               fetchPriority={i === 0 ? "high" : "auto"}
