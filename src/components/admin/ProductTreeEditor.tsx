@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import {
   Plus, Trash2, Save, RefreshCw, Upload, Languages, ChevronRight, ChevronDown,
-  Package, FileImage, GripVertical, FileText,
+  Package, FileImage, GripVertical, FileText, ToggleRight,
 } from "lucide-react";
 
 const PROJECT_ID = import.meta.env.VITE_SUPABASE_PROJECT_ID;
