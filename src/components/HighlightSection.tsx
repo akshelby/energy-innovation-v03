@@ -3,7 +3,6 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { useParallax } from "@/hooks/useParallax";
 import { supabase } from "@/integrations/supabase/client";
-import { getOptimizedImageUrl } from "@/lib/storage";
 import { Award, TrendingUp, Users, Clock } from "lucide-react";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {

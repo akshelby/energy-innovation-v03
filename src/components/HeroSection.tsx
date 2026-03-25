@@ -3,7 +3,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { getStorageUrl, getOptimizedImageUrl } from "@/lib/storage";
+import { getStorageUrl } from "@/lib/storage";
 import { useParallax } from "@/hooks/useParallax";
 
 // Fallback local imports in case Supabase images aren't uploaded yet
