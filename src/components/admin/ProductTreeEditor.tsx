@@ -225,6 +225,22 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
     } catch (e: any) { toast.error(e.message); }
   };
 
+  // Bulk activate all items at a given level
+  const handleActivateAll = async (items: ProductItemNode[]) => {
+    const inactive = items.filter(i => !i.is_active);
+    if (inactive.length === 0) {
+      toast.info("All items are already active");
+      return;
+    }
+    try {
+      setLoading(true);
+      await Promise.all(inactive.map(i => apiCall("product-items", "POST", password, { ...i, is_active: true })));
+      setAllItems(prev => prev.map(i => inactive.some(x => x.id === i.id) ? { ...i, is_active: true } : i));
+      toast.success(`${inactive.length} item${inactive.length > 1 ? "s" : ""} activated`);
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  };
+
   // ─── CRUD: Product Pages ──────────────────────────
   const handleSavePage = async () => {
     if (!editingPage) return;
