@@ -3,7 +3,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { useParallax } from "@/hooks/useParallax";
 import { supabase } from "@/integrations/supabase/client";
-import { Award, TrendingUp, Users, Clock } from "lucide-react";
+import { Award, TrendingUp, Users, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Award, TrendingUp, Users, Clock,
@@ -19,7 +19,6 @@ function useCountUp(end: number, duration = 1500, start = false) {
     const animate = (now: number) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // ease-out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
       setCount(Math.round(eased * end));
       if (progress < 1) rafRef.current = requestAnimationFrame(animate);
@@ -64,7 +63,8 @@ export default function HighlightSection() {
   const parallaxImage = useParallax(0.06);
   const isAr = language === "ar";
 
-  const [imageUrl, setImageUrl] = useState("");
+  const [images, setImages] = useState<string[]>([]);
+  const [current, setCurrent] = useState(0);
   const [stats, setStats] = useState<StatCard[]>(defaultStats);
 
   useEffect(() => {
@@ -72,10 +72,24 @@ export default function HighlightSection() {
       const { data } = await supabase
         .from("site_content")
         .select("content_key, value_en, value_ar")
-        .in("content_key", ["highlight.image", "highlight.stats"]);
+        .in("content_key", ["highlight.image", "highlight.images", "highlight.stats"]);
       if (data) {
-        const imgEntry = data.find((d) => d.content_key === "highlight.image");
-        if (imgEntry?.value_en) setImageUrl(imgEntry.value_en);
+        // Try multi-image key first, fall back to single image
+        const multiEntry = data.find((d) => d.content_key === "highlight.images");
+        const singleEntry = data.find((d) => d.content_key === "highlight.image");
+
+        let imgList: string[] = [];
+        if (multiEntry?.value_en) {
+          try {
+            const parsed = JSON.parse(multiEntry.value_en);
+            if (Array.isArray(parsed)) imgList = parsed.filter((u: string) => u?.length > 0);
+          } catch { /* ignore */ }
+        }
+        if (imgList.length === 0 && singleEntry?.value_en) {
+          imgList = [singleEntry.value_en];
+        }
+        setImages(imgList);
+
         const statsEntry = data.find((d) => d.content_key === "highlight.stats");
         if (statsEntry?.value_en) {
           try {
@@ -86,6 +100,25 @@ export default function HighlightSection() {
     };
     fetchData();
   }, []);
+
+  // Auto-rotate carousel
+  useEffect(() => {
+    if (images.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % images.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [images.length]);
+
+  const prev = useCallback(() => {
+    if (images.length <= 1) return;
+    setCurrent((c) => (c - 1 + images.length) % images.length);
+  }, [images.length]);
+
+  const next = useCallback(() => {
+    if (images.length <= 1) return;
+    setCurrent((c) => (c + 1) % images.length);
+  }, [images.length]);
 
   const statsRef = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
@@ -102,8 +135,6 @@ export default function HighlightSection() {
   const title = t("highlight.title");
   const desc = t("highlight.desc");
   const subdesc = t("highlight.subdesc");
-
-  const hasContent = tagline !== "highlight.tagline" || title !== "highlight.title";
 
   return (
     <section className="py-14 md:py-24 px-6 bg-secondary/30" ref={ref}>
@@ -131,20 +162,60 @@ export default function HighlightSection() {
             )}
           </div>
 
-          {/* Right — Image + Stats */}
+          {/* Right — Image Carousel + Stats */}
           <div className="scroll-reveal relative" style={{ transitionDelay: "150ms" }}>
-            {/* Main image */}
-            <div ref={parallaxImage} className="rounded-2xl overflow-hidden shadow-2xl shadow-primary/10 will-change-transform">
-              {imageUrl ? (
-                <img
-                  src={imageUrl}
-                  alt={isAr ? "صورة القسم" : "Section highlight"}
-                  width={800}
-                  height={600}
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full aspect-[4/3] object-cover"
-                />
+            <div ref={parallaxImage} className="rounded-2xl overflow-hidden shadow-2xl shadow-primary/10 will-change-transform relative">
+              {images.length > 0 ? (
+                <div className="relative aspect-[4/3]">
+                  {images.map((img, i) => (
+                    <img
+                      key={i}
+                      src={img}
+                      alt={isAr ? `صورة القسم ${i + 1}` : `Section highlight ${i + 1}`}
+                      width={800}
+                      height={600}
+                      loading="lazy"
+                      decoding="async"
+                      className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
+                        i === current ? "opacity-100" : "opacity-0"
+                      }`}
+                    />
+                  ))}
+
+                  {/* Navigation arrows */}
+                  {images.length > 1 && (
+                    <>
+                      <button
+                        onClick={prev}
+                        className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-foreground/20 backdrop-blur-sm flex items-center justify-center text-background hover:bg-foreground/40 transition-colors"
+                        aria-label="Previous image"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={next}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-foreground/20 backdrop-blur-sm flex items-center justify-center text-background hover:bg-foreground/40 transition-colors"
+                        aria-label="Next image"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+
+                      {/* Dots */}
+                      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex gap-1.5">
+                        {images.map((_, i) => (
+                          <button
+                            key={i}
+                            onClick={() => setCurrent(i)}
+                            className={`w-1.5 h-1.5 rounded-full transition-all ${
+                              i === current ? "w-5 bg-background" : "bg-background/50"
+                            }`}
+                            aria-label={`Go to image ${i + 1}`}
+                          />
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
               ) : (
                 <div className="w-full aspect-[4/3] gradient-primary flex items-center justify-center">
                   <span className="text-primary-foreground/40 text-sm">Upload an image in Admin</span>
