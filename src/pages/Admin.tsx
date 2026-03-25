@@ -311,6 +311,7 @@ export default function Admin() {
   });
 
   const [highlightImage, setHighlightImage] = useState("");
+  const [highlightImages, setHighlightImages] = useState<string[]>([]);
   const [highlightStats, setHighlightStats] = useState<{ icon: string; value_en: string; value_ar: string; label_en: string; label_ar: string }[]>([
     { icon: "Award", value_en: "100%", value_ar: "١٠٠٪", label_en: "Quality Assurance", label_ar: "ضمان الجودة" },
     { icon: "TrendingUp", value_en: "20+", value_ar: "+٢٠", label_en: "Years of Experience", label_ar: "سنوات الخبرة" },
@@ -595,6 +596,12 @@ export default function Admin() {
       const data = await apiCall("content", "GET", storedPassword);
       const imgEntry = data.find((d: ContentItem) => d.content_key === "highlight.image");
       if (imgEntry) setHighlightImage(imgEntry.value_en);
+      const multiEntry = data.find((d: ContentItem) => d.content_key === "highlight.images");
+      if (multiEntry?.value_en) {
+        try { setHighlightImages(JSON.parse(multiEntry.value_en)); } catch { /* keep empty */ }
+      } else if (imgEntry?.value_en) {
+        setHighlightImages([imgEntry.value_en]);
+      }
       const statsEntry = data.find((d: ContentItem) => d.content_key === "highlight.stats");
       if (statsEntry?.value_en) {
         try { setHighlightStats(JSON.parse(statsEntry.value_en)); } catch { /* keep defaults */ }
