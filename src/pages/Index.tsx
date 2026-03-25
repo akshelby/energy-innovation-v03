@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
@@ -9,8 +10,10 @@ import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 import FloatingButtons from "@/components/FloatingButtons";
 import SEOHead from "@/components/SEOHead";
+import { loadImageOptimizationSetting } from "@/lib/storage";
 
 const Index = () => {
+  useEffect(() => { loadImageOptimizationSetting(); }, []);
   return (
     <main className="min-h-screen">
       <SEOHead />
