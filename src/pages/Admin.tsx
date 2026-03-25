@@ -3672,27 +3672,43 @@ export default function Admin() {
               })}
             </div>
 
-            {/* Contact Info (Phone, Email) */}
+            {/* Contact Info (Phone, Email, Address) */}
             <div className="bg-card border border-border rounded-2xl p-6 mb-6">
               <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
                 <Phone className="w-4 h-4 text-accent" />
-                Contact Info
+                Contact Info Cards
               </h3>
-              <p className="text-xs text-muted-foreground mb-4">Edit the exact contact text shown on the website here. The primary address field is the text like “Industrial District, Building 7”.</p>
+              <p className="text-xs text-muted-foreground mb-4">Customize each contact card's value, label, icon, and visibility as shown on the website.</p>
               {[
-                { key: "contact_address", visKey: "contact_address_visible", label: "Primary Address", icon: Globe, placeholder: "Industrial District, Building 7" },
-                { key: "contact_phone", visKey: "contact_phone_visible", label: "Phone", icon: Phone, placeholder: "+971 XX XXX XXXX" },
-                { key: "contact_email", visKey: "contact_email_visible", label: "Email", icon: Mail, placeholder: "info@example.com" },
-              ].map(({ key, visKey, label, placeholder }) => {
+                { key: "contact_phone", visKey: "contact_phone_visible", labelKey: "contact_phone_label", iconKey: "contact_phone_icon", title: "Phone", placeholder: "+971 XX XXX XXXX" },
+                { key: "contact_email", visKey: "contact_email_visible", labelKey: "contact_email_label", iconKey: "contact_email_icon", title: "Email", placeholder: "info@example.com" },
+                { key: "contact_address", visKey: "contact_address_visible", labelKey: "contact_address_label", iconKey: "contact_address_icon", title: "Address", placeholder: "Riyadh, Saudi Arabia" },
+              ].map(({ key, visKey, labelKey, iconKey, title, placeholder }) => {
                 const item = content.find((c) => c.content_key === key);
                 const edited = editedContent[key];
                 const visItem = content.find((c) => c.content_key === visKey);
                 const visEdited = editedContent[visKey];
                 const isVisible = (visEdited?.value_en ?? visItem?.value_en ?? "true") !== "false";
+
+                // Label
+                const labelItem = content.find((c) => c.content_key === labelKey);
+                const labelEdited = editedContent[labelKey];
+                const labelEn = labelEdited?.value_en ?? labelItem?.value_en ?? "";
+                const labelAr = labelEdited?.value_ar ?? labelItem?.value_ar ?? "";
+
+                // Icon
+                const iconItem = content.find((c) => c.content_key === iconKey);
+                const iconEdited = editedContent[iconKey];
+                const iconVal = iconEdited?.value_en ?? iconItem?.value_en ?? "Phone";
+                const isCustomIcon = iconVal.startsWith("http") || iconVal.startsWith("/") || iconVal.startsWith("data:");
+
+                const CONTACT_ICON_OPTIONS = ["Phone", "Mail", "Globe", "MapPin", "Building", "MessageSquare", "Shield", "Zap", "Factory", "Truck"];
+
                 return (
-                  <div key={key} className="mb-4 last:mb-0 p-4 border border-border rounded-xl">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-sm font-medium text-foreground">{label}</span>
+                  <div key={key} className="mb-5 last:mb-0 p-4 border border-border rounded-xl space-y-3">
+                    {/* Header with title & visibility */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-foreground">{title}</span>
                       <label className="flex items-center gap-2 cursor-pointer">
                         <span className="text-xs text-muted-foreground">{isVisible ? "Visible" : "Hidden"}</span>
                         <input
@@ -3701,18 +3717,20 @@ export default function Admin() {
                           onChange={async () => {
                             const newVal = isVisible ? "false" : "true";
                             setEditedContent((prev) => ({ ...prev, [visKey]: { value_en: newVal, value_ar: newVal } }));
-                            // Auto-save visibility toggle
                             try {
                               await apiCall("content", "POST", storedPassword, { content_key: visKey, value_en: newVal, value_ar: newVal });
                               fetchContent();
-                              toast.success(`${label} ${newVal === "true" ? "shown" : "hidden"}`);
+                              toast.success(`${title} ${newVal === "true" ? "shown" : "hidden"}`);
                             } catch (e: any) { toast.error(e.message); }
                           }}
                           className="w-4 h-4 accent-[hsl(var(--accent))]"
                         />
                       </label>
                     </div>
-                    <div className="flex flex-col sm:flex-row gap-2">
+
+                    {/* Value field */}
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Value (displayed text)</label>
                       <Input
                         value={edited?.value_en ?? item?.value_en ?? ""}
                         onChange={(e) => setEditedContent((prev) => ({
@@ -3720,14 +3738,133 @@ export default function Admin() {
                           [key]: { value_en: e.target.value, value_ar: e.target.value },
                         }))}
                         placeholder={placeholder}
-                        className="rounded-xl flex-1 text-sm"
+                        className="rounded-xl text-sm"
                       />
-                      {edited && (
-                        <Button size="sm" onClick={() => handleSaveContent(key)} disabled={loading} className="gradient-accent text-accent-foreground rounded-xl border-0">
-                          <Save className="w-3 h-3 mr-1" />Save
-                        </Button>
+                    </div>
+
+                    {/* Label / Tagline (EN + AR) */}
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Label / Tagline</label>
+                      <div className="grid sm:grid-cols-2 gap-2">
+                        <Input
+                          value={labelEn}
+                          onChange={(e) => updateEditedField(labelKey, "value_en", e.target.value)}
+                          placeholder="e.g. Phone Number"
+                          className="rounded-xl text-sm"
+                        />
+                        <Input
+                          value={labelAr}
+                          onChange={(e) => updateEditedField(labelKey, "value_ar", e.target.value)}
+                          placeholder="e.g. رقم الهاتف"
+                          className="rounded-xl text-sm"
+                          dir="rtl"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Icon selector */}
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Icon</label>
+                      <div className="flex gap-2 mb-2">
+                        <button
+                          type="button"
+                          onClick={() => updateEditedField(iconKey, "value_en", "Phone")}
+                          className={`text-xs px-3 py-1.5 rounded-lg border transition-colors ${
+                            !isCustomIcon
+                              ? "bg-primary text-primary-foreground border-primary"
+                              : "bg-background border-input text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          Preset Icons
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { updateEditedField(iconKey, "value_en", ""); updateEditedField(iconKey, "value_ar", ""); }}
+                          className={`text-xs px-3 py-1.5 rounded-lg border transition-colors ${
+                            isCustomIcon || iconVal === ""
+                              ? "bg-primary text-primary-foreground border-primary"
+                              : "bg-background border-input text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          Custom Icon
+                        </button>
+                      </div>
+                      {!isCustomIcon && iconVal !== "" ? (
+                        <select
+                          value={iconVal}
+                          onChange={(e) => { updateEditedField(iconKey, "value_en", e.target.value); updateEditedField(iconKey, "value_ar", e.target.value); }}
+                          className="w-full h-10 rounded-xl border border-input bg-background px-3 text-sm"
+                        >
+                          {CONTACT_ICON_OPTIONS.map((ic) => (
+                            <option key={ic} value={ic}>{ic}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Input
+                              value={isCustomIcon ? iconVal : ""}
+                              onChange={(e) => { updateEditedField(iconKey, "value_en", e.target.value); updateEditedField(iconKey, "value_ar", e.target.value); }}
+                              placeholder="Paste icon URL or upload"
+                              className="rounded-xl flex-1"
+                            />
+                            <input
+                              type="file"
+                              accept="image/*,.svg"
+                              className="hidden"
+                              id={`contact-icon-upload-${key}`}
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleFormFileUpload(file, "images", "icons", (url) => {
+                                  updateEditedField(iconKey, "value_en", url);
+                                  updateEditedField(iconKey, "value_ar", url);
+                                });
+                              }}
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => (document.getElementById(`contact-icon-upload-${key}`) as HTMLInputElement)?.click()}
+                              disabled={uploading}
+                              className="rounded-xl shrink-0"
+                            >
+                              {uploading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                            </Button>
+                          </div>
+                          <p className="text-[10px] text-muted-foreground">Upload SVG/PNG/JPG or paste a URL</p>
+                        </div>
+                      )}
+                      {/* Icon preview */}
+                      {iconVal && (
+                        <div className="flex items-center gap-2 mt-1.5">
+                          <span className="text-[10px] text-muted-foreground">Preview:</span>
+                          {isCustomIcon ? (
+                            <img src={iconVal} alt="icon" className="w-7 h-7 object-contain rounded border border-border" />
+                          ) : (() => {
+                            const Ic = icons[iconVal as keyof typeof icons];
+                            return Ic ? <Ic className="w-5 h-5 text-accent" /> : <span className="text-xs text-muted-foreground">{iconVal}</span>;
+                          })()}
+                        </div>
                       )}
                     </div>
+
+                    {/* Save button for all fields */}
+                    {(edited || labelEdited || iconEdited) && (
+                      <div className="flex gap-2 pt-1">
+                        <Button size="sm" onClick={async () => {
+                          try {
+                            setLoading(true);
+                            if (edited) await handleSaveContent(key);
+                            if (labelEdited) await handleSaveContent(labelKey);
+                            if (iconEdited) await handleSaveContent(iconKey);
+                            toast.success(`${title} card updated`);
+                          } catch (e: any) { toast.error(e.message); }
+                          finally { setLoading(false); }
+                        }} disabled={loading} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                          <Save className="w-3 h-3 mr-1" />Save All Changes
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 );
               })}
