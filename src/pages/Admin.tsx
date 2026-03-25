@@ -14,6 +14,7 @@ import {
 import { useTheme } from "@/contexts/ThemeContext";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
 import { supabase } from "@/integrations/supabase/client";
+import ProductTreeEditor from "@/components/admin/ProductTreeEditor";
 import PhoneInput from "@/components/PhoneInput";
 
 const TRANSLATE_URL = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/translate`;
@@ -1417,11 +1418,9 @@ export default function Admin() {
             { key: "branding" as TabKey, icon: Palette, label: "Branding" },
             { key: "leads" as TabKey, icon: MessageSquare, label: `Leads (${leads.length})` },
             { key: "content" as TabKey, icon: FileText, label: "Site Content" },
-            { key: "products" as TabKey, icon: Package, label: `Products (${products.length})` },
+            { key: "products" as TabKey, icon: Package, label: "Product Tree" },
             { key: "services" as TabKey, icon: Briefcase, label: `Services (${services.length})` },
             { key: "highlight" as TabKey, icon: Star, label: "Highlight Section" },
-            { key: "menu-items" as TabKey, icon: List, label: `Product Catalog (${menuItems.length})` },
-            { key: "product-pages" as TabKey, icon: FileImage, label: `Product Pages (${productPages.length})` },
             { key: "product-enquiries" as TabKey, icon: Inbox, label: `Enquiries (${productEnquiries.length})` },
             { key: "careers" as TabKey, icon: UserPlus, label: `Careers (${careersList.length})` },
             { key: "images" as TabKey, icon: Image, label: "Files & Images" },
@@ -2034,64 +2033,7 @@ export default function Admin() {
           </div>
         )}
         {activeTab === "products" && (
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-foreground">Products</h2>
-              <div className="flex gap-2">
-                <Button size="sm" onClick={() => setEditingProduct({ ...emptyProduct, sort_order: products.length })} className="gradient-accent text-accent-foreground rounded-xl border-0">
-                  <Plus className="w-4 h-4 mr-2" />Add Product
-                </Button>
-                <Button variant="outline" size="sm" onClick={fetchProducts} disabled={loading} className="rounded-xl">
-                  <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
-                </Button>
-              </div>
-            </div>
-
-            {editingProduct && renderItemEditor(
-              editingProduct,
-              (item) => setEditingProduct(item as ProductItem),
-              () => handleSaveProduct(editingProduct),
-              () => setEditingProduct(null),
-              productImageRef,
-              productPdfRef,
-              "product"
-            )}
-
-            {products.length === 0 && !editingProduct ? (
-              <div className="text-center py-16 text-muted-foreground">
-                <Package className="w-12 h-12 mx-auto mb-4 opacity-30" /><p>No products yet. Add your first one!</p>
-              </div>
-            ) : (
-              <div className="space-y-3 mt-4">
-                {products.map((p) => (
-                  <div key={p.id} className="bg-card border border-border rounded-2xl p-4 flex items-center gap-4">
-                    <GripVertical className="w-4 h-4 text-muted-foreground shrink-0" />
-                    {p.image_url ? (
-                      <img src={p.image_url} alt={p.name_en} className="w-16 h-12 object-cover rounded-lg border border-border shrink-0" />
-                    ) : (
-                      <div className="w-16 h-12 bg-muted rounded-lg flex items-center justify-center shrink-0">
-                        <Package className="w-5 h-5 text-muted-foreground/40" />
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-foreground truncate">{p.name_en || "Untitled"}</h3>
-                        {p.tag_en && <span className="text-xs bg-accent/10 text-accent px-2 py-0.5 rounded-full shrink-0">{p.tag_en}</span>}
-                        {p.pdf_url && <FileText className="w-3.5 h-3.5 text-primary shrink-0" />}
-                      </div>
-                      <p className="text-xs text-muted-foreground truncate">{p.description_en || "No description"}</p>
-                    </div>
-                    <div className="flex gap-1 shrink-0">
-                      <Button variant="outline" size="sm" onClick={() => setEditingProduct({ ...p })} className="rounded-xl">Edit</Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleDeleteProduct(p.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl">
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <ProductTreeEditor password={storedPassword} isViewer={isViewer} />
         )}
 
         {/* ─── Services Tab ─────── */}
