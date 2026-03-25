@@ -138,7 +138,7 @@ export default function HighlightSection() {
             <div ref={parallaxImage} className="rounded-2xl overflow-hidden shadow-2xl shadow-primary/10 will-change-transform">
               {imageUrl ? (
                 <img
-                  src={getOptimizedImageUrl(imageUrl, { width: 800, quality: 75 })}
+                  src={imageUrl}
                   alt={isAr ? "صورة القسم" : "Section highlight"}
                   width={800}
                   height={600}
