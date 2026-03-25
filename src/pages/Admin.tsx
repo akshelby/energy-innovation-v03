@@ -693,7 +693,6 @@ export default function Admin() {
       else if (activeTab === "careers") { fetchCareers(); fetchCareersContent(); }
       else if (activeTab === "admin-emails") fetchAdminEmails();
       else if (activeTab === "product-enquiries") fetchProductEnquiries();
-      else if (activeTab === "product-enquiries") fetchProductEnquiries();
       else if (activeTab === "footer") fetchContent();
       else if (activeTab === "contact") { fetchContent(); fetchContactAddresses(); }
       else if (activeTab === "email-templates") fetchContent();
