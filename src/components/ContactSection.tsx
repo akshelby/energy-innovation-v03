@@ -121,26 +121,35 @@ export default function ContactSection() {
 
   const isAr = language === "ar";
 
+  // Helper to resolve icon name/URL to a component
+  const resolveIcon = (iconVal: string) => {
+    if (iconVal.startsWith("http") || iconVal.startsWith("/") || iconVal.startsWith("data:")) {
+      return { type: "image" as const, src: iconVal };
+    }
+    const IconComp = icons[iconVal as keyof typeof icons];
+    return { type: "lucide" as const, component: IconComp || Phone };
+  };
+
   // Build contact cards based on visibility
-  const cards: { icon: typeof Phone; label: string; value: string; href?: string }[] = [];
+  const cards: { iconVal: string; label: string; value: string; href?: string }[] = [];
   if (visibility.phone && contactInfo.phone) {
-    cards.push({ icon: Phone, label: t("contact.phone"), value: contactInfo.phone, href: `tel:${contactInfo.phone.replace(/\s/g, "")}` });
+    cards.push({ iconVal: contactMeta.phoneIcon, label: contactMeta.phoneLabel || t("contact.phone"), value: contactInfo.phone, href: `tel:${contactInfo.phone.replace(/\s/g, "")}` });
   }
   if (visibility.email && contactInfo.email) {
-    cards.push({ icon: Mail, label: t("contact.email"), value: contactInfo.email, href: `mailto:${contactInfo.email}` });
+    cards.push({ iconVal: contactMeta.emailIcon, label: contactMeta.emailLabel || t("contact.email"), value: contactInfo.email, href: `mailto:${contactInfo.email}` });
   }
   // Show addresses from new table if visible, fallback to legacy contact_address
   if (visibility.address) {
     if (addresses.length > 0) {
       addresses.forEach((addr) => {
         cards.push({
-          icon: Globe,
-          label: t("footer.address"),
+          iconVal: contactMeta.addressIcon,
+          label: contactMeta.addressLabel || t("footer.address"),
           value: isAr ? addr.label_ar : addr.label_en,
         });
       });
     } else if (contactInfo.address) {
-      cards.push({ icon: Globe, label: t("footer.address"), value: contactInfo.address });
+      cards.push({ iconVal: contactMeta.addressIcon, label: contactMeta.addressLabel || t("footer.address"), value: contactInfo.address });
     }
   }
 
