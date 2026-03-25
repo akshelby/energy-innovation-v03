@@ -30,7 +30,7 @@ const buildHeroImageUrl = (fileName: string, version?: string) => {
 };
 
 // Pre-compute the first hero image URL synchronously so it renders on first paint
-const FIRST_HERO_IMAGE = getOptimizedImageUrl(buildHeroImageUrl("Untitled design .svg"), { width: 1920, quality: 80 });
+const FIRST_HERO_IMAGE = buildHeroImageUrl("Untitled design .svg");
 
 export default function HeroSection() {
   const { t } = useLanguage();

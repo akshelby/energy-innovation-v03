@@ -5,28 +5,15 @@ export function getStorageUrl(bucket: string, path: string): string {
 }
 
 /**
- * Returns a Supabase image-transform URL that serves resized WebP on the fly.
- * Falls back to the raw public URL for non-Supabase origins.
+ * Returns an optimized image URL. Currently passes through as-is since
+ * Supabase image transforms require a Pro plan. Width/height hints are
+ * used only by the calling component for layout (width/height attributes).
  */
 export function getOptimizedImageUrl(
   src: string,
-  opts: { width?: number; height?: number; quality?: number } = {}
+  _opts: { width?: number; height?: number; quality?: number } = {}
 ): string {
-  // Only transform URLs from our own Supabase storage
-  if (!src.includes(SUPABASE_URL)) return src;
-
-  const { width, height, quality = 75 } = opts;
-  // Swap /object/public/ → /render/image/public/ for the transform API
-  let url = src.replace("/storage/v1/object/public/", "/storage/v1/render/image/public/");
-
-  const params = new URLSearchParams();
-  if (width) params.set("width", String(width));
-  if (height) params.set("height", String(height));
-  params.set("quality", String(quality));
-  params.set("format", "webp");
-
-  const separator = url.includes("?") ? "&" : "?";
-  return `${url}${separator}${params.toString()}`;
+  return src;
 }
 
 // Image keys used across the site
