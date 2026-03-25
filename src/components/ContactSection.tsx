@@ -170,10 +170,16 @@ export default function ContactSection() {
           {/* Contact Info Cards */}
           {cards.length > 0 && (
             <div className="space-y-4 md:space-y-5">
-              {cards.map(({ icon: Icon, label, value, href }, idx) => (
+              {cards.map(({ iconVal, label, value, href }, idx) => {
+                const resolved = resolveIcon(iconVal);
+                return (
                 <div key={idx} className="group bg-card rounded-2xl border border-border p-5 md:p-6 shadow-lg flex items-start gap-4 transition-all duration-300 hover:border-destructive/30 hover:shadow-xl hover:-translate-y-1">
                   <div className="shrink-0 w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-accent group-hover:text-destructive transition-colors duration-300" />
+                    {resolved.type === "image" ? (
+                      <img src={resolved.src} alt="" className="w-5 h-5 object-contain" />
+                    ) : (
+                      <resolved.component className="w-5 h-5 text-accent group-hover:text-destructive transition-colors duration-300" />
+                    )}
                   </div>
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-muted-foreground mb-1">{label}</p>
@@ -186,7 +192,8 @@ export default function ContactSection() {
                     )}
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
