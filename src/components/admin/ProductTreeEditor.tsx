@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import {
   Plus, Trash2, Save, RefreshCw, Upload, Languages, ChevronRight, ChevronDown,
-  Package, FileImage, GripVertical, FileText,
+  Package, FileImage, GripVertical, FileText, ToggleRight,
 } from "lucide-react";
 
 const PROJECT_ID = import.meta.env.VITE_SUPABASE_PROJECT_ID;
@@ -223,6 +223,22 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
       setAllItems(prev => prev.map(i => i.id === item.id ? { ...i, is_active: !item.is_active } : i));
       toast.success(`Item ${!item.is_active ? "activated" : "deactivated"}`);
     } catch (e: any) { toast.error(e.message); }
+  };
+
+  // Bulk activate all items at a given level
+  const handleActivateAll = async (items: ProductItemNode[]) => {
+    const inactive = items.filter(i => !i.is_active);
+    if (inactive.length === 0) {
+      toast.info("All items are already active");
+      return;
+    }
+    try {
+      setLoading(true);
+      await Promise.all(inactive.map(i => apiCall("product-items", "POST", password, { ...i, is_active: true })));
+      setAllItems(prev => prev.map(i => inactive.some(x => x.id === i.id) ? { ...i, is_active: true } : i));
+      toast.success(`${inactive.length} item${inactive.length > 1 ? "s" : ""} activated`);
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
   };
 
   // ─── CRUD: Product Pages ──────────────────────────
@@ -677,6 +693,18 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
             )}
 
             {/* Children */}
+            {children.length > 0 && children.some(c => !c.is_active) && (
+              <div className="mt-1.5" style={{ marginLeft: `${(depth + 1) * 20}px` }}>
+                <Button
+                  variant="outline" size="sm"
+                  onClick={() => handleActivateAll(children)}
+                  disabled={loading}
+                  className="rounded-xl text-xs h-7 px-2 mb-1"
+                >
+                  <ToggleRight className="w-3 h-3 mr-1" />Activate All ({children.filter(c => !c.is_active).length})
+                </Button>
+              </div>
+            )}
             {children.map(child => renderTreeNode(child, depth + 1, categoryKey))}
 
             {/* New child editor */}
@@ -760,6 +788,17 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
               >
                 <Plus className="w-3.5 h-3.5 mr-1" />Add Sub-Product
               </Button>
+              {topLevelItems.some(i => !i.is_active) && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleActivateAll(topLevelItems)}
+                  disabled={loading}
+                  className="rounded-xl text-xs h-8 ml-2"
+                >
+                  <ToggleRight className="w-3.5 h-3.5 mr-1" />Activate All
+                </Button>
+              )}
             </div>
 
             {/* Tree */}
