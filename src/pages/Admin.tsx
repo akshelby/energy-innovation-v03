@@ -3750,12 +3750,7 @@ export default function Admin() {
                             const newVal = isVisible ? "false" : "true";
                             setEditedContent((prev) => ({ ...prev, [visKey]: { value_en: newVal, value_ar: newVal } }));
                             try {
-                              const existing = content.find((c) => c.content_key === visKey);
-                              if (existing) {
-                                await apiCall("content", "PUT", storedPassword, { id: existing.id, value_en: newVal, value_ar: newVal });
-                              } else {
-                                await apiCall("content", "POST", storedPassword, { content_key: visKey, value_en: newVal, value_ar: newVal });
-                              }
+                              await apiCall("content", "POST", storedPassword, { content_key: visKey, value_en: newVal, value_ar: newVal });
                               fetchContent();
                               toast.success(`Addresses ${newVal === "true" ? "shown" : "hidden"}`);
                             } catch (e: any) { toast.error(e.message); }
