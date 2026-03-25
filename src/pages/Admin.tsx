@@ -300,6 +300,7 @@ export default function Admin() {
   const [emailActive, setEmailActive] = useState(false);
   const [linkedinUrl, setLinkedinUrl] = useState("");
   const [linkedinActive, setLinkedinActive] = useState(false);
+  const [imageOptimization, setImageOptimization] = useState(false);
 
   // Contact addresses state
   const [contactAddresses, setContactAddresses] = useState<{ id: string; label_en: string; label_ar: string; is_active: boolean; sort_order: number }[]>([]);
@@ -564,6 +565,9 @@ export default function Admin() {
       if (liEntry) setLinkedinUrl(liEntry.value_en);
       const liActive = data.find((d: ContentItem) => d.content_key === "linkedin_active");
       setLinkedinActive(liActive?.value_en === "true");
+
+      const imgOptEntry = data.find((d: ContentItem) => d.content_key === "settings.image_optimization");
+      setImageOptimization(imgOptEntry?.value_en === "true");
 
       // Load hero visibility toggles
       const visKeys = ["hero.show_headline", "hero.show_subtext", "hero.show_explore_btn", "hero.show_contact_btn", "hero.show_arrows", "hero.show_dots"];
@@ -1702,6 +1706,39 @@ export default function Admin() {
                     <Save className="w-4 h-4 mr-2" />Save
                   </Button>
                 </div>
+              </div>
+            </div>
+
+            {/* Image Optimization Toggle */}
+            <div className="md:col-span-2 bg-card border border-border rounded-2xl p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-foreground">Image Optimization (Pro Feature)</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Uses Supabase image transformation to resize and optimize images on-the-fly. 
+                    <span className="text-destructive font-medium"> Disable this if the pro feature is not available on your Supabase plan</span> — images will load directly from storage instead.
+                  </p>
+                </div>
+                <label className="flex items-center gap-2 cursor-pointer shrink-0 ml-4">
+                  <span className="text-sm text-muted-foreground">{imageOptimization ? "On" : "Off"}</span>
+                  <input
+                    type="checkbox"
+                    checked={imageOptimization}
+                    onChange={async (e) => {
+                      const val = e.target.checked;
+                      setImageOptimization(val);
+                      try {
+                        await apiCall("content", "POST", storedPassword, {
+                          content_key: "settings.image_optimization",
+                          value_en: String(val),
+                          value_ar: String(val),
+                        });
+                        toast.success(val ? "Image optimization enabled (Pro)" : "Image optimization disabled (direct URLs)");
+                      } catch (err: any) { toast.error(err.message); }
+                    }}
+                    className="w-5 h-5 accent-primary"
+                  />
+                </label>
               </div>
             </div>
 

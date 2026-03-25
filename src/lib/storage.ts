@@ -1,18 +1,53 @@
+import { supabase } from "@/integrations/supabase/client";
+
 const SUPABASE_URL = "https://xemoqcukwjcmnzqcdrey.supabase.co";
+
+// Cached setting – fetched once from site_content
+let _imageOptimizationEnabled: boolean | null = null;
+
+export async function loadImageOptimizationSetting(): Promise<boolean> {
+  if (_imageOptimizationEnabled !== null) return _imageOptimizationEnabled;
+  try {
+    const { data } = await supabase
+      .from("site_content")
+      .select("value_en")
+      .eq("content_key", "settings.image_optimization")
+      .maybeSingle();
+    _imageOptimizationEnabled = data?.value_en === "true";
+  } catch {
+    _imageOptimizationEnabled = false;
+  }
+  return _imageOptimizationEnabled;
+}
+
+export function isImageOptimizationEnabled(): boolean {
+  return _imageOptimizationEnabled === true;
+}
 
 export function getStorageUrl(bucket: string, path: string): string {
   return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`;
 }
 
 /**
- * Placeholder helper kept for compatibility.
- * For this project, direct public storage URLs are faster than on-the-fly transforms.
+ * Returns an optimized image URL when the pro feature is enabled,
+ * otherwise returns the direct storage URL.
  */
 export function getOptimizedImageUrl(
   src: string,
-  _opts: { width?: number; height?: number; quality?: number } = {}
+  opts: { width?: number; height?: number; quality?: number } = {}
 ): string {
-  return src;
+  if (!_imageOptimizationEnabled) return src;
+  // Use Supabase render/image transform API
+  const params = new URLSearchParams();
+  if (opts.width) params.set("width", String(opts.width));
+  if (opts.height) params.set("height", String(opts.height));
+  params.set("quality", String(opts.quality || 80));
+  // Convert /storage/v1/object/public/ to /storage/v1/render/image/public/
+  const optimizedSrc = src.replace(
+    "/storage/v1/object/public/",
+    "/storage/v1/render/image/public/"
+  );
+  return `${optimizedSrc}?${params.toString()}`;
 }
 
 // Image keys used across the site
