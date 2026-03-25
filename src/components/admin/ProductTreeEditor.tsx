@@ -776,6 +776,17 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
               >
                 <Plus className="w-3.5 h-3.5 mr-1" />Add Sub-Product
               </Button>
+              {topLevelItems.some(i => !i.is_active) && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleActivateAll(topLevelItems)}
+                  disabled={loading}
+                  className="rounded-xl text-xs h-8 ml-2"
+                >
+                  <ToggleRight className="w-3.5 h-3.5 mr-1" />Activate All
+                </Button>
+              )}
             </div>
 
             {/* Tree */}
