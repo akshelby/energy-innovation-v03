@@ -3697,12 +3697,7 @@ export default function Admin() {
                             setEditedContent((prev) => ({ ...prev, [visKey]: { value_en: newVal, value_ar: newVal } }));
                             // Auto-save visibility toggle
                             try {
-                              const existing = content.find((c) => c.content_key === visKey);
-                              if (existing) {
-                                await apiCall("content", "PUT", storedPassword, { id: existing.id, value_en: newVal, value_ar: newVal });
-                              } else {
-                                await apiCall("content", "POST", storedPassword, { content_key: visKey, value_en: newVal, value_ar: newVal });
-                              }
+                              await apiCall("content", "POST", storedPassword, { content_key: visKey, value_en: newVal, value_ar: newVal });
                               fetchContent();
                               toast.success(`${label} ${newVal === "true" ? "shown" : "hidden"}`);
                             } catch (e: any) { toast.error(e.message); }
