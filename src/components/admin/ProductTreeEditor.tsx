@@ -591,6 +591,20 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
                 <input type="checkbox" checked={item.is_active} onChange={() => handleToggleItemActive(item)} className="w-3.5 h-3.5 accent-primary" />
               </label>
 
+              {hasChildren && children.some(child => !child.is_active) && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleActivateAll(children)}
+                  disabled={loading}
+                  className="rounded-xl text-xs h-7 px-2"
+                  title="Activate all children"
+                >
+                  <ToggleRight className="w-3 h-3 mr-1" />
+                  Activate All
+                </Button>
+              )}
+
               {/* Add sub-product */}
               <Button
                 variant="outline" size="sm"
