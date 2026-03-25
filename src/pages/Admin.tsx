@@ -14,6 +14,7 @@ import {
 import { useTheme } from "@/contexts/ThemeContext";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
 import { supabase } from "@/integrations/supabase/client";
+import ProductTreeEditor from "@/components/admin/ProductTreeEditor";
 import PhoneInput from "@/components/PhoneInput";
 
 const TRANSLATE_URL = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/translate`;
@@ -232,7 +233,7 @@ const emptyService: ServiceItem = {
   tag_en: "", tag_ar: "", image_url: null, pdf_url: null, icon: "Wrench", sort_order: 0,
 };
 
-type TabKey = "leads" | "content" | "products" | "services" | "menu-items" | "images" | "branding" | "highlight" | "careers" | "admin-emails" | "product-pages" | "product-enquiries" | "footer" | "contact" | "email-templates";
+type TabKey = "leads" | "content" | "products" | "services" | "images" | "branding" | "highlight" | "careers" | "admin-emails" | "product-enquiries" | "footer" | "contact" | "email-templates";
 
 const emptyMenuChild: MenuChildItem = {
   category_key: "cat.fire", parent_id: null, name_en: "", name_ar: "", pdf_url: null, image_url: null, sort_order: 0, is_active: true,
@@ -685,14 +686,12 @@ export default function Admin() {
     if (authenticated) {
       if (activeTab === "leads") fetchLeads();
       else if (activeTab === "content") { fetchContent(); fetchContactAddresses(); }
-      else if (activeTab === "products") fetchProducts();
+      else if (activeTab === "products") { /* handled by ProductTreeEditor */ }
       else if (activeTab === "services") fetchServices();
-      else if (activeTab === "menu-items") { fetchMenuItems(); fetchCategories(); }
       else if (activeTab === "branding") fetchBranding();
       else if (activeTab === "highlight") fetchHighlight();
       else if (activeTab === "careers") { fetchCareers(); fetchCareersContent(); }
       else if (activeTab === "admin-emails") fetchAdminEmails();
-      else if (activeTab === "product-pages") { fetchProductPages(); fetchMenuItems(); fetchCategories(); }
       else if (activeTab === "product-enquiries") fetchProductEnquiries();
       else if (activeTab === "footer") fetchContent();
       else if (activeTab === "contact") { fetchContent(); fetchContactAddresses(); }
@@ -1417,11 +1416,9 @@ export default function Admin() {
             { key: "branding" as TabKey, icon: Palette, label: "Branding" },
             { key: "leads" as TabKey, icon: MessageSquare, label: `Leads (${leads.length})` },
             { key: "content" as TabKey, icon: FileText, label: "Site Content" },
-            { key: "products" as TabKey, icon: Package, label: `Products (${products.length})` },
+            { key: "products" as TabKey, icon: Package, label: "Product Tree" },
             { key: "services" as TabKey, icon: Briefcase, label: `Services (${services.length})` },
             { key: "highlight" as TabKey, icon: Star, label: "Highlight Section" },
-            { key: "menu-items" as TabKey, icon: List, label: `Product Catalog (${menuItems.length})` },
-            { key: "product-pages" as TabKey, icon: FileImage, label: `Product Pages (${productPages.length})` },
             { key: "product-enquiries" as TabKey, icon: Inbox, label: `Enquiries (${productEnquiries.length})` },
             { key: "careers" as TabKey, icon: UserPlus, label: `Careers (${careersList.length})` },
             { key: "images" as TabKey, icon: Image, label: "Files & Images" },
@@ -2034,64 +2031,7 @@ export default function Admin() {
           </div>
         )}
         {activeTab === "products" && (
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-foreground">Products</h2>
-              <div className="flex gap-2">
-                <Button size="sm" onClick={() => setEditingProduct({ ...emptyProduct, sort_order: products.length })} className="gradient-accent text-accent-foreground rounded-xl border-0">
-                  <Plus className="w-4 h-4 mr-2" />Add Product
-                </Button>
-                <Button variant="outline" size="sm" onClick={fetchProducts} disabled={loading} className="rounded-xl">
-                  <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
-                </Button>
-              </div>
-            </div>
-
-            {editingProduct && renderItemEditor(
-              editingProduct,
-              (item) => setEditingProduct(item as ProductItem),
-              () => handleSaveProduct(editingProduct),
-              () => setEditingProduct(null),
-              productImageRef,
-              productPdfRef,
-              "product"
-            )}
-
-            {products.length === 0 && !editingProduct ? (
-              <div className="text-center py-16 text-muted-foreground">
-                <Package className="w-12 h-12 mx-auto mb-4 opacity-30" /><p>No products yet. Add your first one!</p>
-              </div>
-            ) : (
-              <div className="space-y-3 mt-4">
-                {products.map((p) => (
-                  <div key={p.id} className="bg-card border border-border rounded-2xl p-4 flex items-center gap-4">
-                    <GripVertical className="w-4 h-4 text-muted-foreground shrink-0" />
-                    {p.image_url ? (
-                      <img src={p.image_url} alt={p.name_en} className="w-16 h-12 object-cover rounded-lg border border-border shrink-0" />
-                    ) : (
-                      <div className="w-16 h-12 bg-muted rounded-lg flex items-center justify-center shrink-0">
-                        <Package className="w-5 h-5 text-muted-foreground/40" />
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-foreground truncate">{p.name_en || "Untitled"}</h3>
-                        {p.tag_en && <span className="text-xs bg-accent/10 text-accent px-2 py-0.5 rounded-full shrink-0">{p.tag_en}</span>}
-                        {p.pdf_url && <FileText className="w-3.5 h-3.5 text-primary shrink-0" />}
-                      </div>
-                      <p className="text-xs text-muted-foreground truncate">{p.description_en || "No description"}</p>
-                    </div>
-                    <div className="flex gap-1 shrink-0">
-                      <Button variant="outline" size="sm" onClick={() => setEditingProduct({ ...p })} className="rounded-xl">Edit</Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleDeleteProduct(p.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl">
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <ProductTreeEditor password={storedPassword} isViewer={isViewer} />
         )}
 
         {/* ─── Services Tab ─────── */}
@@ -2156,399 +2096,6 @@ export default function Admin() {
           </div>
         )}
 
-        {/* ─── Menu Items Tab (Hierarchical Tree) ─────── */}
-        {activeTab === "menu-items" && (
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-lg font-semibold text-foreground">Product Catalog Tree</h2>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Manage the full product hierarchy: Categories → Sub-products → Children → Grandchildren. Each item can have its own PDF.
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <Button size="sm" onClick={() => setEditingCategory({ key: "", label_en: "", label_ar: "", sort_order: categories.length })} className="gradient-accent text-accent-foreground rounded-xl border-0">
-                  <Plus className="w-4 h-4 mr-2" />New Category
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => { fetchMenuItems(); fetchCategories(); }} disabled={loading} className="rounded-xl">
-                  <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
-                </Button>
-              </div>
-            </div>
-
-            {/* New Category form (when creating, no id) */}
-            {editingCategory && !editingCategory.id && (
-              <div className="bg-card border-2 border-accent/30 rounded-2xl p-4 mb-6 space-y-3">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-semibold text-foreground">➕ New Category</h4>
-                  <Button
-                    variant="outline" size="sm"
-                    disabled={translating || !editingCategory.label_en}
-                    onClick={async () => {
-                      try {
-                        setTranslating(true);
-                        const result = await translateTexts({ label_en: editingCategory.label_en });
-                        setEditingCategory({ ...editingCategory, label_ar: result.label_ar || editingCategory.label_ar });
-                        toast.success("Arabic translation generated");
-                      } catch (e: any) { toast.error(e.message); }
-                      finally { setTranslating(false); }
-                    }}
-                    className="rounded-xl"
-                  >
-                    <Languages className="w-4 h-4 mr-2" />
-                    {translating ? "..." : "Auto Translate"}
-                  </Button>
-                </div>
-                <div className="grid md:grid-cols-3 gap-3">
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Key (unique identifier)</label>
-                    <Input value={editingCategory.key} onChange={(e) => setEditingCategory({ ...editingCategory, key: e.target.value })} placeholder="cat.new-category" className="rounded-xl" />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Label (EN)</label>
-                    <Input value={editingCategory.label_en} onChange={(e) => setEditingCategory({ ...editingCategory, label_en: e.target.value })} placeholder="Category Name" className="rounded-xl" />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Label (AR) — auto-generated</label>
-                    <Input value={editingCategory.label_ar} onChange={(e) => setEditingCategory({ ...editingCategory, label_ar: e.target.value })} placeholder="auto-generated" className="rounded-xl bg-muted/50" dir="rtl" />
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button size="sm" onClick={() => handleSaveCategory(editingCategory)} disabled={loading || !editingCategory.key || !editingCategory.label_en} className="gradient-accent text-accent-foreground rounded-xl border-0">
-                    <Save className="w-3.5 h-3.5 mr-1" />Save Category
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => setEditingCategory(null)} className="rounded-xl">Cancel</Button>
-                </div>
-              </div>
-            )}
-
-            {/* Inline editor renderer */}
-            {(() => {
-              const renderInlineEditor = (depth: number) => {
-                if (!editingMenuItem) return null;
-                const categoryItems = menuItems.filter(m => m.category_key === editingMenuItem.category_key && m.id !== editingMenuItem.id);
-                const topLevelItems = categoryItems.filter(m => !m.parent_id);
-                const getChildrenOf = (pid: string) => categoryItems.filter(m => m.parent_id === pid);
-                const parentOptions: { id: string; label: string; depth: number }[] = [];
-                topLevelItems.sort((a, b) => a.sort_order - b.sort_order).forEach(item => {
-                  parentOptions.push({ id: item.id!, label: item.name_en, depth: 0 });
-                  getChildrenOf(item.id!).sort((a, b) => a.sort_order - b.sort_order).forEach(child => {
-                    parentOptions.push({ id: child.id!, label: child.name_en, depth: 1 });
-                  });
-                });
-
-                return (
-                  <div ref={menuEditorRef} className="bg-card border-2 border-accent/30 rounded-2xl p-5 space-y-4" style={{ marginLeft: `${depth * 24}px` }}>
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-foreground text-sm">
-                        {editingMenuItem.id ? "✏️ Edit" : "➕ New"} Item
-                        {editingMenuItem.parent_id && !editingMenuItem.id && (
-                          <span className="text-xs font-normal text-muted-foreground ml-2">
-                            (under {menuItems.find(m => m.id === editingMenuItem.parent_id)?.name_en || "parent"})
-                          </span>
-                        )}
-                      </h3>
-                      <Button
-                        variant="outline" size="sm"
-                        disabled={translating || !editingMenuItem.name_en}
-                        onClick={async () => {
-                          try {
-                            setTranslating(true);
-                            const result = await translateTexts({ name_en: editingMenuItem.name_en });
-                            setEditingMenuItem({ ...editingMenuItem, name_ar: result.name_ar || editingMenuItem.name_ar });
-                            toast.success("Arabic translation generated");
-                          } catch (e: any) { toast.error(e.message); }
-                          finally { setTranslating(false); }
-                        }}
-                        className="rounded-xl"
-                      >
-                        <Languages className="w-4 h-4 mr-2" />
-                        {translating ? "..." : "Auto Translate"}
-                      </Button>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Category</label>
-                        <select
-                          value={editingMenuItem.category_key}
-                          onChange={(e) => setEditingMenuItem({ ...editingMenuItem, category_key: e.target.value, parent_id: null })}
-                          className="w-full h-10 rounded-xl border border-input bg-background px-3 text-sm"
-                        >
-                          {categories.map((cat) => (
-                            <option key={cat.key} value={cat.key}>{cat.label_en}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Parent Item</label>
-                        <select
-                          value={editingMenuItem.parent_id || ""}
-                          onChange={(e) => setEditingMenuItem({ ...editingMenuItem, parent_id: e.target.value || null })}
-                          className="w-full h-10 rounded-xl border border-input bg-background px-3 text-sm"
-                        >
-                          <option value="">— Top Level (no parent) —</option>
-                          {parentOptions.map((opt) => (
-                            <option key={opt.id} value={opt.id}>
-                              {"　".repeat(opt.depth)}{"└ ".repeat(opt.depth ? 1 : 0)}{opt.label}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Name (EN)</label>
-                        <Input value={editingMenuItem.name_en} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, name_en: e.target.value })} placeholder="e.g. Fire Curtains" className="rounded-xl" />
-                      </div>
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Name (AR) — auto-generated</label>
-                        <Input value={editingMenuItem.name_ar} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, name_ar: e.target.value })} placeholder="auto-generated" className="rounded-xl bg-muted/50" dir="rtl" />
-                      </div>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">PDF Document</label>
-                        <div className="flex items-center gap-2">
-                          <Input value={editingMenuItem.pdf_url || ""} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, pdf_url: e.target.value || null })} placeholder="PDF URL or upload" className="rounded-xl flex-1" />
-                          <input ref={menuItemPdfRef} type="file" accept=".pdf" className="hidden"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) handleFormFileUpload(file, "pdfs", "", (url) => setEditingMenuItem({ ...editingMenuItem!, pdf_url: url }));
-                            }}
-                          />
-                          <Button variant="outline" size="sm" onClick={() => menuItemPdfRef.current?.click()} disabled={uploading} className="rounded-xl shrink-0">
-                            <Upload className="w-4 h-4" />
-                          </Button>
-                        </div>
-                        {editingMenuItem.pdf_url && (
-                          <button
-                            onClick={() => { setPdfPreviewUrl(editingMenuItem.pdf_url!); setPdfPreviewOpen(true); }}
-                            className="mt-2 text-xs text-primary underline"
-                          >
-                            Preview PDF
-                          </button>
-                        )}
-                      </div>
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Cover Image</label>
-                        <div className="flex items-center gap-2">
-                          <Input value={editingMenuItem.image_url || ""} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, image_url: e.target.value || null })} placeholder="Image URL or upload" className="rounded-xl flex-1" />
-                          <input ref={menuItemImgRef} type="file" accept="image/*" className="hidden"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) handleFormFileUpload(file, "images", "product-items/", (url) => setEditingMenuItem({ ...editingMenuItem!, image_url: url }));
-                            }}
-                          />
-                          <Button variant="outline" size="sm" onClick={() => menuItemImgRef.current?.click()} disabled={uploading} className="rounded-xl shrink-0">
-                            <Upload className="w-4 h-4" />
-                          </Button>
-                        </div>
-                        {editingMenuItem.image_url && (
-                          <img src={editingMenuItem.image_url} alt="Preview" className="mt-2 w-20 h-14 object-cover rounded-lg border border-border" />
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Sort Order</label>
-                        <Input type="number" value={editingMenuItem.sort_order} onChange={(e) => setEditingMenuItem({ ...editingMenuItem, sort_order: parseInt(e.target.value) || 0 })} className="rounded-xl" />
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2 pt-2">
-                      <Button onClick={() => handleSaveMenuItem(editingMenuItem)} disabled={loading} className="gradient-accent text-accent-foreground rounded-xl border-0">
-                        <Save className="w-4 h-4 mr-2" />Save
-                      </Button>
-                      <Button variant="outline" onClick={() => setEditingMenuItem(null)} className="rounded-xl">Cancel</Button>
-                    </div>
-                  </div>
-                );
-              };
-
-              // Determine where editor should show: after which item ID, or at category top level
-              const editorParentId = editingMenuItem?.parent_id || null;
-              const editorItemId = editingMenuItem?.id || null;
-              // "showEditorAfter" = the item id after which the form renders
-              // If editing an existing item: show after that item
-              // If adding child to a parent: show after that parent's children
-              // If adding top-level to category: show at bottom of that category
-
-              return (
-                <>
-                  {/* Tree List grouped by category */}
-                  {menuItems.length === 0 && !editingMenuItem ? (
-                    <div className="text-center py-16 text-muted-foreground">
-                      <List className="w-12 h-12 mx-auto mb-4 opacity-30" /><p>No menu items yet.</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-8">
-                      {categories.map((cat) => {
-                        const catItems = menuItems.filter((m) => m.category_key === cat.key);
-                        const topLevel = catItems.filter(m => !m.parent_id).sort((a, b) => a.sort_order - b.sort_order);
-                        const getChildren = (pid: string) => menuItems.filter(m => m.parent_id === pid).sort((a, b) => a.sort_order - b.sort_order);
-                        const isEditorForThisCategory = editingMenuItem && editingMenuItem.category_key === cat.key;
-
-                        const renderItem = (item: typeof menuItems[0], depth: number) => {
-                          const children = getChildren(item.id);
-                          const hasChildren = children.length > 0;
-                          const isEditingThis = editingMenuItem && editorItemId === item.id;
-                          const isAddingChildHere = editingMenuItem && !editorItemId && editorParentId === item.id;
-
-                          return (
-                            <div key={item.id}>
-                              {!isEditingThis && (
-                                <div
-                                  className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${
-                                    depth === 0 ? "bg-card border-border" : depth === 1 ? "bg-secondary/50 border-border/50" : "bg-muted/30 border-border/30"
-                                  }`}
-                                  style={{ marginLeft: `${depth * 24}px` }}
-                                >
-                                  <div className="flex items-center gap-1 shrink-0">
-                                    {depth > 0 && <span className="text-muted-foreground text-xs select-none">└</span>}
-                                    <GripVertical className="w-3.5 h-3.5 text-muted-foreground" />
-                                  </div>
-                                   <div className="flex-1 min-w-0">
-                                    <div className="flex items-center gap-2 flex-wrap">
-                                      <span className={`font-medium ${(item as any).is_active === false ? "text-muted-foreground line-through" : "text-foreground"} ${depth === 0 ? "text-sm font-bold" : "text-sm"}`}>
-                                        {item.name_en}
-                                      </span>
-                                      <span className="text-xs text-muted-foreground">/ {item.name_ar}</span>
-                                      {item.pdf_url ? (
-                                        <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full font-medium">PDF ✓</span>
-                                      ) : (
-                                        <span className="text-[10px] bg-muted text-muted-foreground px-2 py-0.5 rounded-full">No PDF</span>
-                                      )}
-                                      {hasChildren && (
-                                        <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
-                                          {children.length} sub-item{children.length > 1 ? "s" : ""}
-                                        </span>
-                                      )}
-                                      {(item as any).image_url && (
-                                        <span className="text-[10px] bg-blue-500/10 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full font-medium">IMG ✓</span>
-                                      )}
-                                      {(item as any).is_active === false && (
-                                        <span className="text-[10px] bg-destructive/10 text-destructive px-2 py-0.5 rounded-full font-medium">Inactive</span>
-                                      )}
-                                    </div>
-                                   </div>
-                                   <div className="flex gap-1 items-center shrink-0">
-                                    <label className="flex items-center gap-1 cursor-pointer mr-1" title={(item as any).is_active === false ? "Activate item" : "Deactivate item"}>
-                                      <span className="text-[10px] text-muted-foreground">{(item as any).is_active === false ? "Off" : "On"}</span>
-                                      <input
-                                        type="checkbox"
-                                        checked={(item as any).is_active !== false}
-                                        onChange={() => handleToggleItemActive(item as MenuChildItem & { id: string })}
-                                        className="w-3.5 h-3.5 accent-primary"
-                                      />
-                                    </label>
-                                     <Button
-                                       variant="outline" size="sm"
-                                       onClick={() => setEditingMenuItem({
-                                         ...emptyMenuChild,
-                                         category_key: item.category_key,
-                                         parent_id: item.id!,
-                                         sort_order: children.length,
-                                       })}
-                                       className="rounded-xl text-xs h-7 px-2"
-                                       title="Add child item"
-                                     >
-                                       <Plus className="w-3 h-3" />
-                                     </Button>
-                                     <Button variant="outline" size="sm" onClick={() => setEditingMenuItem({ ...item })} className="rounded-xl text-xs h-7">Edit</Button>
-                                     <Button variant="ghost" size="sm" onClick={() => handleDeleteMenuItem(item.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl h-7 w-7 p-0">
-                                       <Trash2 className="w-3.5 h-3.5" />
-                                     </Button>
-                                   </div>
-                                 </div>
-                               )}
-                              {isEditingThis && renderInlineEditor(depth)}
-                              {children.map(child => renderItem(child, depth + 1))}
-                              {isAddingChildHere && renderInlineEditor(depth + 1)}
-                            </div>
-                          );
-                        };
-
-                        return (
-                          <div key={cat.key}>
-                            <div className="flex items-center justify-between mb-3">
-                              <div className="flex items-center gap-2">
-                                <h3 className={`text-sm font-bold uppercase tracking-wider ${cat.is_active === false ? "text-muted-foreground line-through" : "text-accent"}`}>{cat.label_en}</h3>
-                                <span className="text-xs text-muted-foreground">/ {cat.label_ar}</span>
-                                {cat.is_active === false && <span className="text-[10px] bg-destructive/10 text-destructive px-2 py-0.5 rounded-full font-medium">Inactive</span>}
-                              </div>
-                              <div className="flex gap-1 items-center">
-                                <label className="flex items-center gap-1.5 cursor-pointer mr-2" title={cat.is_active === false ? "Activate category" : "Deactivate category"}>
-                                  <span className="text-[10px] text-muted-foreground">{cat.is_active === false ? "Off" : "On"}</span>
-                                  <input
-                                    type="checkbox"
-                                    checked={cat.is_active !== false}
-                                    onChange={() => handleToggleCategoryActive(cat as CategoryItem & { id: string })}
-                                    className="w-4 h-4 accent-primary"
-                                  />
-                                </label>
-                                <Button
-                                  variant="outline" size="sm"
-                                  onClick={() => setEditingMenuItem({
-                                    ...emptyMenuChild,
-                                    category_key: cat.key,
-                                    sort_order: topLevel.length,
-                                  })}
-                                  className="rounded-xl text-xs h-7"
-                                >
-                                  <Plus className="w-3 h-3 mr-1" />Add Item
-                                </Button>
-                                <Button variant="outline" size="sm" onClick={() => setEditingCategory({ ...cat })} className="rounded-xl text-xs h-7">Edit</Button>
-                                <Button variant="ghost" size="sm" onClick={() => handleDeleteCategory(cat.id!)} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl h-7 w-7 p-0">
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </Button>
-                              </div>
-                            </div>
-                            {/* Inline category editor */}
-                            {editingCategory && editingCategory.id === cat.id && (
-                              <div className="bg-card border-2 border-accent/30 rounded-2xl p-4 mb-3 space-y-3">
-                                <h4 className="text-sm font-semibold text-foreground">✏️ Edit Category</h4>
-                                <div className="grid md:grid-cols-3 gap-3">
-                                  <div>
-                                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Key</label>
-                                    <Input value={editingCategory.key} onChange={(e) => setEditingCategory({ ...editingCategory, key: e.target.value })} placeholder="cat.new" className="rounded-xl" />
-                                  </div>
-                                  <div>
-                                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Label (EN)</label>
-                                    <Input value={editingCategory.label_en} onChange={(e) => setEditingCategory({ ...editingCategory, label_en: e.target.value })} placeholder="Category Name" className="rounded-xl" />
-                                  </div>
-                                  <div>
-                                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Label (AR)</label>
-                                    <Input value={editingCategory.label_ar} onChange={(e) => setEditingCategory({ ...editingCategory, label_ar: e.target.value })} placeholder="auto-generated" className="rounded-xl bg-muted/50" dir="rtl" />
-                                  </div>
-                                </div>
-                                <div className="flex gap-2">
-                                  <Button size="sm" onClick={() => handleSaveCategory(editingCategory)} disabled={loading} className="gradient-accent text-accent-foreground rounded-xl border-0">
-                                    <Save className="w-3.5 h-3.5 mr-1" />Save
-                                  </Button>
-                                  <Button variant="outline" size="sm" onClick={() => setEditingCategory(null)} className="rounded-xl">Cancel</Button>
-                                </div>
-                              </div>
-                            )}
-                            <div className="space-y-2">
-                              {topLevel.map(item => renderItem(item, 0))}
-                              {/* Show editor at bottom of category if adding top-level item here */}
-                              {isEditorForThisCategory && !editorItemId && !editorParentId && renderInlineEditor(0)}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </>
-              );
-            })()}
-          </div>
-        )}
-
         {/* ─── Highlight Tab ─────── */}
         {activeTab === "highlight" && (
           <div>
@@ -2558,55 +2105,34 @@ export default function Admin() {
                 <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
               </Button>
             </div>
-
             <div className="space-y-6">
-              {/* Text Content — managed via Site Content tab */}
               <div className="bg-card border border-border rounded-2xl p-6">
                 <h3 className="font-semibold text-foreground mb-2">Text Content</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Edit the highlight section text (tagline, title, description, sub-description) in the <button className="text-accent underline" onClick={() => setActiveTab("content")}>Site Content</button> tab under the "Highlight" group.
+                  Edit the highlight section text in the <button className="text-accent underline" onClick={() => setActiveTab("content")}>Site Content</button> tab.
                 </p>
               </div>
-
-              {/* Multi-Image Upload (up to 5) */}
               <div className="bg-card border border-border rounded-2xl p-6">
                 <h3 className="font-semibold text-foreground mb-2">Section Images</h3>
-                <p className="text-sm text-muted-foreground mb-4">Upload up to 5 images that rotate in a carousel on the right side of the highlight section.</p>
-
-                {/* Current images grid */}
+                <p className="text-sm text-muted-foreground mb-4">Upload up to 5 images for the highlight carousel.</p>
                 {highlightImages.length > 0 && (
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
                     {highlightImages.map((url, idx) => (
                       <div key={idx} className="relative group rounded-xl overflow-hidden border border-border">
                         <img src={url} alt={`Highlight ${idx + 1}`} className="w-full aspect-[4/3] object-cover" />
                         <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/40 transition-colors flex items-center justify-center">
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            className="opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"
-                            onClick={() => {
-                              setHighlightImages((prev) => prev.filter((_, i) => i !== idx));
-                            }}
-                          >
+                          <Button variant="destructive" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity rounded-xl" onClick={() => setHighlightImages((prev) => prev.filter((_, i) => i !== idx))}>
                             <Trash2 className="w-3 h-3 mr-1" />Remove
                           </Button>
                         </div>
-                        <span className="absolute top-1.5 left-1.5 bg-foreground/70 text-background text-[10px] font-bold px-1.5 py-0.5 rounded-md">
-                          {idx + 1}
-                        </span>
+                        <span className="absolute top-1.5 left-1.5 bg-foreground/70 text-background text-[10px] font-bold px-1.5 py-0.5 rounded-md">{idx + 1}</span>
                       </div>
                     ))}
                   </div>
                 )}
-
-                {/* Add image */}
                 {highlightImages.length < 5 && (
                   <div className="flex items-center gap-3 mb-3">
-                    <input
-                      ref={highlightImageRef}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
+                    <input ref={highlightImageRef} type="file" accept="image/*" className="hidden"
                       onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (file) {
@@ -2626,153 +2152,68 @@ export default function Admin() {
                     </Button>
                   </div>
                 )}
-
-                <Button
-                  onClick={async () => {
-                    try {
-                      // Save as JSON array to highlight.images
-                      await apiCall("content", "POST", storedPassword, {
-                        content_key: "highlight.images",
-                        value_en: JSON.stringify(highlightImages),
-                        value_ar: JSON.stringify(highlightImages),
-                      });
-                      // Also keep single image key in sync for backwards compat
-                      await apiCall("content", "POST", storedPassword, {
-                        content_key: "highlight.image",
-                        value_en: highlightImages[0] || "",
-                        value_ar: highlightImages[0] || "",
-                      });
-                      toast.success("Images saved!");
-                    } catch (err: any) { toast.error(err.message); }
-                  }}
-                  className="gradient-accent text-accent-foreground rounded-xl border-0"
-                >
+                <Button onClick={async () => {
+                  try {
+                    await apiCall("content", "POST", storedPassword, { content_key: "highlight.images", value_en: JSON.stringify(highlightImages), value_ar: JSON.stringify(highlightImages) });
+                    await apiCall("content", "POST", storedPassword, { content_key: "highlight.image", value_en: highlightImages[0] || "", value_ar: highlightImages[0] || "" });
+                    toast.success("Images saved!");
+                  } catch (err: any) { toast.error(err.message); }
+                }} className="gradient-accent text-accent-foreground rounded-xl border-0">
                   <Save className="w-4 h-4 mr-2" />Save Images
                 </Button>
               </div>
-
-              {/* Stats Cards */}
               <div className="bg-card border border-border rounded-2xl p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-foreground">Stat Cards</h3>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setHighlightStats([...highlightStats, { icon: "Award", value_en: "", value_ar: "", label_en: "", label_ar: "" }])}
-                    className="rounded-xl"
-                    disabled={highlightStats.length >= 4}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => setHighlightStats([...highlightStats, { icon: "Award", value_en: "", value_ar: "", label_en: "", label_ar: "" }])} className="rounded-xl" disabled={highlightStats.length >= 4}>
                     <Plus className="w-4 h-4 mr-1" />Add Stat
                   </Button>
                 </div>
-                <p className="text-sm text-muted-foreground mb-4">These appear as overlay cards on the image. Maximum 4 stats recommended.</p>
-
+                <p className="text-sm text-muted-foreground mb-4">Overlay cards on the image. Maximum 4 stats.</p>
                 <div className="space-y-4">
                   {highlightStats.map((stat, i) => (
                     <div key={i} className="border border-border rounded-xl p-4 space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-semibold text-muted-foreground">Stat #{i + 1}</span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setHighlightStats(highlightStats.filter((_, idx) => idx !== i))}
-                          className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl h-7 w-7 p-0"
-                          disabled={highlightStats.length <= 1}
-                        >
+                        <Button variant="ghost" size="sm" onClick={() => setHighlightStats(highlightStats.filter((_, idx) => idx !== i))} className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl h-7 w-7 p-0" disabled={highlightStats.length <= 1}>
                           <Trash2 className="w-3.5 h-3.5" />
                         </Button>
                       </div>
                       <div className="grid md:grid-cols-3 gap-3">
                         <div>
                           <label className="text-xs font-medium text-muted-foreground mb-1 block">Icon</label>
-                          <select
-                            value={stat.icon}
-                            onChange={(e) => {
-                              const updated = [...highlightStats];
-                              updated[i] = { ...stat, icon: e.target.value };
-                              setHighlightStats(updated);
-                            }}
-                            className="w-full h-10 rounded-xl border border-input bg-background px-3 text-sm"
-                          >
-                            {["Award", "TrendingUp", "Users", "Clock"].map((ic) => (
-                              <option key={ic} value={ic}>{ic}</option>
-                            ))}
+                          <select value={stat.icon} onChange={(e) => { const updated = [...highlightStats]; updated[i] = { ...stat, icon: e.target.value }; setHighlightStats(updated); }} className="w-full h-10 rounded-xl border border-input bg-background px-3 text-sm">
+                            {["Award", "TrendingUp", "Users", "Clock"].map((ic) => (<option key={ic} value={ic}>{ic}</option>))}
                           </select>
                         </div>
                         <div>
                           <label className="text-xs font-medium text-muted-foreground mb-1 block">Value (EN)</label>
-                          <Input
-                            value={stat.value_en}
-                            onChange={(e) => {
-                              const updated = [...highlightStats];
-                              updated[i] = { ...stat, value_en: e.target.value };
-                              setHighlightStats(updated);
-                            }}
-                            placeholder="e.g. 100%"
-                            className="rounded-xl"
-                          />
+                          <Input value={stat.value_en} onChange={(e) => { const updated = [...highlightStats]; updated[i] = { ...stat, value_en: e.target.value }; setHighlightStats(updated); }} placeholder="e.g. 100%" className="rounded-xl" />
                         </div>
                         <div>
                           <label className="text-xs font-medium text-muted-foreground mb-1 block">Value (AR)</label>
-                          <Input
-                            value={stat.value_ar}
-                            onChange={(e) => {
-                              const updated = [...highlightStats];
-                              updated[i] = { ...stat, value_ar: e.target.value };
-                              setHighlightStats(updated);
-                            }}
-                            placeholder="e.g. ١٠٠٪"
-                            className="rounded-xl bg-muted/50"
-                            dir="rtl"
-                          />
+                          <Input value={stat.value_ar} onChange={(e) => { const updated = [...highlightStats]; updated[i] = { ...stat, value_ar: e.target.value }; setHighlightStats(updated); }} placeholder="e.g. ١٠٠٪" className="rounded-xl bg-muted/50" dir="rtl" />
                         </div>
                       </div>
                       <div className="grid md:grid-cols-2 gap-3">
                         <div>
                           <label className="text-xs font-medium text-muted-foreground mb-1 block">Label (EN)</label>
-                          <Input
-                            value={stat.label_en}
-                            onChange={(e) => {
-                              const updated = [...highlightStats];
-                              updated[i] = { ...stat, label_en: e.target.value };
-                              setHighlightStats(updated);
-                            }}
-                            placeholder="e.g. Quality Assurance"
-                            className="rounded-xl"
-                          />
+                          <Input value={stat.label_en} onChange={(e) => { const updated = [...highlightStats]; updated[i] = { ...stat, label_en: e.target.value }; setHighlightStats(updated); }} placeholder="e.g. Quality Assurance" className="rounded-xl" />
                         </div>
                         <div>
                           <label className="text-xs font-medium text-muted-foreground mb-1 block">Label (AR)</label>
-                          <Input
-                            value={stat.label_ar}
-                            onChange={(e) => {
-                              const updated = [...highlightStats];
-                              updated[i] = { ...stat, label_ar: e.target.value };
-                              setHighlightStats(updated);
-                            }}
-                            placeholder="e.g. ضمان الجودة"
-                            className="rounded-xl bg-muted/50"
-                            dir="rtl"
-                          />
+                          <Input value={stat.label_ar} onChange={(e) => { const updated = [...highlightStats]; updated[i] = { ...stat, label_ar: e.target.value }; setHighlightStats(updated); }} placeholder="e.g. ضمان الجودة" className="rounded-xl bg-muted/50" dir="rtl" />
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
-
-                <Button
-                  onClick={async () => {
-                    try {
-                      await apiCall("content", "POST", storedPassword, {
-                        content_key: "highlight.stats",
-                        value_en: JSON.stringify(highlightStats),
-                        value_ar: JSON.stringify(highlightStats),
-                      });
-                      toast.success("Stats saved!");
-                    } catch (err: any) { toast.error(err.message); }
-                  }}
-                  className="gradient-accent text-accent-foreground rounded-xl border-0 mt-4"
-                >
+                <Button onClick={async () => {
+                  try {
+                    await apiCall("content", "POST", storedPassword, { content_key: "highlight.stats", value_en: JSON.stringify(highlightStats), value_ar: JSON.stringify(highlightStats) });
+                    toast.success("Stats saved!");
+                  } catch (err: any) { toast.error(err.message); }
+                }} className="gradient-accent text-accent-foreground rounded-xl border-0 mt-4">
                   <Save className="w-4 h-4 mr-2" />Save Stats
                 </Button>
               </div>
@@ -2781,7 +2222,6 @@ export default function Admin() {
         )}
 
 
-        {/* ─── Careers Tab ──────── */}
         {activeTab === "careers" && (
           <div className="space-y-8">
 
@@ -3345,286 +2785,7 @@ export default function Admin() {
           </div>
         )}
 
-        {/* ─── Product Pages Tab ──────── */}
-        {activeTab === "product-pages" && (
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-foreground">Product Pages</h2>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={fetchProductPages} disabled={loading} className="rounded-xl">
-                  <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
-                </Button>
-                <Button size="sm" onClick={() => setEditingPage({ product_item_id: "", headline_en: "", headline_ar: "", description_en: "", description_ar: "", sub_description_en: "", sub_description_ar: "", is_active: true })} className="gradient-accent text-accent-foreground rounded-xl border-0">
-                  <Plus className="w-4 h-4 mr-2" />New Product Page
-                </Button>
-              </div>
-            </div>
 
-            {editingPage && (
-              <div ref={pageEditorRef} className="bg-card border border-border rounded-2xl p-6 space-y-4 mb-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-foreground">{editingPage.id ? "Edit" : "New"} Product Page</h3>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={translating || (!editingPage.headline_en && !editingPage.description_en)}
-                    onClick={async () => {
-                      try {
-                        setTranslating(true);
-                        const result = await translateTexts({
-                          headline_en: editingPage.headline_en,
-                          description_en: editingPage.description_en,
-                          sub_description_en: editingPage.sub_description_en,
-                        });
-                        setEditingPage({
-                          ...editingPage,
-                          headline_ar: result.headline_ar || editingPage.headline_ar,
-                          description_ar: result.description_ar || editingPage.description_ar,
-                          sub_description_ar: result.sub_description_ar || editingPage.sub_description_ar,
-                        });
-                        toast.success("Arabic translations generated");
-                      } catch (e: any) { toast.error(e.message); }
-                      finally { setTranslating(false); }
-                    }}
-                    className="rounded-xl"
-                  >
-                    <Languages className="w-4 h-4 mr-2" />
-                    {translating ? <RefreshCw className="w-4 h-4 animate-spin" /> : "Auto Translate"}
-                  </Button>
-                </div>
-
-                {/* Product Item Selector */}
-                <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Attach to Product Item *</label>
-                  <select
-                    value={editingPage.product_item_id}
-                    onChange={(e) => setEditingPage({ ...editingPage, product_item_id: e.target.value })}
-                    className="w-full h-10 rounded-xl border border-input bg-background px-3 text-sm"
-                  >
-                    <option value="">-- Select a product item --</option>
-                    {categories.map((cat) => (
-                      <optgroup key={cat.id} label={cat.label_en}>
-                        {menuItems
-                          .filter((mi) => mi.category_key === cat.key && mi.is_active !== false)
-                          .map((mi) => {
-                            const indent = mi.parent_id ? "  └ " : "";
-                            const parentName = mi.parent_id ? menuItems.find(m => m.id === mi.parent_id)?.name_en : null;
-                            return (
-                              <option key={mi.id} value={mi.id}>
-                                {indent}{mi.name_en}{parentName ? ` (under ${parentName})` : ""}
-                              </option>
-                            );
-                          })}
-                      </optgroup>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Headline */}
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Headline (EN)</label>
-                    <Input value={editingPage.headline_en} onChange={(e) => setEditingPage({ ...editingPage, headline_en: e.target.value })} placeholder="Product headline" className="rounded-xl" />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Headline (AR)</label>
-                    <Input value={editingPage.headline_ar} onChange={(e) => setEditingPage({ ...editingPage, headline_ar: e.target.value })} placeholder="auto-generated" className="rounded-xl bg-muted/50" dir="rtl" />
-                  </div>
-                </div>
-
-                {/* Description */}
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Description (EN)</label>
-                    <Textarea value={editingPage.description_en} onChange={(e) => setEditingPage({ ...editingPage, description_en: e.target.value })} rows={3} className="rounded-xl resize-none" />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Description (AR)</label>
-                    <Textarea value={editingPage.description_ar} onChange={(e) => setEditingPage({ ...editingPage, description_ar: e.target.value })} rows={3} className="rounded-xl resize-none bg-muted/50" dir="rtl" />
-                  </div>
-                </div>
-
-                {/* Sub Description */}
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Sub Description (EN)</label>
-                    <Textarea value={editingPage.sub_description_en} onChange={(e) => setEditingPage({ ...editingPage, sub_description_en: e.target.value })} rows={2} className="rounded-xl resize-none" />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Sub Description (AR)</label>
-                    <Textarea value={editingPage.sub_description_ar} onChange={(e) => setEditingPage({ ...editingPage, sub_description_ar: e.target.value })} rows={2} className="rounded-xl resize-none bg-muted/50" dir="rtl" />
-                  </div>
-                </div>
-
-                {/* Active Toggle */}
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={editingPage.is_active} onChange={(e) => setEditingPage({ ...editingPage, is_active: e.target.checked })} className="rounded" />
-                  <span className="text-sm text-foreground">Active</span>
-                </label>
-
-                {/* Images Management (only for existing pages) */}
-                {editingPage.id && (
-                  <div className="border-t border-border pt-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="text-sm font-semibold text-foreground">Gallery Images (up to 4)</h4>
-                      <div>
-                        <input
-                          ref={pageImageRef}
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={async (e) => {
-                            const file = e.target.files?.[0];
-                            if (!file || !editingPage.id) return;
-                            try {
-                              setUploading(true);
-                              const url = await uploadFileAndGetUrl(file, "images", "product-pages", storedPassword);
-                              await apiCall("product-page-images", "POST", storedPassword, {
-                                product_page_id: editingPage.id,
-                                image_url: url,
-                                sort_order: pageImages.length,
-                              });
-                              toast.success("Image added");
-                              fetchPageImages(editingPage.id);
-                            } catch (err: any) { toast.error(err.message); }
-                            finally { setUploading(false); }
-                          }}
-                        />
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => pageImageRef.current?.click()}
-                          disabled={uploading || pageImages.length >= 4}
-                          className="rounded-xl"
-                        >
-                          {uploading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                          <span className="ml-1">Add Image</span>
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-4 gap-3">
-                      {pageImages.map((img) => (
-                        <div key={img.id} className="relative group">
-                          <img src={img.image_url} alt="" className="w-full aspect-square object-cover rounded-xl border border-border" />
-                          <button
-                            onClick={async () => {
-                              try {
-                                await apiCall("product-page-images", "DELETE", storedPassword, { id: img.id });
-                                setPageImages((prev) => prev.filter((i) => i.id !== img.id));
-                                toast.success("Image removed");
-                              } catch (err: any) { toast.error(err.message); }
-                            }}
-                            className="absolute top-1 right-1 w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </button>
-                        </div>
-                      ))}
-                      {pageImages.length === 0 && (
-                        <p className="col-span-4 text-sm text-muted-foreground py-4 text-center">No images yet. Upload up to 4 gallery images.</p>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Actions */}
-                <div className="flex gap-2 pt-2">
-                  <Button
-                    onClick={async () => {
-                      if (!editingPage.product_item_id) {
-                        toast.error("Please select a product item");
-                        return;
-                      }
-                      try {
-                        setLoading(true);
-                        let page = { ...editingPage };
-                        if (page.headline_en && !page.headline_ar) {
-                          try {
-                            const result = await translateTexts({
-                              headline_en: page.headline_en,
-                              description_en: page.description_en,
-                              sub_description_en: page.sub_description_en,
-                            });
-                            page = {
-                              ...page,
-                              headline_ar: result.headline_ar || page.headline_ar,
-                              description_ar: result.description_ar || page.description_ar,
-                              sub_description_ar: result.sub_description_ar || page.sub_description_ar,
-                            };
-                          } catch { /* proceed */ }
-                        }
-                        const saved = await apiCall("product-pages", "POST", storedPassword, page);
-                        toast.success("Product page saved");
-                        // If new page, switch to editing it to enable image upload
-                        if (!editingPage.id && saved.id) {
-                          setEditingPage({ ...page, id: saved.id });
-                          fetchPageImages(saved.id);
-                        } else {
-                          setEditingPage(null);
-                        }
-                        fetchProductPages();
-                      } catch (e: any) { toast.error(e.message); }
-                      finally { setLoading(false); }
-                    }}
-                    disabled={loading}
-                    className="gradient-accent text-accent-foreground rounded-xl border-0"
-                  >
-                    <Save className="w-4 h-4 mr-2" />Save
-                  </Button>
-                  <Button variant="outline" onClick={() => setEditingPage(null)} className="rounded-xl">Cancel</Button>
-                </div>
-              </div>
-            )}
-
-            {/* Product Pages List */}
-            <div className="space-y-3">
-              {productPages.map((pp) => {
-                const itemName = pp.product_items?.name_en || "Unknown";
-                return (
-                  <div key={pp.id} className="bg-card border border-border rounded-2xl p-4 flex items-center justify-between flex-wrap gap-3">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-semibold text-foreground">{pp.headline_en || itemName}</span>
-                        {!pp.is_active && <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">Inactive</span>}
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-0.5 truncate">Linked to: {itemName}</p>
-                    </div>
-                    <div className="flex gap-2 shrink-0">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setEditingPage(pp);
-                          fetchPageImages(pp.id);
-                        }}
-                        className="rounded-xl"
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={async () => {
-                          try {
-                            await apiCall("product-pages", "DELETE", storedPassword, { id: pp.id });
-                            toast.success("Product page deleted");
-                            fetchProductPages();
-                          } catch (e: any) { toast.error(e.message); }
-                        }}
-                        className="rounded-xl text-destructive"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
-              {productPages.length === 0 && (
-                <p className="text-center text-muted-foreground py-8">No product pages created yet. Click "New Product Page" to get started.</p>
-              )}
-            </div>
-          </div>
-        )}
 
         {/* ─── Product Enquiries Tab ──────── */}
         {activeTab === "product-enquiries" && (
