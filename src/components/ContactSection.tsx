@@ -127,7 +127,7 @@ export default function ContactSection() {
     if (iconVal.startsWith("http") || iconVal.startsWith("/") || iconVal.startsWith("data:")) {
       return { type: "image" as const, src: iconVal };
     }
-    const IconComp = icons[iconVal as keyof typeof icons];
+    const IconComp = LucideIcons[iconVal as keyof typeof LucideIcons] as React.ComponentType<{ className?: string }> | undefined;
     return { type: "lucide" as const, component: IconComp || Phone };
   };
 
