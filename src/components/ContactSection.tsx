@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Send, Phone, Mail, Globe } from "lucide-react";
+import { Send, Phone, Mail, Globe, MapPin, Building, MessageSquare, Shield, Zap, Factory, Truck, icons } from "lucide-react";
 import PhoneInput from "@/components/PhoneInput";
 
 const contactSchema = z.object({
@@ -25,6 +25,7 @@ export default function ContactSection() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", company: "", message: "" });
   const [contactInfo, setContactInfo] = useState({ phone: "", email: "", address: "" });
   const [visibility, setVisibility] = useState({ phone: true, email: true, address: true });
+  const [contactMeta, setContactMeta] = useState({ phoneLabel: "", emailLabel: "", addressLabel: "", phoneIcon: "Phone", emailIcon: "Mail", addressIcon: "Globe" });
   const [addresses, setAddresses] = useState<{ id: string; label_en: string; label_ar: string }[]>([]);
 
   useEffect(() => {
@@ -35,6 +36,8 @@ export default function ContactSection() {
         .in("content_key", [
           "contact_phone", "contact_email", "contact_address",
           "contact_phone_visible", "contact_email_visible", "contact_address_visible",
+          "contact_phone_label", "contact_email_label", "contact_address_label",
+          "contact_phone_icon", "contact_email_icon", "contact_address_icon",
         ]);
       if (data) {
         const map: Record<string, { en: string; ar: string }> = {};
@@ -48,6 +51,14 @@ export default function ContactSection() {
           phone: map.contact_phone_visible?.en !== "false",
           email: map.contact_email_visible?.en !== "false",
           address: map.contact_address_visible?.en !== "false",
+        });
+        setContactMeta({
+          phoneLabel: map.contact_phone_label?.[language] || t("contact.phone"),
+          emailLabel: map.contact_email_label?.[language] || t("contact.email"),
+          addressLabel: map.contact_address_label?.[language] || t("footer.address"),
+          phoneIcon: map.contact_phone_icon?.en || "Phone",
+          emailIcon: map.contact_email_icon?.en || "Mail",
+          addressIcon: map.contact_address_icon?.en || "Globe",
         });
       }
     };
@@ -110,26 +121,35 @@ export default function ContactSection() {
 
   const isAr = language === "ar";
 
+  // Helper to resolve icon name/URL to a component
+  const resolveIcon = (iconVal: string) => {
+    if (iconVal.startsWith("http") || iconVal.startsWith("/") || iconVal.startsWith("data:")) {
+      return { type: "image" as const, src: iconVal };
+    }
+    const IconComp = icons[iconVal as keyof typeof icons];
+    return { type: "lucide" as const, component: IconComp || Phone };
+  };
+
   // Build contact cards based on visibility
-  const cards: { icon: typeof Phone; label: string; value: string; href?: string }[] = [];
+  const cards: { iconVal: string; label: string; value: string; href?: string }[] = [];
   if (visibility.phone && contactInfo.phone) {
-    cards.push({ icon: Phone, label: t("contact.phone"), value: contactInfo.phone, href: `tel:${contactInfo.phone.replace(/\s/g, "")}` });
+    cards.push({ iconVal: contactMeta.phoneIcon, label: contactMeta.phoneLabel || t("contact.phone"), value: contactInfo.phone, href: `tel:${contactInfo.phone.replace(/\s/g, "")}` });
   }
   if (visibility.email && contactInfo.email) {
-    cards.push({ icon: Mail, label: t("contact.email"), value: contactInfo.email, href: `mailto:${contactInfo.email}` });
+    cards.push({ iconVal: contactMeta.emailIcon, label: contactMeta.emailLabel || t("contact.email"), value: contactInfo.email, href: `mailto:${contactInfo.email}` });
   }
   // Show addresses from new table if visible, fallback to legacy contact_address
   if (visibility.address) {
     if (addresses.length > 0) {
       addresses.forEach((addr) => {
         cards.push({
-          icon: Globe,
-          label: t("footer.address"),
+          iconVal: contactMeta.addressIcon,
+          label: contactMeta.addressLabel || t("footer.address"),
           value: isAr ? addr.label_ar : addr.label_en,
         });
       });
     } else if (contactInfo.address) {
-      cards.push({ icon: Globe, label: t("footer.address"), value: contactInfo.address });
+      cards.push({ iconVal: contactMeta.addressIcon, label: contactMeta.addressLabel || t("footer.address"), value: contactInfo.address });
     }
   }
 
@@ -150,10 +170,16 @@ export default function ContactSection() {
           {/* Contact Info Cards */}
           {cards.length > 0 && (
             <div className="space-y-4 md:space-y-5">
-              {cards.map(({ icon: Icon, label, value, href }, idx) => (
+              {cards.map(({ iconVal, label, value, href }, idx) => {
+                const resolved = resolveIcon(iconVal);
+                return (
                 <div key={idx} className="group bg-card rounded-2xl border border-border p-5 md:p-6 shadow-lg flex items-start gap-4 transition-all duration-300 hover:border-destructive/30 hover:shadow-xl hover:-translate-y-1">
                   <div className="shrink-0 w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-accent group-hover:text-destructive transition-colors duration-300" />
+                    {resolved.type === "image" ? (
+                      <img src={resolved.src} alt="" className="w-5 h-5 object-contain" />
+                    ) : (
+                      <resolved.component className="w-5 h-5 text-accent group-hover:text-destructive transition-colors duration-300" />
+                    )}
                   </div>
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-muted-foreground mb-1">{label}</p>
@@ -166,7 +192,8 @@ export default function ContactSection() {
                     )}
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
