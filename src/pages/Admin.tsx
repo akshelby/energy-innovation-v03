@@ -4220,7 +4220,7 @@ export default function Admin() {
                     </div>
                   );
                 })}
-                {/* Logo URL */}
+                {/* Logo Upload */}
                 {(() => {
                   const key = "email.logo_url";
                   const val = editedContent[key] || { value_en: "", value_ar: "" };
@@ -4228,14 +4228,34 @@ export default function Admin() {
                   const edited = original && (val.value_en !== original.value_en);
                   return (
                     <div>
-                      <label className="text-sm font-medium text-foreground">Logo URL</label>
-                      <div className="flex gap-2 mt-1">
-                        <Input
-                          value={val.value_en}
-                          onChange={(e) => updateEditedField(key, "value_en", e.target.value)}
-                          placeholder="https://... (paste logo image URL)"
-                          className="rounded-xl"
+                      <label className="text-sm font-medium text-foreground">Logo Image</label>
+                      <div className="flex gap-2 mt-1 items-center flex-wrap">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          id="email-logo-upload"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            try {
+                              setUploading(true);
+                              const url = await uploadFileAndGetUrl(file, "images", "email", storedPassword);
+                              updateEditedField(key, "value_en", url);
+                              updateEditedField(key, "value_ar", url);
+                              toast.success("Logo uploaded — click Save to apply");
+                            } catch (err: any) { toast.error(err.message); }
+                            finally { setUploading(false); e.target.value = ""; }
+                          }}
                         />
+                        <Button variant="outline" size="sm" onClick={() => document.getElementById("email-logo-upload")?.click()} disabled={uploading} className="rounded-xl">
+                          <Upload className={`w-4 h-4 mr-2 ${uploading ? "animate-spin" : ""}`} />{uploading ? "Uploading..." : "Upload Logo"}
+                        </Button>
+                        {val.value_en && (
+                          <Button variant="outline" size="sm" onClick={() => { updateEditedField(key, "value_en", ""); updateEditedField(key, "value_ar", ""); }} className="rounded-xl text-destructive">
+                            <Trash2 className="w-3 h-3 mr-1" />Remove
+                          </Button>
+                        )}
                         {edited && (
                           <Button size="sm" onClick={() => handleSaveContent(key)} className="gradient-accent text-accent-foreground rounded-xl border-0">
                             <Save className="w-3 h-3" />
@@ -4250,7 +4270,7 @@ export default function Admin() {
                     </div>
                   );
                 })()}
-                {/* Banner URL */}
+                {/* Banner Upload */}
                 {(() => {
                   const key = "email.banner_url";
                   const val = editedContent[key] || { value_en: "", value_ar: "" };
@@ -4258,14 +4278,34 @@ export default function Admin() {
                   const edited = original && (val.value_en !== original.value_en);
                   return (
                     <div className="md:col-span-2">
-                      <label className="text-sm font-medium text-foreground">Promotion Banner Image URL</label>
-                      <div className="flex gap-2 mt-1">
-                        <Input
-                          value={val.value_en}
-                          onChange={(e) => updateEditedField(key, "value_en", e.target.value)}
-                          placeholder="https://... (optional banner image)"
-                          className="rounded-xl"
+                      <label className="text-sm font-medium text-foreground">Promotion Banner Image</label>
+                      <div className="flex gap-2 mt-1 items-center flex-wrap">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          id="email-banner-upload"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            try {
+                              setUploading(true);
+                              const url = await uploadFileAndGetUrl(file, "images", "email", storedPassword);
+                              updateEditedField(key, "value_en", url);
+                              updateEditedField(key, "value_ar", url);
+                              toast.success("Banner uploaded — click Save to apply");
+                            } catch (err: any) { toast.error(err.message); }
+                            finally { setUploading(false); e.target.value = ""; }
+                          }}
                         />
+                        <Button variant="outline" size="sm" onClick={() => document.getElementById("email-banner-upload")?.click()} disabled={uploading} className="rounded-xl">
+                          <Upload className={`w-4 h-4 mr-2 ${uploading ? "animate-spin" : ""}`} />{uploading ? "Uploading..." : "Upload Banner"}
+                        </Button>
+                        {val.value_en && (
+                          <Button variant="outline" size="sm" onClick={() => { updateEditedField(key, "value_en", ""); updateEditedField(key, "value_ar", ""); }} className="rounded-xl text-destructive">
+                            <Trash2 className="w-3 h-3 mr-1" />Remove
+                          </Button>
+                        )}
                         {edited && (
                           <Button size="sm" onClick={() => handleSaveContent(key)} className="gradient-accent text-accent-foreground rounded-xl border-0">
                             <Save className="w-3 h-3" />
