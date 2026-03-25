@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Send, Phone, Mail, Globe, MapPin, Building, MessageSquare, Shield, Zap, Factory, Truck, icons } from "lucide-react";
+import { Send, Phone, Mail, Globe } from "lucide-react";
+import * as LucideIcons from "lucide-react";
 import PhoneInput from "@/components/PhoneInput";
 
 const contactSchema = z.object({
