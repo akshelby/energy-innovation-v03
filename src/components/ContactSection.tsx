@@ -35,6 +35,8 @@ export default function ContactSection() {
         .in("content_key", [
           "contact_phone", "contact_email", "contact_address",
           "contact_phone_visible", "contact_email_visible", "contact_address_visible",
+          "contact_phone_label", "contact_email_label", "contact_address_label",
+          "contact_phone_icon", "contact_email_icon", "contact_address_icon",
         ]);
       if (data) {
         const map: Record<string, { en: string; ar: string }> = {};
@@ -48,6 +50,14 @@ export default function ContactSection() {
           phone: map.contact_phone_visible?.en !== "false",
           email: map.contact_email_visible?.en !== "false",
           address: map.contact_address_visible?.en !== "false",
+        });
+        setContactMeta({
+          phoneLabel: map.contact_phone_label?.[language] || t("contact.phone"),
+          emailLabel: map.contact_email_label?.[language] || t("contact.email"),
+          addressLabel: map.contact_address_label?.[language] || t("footer.address"),
+          phoneIcon: map.contact_phone_icon?.en || "Phone",
+          emailIcon: map.contact_email_icon?.en || "Mail",
+          addressIcon: map.contact_address_icon?.en || "Globe",
         });
       }
     };
