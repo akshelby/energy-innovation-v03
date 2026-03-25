@@ -2094,6 +2094,7 @@ export default function Admin() {
               </div>
             )}
           </div>
+        )}
 
         {/* ─── Highlight Tab ─────── */}
         {activeTab === "highlight" && (
