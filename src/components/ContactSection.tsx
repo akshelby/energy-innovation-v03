@@ -25,6 +25,7 @@ export default function ContactSection() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", company: "", message: "" });
   const [contactInfo, setContactInfo] = useState({ phone: "", email: "", address: "" });
   const [visibility, setVisibility] = useState({ phone: true, email: true, address: true });
+  const [contactMeta, setContactMeta] = useState({ phoneLabel: "", emailLabel: "", addressLabel: "", phoneIcon: "Phone", emailIcon: "Mail", addressIcon: "Globe" });
   const [addresses, setAddresses] = useState<{ id: string; label_en: string; label_ar: string }[]>([]);
 
   useEffect(() => {
