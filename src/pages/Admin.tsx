@@ -686,14 +686,13 @@ export default function Admin() {
     if (authenticated) {
       if (activeTab === "leads") fetchLeads();
       else if (activeTab === "content") { fetchContent(); fetchContactAddresses(); }
-      else if (activeTab === "products") fetchProducts();
+      else if (activeTab === "products") { /* handled by ProductTreeEditor */ }
       else if (activeTab === "services") fetchServices();
-      else if (activeTab === "menu-items") { fetchMenuItems(); fetchCategories(); }
       else if (activeTab === "branding") fetchBranding();
       else if (activeTab === "highlight") fetchHighlight();
       else if (activeTab === "careers") { fetchCareers(); fetchCareersContent(); }
       else if (activeTab === "admin-emails") fetchAdminEmails();
-      else if (activeTab === "product-pages") { fetchProductPages(); fetchMenuItems(); fetchCategories(); }
+      else if (activeTab === "product-enquiries") fetchProductEnquiries();
       else if (activeTab === "product-enquiries") fetchProductEnquiries();
       else if (activeTab === "footer") fetchContent();
       else if (activeTab === "contact") { fetchContent(); fetchContactAddresses(); }
