@@ -3,7 +3,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { getStorageUrl, getOptimizedImageUrl } from "@/lib/storage";
+import { getStorageUrl } from "@/lib/storage";
 import { useParallax } from "@/hooks/useParallax";
 
 // Fallback local imports in case Supabase images aren't uploaded yet
@@ -30,7 +30,7 @@ const buildHeroImageUrl = (fileName: string, version?: string) => {
 };
 
 // Pre-compute the first hero image URL synchronously so it renders on first paint
-const FIRST_HERO_IMAGE = getOptimizedImageUrl(buildHeroImageUrl("Untitled design .svg"), { width: 1920, quality: 80 });
+const FIRST_HERO_IMAGE = buildHeroImageUrl("Untitled design .svg");
 
 export default function HeroSection() {
   const { t } = useLanguage();
@@ -86,9 +86,7 @@ export default function HeroSection() {
       setVisibility(vis);
 
       if (activeList.length > 0) {
-        const urls = activeList.map((fileName) =>
-          getOptimizedImageUrl(buildHeroImageUrl(fileName), { width: 1920, quality: 80 })
-        );
+        const urls = activeList.map((fileName) => buildHeroImageUrl(fileName));
         // Preload only the first slide; prefetch the next one for fast transition
         urls.slice(0, 2).forEach((url, i) => {
           const link = document.createElement("link");
@@ -123,10 +121,7 @@ export default function HeroSection() {
         );
 
         const urls = selectedFiles.map((file) =>
-          getOptimizedImageUrl(
-            buildHeroImageUrl(file.name, file.updated_at ?? file.created_at ?? undefined),
-            { width: 1920, quality: 80 }
-          )
+          buildHeroImageUrl(file.name, file.updated_at ?? file.created_at ?? undefined)
         );
 
         setCurrent(0);

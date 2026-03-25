@@ -4,7 +4,6 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import StickyCardStack from "@/components/StickyCardStack";
 import { supabase } from "@/integrations/supabase/client";
-import { getOptimizedImageUrl } from "@/lib/storage";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
 import { ArrowUpRight } from "lucide-react";
 import {
@@ -104,7 +103,7 @@ export default function ProductsSection() {
 
                   {product.image_url ? (
                     <img
-                      src={getOptimizedImageUrl(product.image_url, { width: 640, quality: 75 })}
+                      src={product.image_url}
                       alt={isAr ? product.name_ar : product.name_en}
                       width={640}
                       height={480}

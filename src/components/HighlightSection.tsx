@@ -3,7 +3,6 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { useParallax } from "@/hooks/useParallax";
 import { supabase } from "@/integrations/supabase/client";
-import { getOptimizedImageUrl } from "@/lib/storage";
 import { Award, TrendingUp, Users, Clock } from "lucide-react";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -138,7 +137,7 @@ export default function HighlightSection() {
             <div ref={parallaxImage} className="rounded-2xl overflow-hidden shadow-2xl shadow-primary/10 will-change-transform">
               {imageUrl ? (
                 <img
-                  src={getOptimizedImageUrl(imageUrl, { width: 800, quality: 75 })}
+                  src={imageUrl}
                   alt={isAr ? "صورة القسم" : "Section highlight"}
                   width={800}
                   height={600}
