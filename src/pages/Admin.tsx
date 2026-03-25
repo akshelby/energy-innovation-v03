@@ -1860,7 +1860,7 @@ export default function Admin() {
                 {/* ── Generic Sections (ordered by site layout) ── */}
                 {(() => {
                   const grouped: Record<string, ContentItem[]> = {};
-                  const managedPrefixes = new Set(["hero", "contact", "footer", "highlight", "careers"]);
+                  const managedPrefixes = new Set(["hero", "contact", "footer", "highlight", "careers", "email"]);
                   const managedKeys = new Set([
                     "contact_phone", "contact_email", "contact_address",
                     "contact_phone_visible", "contact_email_visible", "contact_address_visible",
