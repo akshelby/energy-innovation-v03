@@ -4,6 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import StickyCardStack from "@/components/StickyCardStack";
 import { supabase } from "@/integrations/supabase/client";
+import { getOptimizedImageUrl } from "@/lib/storage";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
 import { ArrowUpRight } from "lucide-react";
 import {
@@ -103,11 +104,13 @@ export default function ProductsSection() {
 
                   {product.image_url ? (
                     <img
-                      src={product.image_url}
+                      src={getOptimizedImageUrl(product.image_url, { width: 640, quality: 75 })}
                       alt={isAr ? product.name_ar : product.name_en}
+                      width={640}
+                      height={480}
                       className="relative w-full h-full object-cover transition-all duration-500 group-hover:scale-105 opacity-0"
-                      loading={i < 3 ? "eager" : "lazy"}
-                      decoding={i < 3 ? "sync" : "async"}
+                      loading={i < 2 ? "eager" : "lazy"}
+                      decoding={i < 2 ? "sync" : "async"}
                       onLoad={(e) => {
                         (e.target as HTMLImageElement).classList.remove("opacity-0");
                         (e.target as HTMLImageElement).classList.add("opacity-100");
