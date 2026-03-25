@@ -785,37 +785,38 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
               <p className="text-xs text-muted-foreground">
                 Manage sub-products for <strong>{product.name_en}</strong>. At each level, add more sub-products or create a product page.
               </p>
-              <div className="flex gap-2 shrink-0">
-                {topLevelItems.some(i => !i.is_active) && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleActivateAll(topLevelItems)}
-                    disabled={loading}
-                    className="rounded-xl text-xs h-8"
-                  >
-                    <ToggleRight className="w-3.5 h-3.5 mr-1" />Activate All
-                  </Button>
-                )}
+              <Button
+                size="sm"
+                onClick={() => {
+                  setEditingPage(null);
+                  setEditingItem({
+                    category_key: product.category_key!,
+                    parent_id: null,
+                    name_en: "", name_ar: "",
+                    is_active: true, has_page: false,
+                    sort_order: topLevelItems.length,
+                    image_url: null, pdf_url: null,
+                  });
+                }}
+                className="gradient-accent text-accent-foreground rounded-xl border-0 text-xs h-8"
+              >
+                <Plus className="w-3.5 h-3.5 mr-1" />Add Sub-Product
+              </Button>
+            </div>
+
+            {/* Top-level activate all */}
+            {topLevelItems.length > 0 && topLevelItems.some(i => !i.is_active) && (
+              <div className="mb-1.5">
                 <Button
-                  size="sm"
-                  onClick={() => {
-                    setEditingPage(null);
-                    setEditingItem({
-                      category_key: product.category_key!,
-                      parent_id: null,
-                      name_en: "", name_ar: "",
-                      is_active: true, has_page: false,
-                      sort_order: topLevelItems.length,
-                      image_url: null, pdf_url: null,
-                    });
-                  }}
-                  className="gradient-accent text-accent-foreground rounded-xl border-0 text-xs h-8"
+                  variant="outline" size="sm"
+                  onClick={() => handleActivateAll(topLevelItems)}
+                  disabled={loading}
+                  className="rounded-xl text-xs h-7 px-2"
                 >
-                  <Plus className="w-3.5 h-3.5 mr-1" />Add Sub-Product
+                  <ToggleRight className="w-3 h-3 mr-1" />Activate All ({topLevelItems.filter(i => !i.is_active).length})
                 </Button>
               </div>
-            </div>
+            )}
 
             {/* Tree */}
             {topLevelItems.length === 0 && !isAddingTopLevel && (
