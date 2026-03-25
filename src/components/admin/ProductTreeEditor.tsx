@@ -693,6 +693,18 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
             )}
 
             {/* Children */}
+            {children.length > 0 && children.some(c => !c.is_active) && (
+              <div className="mt-1.5" style={{ marginLeft: `${(depth + 1) * 20}px` }}>
+                <Button
+                  variant="outline" size="sm"
+                  onClick={() => handleActivateAll(children)}
+                  disabled={loading}
+                  className="rounded-xl text-xs h-7 px-2 mb-1"
+                >
+                  <ToggleRight className="w-3 h-3 mr-1" />Activate All ({children.filter(c => !c.is_active).length})
+                </Button>
+              </div>
+            )}
             {children.map(child => renderTreeNode(child, depth + 1, categoryKey))}
 
             {/* New child editor */}
