@@ -2531,60 +2531,86 @@ export default function Admin() {
                 </p>
               </div>
 
-              {/* Image Upload */}
+              {/* Multi-Image Upload (up to 5) */}
               <div className="bg-card border border-border rounded-2xl p-6">
-                <h3 className="font-semibold text-foreground mb-4">Section Image</h3>
-                <p className="text-sm text-muted-foreground mb-4">Upload an image that appears on the right side of the highlight section.</p>
-                
-                {highlightImage && (
-                  <div className="mb-4 rounded-xl overflow-hidden border border-border max-w-md">
-                    <img src={highlightImage} alt="Highlight" className="w-full aspect-[4/3] object-cover" />
+                <h3 className="font-semibold text-foreground mb-2">Section Images</h3>
+                <p className="text-sm text-muted-foreground mb-4">Upload up to 5 images that rotate in a carousel on the right side of the highlight section.</p>
+
+                {/* Current images grid */}
+                {highlightImages.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+                    {highlightImages.map((url, idx) => (
+                      <div key={idx} className="relative group rounded-xl overflow-hidden border border-border">
+                        <img src={url} alt={`Highlight ${idx + 1}`} className="w-full aspect-[4/3] object-cover" />
+                        <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/40 transition-colors flex items-center justify-center">
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"
+                            onClick={() => {
+                              setHighlightImages((prev) => prev.filter((_, i) => i !== idx));
+                            }}
+                          >
+                            <Trash2 className="w-3 h-3 mr-1" />Remove
+                          </Button>
+                        </div>
+                        <span className="absolute top-1.5 left-1.5 bg-foreground/70 text-background text-[10px] font-bold px-1.5 py-0.5 rounded-md">
+                          {idx + 1}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 )}
 
-                <div className="flex items-center gap-3">
-                  <Input
-                    value={highlightImage}
-                    onChange={(e) => setHighlightImage(e.target.value)}
-                    placeholder="Image URL or upload"
-                    className="rounded-xl flex-1 max-w-md"
-                  />
-                  <input
-                    ref={highlightImageRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        try {
-                          setUploading(true);
-                          const url = await uploadFileAndGetUrl(file, "images", "highlight", storedPassword);
-                          setHighlightImage(url);
-                          toast.success("Image uploaded");
-                        } catch (err: any) { toast.error(err.message); }
-                        finally { setUploading(false); }
-                      }
-                    }}
-                  />
-                  <Button variant="outline" size="sm" onClick={() => highlightImageRef.current?.click()} disabled={uploading} className="rounded-xl">
-                    {uploading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                  </Button>
-                </div>
+                {/* Add image */}
+                {highlightImages.length < 5 && (
+                  <div className="flex items-center gap-3 mb-3">
+                    <input
+                      ref={highlightImageRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          try {
+                            setUploading(true);
+                            const url = await uploadFileAndGetUrl(file, "images", "highlight", storedPassword);
+                            setHighlightImages((prev) => [...prev, url]);
+                            toast.success("Image uploaded");
+                          } catch (err: any) { toast.error(err.message); }
+                          finally { setUploading(false); }
+                        }
+                      }}
+                    />
+                    <Button variant="outline" size="sm" onClick={() => highlightImageRef.current?.click()} disabled={uploading || highlightImages.length >= 5} className="rounded-xl">
+                      {uploading ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : <Upload className="w-4 h-4 mr-2" />}
+                      Add Image ({highlightImages.length}/5)
+                    </Button>
+                  </div>
+                )}
+
                 <Button
                   onClick={async () => {
                     try {
+                      // Save as JSON array to highlight.images
+                      await apiCall("content", "POST", storedPassword, {
+                        content_key: "highlight.images",
+                        value_en: JSON.stringify(highlightImages),
+                        value_ar: JSON.stringify(highlightImages),
+                      });
+                      // Also keep single image key in sync for backwards compat
                       await apiCall("content", "POST", storedPassword, {
                         content_key: "highlight.image",
-                        value_en: highlightImage,
-                        value_ar: highlightImage,
+                        value_en: highlightImages[0] || "",
+                        value_ar: highlightImages[0] || "",
                       });
-                      toast.success("Image saved!");
+                      toast.success("Images saved!");
                     } catch (err: any) { toast.error(err.message); }
                   }}
-                  className="gradient-accent text-accent-foreground rounded-xl border-0 mt-3"
+                  className="gradient-accent text-accent-foreground rounded-xl border-0"
                 >
-                  <Save className="w-4 h-4 mr-2" />Save Image
+                  <Save className="w-4 h-4 mr-2" />Save Images
                 </Button>
               </div>
 
