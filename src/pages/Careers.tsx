@@ -95,7 +95,11 @@ export default function Careers() {
         for (const item of contentData) {
           if (item.content_key === "careers.hero_title") setHeroTitle({ en: item.value_en, ar: item.value_ar });
           else if (item.content_key === "careers.hero_subtitle") setHeroSubtitle({ en: item.value_en, ar: item.value_ar });
-          else if (item.content_key === "careers.banner_image" && item.value_en) setBannerUrl(item.value_en);
+          else if (item.content_key === "careers.banner_image" && item.value_en) {
+            // Append cache-busting param so updated images aren't served from browser cache
+            const sep = item.value_en.includes("?") ? "&" : "?";
+            setBannerUrl(`${item.value_en}${sep}v=${encodeURIComponent(item.updated_at)}`);
+          }
           else if (item.content_key === "careers.stats" && item.value_en) {
             try { setExtraStats(JSON.parse(item.value_en)); } catch { /* keep defaults */ }
           }
