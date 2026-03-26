@@ -130,12 +130,15 @@ export default function Careers() {
 
       {/* Hero Banner */}
       <section className="relative pt-20 md:pt-24">
-        <div className="relative h-[320px] md:h-[420px] overflow-hidden">
-          <img
-            src={bannerUrl || careersBannerFallback}
-            alt="Careers at Energy Innovation"
-            className="w-full h-full object-cover"
-          />
+        <div className="relative h-[320px] md:h-[420px] overflow-hidden bg-muted">
+          {bannerReady && (
+            <img
+              key={bannerUrl || "fallback"}
+              src={bannerUrl || careersBannerFallback}
+              alt="Careers at Energy Innovation"
+              className="w-full h-full object-cover animate-fade-in"
+            />
+          )}
           <div className="absolute inset-0 bg-black/45" />
           <div
             className="absolute inset-0 flex items-center justify-center px-6"
