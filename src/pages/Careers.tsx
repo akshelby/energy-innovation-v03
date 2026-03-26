@@ -63,7 +63,8 @@ export default function Careers() {
   // Dynamic page content
   const [heroTitle, setHeroTitle] = useState({ en: "Build Your Future With Us", ar: "ابنِ مستقبلك معنا" });
   const [heroSubtitle, setHeroSubtitle] = useState({ en: "Join a leading team in industrial innovation and engineering solutions across the Gulf region.", ar: "انضم إلى فريق رائد في الابتكار الصناعي والحلول الهندسية في منطقة الخليج." });
-  const [bannerUrl, setBannerUrl] = useState("");
+  const [bannerUrl, setBannerUrl] = useState<string | null>(null);
+  const [bannerReady, setBannerReady] = useState(false);
   const [extraStats, setExtraStats] = useState<StatItem[]>([
     { value_en: "5+", value_ar: "+٥", label_en: "Countries", label_ar: "دول" },
     { value_en: "100%", value_ar: "١٠٠٪", label_en: "Growth Focus", label_ar: "تركيز على النمو" },
