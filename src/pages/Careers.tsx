@@ -109,6 +109,7 @@ export default function Careers() {
         }
       }
 
+      setBannerReady(true);
       setLoading(false);
     };
     fetchAll();
