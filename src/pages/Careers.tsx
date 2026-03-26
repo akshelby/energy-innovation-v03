@@ -63,7 +63,8 @@ export default function Careers() {
   // Dynamic page content
   const [heroTitle, setHeroTitle] = useState({ en: "Build Your Future With Us", ar: "ابنِ مستقبلك معنا" });
   const [heroSubtitle, setHeroSubtitle] = useState({ en: "Join a leading team in industrial innovation and engineering solutions across the Gulf region.", ar: "انضم إلى فريق رائد في الابتكار الصناعي والحلول الهندسية في منطقة الخليج." });
-  const [bannerUrl, setBannerUrl] = useState("");
+  const [bannerUrl, setBannerUrl] = useState<string | null>(null);
+  const [bannerReady, setBannerReady] = useState(false);
   const [extraStats, setExtraStats] = useState<StatItem[]>([
     { value_en: "5+", value_ar: "+٥", label_en: "Countries", label_ar: "دول" },
     { value_en: "100%", value_ar: "١٠٠٪", label_en: "Growth Focus", label_ar: "تركيز على النمو" },
@@ -96,9 +97,8 @@ export default function Careers() {
           if (item.content_key === "careers.hero_title") setHeroTitle({ en: item.value_en, ar: item.value_ar });
           else if (item.content_key === "careers.hero_subtitle") setHeroSubtitle({ en: item.value_en, ar: item.value_ar });
           else if (item.content_key === "careers.banner_image" && item.value_en) {
-            // Append cache-busting param so updated images aren't served from browser cache
             const sep = item.value_en.includes("?") ? "&" : "?";
-            setBannerUrl(`${item.value_en}${sep}v=${encodeURIComponent(item.updated_at)}`);
+            setBannerUrl(`${item.value_en}${sep}v=${new Date(item.updated_at).getTime()}`);
           }
           else if (item.content_key === "careers.stats" && item.value_en) {
             try { setExtraStats(JSON.parse(item.value_en)); } catch { /* keep defaults */ }
@@ -109,6 +109,7 @@ export default function Careers() {
         }
       }
 
+      setBannerReady(true);
       setLoading(false);
     };
     fetchAll();
@@ -129,12 +130,15 @@ export default function Careers() {
 
       {/* Hero Banner */}
       <section className="relative pt-20 md:pt-24">
-        <div className="relative h-[320px] md:h-[420px] overflow-hidden">
-          <img
-            src={bannerUrl || careersBannerFallback}
-            alt="Careers at Energy Innovation"
-            className="w-full h-full object-cover"
-          />
+        <div className="relative h-[320px] md:h-[420px] overflow-hidden bg-muted">
+          {bannerReady && (
+            <img
+              key={bannerUrl || "fallback"}
+              src={bannerUrl || careersBannerFallback}
+              alt="Careers at Energy Innovation"
+              className="w-full h-full object-cover animate-fade-in"
+            />
+          )}
           <div className="absolute inset-0 bg-black/45" />
           <div
             className="absolute inset-0 flex items-center justify-center px-6"
