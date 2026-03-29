@@ -31,57 +31,131 @@ interface ProductItem {
   image_url: string | null;
 }
 
+interface DisplayItem extends ProductItem {
+  pageActive?: boolean;
+  hasChildren?: boolean;
+}
+
+interface BreadcrumbItem {
+  label: string;
+  path?: string;
+}
+
 export default function SubProductsPage() {
-  const { productId } = useParams<{ productId: string }>();
+  const { productId, itemId } = useParams<{ productId?: string; itemId?: string }>();
   const { language } = useLanguage();
   const navigate = useNavigate();
   const isAr = language === "ar";
 
   const [product, setProduct] = useState<Product | null>(null);
-  const [items, setItems] = useState<(ProductItem & { pageActive?: boolean })[]>([]);
+  const [parentItem, setParentItem] = useState<ProductItem | null>(null);
+  const [items, setItems] = useState<DisplayItem[]>([]);
+  const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const isItemView = !!itemId;
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [productId]);
+  }, [productId, itemId]);
 
   useEffect(() => {
-    if (!productId) return;
     setLoading(true);
 
     const fetchData = async () => {
-      // Fetch product first to get category_key
-      const { data: prod } = await supabase
-        .from("products")
-        .select("id,name_en,name_ar,description_en,description_ar,image_url,category_key")
-        .eq("id", productId)
-        .single();
-
-      if (!prod) {
-        setLoading(false);
-        return;
-      }
-      setProduct(prod as Product);
-
-      if (!prod.category_key) {
-        setItems([]);
-        setLoading(false);
-        return;
-      }
-
-      // Fetch items + all pages for this category in parallel
-      const [{ data: itemsData }, { data: pages }] = await Promise.all([
-        supabase
+      if (isItemView) {
+        // Viewing children of a product_item
+        const { data: parent } = await supabase
           .from("product_items")
           .select("id,name_en,name_ar,category_key,parent_id,is_active,has_page,sort_order,image_url")
-          .eq("category_key", prod.category_key)
-          .is("parent_id", null)
-          .eq("is_active", true)
-          .order("sort_order"),
-        supabase
-          .from("product_pages")
-          .select("product_item_id,id")
-          .eq("is_active", true),
+          .eq("id", itemId)
+          .single();
+
+        if (!parent) {
+          setLoading(false);
+          return;
+        }
+        setParentItem(parent as ProductItem);
+
+        // Build breadcrumb chain by walking up parent_id
+        const crumbs: BreadcrumbItem[] = [];
+        let currentParent = parent;
+        while (currentParent.parent_id) {
+          const { data: ancestor } = await supabase
+            .from("product_items")
+            .select("id,name_en,name_ar,parent_id")
+            .eq("id", currentParent.parent_id)
+            .single();
+          if (!ancestor) break;
+          crumbs.unshift({
+            label: isAr ? ancestor.name_ar : ancestor.name_en,
+            path: `/products/item/${ancestor.id}`,
+          });
+          currentParent = ancestor as any;
+        }
+
+        // Find the root product for this category
+        const { data: rootProd } = await supabase
+          .from("products")
+          .select("id,name_en,name_ar,description_en,description_ar,image_url,category_key")
+          .eq("category_key", parent.category_key)
+          .single();
+
+        if (rootProd) {
+          setProduct(rootProd as Product);
+          crumbs.unshift({
+            label: isAr ? rootProd.name_ar : rootProd.name_en,
+            path: `/products/${rootProd.id}`,
+          });
+        }
+
+        setBreadcrumbs(crumbs);
+
+        // Fetch children of this item
+        await fetchChildren(parent.category_key, parent.id);
+      } else if (productId) {
+        // Viewing top-level items for a product category
+        const { data: prod } = await supabase
+          .from("products")
+          .select("id,name_en,name_ar,description_en,description_ar,image_url,category_key")
+          .eq("id", productId)
+          .single();
+
+        if (!prod) {
+          setLoading(false);
+          return;
+        }
+        setProduct(prod as Product);
+        setParentItem(null);
+        setBreadcrumbs([]);
+
+        if (!prod.category_key) {
+          setItems([]);
+          setLoading(false);
+          return;
+        }
+
+        await fetchChildren(prod.category_key, null);
+      }
+    };
+
+    const fetchChildren = async (categoryKey: string, parentId: string | null) => {
+      let query = supabase
+        .from("product_items")
+        .select("id,name_en,name_ar,category_key,parent_id,is_active,has_page,sort_order,image_url")
+        .eq("category_key", categoryKey)
+        .eq("is_active", true)
+        .order("sort_order");
+
+      if (parentId) {
+        query = query.eq("parent_id", parentId);
+      } else {
+        query = query.is("parent_id", null);
+      }
+
+      const [{ data: itemsData }, { data: pages }] = await Promise.all([
+        query,
+        supabase.from("product_pages").select("product_item_id,id").eq("is_active", true),
       ]);
 
       if (!itemsData || itemsData.length === 0) {
@@ -90,11 +164,22 @@ export default function SubProductsPage() {
         return;
       }
 
-      const itemIds = new Set(itemsData.map((i) => i.id));
-      const relevantPages = (pages || []).filter((p) => itemIds.has(p.product_item_id));
+      const itemIds = itemsData.map((i) => i.id);
+
+      // Check which items have children
+      const { data: childCounts } = await supabase
+        .from("product_items")
+        .select("parent_id")
+        .in("parent_id", itemIds)
+        .eq("is_active", true);
+
+      const parentIdsWithChildren = new Set((childCounts || []).map((c) => c.parent_id));
+
+      const itemIdSet = new Set(itemIds);
+      const relevantPages = (pages || []).filter((p) => itemIdSet.has(p.product_item_id));
       const pagesMap = new Map(relevantPages.map((p) => [p.product_item_id, p.id]));
 
-      // Only fetch images if needed
+      // Fetch images
       let imageMap = new Map<string, string>();
       const pageIds = relevantPages.map((p) => p.id);
       if (pageIds.length > 0) {
@@ -122,14 +207,15 @@ export default function SubProductsPage() {
         itemsData.map((i) => ({
           ...i,
           pageActive: pagesMap.has(i.id),
+          hasChildren: parentIdsWithChildren.has(i.id),
           image_url: i.image_url || imageMap.get(i.id) || null,
-        })) as any
+        })) as DisplayItem[]
       );
       setLoading(false);
     };
 
     fetchData();
-  }, [productId]);
+  }, [productId, itemId, isAr]);
 
   if (loading) {
     return (
@@ -162,7 +248,7 @@ export default function SubProductsPage() {
     );
   }
 
-  if (!product) {
+  if (!product && !parentItem) {
     return (
       <main className="min-h-screen">
         <Header />
@@ -181,26 +267,36 @@ export default function SubProductsPage() {
     );
   }
 
-  const productName = isAr ? product.name_ar : product.name_en;
-  const productDesc = isAr ? product.description_ar : product.description_en;
-  const productNameEn = product.name_en;
+  const displayName = isItemView && parentItem
+    ? (isAr ? parentItem.name_ar : parentItem.name_en)
+    : product
+      ? (isAr ? product.name_ar : product.name_en)
+      : "";
+  const displayDesc = !isItemView && product
+    ? (isAr ? product.description_ar : product.description_en)
+    : "";
+  const seoName = isItemView && parentItem ? parentItem.name_en : product?.name_en || "";
+  const seoDesc = product?.description_en || "";
+  const seoImage = product?.image_url || undefined;
+  const seoPath = isItemView ? `/products/item/${itemId}` : `/products/${productId}`;
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
-    "name": product.name_en,
-    "description": product.description_en,
+    "name": seoName,
+    "description": seoDesc,
     "brand": { "@type": "Brand", "name": "Energy Innovation" },
-    "url": `https://mivora.com/products/${productId}`,
-    ...(product.image_url ? { "image": product.image_url } : {}),
+    "url": `https://mivora.com${seoPath}`,
+    ...(seoImage ? { "image": seoImage } : {}),
   };
+
   return (
     <main className="min-h-screen">
       <SEOHead
-        title={productNameEn}
-        description={`${product.description_en.slice(0, 150)} — Energy Innovation`}
-        path={`/products/${productId}`}
-        image={product.image_url || undefined}
+        title={seoName}
+        description={`${seoDesc.slice(0, 150)} — Energy Innovation`}
+        path={seoPath}
+        image={seoImage}
       />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Header />
@@ -225,19 +321,31 @@ export default function SubProductsPage() {
             >
               {isAr ? "المنتجات" : "Products"}
             </button>
+            {breadcrumbs.map((crumb, idx) => (
+              <span key={idx} className="flex items-center gap-1.5">
+                <ChevronRight className={`w-3.5 h-3.5 ${isAr ? "rotate-180" : ""}`} />
+                {crumb.path ? (
+                  <Link to={crumb.path} className="hover:text-foreground transition-colors">
+                    {crumb.label}
+                  </Link>
+                ) : (
+                  <span className="text-foreground font-medium">{crumb.label}</span>
+                )}
+              </span>
+            ))}
             <ChevronRight className={`w-3.5 h-3.5 ${isAr ? "rotate-180" : ""}`} />
-            <span className="text-foreground font-medium">{productName}</span>
+            <span className="text-foreground font-medium">{displayName}</span>
           </nav>
 
           <div className="text-center mt-6 md:mt-10">
             <span className="inline-block px-8 py-3.5 text-lg font-bold tracking-wide text-white bg-accent rounded-full mb-6">
-              {productName}
+              {displayName}
             </span>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
               {isAr ? "منتجاتنا" : "Our Products"}
             </h1>
-            {productDesc && (
-              <p className="text-muted-foreground max-w-2xl mx-auto text-lg">{productDesc}</p>
+            {displayDesc && (
+              <p className="text-muted-foreground max-w-2xl mx-auto text-lg">{displayDesc}</p>
             )}
           </div>
         </div>
@@ -251,15 +359,21 @@ export default function SubProductsPage() {
               {items.map((item) => {
                 const itemName = isAr ? item.name_ar : item.name_en;
                 const hasDetailPage = item.has_page && item.pageActive;
+                const isContainer = item.hasChildren;
+                const isClickable = hasDetailPage || isContainer;
 
                 return (
                   <div
                     key={item.id}
                     onClick={() => {
-                      if (hasDetailPage) navigate(`/product/${item.id}`);
+                      if (hasDetailPage) {
+                        navigate(`/product/${item.id}`);
+                      } else if (isContainer) {
+                        navigate(`/products/item/${item.id}`);
+                      }
                     }}
                     className={`group bg-card rounded-2xl border border-border overflow-hidden transition-all duration-300 hover:border-destructive/30 hover:shadow-lg ${
-                      hasDetailPage ? "cursor-pointer" : ""
+                      isClickable ? "cursor-pointer" : ""
                     }`}
                   >
                     {/* Image */}
@@ -304,13 +418,17 @@ export default function SubProductsPage() {
                           <span className="text-sm text-accent font-medium">
                             {isAr ? "عرض التفاصيل" : "View Details"} →
                           </span>
+                        ) : isContainer ? (
+                          <span className="text-sm text-accent font-medium">
+                            {isAr ? "عرض المنتجات" : "View Products"} →
+                          </span>
                         ) : (
                           <span className="text-sm text-muted-foreground">
                             {isAr ? "قريباً" : "Coming soon"}
                           </span>
                         )}
                       </div>
-                      {hasDetailPage && (
+                      {isClickable && (
                         <div className="w-9 h-9 rounded-full border border-border group-hover:border-destructive/30 group-hover:bg-destructive/10 flex items-center justify-center shrink-0 transition-all duration-300">
                           <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-destructive transition-colors duration-300" />
                         </div>
