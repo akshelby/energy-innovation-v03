@@ -33,6 +33,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/careers" element={<Careers />} />
               <Route path="/products/:productId" element={<SubProductsPage />} />
+              <Route path="/products/item/:itemId" element={<SubProductsPage />} />
               <Route path="/product/:id" element={<ProductPageView />} />
               <Route path="/admin" element={<Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading…</div>}><Admin /></Suspense>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
