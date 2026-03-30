@@ -233,7 +233,7 @@ const emptyService: ServiceItem = {
   tag_en: "", tag_ar: "", image_url: null, pdf_url: null, icon: "Wrench", sort_order: 0,
 };
 
-type TabKey = "leads" | "content" | "products" | "services" | "images" | "branding" | "highlight" | "careers" | "admin-emails" | "product-enquiries" | "footer" | "contact" | "email-templates";
+type TabKey = "leads" | "content" | "products" | "services" | "images" | "branding" | "highlight" | "careers" | "admin-emails" | "product-enquiries" | "footer" | "contact" | "email-templates" | "seo";
 
 const emptyMenuChild: MenuChildItem = {
   category_key: "cat.fire", parent_id: null, name_en: "", name_ar: "", pdf_url: null, image_url: null, sort_order: 0, is_active: true,
@@ -302,6 +302,10 @@ export default function Admin() {
   const [linkedinUrl, setLinkedinUrl] = useState("");
   const [linkedinActive, setLinkedinActive] = useState(false);
   const [imageOptimization, setImageOptimization] = useState(false);
+
+  // SEO state
+  const [seoDescription, setSeoDescription] = useState({ en: "", ar: "" });
+  const [seoSaving, setSeoSaving] = useState(false);
 
   // Contact addresses state
   const [contactAddresses, setContactAddresses] = useState<{ id: string; label_en: string; label_ar: string; is_active: boolean; sort_order: number }[]>([]);
@@ -456,6 +460,14 @@ export default function Admin() {
       setEditedContent(edits);
     } catch (e: any) { toast.error(e.message); }
     finally { setLoading(false); }
+  }, [storedPassword]);
+
+  const fetchSeo = useCallback(async () => {
+    try {
+      const data = await apiCall("content", "GET", storedPassword);
+      const seoRow = data.find((item: ContentItem) => item.content_key === "seo.description");
+      if (seoRow) setSeoDescription({ en: seoRow.value_en, ar: seoRow.value_ar });
+    } catch (e: any) { toast.error(e.message); }
   }, [storedPassword]);
 
   const fetchProducts = useCallback(async () => {
@@ -696,6 +708,7 @@ export default function Admin() {
       else if (activeTab === "footer") fetchContent();
       else if (activeTab === "contact") { fetchContent(); fetchContactAddresses(); }
       else if (activeTab === "email-templates") fetchContent();
+      else if (activeTab === "seo") fetchSeo();
       else fetchFiles();
     }
   }, [authenticated, activeTab, fetchLeads, fetchContent, fetchContactAddresses, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding, fetchHighlight, fetchCareers, fetchCareersContent, fetchAdminEmails, fetchProductPages, fetchProductEnquiries]);
