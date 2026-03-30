@@ -16,4 +16,4 @@ User-agent: *
 Allow: /
 Disallow: /admin
 
-Sitemap: https://mivora.com/sitemap.xml
+Sitemap: https://energyinnvo.com/sitemap.xml
