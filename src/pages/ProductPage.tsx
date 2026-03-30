@@ -229,7 +229,7 @@ export default function ProductPageView() {
     "name": item.name_en,
     "description": page?.description_en || item.name_en,
     "brand": { "@type": "Brand", "name": "Energy Innovation" },
-    "url": `https://mivora.com/product/${id}`,
+    "url": `https://energyinnvo.com/product/${id}`,
     ...(images[0]?.image_url ? { "image": images[0].image_url } : {}),
   };
 

@@ -25,7 +25,7 @@ const Index = () => {
             "@context": "https://schema.org",
             "@type": "Organization",
             "name": "Energy Innovation",
-            "url": "https://mivora.com",
+            "url": "https://energyinnvo.com",
             "description": "Premium industrial technology solutions for modern facilities worldwide. Fuelling the Future.",
             "sameAs": [],
             "hasOfferCatalog": {

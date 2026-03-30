@@ -286,7 +286,7 @@ export default function SubProductsPage() {
     "name": seoName,
     "description": seoDesc,
     "brand": { "@type": "Brand", "name": "Energy Innovation" },
-    "url": `https://mivora.com${seoPath}`,
+    "url": `https://energyinnvo.com${seoPath}`,
     ...(seoImage ? { "image": seoImage } : {}),
   };
 
