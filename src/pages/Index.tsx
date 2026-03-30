@@ -47,14 +47,16 @@ const Index = () => {
       />
       <Header />
       <HeroSection />
-      <AboutSection />
-      <ProductsSection />
-      <ServicesSection />
-      <HighlightSection />
-      <WhyChooseUsSection />
-      <ContactSection />
-      <Footer />
-      <FloatingButtons />
+      <Suspense fallback={null}>
+        <AboutSection />
+        <ProductsSection />
+        <ServicesSection />
+        <HighlightSection />
+        <WhyChooseUsSection />
+        <ContactSection />
+        <Footer />
+        <FloatingButtons />
+      </Suspense>
     </main>
   );
 };
