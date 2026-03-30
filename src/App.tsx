@@ -9,12 +9,12 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { BrandingProvider } from "@/contexts/BrandingContext";
 import Index from "./pages/Index.tsx";
-import NotFound from "./pages/NotFound.tsx";
-import Careers from "./pages/Careers.tsx";
-import ProductPageView from "./pages/ProductPage.tsx";
-import SubProductsPage from "./pages/SubProductsPage.tsx";
 import CookieConsent from "@/components/CookieConsent";
 
+const NotFound = lazy(() => import("./pages/NotFound.tsx"));
+const Careers = lazy(() => import("./pages/Careers.tsx"));
+const ProductPageView = lazy(() => import("./pages/ProductPage.tsx"));
+const SubProductsPage = lazy(() => import("./pages/SubProductsPage.tsx"));
 const Admin = lazy(() => import("./pages/Admin.tsx"));
 
 const queryClient = new QueryClient();
@@ -31,13 +31,13 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/careers" element={<Careers />} />
-              <Route path="/products/:productId" element={<SubProductsPage />} />
-              <Route path="/products/item/:itemId" element={<SubProductsPage />} />
-              <Route path="/product/:id" element={<ProductPageView />} />
+              <Route path="/careers" element={<Suspense fallback={null}><Careers /></Suspense>} />
+              <Route path="/products/:productId" element={<Suspense fallback={null}><SubProductsPage /></Suspense>} />
+              <Route path="/products/item/:itemId" element={<Suspense fallback={null}><SubProductsPage /></Suspense>} />
+              <Route path="/product/:id" element={<Suspense fallback={null}><ProductPageView /></Suspense>} />
               <Route path="/admin" element={<Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading…</div>}><Admin /></Suspense>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
+              <Route path="*" element={<Suspense fallback={null}><NotFound /></Suspense>} />
             </Routes>
           </BrowserRouter>
           <CookieConsent />
