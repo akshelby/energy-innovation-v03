@@ -470,6 +470,7 @@ export default function Admin() {
     } catch (e: any) { toast.error(e.message); }
   }, [storedPassword]);
 
+  const fetchProducts = useCallback(async () => {
     setLoading(true);
     try {
       const data = await apiCall("products", "GET", storedPassword);
