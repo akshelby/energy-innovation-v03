@@ -462,7 +462,14 @@ export default function Admin() {
     finally { setLoading(false); }
   }, [storedPassword]);
 
-  const fetchProducts = useCallback(async () => {
+  const fetchSeo = useCallback(async () => {
+    try {
+      const data = await apiCall("content", "GET", storedPassword);
+      const seoRow = data.find((item: ContentItem) => item.content_key === "seo.description");
+      if (seoRow) setSeoDescription({ en: seoRow.value_en, ar: seoRow.value_ar });
+    } catch (e: any) { toast.error(e.message); }
+  }, [storedPassword]);
+
     setLoading(true);
     try {
       const data = await apiCall("products", "GET", storedPassword);
