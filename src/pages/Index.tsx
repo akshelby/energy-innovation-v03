@@ -1,16 +1,17 @@
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
-import AboutSection from "@/components/AboutSection";
-import ProductsSection from "@/components/ProductsSection";
-import ServicesSection from "@/components/ServicesSection";
-import HighlightSection from "@/components/HighlightSection";
-import WhyChooseUsSection from "@/components/WhyChooseUsSection";
-import ContactSection from "@/components/ContactSection";
-import Footer from "@/components/Footer";
-import FloatingButtons from "@/components/FloatingButtons";
 import SEOHead from "@/components/SEOHead";
 import { loadImageOptimizationSetting } from "@/lib/storage";
+
+const AboutSection = lazy(() => import("@/components/AboutSection"));
+const ProductsSection = lazy(() => import("@/components/ProductsSection"));
+const ServicesSection = lazy(() => import("@/components/ServicesSection"));
+const HighlightSection = lazy(() => import("@/components/HighlightSection"));
+const WhyChooseUsSection = lazy(() => import("@/components/WhyChooseUsSection"));
+const ContactSection = lazy(() => import("@/components/ContactSection"));
+const Footer = lazy(() => import("@/components/Footer"));
+const FloatingButtons = lazy(() => import("@/components/FloatingButtons"));
 
 const Index = () => {
   useEffect(() => { loadImageOptimizationSetting(); }, []);
