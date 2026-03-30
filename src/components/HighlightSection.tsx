@@ -224,18 +224,18 @@ export default function HighlightSection() {
             </div>
 
             {/* Floating stats cards */}
-            <div className="absolute -bottom-8 left-4 right-4 sm:left-6 sm:right-6 lg:-bottom-10 lg:-left-6 lg:right-6">
-              <div className="bg-foreground/95 backdrop-blur-sm rounded-2xl p-5 shadow-xl" ref={statsRef}>
+            <div className="absolute -bottom-6 left-3 right-3 sm:-bottom-8 sm:left-6 sm:right-6 lg:-bottom-10 lg:-left-6 lg:right-6">
+              <div className="bg-foreground/95 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-5 shadow-xl" ref={statsRef}>
                 <div className="grid grid-cols-3 divide-x divide-muted-foreground/20">
                   {stats.map((stat, i) => {
                     const Icon = iconMap[stat.icon] || Award;
                     return (
-                      <div key={i} className="flex flex-col items-center px-3 text-center">
-                        <Icon className="w-5 h-5 text-accent mb-2" />
-                        <span className="text-xl sm:text-2xl font-bold text-background">
+                      <div key={i} className="flex flex-col items-center px-1.5 sm:px-3 text-center">
+                        <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-accent mb-1 sm:mb-2" />
+                        <span className="text-base sm:text-2xl font-bold text-background">
                           <CountUpStat value={isAr ? stat.value_ar : stat.value_en} inView={inView} />
                         </span>
-                        <span className="text-[11px] sm:text-xs text-background/60 mt-0.5 leading-tight">
+                        <span className="text-[9px] sm:text-xs text-background/60 mt-0.5 leading-tight">
                           {isAr ? stat.label_ar : stat.label_en}
                         </span>
                       </div>
