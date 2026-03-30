@@ -10,7 +10,7 @@ interface SEOHeadProps {
 }
 
 const SITE_NAME = "Energy Innovation";
-const BASE_URL = "https://mivora.com";
+const BASE_URL = "https://energyinnvo.com";
 const DEFAULT_IMAGE = "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/10ae2cad-fff0-4703-b374-200fe844bee8/id-preview-f8691b14--edc2b028-454e-4fbf-87f4-5a0c061be37d.lovable.app-1773610585231.png";
 
 export default function SEOHead({
