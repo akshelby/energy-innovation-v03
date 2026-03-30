@@ -303,6 +303,10 @@ export default function Admin() {
   const [linkedinActive, setLinkedinActive] = useState(false);
   const [imageOptimization, setImageOptimization] = useState(false);
 
+  // SEO state
+  const [seoDescription, setSeoDescription] = useState({ en: "", ar: "" });
+  const [seoSaving, setSeoSaving] = useState(false);
+
   // Contact addresses state
   const [contactAddresses, setContactAddresses] = useState<{ id: string; label_en: string; label_ar: string; is_active: boolean; sort_order: number }[]>([]);
   const [editingAddress, setEditingAddress] = useState<{ id?: string; label_en: string; label_ar: string; is_active: boolean; sort_order: number } | null>(null);
