@@ -9,12 +9,12 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { BrandingProvider } from "@/contexts/BrandingContext";
 import Index from "./pages/Index.tsx";
-import NotFound from "./pages/NotFound.tsx";
-import Careers from "./pages/Careers.tsx";
-import ProductPageView from "./pages/ProductPage.tsx";
-import SubProductsPage from "./pages/SubProductsPage.tsx";
 import CookieConsent from "@/components/CookieConsent";
 
+const NotFound = lazy(() => import("./pages/NotFound.tsx"));
+const Careers = lazy(() => import("./pages/Careers.tsx"));
+const ProductPageView = lazy(() => import("./pages/ProductPage.tsx"));
+const SubProductsPage = lazy(() => import("./pages/SubProductsPage.tsx"));
 const Admin = lazy(() => import("./pages/Admin.tsx"));
 
 const queryClient = new QueryClient();
