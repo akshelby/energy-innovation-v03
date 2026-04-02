@@ -34,7 +34,7 @@ export default function Header() {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
-  const { logoUrl, brandName, logoSize, ready: brandReady } = useBranding();
+  const { logoUrl, brandName, logoSize } = useBranding();
   const [scrolled, setScrolled] = useState(false);
   const [pastHero, setPastHero] = useState(false);
   const [headerVisible, setHeaderVisible] = useState(true);
@@ -298,7 +298,7 @@ export default function Header() {
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-2 md:px-6">
           {/* Logo */}
           <a href="#home" onClick={() => scrollToSection("#home")} className="flex items-center shrink-0">
-            {brandReady && <img src={logoUrl} alt={brandName} className="w-auto object-contain" style={{ height: `${Math.round(logoSize * 0.8)}px` }} />}
+            <img src={logoUrl} alt={brandName} className="w-auto object-contain" style={{ height: `${Math.round(logoSize * 0.8)}px` }} loading="eager" fetchPriority="high" decoding="sync" />
           </a>
 
           {/* Desktop Nav - centered */}
