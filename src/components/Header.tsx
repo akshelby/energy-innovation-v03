@@ -34,7 +34,7 @@ export default function Header() {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
-  const { logoUrl, brandName, logoSize, ready: brandReady } = useBranding();
+  const { logoUrl, brandName, logoSize } = useBranding();
   const [scrolled, setScrolled] = useState(false);
   const [pastHero, setPastHero] = useState(false);
   const [headerVisible, setHeaderVisible] = useState(true);
