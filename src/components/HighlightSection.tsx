@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { getResizedUrl } from "@/lib/storage";
+import { getCached, setCache } from "@/lib/cache";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { useParallax } from "@/hooks/useParallax";
@@ -64,9 +65,11 @@ export default function HighlightSection() {
   const parallaxImage = useParallax(0.06);
   const isAr = language === "ar";
 
-  const [images, setImages] = useState<string[]>([]);
+  const cachedHL = getCached<{ images: string[]; stats: StatCard[] }>("highlight");
+  const [images, setImages] = useState<string[]>(cachedHL?.images || []);
   const [current, setCurrent] = useState(0);
-  const [stats, setStats] = useState<StatCard[]>([]);
+  const [stats, setStats] = useState<StatCard[]>(cachedHL?.stats || []);
+  const [ready, setReady] = useState(!!cachedHL);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -92,14 +95,9 @@ export default function HighlightSection() {
         }
         setImages(imgList);
 
-        const statsEntry = data.find((d) => d.content_key === "highlight.stats");
-        if (statsEntry?.value_en) {
-          try {
-            setStats(JSON.parse(statsEntry.value_en));
-          } catch { setStats(defaultStats); }
-        } else {
-          setStats(defaultStats);
-        }
+        const parsedStats = statsEntry?.value_en ? (() => { try { return JSON.parse(statsEntry.value_en); } catch { return defaultStats; } })() : defaultStats;
+        setStats(parsedStats);
+        setCache("highlight", { images: imgList, stats: parsedStats });
       }
       setReady(true);
     };
