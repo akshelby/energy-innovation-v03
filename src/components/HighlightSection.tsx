@@ -65,7 +65,8 @@ export default function HighlightSection() {
 
   const [images, setImages] = useState<string[]>([]);
   const [current, setCurrent] = useState(0);
-  const [stats, setStats] = useState<StatCard[]>(defaultStats);
+  const [stats, setStats] = useState<StatCard[]>([]);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -94,9 +95,12 @@ export default function HighlightSection() {
         if (statsEntry?.value_en) {
           try {
             setStats(JSON.parse(statsEntry.value_en));
-          } catch { /* use defaults */ }
+          } catch { setStats(defaultStats); }
+        } else {
+          setStats(defaultStats);
         }
       }
+      setReady(true);
     };
     fetchData();
   }, []);
@@ -137,7 +141,7 @@ export default function HighlightSection() {
   const subdesc = t("highlight.subdesc");
 
   return (
-    <section className="py-14 md:py-24 px-6 bg-secondary/30" ref={ref}>
+    <section className={`py-14 md:py-24 px-6 bg-secondary/30 transition-opacity duration-500 ${ready ? 'opacity-100' : 'opacity-0'}`} ref={ref}>
       <div className="max-w-6xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-10 md:gap-12 lg:gap-16 items-center">
           {/* Left — Text */}

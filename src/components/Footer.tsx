@@ -30,6 +30,7 @@ export default function Footer() {
   const navigate = useNavigate();
 
   const [footerData, setFooterData] = useState<Record<string, { en: string; ar: string }>>({});
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const fetchFooterContent = async () => {
@@ -45,7 +46,8 @@ export default function Footer() {
           });
           setFooterData(map);
         }
-      } catch { /* fallback to t() */ }
+        setReady(true);
+      } catch { setReady(true); }
     };
     fetchFooterContent();
   }, []);
@@ -121,7 +123,7 @@ export default function Footer() {
   ].filter((s) => s.url);
 
   return (
-    <footer className="gradient-primary text-primary-foreground pt-12 pb-8 px-6">
+    <footer className={`gradient-primary text-primary-foreground pt-12 pb-8 px-6 transition-opacity duration-500 ${ready ? 'opacity-100' : 'opacity-0'}`}>
       <div className="max-w-6xl mx-auto">
         {/* Social Icons Row */}
         {socialItems.length > 0 && (

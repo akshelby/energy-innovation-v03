@@ -36,13 +36,15 @@ interface Service {
 export default function ServicesSection() {
   const { t, language } = useLanguage();
   const ref = useScrollReveal();
-  const [services, setServices] = useState<Service[]>(fallbackServices);
+  const [services, setServices] = useState<Service[]>([]);
+  const [ready, setReady] = useState(false);
   const [pdfOpen, setPdfOpen] = useState(false);
   const [pdfSrc, setPdfSrc] = useState("");
 
   useEffect(() => {
     supabase.from("services").select("*").order("sort_order").then(({ data }) => {
-      if (data && data.length > 0) setServices(data as Service[]);
+      setServices(data && data.length > 0 ? (data as Service[]) : fallbackServices);
+      setReady(true);
     });
   }, []);
 
@@ -63,6 +65,7 @@ export default function ServicesSection() {
           </p>
         </div>
 
+        <div className={`transition-opacity duration-500 ${ready ? 'opacity-100' : 'opacity-0'}`}>
         <StickyCardStack baseTop={72} offsetIncrement={0} scrollSpace="6svh" maxWidthClass="max-w-md">
           {services.map((service, i) => {
             const isCustomIcon = service.icon?.startsWith("http") || service.icon?.startsWith("/") || service.icon?.startsWith("data:");
@@ -138,6 +141,7 @@ export default function ServicesSection() {
             );
           })}
         </StickyCardStack>
+        </div>
       </div>
       <PdfViewerDialog open={pdfOpen} onOpenChange={setPdfOpen} src={pdfSrc} />
     </section>
