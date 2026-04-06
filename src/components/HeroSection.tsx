@@ -98,6 +98,7 @@ export default function HeroSection() {
         setCurrent(0);
         setImages(urls);
         setHeroReady(true);
+        setCache("hero", { images: urls, speed: speed, visibility: vis });
         return;
       }
 
@@ -125,15 +126,18 @@ export default function HeroSection() {
           buildHeroImageUrl(file.name, file.updated_at ?? file.created_at ?? undefined)
         );
 
+        const finalUrls = urls.length > 0 ? urls : activeList.length > 0 ? [] : localImages;
         setCurrent(0);
-        setImages(urls.length > 0 ? urls : activeList.length > 0 ? [] : localImages);
+        setImages(finalUrls);
         setHeroReady(true);
+        setCache("hero", { images: finalUrls, speed: speed, visibility: vis });
         return;
       }
 
       setCurrent(0);
       setImages(localImages);
       setHeroReady(true);
+      setCache("hero", { images: localImages, speed: speed, visibility: vis });
     }
 
     fetchHeroImages();
