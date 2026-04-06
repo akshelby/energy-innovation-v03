@@ -11,9 +11,9 @@ interface BrandingContextType {
 const LOGO_STORAGE_PATH = "branding/logo";
 const BRAND_NAME_KEY = "brand.name";
 
-// Pre-compute the public URL so it's available immediately — no async needed
+// Pre-compute the public URL with cache-busting timestamp
 const { data: logoData } = supabase.storage.from("images").getPublicUrl(LOGO_STORAGE_PATH);
-const INITIAL_LOGO_URL = logoData?.publicUrl || "";
+const INITIAL_LOGO_URL = logoData?.publicUrl ? `${logoData.publicUrl}?v=${Date.now()}` : "";
 
 const BrandingContext = createContext<BrandingContextType>({
   logoUrl: INITIAL_LOGO_URL,
