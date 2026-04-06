@@ -70,7 +70,7 @@ export default function HighlightSection() {
   const [current, setCurrent] = useState(0);
   const [stats, setStats] = useState<StatCard[]>(cachedHL?.stats || []);
   const [ready, setReady] = useState(!!cachedHL);
-  const [ready, setReady] = useState(false);
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -95,6 +95,7 @@ export default function HighlightSection() {
         }
         setImages(imgList);
 
+        const statsEntry = data.find((d) => d.content_key === "highlight.stats");
         const parsedStats = statsEntry?.value_en ? (() => { try { return JSON.parse(statsEntry.value_en); } catch { return defaultStats; } })() : defaultStats;
         setStats(parsedStats);
         setCache("highlight", { images: imgList, stats: parsedStats });
