@@ -51,7 +51,7 @@ export default function ServicesSection() {
   const isAr = language === "ar";
 
   return (
-    <section id="services" className="py-12 md:py-20 px-6 bg-background" ref={ref}>
+    <section id="services" className="py-12 md:py-20 px-6 bg-background lazy-section" ref={ref}>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-10 md:mb-16 scroll-reveal">
           <span className="inline-block px-8 py-3.5 text-lg font-bold tracking-wide text-white bg-accent rounded-full mb-4">
@@ -97,7 +97,7 @@ export default function ServicesSection() {
                   <div className="mb-5">
                     {service.image_url ? (
                       <div className="w-14 h-14 rounded-xl overflow-hidden">
-                        <img src={service.image_url} alt="" className="w-full h-full object-cover" />
+                        <img src={service.image_url} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" width={56} height={56} />
                       </div>
                     ) : (
                       <div className="w-14 h-14 rounded-xl bg-accent/8 flex items-center justify-center transition-colors duration-300 group-hover:bg-destructive/10">

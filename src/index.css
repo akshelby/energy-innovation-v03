@@ -263,3 +263,9 @@
   opacity: 1 !important;
   cursor: pointer !important;
 }
+
+/* Defer rendering of below-fold sections until near viewport */
+.lazy-section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
+}

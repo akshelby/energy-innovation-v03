@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { getResizedUrl } from "@/lib/storage";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { useParallax } from "@/hooks/useParallax";
@@ -141,7 +142,7 @@ export default function HighlightSection() {
   const subdesc = t("highlight.subdesc");
 
   return (
-    <section className={`py-14 md:py-24 px-6 bg-secondary/30 transition-opacity duration-500 ${ready ? 'opacity-100' : 'opacity-0'}`} ref={ref}>
+    <section className={`py-14 md:py-24 px-6 bg-secondary/30 lazy-section transition-opacity duration-500 ${ready ? 'opacity-100' : 'opacity-0'}`} ref={ref}>
       <div className="max-w-6xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-10 md:gap-12 lg:gap-16 items-center">
           {/* Left — Text */}
@@ -174,7 +175,7 @@ export default function HighlightSection() {
                   {images.map((img, i) => (
                     <img
                       key={i}
-                      src={img}
+                      src={getResizedUrl(img, 800)}
                       alt={isAr ? `صورة القسم ${i + 1}` : `Section highlight ${i + 1}`}
                       width={800}
                       height={600}

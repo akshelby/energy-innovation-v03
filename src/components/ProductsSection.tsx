@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { getResizedUrl } from "@/lib/storage";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -66,7 +67,7 @@ export default function ProductsSection() {
   const isAr = language === "ar";
 
   return (
-    <section id="products" className="py-10 md:py-20 px-0 md:px-6 bg-secondary/30" ref={ref}>
+    <section id="products" className="py-10 md:py-20 px-0 md:px-6 bg-secondary/30 lazy-section" ref={ref}>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-6 md:mb-16 scroll-reveal">
           <span className="inline-block px-8 py-3.5 text-lg font-bold tracking-wide text-white bg-accent rounded-full mb-4">
@@ -106,7 +107,7 @@ export default function ProductsSection() {
 
                   {product.image_url ? (
                     <img
-                      src={product.image_url}
+                      src={getResizedUrl(product.image_url, 640)}
                       alt={isAr ? product.name_ar : product.name_en}
                       width={640}
                       height={480}
