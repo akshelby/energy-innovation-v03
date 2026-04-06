@@ -29,6 +29,25 @@ export function getStorageUrl(bucket: string, path: string): string {
 }
 
 /**
+ * Returns a resized image URL using Supabase Storage render/image transform.
+ * Works on any public storage URL from this project.
+ * Falls back to the original URL if the src doesn't match the expected pattern.
+ */
+export function getResizedUrl(
+  src: string,
+  width: number,
+  quality = 75
+): string {
+  if (!src || !src.includes("/storage/v1/object/public/")) return src;
+  const transformed = src.replace(
+    "/storage/v1/object/public/",
+    "/storage/v1/render/image/public/"
+  );
+  const sep = transformed.includes("?") ? "&" : "?";
+  return `${transformed}${sep}width=${width}&quality=${quality}`;
+}
+
+/**
  * Returns an optimized image URL when the pro feature is enabled,
  * otherwise returns the direct storage URL.
  */
