@@ -51,13 +51,15 @@ export default function ProductsSection() {
   const { t, language } = useLanguage();
   const ref = useScrollReveal();
   const navigate = useNavigate();
-  const [products, setProducts] = useState<Product[]>(fallbackProducts);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [ready, setReady] = useState(false);
   const [pdfOpen, setPdfOpen] = useState(false);
   const [pdfSrc, setPdfSrc] = useState("");
 
   useEffect(() => {
     supabase.from("products").select("*").order("sort_order").then(({ data }) => {
-      if (data && data.length > 0) setProducts(data as Product[]);
+      setProducts(data && data.length > 0 ? (data as Product[]) : fallbackProducts);
+      setReady(true);
     });
   }, []);
 
@@ -78,6 +80,7 @@ export default function ProductsSection() {
           </p>
         </div>
 
+        <div className={`transition-opacity duration-500 ${ready ? 'opacity-100' : 'opacity-0'}`}>
         <StickyCardStack baseTop={90} offsetIncrement={0} scrollSpace="2svh" maxWidthClass="max-w-none md:max-w-lg" fullHeight>
           {products.map((product, i) => {
             const isCustomIcon = product.icon?.startsWith("http") || product.icon?.startsWith("/") || product.icon?.startsWith("data:");
@@ -153,6 +156,7 @@ export default function ProductsSection() {
             );
           })}
         </StickyCardStack>
+        </div>
       </div>
       <PdfViewerDialog open={pdfOpen} onOpenChange={setPdfOpen} src={pdfSrc} />
     </section>
