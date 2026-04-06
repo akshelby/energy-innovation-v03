@@ -142,7 +142,7 @@ export default function HighlightSection() {
   const subdesc = t("highlight.subdesc");
 
   return (
-    <section className={`py-14 md:py-24 px-6 bg-secondary/30 transition-opacity duration-500 ${ready ? 'opacity-100' : 'opacity-0'}`} ref={ref}>
+    <section className={`py-14 md:py-24 px-6 bg-secondary/30 lazy-section transition-opacity duration-500 ${ready ? 'opacity-100' : 'opacity-0'}`} ref={ref}>
       <div className="max-w-6xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-10 md:gap-12 lg:gap-16 items-center">
           {/* Left — Text */}

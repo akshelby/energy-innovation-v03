@@ -51,7 +51,7 @@ export default function ServicesSection() {
   const isAr = language === "ar";
 
   return (
-    <section id="services" className="py-12 md:py-20 px-6 bg-background" ref={ref}>
+    <section id="services" className="py-12 md:py-20 px-6 bg-background lazy-section" ref={ref}>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-10 md:mb-16 scroll-reveal">
           <span className="inline-block px-8 py-3.5 text-lg font-bold tracking-wide text-white bg-accent rounded-full mb-4">
