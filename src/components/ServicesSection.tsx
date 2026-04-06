@@ -4,6 +4,7 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 import StickyCardStack from "@/components/StickyCardStack";
 import { supabase } from "@/integrations/supabase/client";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
+import { getCached, setCache } from "@/lib/cache";
 import {
   Flame, DoorOpen, Droplets, Wind, Truck, Shield, Zap, Factory,
   HardHat, Gauge, Cog, Building, PenTool, Wrench, Settings, MessageSquare, FileText, ArrowUpRight,
@@ -36,14 +37,16 @@ interface Service {
 export default function ServicesSection() {
   const { t, language } = useLanguage();
   const ref = useScrollReveal();
-  const [services, setServices] = useState<Service[]>([]);
-  const [ready, setReady] = useState(false);
+  const [services, setServices] = useState<Service[]>(() => getCached<Service[]>("services") || []);
+  const [ready, setReady] = useState(() => services.length > 0);
   const [pdfOpen, setPdfOpen] = useState(false);
   const [pdfSrc, setPdfSrc] = useState("");
 
   useEffect(() => {
     supabase.from("services").select("*").order("sort_order").then(({ data }) => {
-      setServices(data && data.length > 0 ? (data as Service[]) : fallbackServices);
+      const result = data && data.length > 0 ? (data as Service[]) : fallbackServices;
+      setServices(result);
+      setCache("services", result);
       setReady(true);
     });
   }, []);

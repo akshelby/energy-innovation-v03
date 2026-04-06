@@ -4,6 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Mail, Globe } from "lucide-react";
 import { useBranding } from "@/contexts/BrandingContext";
 import { supabase } from "@/integrations/supabase/client";
+import { getCached, setCache } from "@/lib/cache";
 
 interface SocialLinks {
   linkedin: string;
@@ -29,8 +30,8 @@ export default function Footer() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [footerData, setFooterData] = useState<Record<string, { en: string; ar: string }>>({});
-  const [ready, setReady] = useState(false);
+  const [footerData, setFooterData] = useState<Record<string, { en: string; ar: string }>>(() => getCached<Record<string, { en: string; ar: string }>>("footer") || {});
+  const [ready, setReady] = useState(() => Object.keys(footerData).length > 0);
 
   useEffect(() => {
     const fetchFooterContent = async () => {
@@ -45,6 +46,7 @@ export default function Footer() {
             map[item.content_key] = { en: item.value_en, ar: item.value_ar };
           });
           setFooterData(map);
+          setCache("footer", map);
         }
         setReady(true);
       } catch { setReady(true); }

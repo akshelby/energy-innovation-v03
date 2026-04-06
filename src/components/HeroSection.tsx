@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getStorageUrl } from "@/lib/storage";
+import { getCached, setCache } from "@/lib/cache";
 import { useParallax } from "@/hooks/useParallax";
 
 // Fallback local imports in case Supabase images aren't uploaded yet
@@ -33,11 +34,12 @@ const buildHeroImageUrl = (fileName: string, version?: string) => {
 export default function HeroSection() {
   const { t } = useLanguage();
   const parallaxBg = useParallax(0.15);
+  const cachedHero = getCached<{ images: string[]; speed: number; visibility: Record<string, boolean> }>("hero");
   const [current, setCurrent] = useState(0);
-  const [images, setImages] = useState<string[]>([]);
-  const [heroReady, setHeroReady] = useState(false);
-  const [speed, setSpeed] = useState(6000);
-  const [visibility, setVisibility] = useState<Record<string, boolean>>({
+  const [images, setImages] = useState<string[]>(cachedHero?.images || []);
+  const [heroReady, setHeroReady] = useState(!!cachedHero);
+  const [speed, setSpeed] = useState(cachedHero?.speed || 6000);
+  const [visibility, setVisibility] = useState<Record<string, boolean>>(cachedHero?.visibility || {
     "hero.show_headline": false,
     "hero.show_subtext": false,
     "hero.show_explore_btn": false,
@@ -96,6 +98,7 @@ export default function HeroSection() {
         setCurrent(0);
         setImages(urls);
         setHeroReady(true);
+        setCache("hero", { images: urls, speed: speed, visibility: vis });
         return;
       }
 
@@ -123,15 +126,18 @@ export default function HeroSection() {
           buildHeroImageUrl(file.name, file.updated_at ?? file.created_at ?? undefined)
         );
 
+        const finalUrls = urls.length > 0 ? urls : activeList.length > 0 ? [] : localImages;
         setCurrent(0);
-        setImages(urls.length > 0 ? urls : activeList.length > 0 ? [] : localImages);
+        setImages(finalUrls);
         setHeroReady(true);
+        setCache("hero", { images: finalUrls, speed: speed, visibility: vis });
         return;
       }
 
       setCurrent(0);
       setImages(localImages);
       setHeroReady(true);
+      setCache("hero", { images: localImages, speed: speed, visibility: vis });
     }
 
     fetchHeroImages();

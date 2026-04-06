@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { getResizedUrl } from "@/lib/storage";
+import { getCached, setCache } from "@/lib/cache";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -52,14 +53,16 @@ export default function ProductsSection() {
   const { t, language } = useLanguage();
   const ref = useScrollReveal();
   const navigate = useNavigate();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [ready, setReady] = useState(false);
+  const [products, setProducts] = useState<Product[]>(() => getCached<Product[]>("products") || []);
+  const [ready, setReady] = useState(() => products.length > 0);
   const [pdfOpen, setPdfOpen] = useState(false);
   const [pdfSrc, setPdfSrc] = useState("");
 
   useEffect(() => {
     supabase.from("products").select("*").order("sort_order").then(({ data }) => {
-      setProducts(data && data.length > 0 ? (data as Product[]) : fallbackProducts);
+      const result = data && data.length > 0 ? (data as Product[]) : fallbackProducts;
+      setProducts(result);
+      setCache("products", result);
       setReady(true);
     });
   }, []);
