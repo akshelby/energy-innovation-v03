@@ -107,7 +107,7 @@ export default function ProductsSection() {
 
                   {product.image_url ? (
                     <img
-                      src={product.image_url}
+                      src={getResizedUrl(product.image_url, 640)}
                       alt={isAr ? product.name_ar : product.name_en}
                       width={640}
                       height={480}

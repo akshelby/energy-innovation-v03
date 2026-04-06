@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { getResizedUrl } from "@/lib/storage";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { useParallax } from "@/hooks/useParallax";
@@ -174,7 +175,7 @@ export default function HighlightSection() {
                   {images.map((img, i) => (
                     <img
                       key={i}
-                      src={img}
+                      src={getResizedUrl(img, 800)}
                       alt={isAr ? `صورة القسم ${i + 1}` : `Section highlight ${i + 1}`}
                       width={800}
                       height={600}
