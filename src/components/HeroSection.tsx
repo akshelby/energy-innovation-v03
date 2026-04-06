@@ -34,7 +34,8 @@ export default function HeroSection() {
   const { t } = useLanguage();
   const parallaxBg = useParallax(0.15);
   const [current, setCurrent] = useState(0);
-  const [images, setImages] = useState<string[]>(localImages);
+  const [images, setImages] = useState<string[]>([]);
+  const [heroReady, setHeroReady] = useState(false);
   const [speed, setSpeed] = useState(6000);
   const [visibility, setVisibility] = useState<Record<string, boolean>>({
     "hero.show_headline": false,
@@ -85,7 +86,6 @@ export default function HeroSection() {
 
       if (activeList.length > 0) {
         const urls = activeList.map((fileName) => buildHeroImageUrl(fileName));
-        // Preload only the first slide; prefetch the next one for fast transition
         urls.slice(0, 2).forEach((url, i) => {
           const link = document.createElement("link");
           link.rel = i === 0 ? "preload" : "prefetch";
@@ -95,6 +95,7 @@ export default function HeroSection() {
         });
         setCurrent(0);
         setImages(urls);
+        setHeroReady(true);
         return;
       }
 
@@ -124,11 +125,13 @@ export default function HeroSection() {
 
         setCurrent(0);
         setImages(urls.length > 0 ? urls : activeList.length > 0 ? [] : localImages);
+        setHeroReady(true);
         return;
       }
 
       setCurrent(0);
       setImages(localImages);
+      setHeroReady(true);
     }
 
     fetchHeroImages();
@@ -156,8 +159,8 @@ export default function HeroSection() {
   };
 
   return (
-    <section id="home" className="relative h-screen w-full overflow-hidden">
-      <div ref={parallaxBg} className="absolute inset-0 will-change-transform" style={{ top: "-10%", bottom: "-10%", height: "120%" }}>
+    <section id="home" className="relative h-screen w-full overflow-hidden bg-black">
+      <div ref={parallaxBg} className={`absolute inset-0 will-change-transform transition-opacity duration-500 ${heroReady ? 'opacity-100' : 'opacity-0'}`} style={{ top: "-10%", bottom: "-10%", height: "120%" }}>
         {images.map((img, i) => (
           <div
             key={i}
