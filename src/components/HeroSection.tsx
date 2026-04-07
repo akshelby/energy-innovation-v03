@@ -17,6 +17,13 @@ import hero5Local from "@/assets/hero-5.webp";
 const localImages = [hero1Local, hero2Local, hero3Local, hero4Local, hero5Local];
 const imageFilePattern = /\.\w+$/i;
 
+const preloadImage = (src: string) =>
+  new Promise<void>((resolve) => {
+    const img = new Image();
+    img.onload = img.onerror = () => resolve();
+    img.src = src;
+  });
+
 const normalizeFileName = (fileName: string) =>
   fileName.trim().replace(/\s+\.(?=[^.]+$)/, ".");
 
@@ -88,17 +95,14 @@ export default function HeroSection() {
 
       if (activeList.length > 0) {
         const urls = activeList.map((fileName) => buildHeroImageUrl(fileName));
-        urls.slice(0, 2).forEach((url, i) => {
-          const link = document.createElement("link");
-          link.rel = i === 0 ? "preload" : "prefetch";
-          link.as = "image";
-          link.href = url;
-          document.head.appendChild(link);
-        });
+        // Preload first image before swapping to avoid blank flash
+        await preloadImage(urls[0]);
         setCurrent(0);
         setImages(urls);
         setHeroReady(true);
         setCache("hero", { images: urls, speed: speed, visibility: vis });
+        // Prefetch remaining images in background
+        urls.slice(1).forEach(preloadImage);
         return;
       }
 
@@ -127,10 +131,12 @@ export default function HeroSection() {
         );
 
         const finalUrls = urls.length > 0 ? urls : activeList.length > 0 ? [] : localImages;
+        if (finalUrls.length > 0) await preloadImage(finalUrls[0]);
         setCurrent(0);
         setImages(finalUrls);
         setHeroReady(true);
         setCache("hero", { images: finalUrls, speed: speed, visibility: vis });
+        finalUrls.slice(1).forEach(preloadImage);
         return;
       }
 
