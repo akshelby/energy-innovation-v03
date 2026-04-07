@@ -36,16 +36,16 @@ export default function HeroSection() {
   const parallaxBg = useParallax(0.15);
   const cachedHero = getCached<{ images: string[]; speed: number; visibility: Record<string, boolean> }>("hero");
   const [current, setCurrent] = useState(0);
-  const [images, setImages] = useState<string[]>(cachedHero?.images || []);
-  const [heroReady, setHeroReady] = useState(!!cachedHero);
+  const [images, setImages] = useState<string[]>(cachedHero?.images || localImages);
+  const [heroReady, setHeroReady] = useState(true);
   const [speed, setSpeed] = useState(cachedHero?.speed || 6000);
   const [visibility, setVisibility] = useState<Record<string, boolean>>(cachedHero?.visibility || {
-    "hero.show_headline": false,
-    "hero.show_subtext": false,
-    "hero.show_explore_btn": false,
-    "hero.show_contact_btn": false,
-    "hero.show_arrows": false,
-    "hero.show_dots": false,
+    "hero.show_headline": true,
+    "hero.show_subtext": true,
+    "hero.show_explore_btn": true,
+    "hero.show_contact_btn": true,
+    "hero.show_arrows": true,
+    "hero.show_dots": true,
   });
 
   useEffect(() => {
