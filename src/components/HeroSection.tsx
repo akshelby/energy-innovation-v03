@@ -16,6 +16,29 @@ import hero5Local from "@/assets/hero-5.webp";
 
 const localImages = [hero1Local, hero2Local, hero3Local, hero4Local, hero5Local];
 const imageFilePattern = /\.\w+$/i;
+const PERSISTENT_HERO_KEY = "ei_hero_active_v1";
+
+interface PersistedHero {
+  images: string[];
+  speed: number;
+  visibility: Record<string, boolean>;
+}
+
+function getPersistedHero(): PersistedHero | null {
+  try {
+    const raw = localStorage.getItem(PERSISTENT_HERO_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as PersistedHero;
+    if (!parsed?.images?.length) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function setPersistedHero(data: PersistedHero) {
+  try { localStorage.setItem(PERSISTENT_HERO_KEY, JSON.stringify(data)); } catch {}
+}
 
 const preloadImage = (src: string) =>
   new Promise<void>((resolve) => {
@@ -42,11 +65,13 @@ export default function HeroSection() {
   const { t } = useLanguage();
   const parallaxBg = useParallax(0.15);
   const cachedHero = getCached<{ images: string[]; speed: number; visibility: Record<string, boolean> }>("hero");
+  const persistedHero = getPersistedHero();
+  const initialHero = (cachedHero?.images?.length ? cachedHero : persistedHero) || null;
   const [current, setCurrent] = useState(0);
-  const [images, setImages] = useState<string[]>(cachedHero?.images || localImages);
+  const [images, setImages] = useState<string[]>(initialHero?.images || localImages);
   const [heroReady, setHeroReady] = useState(true);
-  const [speed, setSpeed] = useState(cachedHero?.speed || 6000);
-  const [visibility, setVisibility] = useState<Record<string, boolean>>(cachedHero?.visibility || {
+  const [speed, setSpeed] = useState(initialHero?.speed || 6000);
+  const [visibility, setVisibility] = useState<Record<string, boolean>>(initialHero?.visibility || {
     "hero.show_headline": true,
     "hero.show_subtext": true,
     "hero.show_explore_btn": true,
@@ -101,6 +126,7 @@ export default function HeroSection() {
         setImages(urls);
         setHeroReady(true);
         setCache("hero", { images: urls, speed: speed, visibility: vis });
+        setPersistedHero({ images: urls, speed, visibility: vis });
         // Prefetch remaining images in background
         urls.slice(1).forEach(preloadImage);
         return;
@@ -136,6 +162,7 @@ export default function HeroSection() {
         setImages(finalUrls);
         setHeroReady(true);
         setCache("hero", { images: finalUrls, speed: speed, visibility: vis });
+        if (finalUrls.length > 0) setPersistedHero({ images: finalUrls, speed, visibility: vis });
         finalUrls.slice(1).forEach(preloadImage);
         return;
       }
