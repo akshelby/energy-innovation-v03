@@ -65,11 +65,13 @@ export default function HeroSection() {
   const { t } = useLanguage();
   const parallaxBg = useParallax(0.15);
   const cachedHero = getCached<{ images: string[]; speed: number; visibility: Record<string, boolean> }>("hero");
+  const persistedHero = getPersistedHero();
+  const initialHero = (cachedHero?.images?.length ? cachedHero : persistedHero) || null;
   const [current, setCurrent] = useState(0);
-  const [images, setImages] = useState<string[]>(cachedHero?.images || localImages);
+  const [images, setImages] = useState<string[]>(initialHero?.images || localImages);
   const [heroReady, setHeroReady] = useState(true);
-  const [speed, setSpeed] = useState(cachedHero?.speed || 6000);
-  const [visibility, setVisibility] = useState<Record<string, boolean>>(cachedHero?.visibility || {
+  const [speed, setSpeed] = useState(initialHero?.speed || 6000);
+  const [visibility, setVisibility] = useState<Record<string, boolean>>(initialHero?.visibility || {
     "hero.show_headline": true,
     "hero.show_subtext": true,
     "hero.show_explore_btn": true,
