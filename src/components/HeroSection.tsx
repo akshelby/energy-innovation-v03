@@ -254,42 +254,43 @@ export default function HeroSection() {
               {t("hero.subtext")}
             </p>
           )}
-        {(visibility["hero.show_explore_btn"] || visibility["hero.show_contact_btn"]) && (
-          <div className="mt-6 flex flex-wrap gap-3 justify-center animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
-            {visibility["hero.show_explore_btn"] && (
-              <Button
-                onClick={() => scrollTo("#products")}
-                className="gradient-accent text-accent-foreground rounded-full px-6 py-5 text-sm font-semibold transition-all border-0"
-              >
-                {t("hero.explore")}
-              </Button>
-            )}
-            {visibility["hero.show_contact_btn"] && (
-              <Button
-                onClick={() => scrollTo("#contact")}
-                variant="outline"
-                className="rounded-full px-6 py-5 text-sm font-semibold border-2 border-white text-white bg-white/10 backdrop-blur-sm hover:border-red-500 hover:bg-white/20 hover:text-white transition-all duration-500"
-              >
-                {t("hero.contact")}
-              </Button>
-            )}
-          </div>
-        )}
+          {(visibility["hero.show_explore_btn"] || visibility["hero.show_contact_btn"]) && (
+            <div className="mt-6 flex flex-wrap gap-3 animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
+              {visibility["hero.show_explore_btn"] && (
+                <Button
+                  onClick={() => scrollTo("#products")}
+                  className="gradient-accent text-accent-foreground rounded-full px-6 py-5 text-sm font-semibold transition-all border-0"
+                >
+                  {t("hero.explore")}
+                </Button>
+              )}
+              {visibility["hero.show_contact_btn"] && (
+                <Button
+                  onClick={() => scrollTo("#contact")}
+                  variant="outline"
+                  className="rounded-full px-6 py-5 text-sm font-semibold border-2 border-white text-white bg-white/10 backdrop-blur-sm hover:border-red-500 hover:bg-white/20 hover:text-white transition-all duration-500"
+                >
+                  {t("hero.contact")}
+                </Button>
+              )}
+            </div>
+          )}
 
-        {visibility["hero.show_dots"] && (
-          <div className="flex gap-2 justify-center mt-6">
-            {images.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrent(i)}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  i === current ? "w-8 bg-accent" : "bg-primary-foreground/40"
-                }`}
-                aria-label={`Go to slide ${i + 1}`}
-              />
-            ))}
-          </div>
-        )}
+          {visibility["hero.show_dots"] && (
+            <div className="flex gap-2 mt-6">
+              {images.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrent(i)}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    i === current ? "w-8 bg-accent" : "bg-primary-foreground/40"
+                  }`}
+                  aria-label={`Go to slide ${i + 1}`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );
