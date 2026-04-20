@@ -212,7 +212,7 @@ export default function HeroSection() {
               alt={`Industrial scene ${i + 1}`}
               width={1920}
               height={1080}
-              className={`w-full h-full object-cover ${i === current ? "animate-ken-burns" : ""}`}
+              className={`w-full h-full object-cover ${i === 0 && current === 0 ? "animate-ken-burns" : ""}`}
               loading={i === 0 ? "eager" : "lazy"}
               fetchPriority={i === 0 ? "high" : "auto"}
               decoding={i === 0 ? "sync" : "async"}
