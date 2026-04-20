@@ -242,17 +242,18 @@ export default function HeroSection() {
         </>
       )}
 
-      <div className="relative z-10 h-full flex flex-col justify-end pb-8 md:pb-12 text-center px-6">
-        {visibility["hero.show_headline"] && (
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary-foreground max-w-3xl mx-auto leading-tight animate-fade-in-up drop-shadow-lg">
-            {t("hero.headline")}
-          </h1>
-        )}
-        {visibility["hero.show_subtext"] && (
-          <p className="mt-4 text-sm md:text-base font-medium text-primary-foreground/80 max-w-xl mx-auto animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
-            {t("hero.subtext")}
-          </p>
-        )}
+      <div className="relative z-10 h-full flex items-center px-6 md:px-12 lg:px-20">
+        <div className="w-full max-w-2xl rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 p-6 md:p-10 text-left rtl:text-right shadow-2xl">
+          {visibility["hero.show_headline"] && (
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary-foreground leading-tight animate-fade-in-up drop-shadow-lg">
+              {t("hero.headline")}
+            </h1>
+          )}
+          {visibility["hero.show_subtext"] && (
+            <p className="mt-4 text-sm md:text-base font-medium text-primary-foreground/80 animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
+              {t("hero.subtext")}
+            </p>
+          )}
         {(visibility["hero.show_explore_btn"] || visibility["hero.show_contact_btn"]) && (
           <div className="mt-6 flex flex-wrap gap-3 justify-center animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
             {visibility["hero.show_explore_btn"] && (
