@@ -242,55 +242,53 @@ export default function HeroSection() {
         </>
       )}
 
-      <div className="relative z-10 h-full flex items-center px-6 md:px-12 lg:px-20">
-        <div className="w-full max-w-2xl rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 p-6 md:p-10 text-left rtl:text-right shadow-2xl">
-          {visibility["hero.show_headline"] && (
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary-foreground leading-tight animate-fade-in-up drop-shadow-lg">
-              {t("hero.headline")}
-            </h1>
-          )}
-          {visibility["hero.show_subtext"] && (
-            <p className="mt-4 text-sm md:text-base font-medium text-primary-foreground/80 animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
-              {t("hero.subtext")}
-            </p>
-          )}
-          {(visibility["hero.show_explore_btn"] || visibility["hero.show_contact_btn"]) && (
-            <div className="mt-6 flex flex-wrap gap-3 animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
-              {visibility["hero.show_explore_btn"] && (
-                <Button
-                  onClick={() => scrollTo("#products")}
-                  className="gradient-accent text-accent-foreground rounded-full px-6 py-5 text-sm font-semibold transition-all border-0"
-                >
-                  {t("hero.explore")}
-                </Button>
-              )}
-              {visibility["hero.show_contact_btn"] && (
-                <Button
-                  onClick={() => scrollTo("#contact")}
-                  variant="outline"
-                  className="rounded-full px-6 py-5 text-sm font-semibold border-2 border-white text-white bg-white/10 backdrop-blur-sm hover:border-red-500 hover:bg-white/20 hover:text-white transition-all duration-500"
-                >
-                  {t("hero.contact")}
-                </Button>
-              )}
-            </div>
-          )}
+      <div className="relative z-10 h-full flex flex-col justify-end pb-8 md:pb-12 text-center px-6">
+        {visibility["hero.show_headline"] && (
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary-foreground max-w-3xl mx-auto leading-tight animate-fade-in-up drop-shadow-lg">
+            {t("hero.headline")}
+          </h1>
+        )}
+        {visibility["hero.show_subtext"] && (
+          <p className="mt-4 text-sm md:text-base font-medium text-primary-foreground/80 max-w-xl mx-auto animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
+            {t("hero.subtext")}
+          </p>
+        )}
+        {(visibility["hero.show_explore_btn"] || visibility["hero.show_contact_btn"]) && (
+          <div className="mt-6 flex flex-wrap gap-3 justify-center animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
+            {visibility["hero.show_explore_btn"] && (
+              <Button
+                onClick={() => scrollTo("#products")}
+                className="gradient-accent text-accent-foreground rounded-full px-6 py-5 text-sm font-semibold transition-all border-0"
+              >
+                {t("hero.explore")}
+              </Button>
+            )}
+            {visibility["hero.show_contact_btn"] && (
+              <Button
+                onClick={() => scrollTo("#contact")}
+                variant="outline"
+                className="rounded-full px-6 py-5 text-sm font-semibold border-2 border-white text-white bg-white/10 backdrop-blur-sm hover:border-red-500 hover:bg-white/20 hover:text-white transition-all duration-500"
+              >
+                {t("hero.contact")}
+              </Button>
+            )}
+          </div>
+        )}
 
-          {visibility["hero.show_dots"] && (
-            <div className="flex gap-2 mt-6">
-              {images.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrent(i)}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    i === current ? "w-8 bg-accent" : "bg-primary-foreground/40"
-                  }`}
-                  aria-label={`Go to slide ${i + 1}`}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+        {visibility["hero.show_dots"] && (
+          <div className="flex gap-2 justify-center mt-6">
+            {images.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrent(i)}
+                className={`w-2 h-2 rounded-full transition-all ${
+                  i === current ? "w-8 bg-accent" : "bg-primary-foreground/40"
+                }`}
+                aria-label={`Go to slide ${i + 1}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
