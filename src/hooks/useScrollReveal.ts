@@ -1,5 +1,11 @@
 import { useEffect, useRef } from "react";
 
+/**
+ * Scroll-reveal hook using IntersectionObserver.
+ * - Animates each `.scroll-reveal` or `.animate-on-scroll` child once when it enters the viewport.
+ * - Adds `.visible` (legacy) and `.is-visible` (new) so both CSS conventions work.
+ * - Mobile uses a smaller rootMargin/threshold so animations trigger earlier and feel snappier.
+ */
 export function useScrollReveal() {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -10,7 +16,8 @@ export function useScrollReveal() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
+            entry.target.classList.add("visible", "is-visible");
+            observer.unobserve(entry.target); // play once
           }
         });
       },
@@ -22,10 +29,9 @@ export function useScrollReveal() {
 
     const el = ref.current;
     if (el) {
-      const children = el.querySelectorAll(".scroll-reveal");
+      const children = el.querySelectorAll(".scroll-reveal, .animate-on-scroll");
       children.forEach((child) => observer.observe(child));
-      // Also observe the element itself
-      if (el.classList.contains("scroll-reveal")) {
+      if (el.classList.contains("scroll-reveal") || el.classList.contains("animate-on-scroll")) {
         observer.observe(el);
       }
     }
