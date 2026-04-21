@@ -69,7 +69,7 @@ export default function HeroSection() {
   const persistedHero = getPersistedHero();
   const initialHero = (cachedHero?.images?.length ? cachedHero : persistedHero) || null;
   const [current, setCurrent] = useState(0);
-  const [images, setImages] = useState<string[]>(initialHero?.images || localImages);
+  const [images, setImages] = useState<string[]>(initialHero?.images || [buildHeroImageUrl(FIRST_HERO_FILENAME)]);
   const [heroReady, setHeroReady] = useState(true);
   const [speed, setSpeed] = useState(initialHero?.speed || 6000);
   const [visibility, setVisibility] = useState<Record<string, boolean>>(initialHero?.visibility || {
