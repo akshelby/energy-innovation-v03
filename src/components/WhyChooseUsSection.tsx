@@ -1,5 +1,5 @@
+import { useEffect, useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { Award, CheckCircle, Target, Headphones, ArrowRight } from "lucide-react";
 
 const reasons = [
@@ -11,12 +11,34 @@ const reasons = [
 
 export default function WhyChooseUsSection() {
   const { t } = useLanguage();
-  const ref = useScrollReveal();
+  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+          } else {
+            entry.target.classList.remove("is-visible");
+          }
+        });
+      },
+      {
+        threshold: isMobile ? 0.05 : 0.15,
+        rootMargin: isMobile ? "0px 0px 60px 0px" : "0px 0px -40px 0px",
+      }
+    );
+
+    cardsRef.current.forEach((el) => el && observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <section className="py-14 md:py-24 px-6 gradient-primary overflow-hidden" ref={ref}>
+    <section className="py-14 md:py-24 px-6 gradient-primary overflow-hidden">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-10 md:mb-16 scroll-reveal">
+        <div className="text-center mb-10 md:mb-16">
           <span className="inline-block px-8 py-3.5 text-lg font-bold tracking-wide text-white bg-accent rounded-full mb-4">
             {t("why.tag")}
           </span>
@@ -28,10 +50,12 @@ export default function WhyChooseUsSection() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {reasons.map((reason, i) => {
             const Icon = reason.icon;
+            const slideClass = i % 2 === 0 ? "card-slide-left" : "card-slide-right";
             return (
               <div
                 key={reason.key}
-                className="scroll-reveal group relative rounded-2xl overflow-hidden"
+                ref={(el) => (cardsRef.current[i] = el)}
+                className={`${slideClass} group relative rounded-2xl overflow-hidden`}
                 style={{ transitionDelay: `${i * 100}ms` }}
               >
                 {/* Left accent edge */}
