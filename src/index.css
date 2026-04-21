@@ -103,7 +103,6 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Plus Jakarta Sans', sans-serif;
-    overflow-x: hidden;
   }
 
   [dir="rtl"] body,
@@ -113,7 +112,6 @@
 
   html {
     scroll-behavior: smooth;
-    overflow-x: hidden;
   }
 }
 
