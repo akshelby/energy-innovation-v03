@@ -25,28 +25,30 @@ export default function AboutSection() {
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
             {t("about.title")}
           </h2>
-          <div
-            className={`grid max-w-3xl mx-auto transition-[grid-template-rows] duration-500 ease-in-out ${
-              isCollapsed ? "[grid-template-rows:4.5rem]" : "[grid-template-rows:1fr]"
-            } md:[grid-template-rows:1fr]`}
-          >
+          <div className="max-w-3xl mx-auto relative">
             <p
-              className={`text-muted-foreground text-lg leading-relaxed overflow-hidden ${
+              className={`text-muted-foreground text-lg leading-relaxed ${
                 isCollapsed ? "line-clamp-3" : ""
               } md:line-clamp-none`}
             >
               {t("about.desc")}
             </p>
+            {isCollapsed && (
+              <div
+                className="md:hidden pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-b from-transparent to-background"
+                aria-hidden="true"
+              />
+            )}
           </div>
           {showToggle && (
             <button
               onClick={() => setExpanded((v) => !v)}
-              className="md:hidden mt-4 inline-flex items-center gap-1.5 text-accent font-semibold text-sm hover:opacity-80 transition-opacity"
+              className="md:hidden mt-2 inline-flex items-center gap-1 text-accent text-sm font-medium underline underline-offset-4 hover:opacity-80 transition-opacity"
               aria-expanded={expanded}
             >
               {expanded ? "Read Less" : "Read More"}
               <ChevronDown
-                className={`w-4 h-4 transition-transform duration-300 ${expanded ? "rotate-180" : ""}`}
+                className={`w-3.5 h-3.5 transition-transform duration-300 ${expanded ? "rotate-180" : ""}`}
               />
             </button>
           )}
