@@ -24,13 +24,18 @@ export default function AboutSection() {
             {t("about.title")}
           </h2>
           <div className="max-w-3xl mx-auto relative">
-            <p
-              className={`text-muted-foreground text-lg leading-relaxed ${
-                isCollapsed ? "line-clamp-3" : ""
-              } md:line-clamp-none`}
+            <div
+              className="overflow-hidden md:!max-h-none md:!opacity-100"
+              style={{
+                maxHeight: showToggle ? (expanded ? "1200px" : "5.25rem") : "none",
+                opacity: showToggle ? (expanded ? 1 : 0.95) : 1,
+                transition: "max-height 0.8s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.6s ease",
+              }}
             >
-              {t("about.desc")}
-            </p>
+              <p className="text-muted-foreground text-lg leading-relaxed">
+                {t("about.desc")}
+              </p>
+            </div>
             {isCollapsed && (
               <div
                 className="md:hidden pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-b from-transparent to-background"
