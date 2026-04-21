@@ -47,9 +47,14 @@ export function useScrollReveal() {
     observer.observe(el);
 
     // Observe inner reveal children for staggered fade-up.
-    const children = el.querySelectorAll(".scroll-reveal, .animate-on-scroll");
+    // Observe inner reveal children for staggered fade-up / fade-only.
+    const children = el.querySelectorAll(".scroll-reveal, .animate-on-scroll, .scroll-reveal-fade");
     children.forEach((child) => observer.observe(child));
-    if (el.classList.contains("scroll-reveal") || el.classList.contains("animate-on-scroll")) {
+    if (
+      el.classList.contains("scroll-reveal") ||
+      el.classList.contains("animate-on-scroll") ||
+      el.classList.contains("scroll-reveal-fade")
+    ) {
       observer.observe(el);
     }
 
