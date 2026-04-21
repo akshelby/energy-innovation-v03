@@ -311,6 +311,7 @@
   .card-slide-right.is-visible {
     transform: none;
   }
+}
 
 /* Respect users who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
