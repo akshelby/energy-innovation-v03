@@ -103,6 +103,7 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Plus Jakarta Sans', sans-serif;
+    overflow-x: hidden;
   }
 
   [dir="rtl"] body,
@@ -247,10 +248,10 @@
   will-change: opacity, transform;
 }
 .section-reveal-left {
-  transform: translateX(-60px);
+  transform: translateX(-20px);
 }
 .section-reveal-right {
-  transform: translateX(60px);
+  transform: translateX(20px);
 }
 .section-reveal-left.visible,
 .section-reveal-left.is-visible,
@@ -287,10 +288,10 @@
     transition: opacity 0.35s ease-out, transform 0.35s ease-out;
   }
   .section-reveal-left {
-    transform: translateX(-30px);
+    transform: translateX(-20px);
   }
   .section-reveal-right {
-    transform: translateX(30px);
+    transform: translateX(20px);
   }
   .card-slide-left {
     transform: translateX(-30px);
