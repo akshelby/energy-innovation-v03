@@ -214,7 +214,7 @@ export default function Footer() {
               return (
                 <div key={i} className={i === 0 ? "mt-6" : "mt-5"}>
                   <h5 className="font-semibold mb-1.5 text-accent text-sm">{heading}</h5>
-                  <p className="text-sm text-primary-foreground/70 leading-relaxed whitespace-pre-line">
+                  <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-line">
                     {body}
                   </p>
                 </div>
