@@ -16,7 +16,7 @@ export default function AboutSection() {
   return (
     <section id="about" className="py-14 md:py-24 px-6 bg-background" ref={ref}>
       <div className="max-w-6xl mx-auto">
-        <div ref={parallaxHeading} className="text-center scroll-reveal will-change-transform">
+        <div className="text-center scroll-reveal-fade">
           <span className="inline-block px-8 py-3.5 text-lg font-bold tracking-wide text-white bg-accent rounded-full mb-4">
             {t("about.tag")}
           </span>
