@@ -159,13 +159,13 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-bold mb-5">{t("footer.quick")}</h4>
+            <h4 className="font-bold mb-5 text-white">{t("footer.quick")}</h4>
             <ul className="space-y-3">
               {quickLinks.map((link) => (
                 <li key={link.href}>
                   <button
                     onClick={() => scrollTo(link.href)}
-                    className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors"
+                    className="text-sm text-slate-300 hover:text-white transition-colors"
                   >
                     {link.label}
                   </button>
