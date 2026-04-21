@@ -56,7 +56,12 @@ export default function WhyChooseUsSection() {
                 key={reason.key}
                 ref={(el) => (cardsRef.current[i] = el)}
                 className={`${slideClass} group relative rounded-2xl overflow-hidden`}
-                style={{ transitionDelay: `${i * 100}ms` }}
+                style={{
+                  transitionDelay: `${i * 100}ms`,
+                  transitionDuration: "1.2s",
+                  transitionTimingFunction: "cubic-bezier(0.25, 0.1, 0.25, 1)",
+                  transitionProperty: "opacity, transform",
+                }}
               >
                 {/* Left accent edge */}
                 <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-accent via-accent/60 to-accent/20 transition-all duration-500 group-hover:w-1.5 z-10" />
