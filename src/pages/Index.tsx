@@ -1,10 +1,10 @@
 import { useEffect, lazy, Suspense } from "react";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
+import AboutSection from "@/components/AboutSection";
 import SEOHead from "@/components/SEOHead";
 import { loadImageOptimizationSetting } from "@/lib/storage";
 
-const AboutSection = lazy(() => import("@/components/AboutSection"));
 const ProductsSection = lazy(() => import("@/components/ProductsSection"));
 const ServicesSection = lazy(() => import("@/components/ServicesSection"));
 const HighlightSection = lazy(() => import("@/components/HighlightSection"));
@@ -47,8 +47,8 @@ const Index = () => {
       />
       <Header />
       <HeroSection />
+      <AboutSection />
       <Suspense fallback={null}>
-        <AboutSection />
         <ProductsSection />
         <ServicesSection />
         <HighlightSection />
