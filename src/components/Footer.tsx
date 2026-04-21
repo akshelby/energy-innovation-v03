@@ -193,15 +193,15 @@ export default function Footer() {
 
           {/* Contact Info */}
           <div>
-            <h4 className="font-bold mb-5 text-accent">{t("footer.contactInfo")}</h4>
-            <ul className="space-y-3 text-sm text-primary-foreground/70">
+            <h4 className="font-bold mb-5 text-white">{t("footer.contactInfo")}</h4>
+            <ul className="space-y-3 text-sm text-white">
               <li className="flex items-center gap-2">
-                <Mail className="w-4 h-4 shrink-0 text-primary-foreground/50" />
-                <a href={`mailto:${contactEmail}`} className="hover:text-primary-foreground transition-colors">{contactEmail}</a>
+                <Mail className="w-4 h-4 shrink-0 text-slate-300" />
+                <a href={`mailto:${contactEmail}`} className="text-white hover:text-white/80 transition-colors">{contactEmail}</a>
               </li>
               <li className="flex items-center gap-2">
-                <Globe className="w-4 h-4 shrink-0 text-primary-foreground/50" />
-                <span>{contactWebsite}</span>
+                <Globe className="w-4 h-4 shrink-0 text-slate-300" />
+                <span className="text-white">{contactWebsite}</span>
               </li>
             </ul>
 
