@@ -26,6 +26,16 @@ export default function FloatingButtons() {
     linkedinUrl: "",
     linkedinActive: false,
   });
+  const [mobileBottom, setMobileBottom] = useState<number>(() => {
+    try { return parseInt(localStorage.getItem("ei_floating_mobile_bottom") || "") || 80; } catch { return 80; }
+  });
+  const [isMobile, setIsMobile] = useState<boolean>(() => typeof window !== "undefined" && window.innerWidth < 768);
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   useEffect(() => {
     supabase
@@ -39,6 +49,7 @@ export default function FloatingButtons() {
         "email_active",
         "linkedin_url",
         "linkedin_active",
+        "floating.mobile_bottom",
       ])
       .then(({ data }) => {
         if (!data) return;
