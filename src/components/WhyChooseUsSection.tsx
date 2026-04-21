@@ -35,31 +35,31 @@ export default function WhyChooseUsSection() {
                 style={{ transitionDelay: `${i * 100}ms` }}
               >
                 {/* Left accent edge */}
-                <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-accent via-accent/40 to-transparent transition-all duration-500 group-hover:w-1.5 group-hover:from-accent group-hover:via-accent group-hover:to-accent/30" />
+                <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-accent via-accent/60 to-accent/20 transition-all duration-500 group-hover:w-1.5 z-10" />
 
-                <div className="pl-6 pr-6 py-7 bg-primary-foreground/[0.05] border border-primary-foreground/[0.08] border-l-0 rounded-r-2xl transition-colors duration-300 group-hover:bg-primary-foreground/[0.08] group-hover:border-primary-foreground/[0.12] flex flex-col h-full">
+                <div className="pl-6 pr-6 py-7 bg-white border border-black/5 border-l-0 rounded-r-2xl shadow-lg shadow-black/10 transition-shadow duration-300 group-hover:shadow-xl group-hover:shadow-black/20 flex flex-col h-full">
                   {/* Number + Icon row */}
                   <div className="flex items-center justify-between mb-5">
-                    <div className="w-12 h-12 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center transition-colors duration-300 group-hover:bg-destructive/10 group-hover:border-destructive/20">
-                      <Icon className="w-6 h-6 text-accent transition-colors duration-300 group-hover:text-destructive" />
+                    <div className="w-12 h-12 rounded-xl bg-accent border border-accent flex items-center justify-center transition-colors duration-300 group-hover:bg-destructive group-hover:border-destructive">
+                      <Icon className="w-6 h-6 text-white" />
                     </div>
-                    <span className="text-3xl font-black text-primary-foreground/[0.06] select-none">
+                    <span className="text-3xl font-black text-accent/80 select-none">
                       {reason.num}
                     </span>
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-base font-bold text-primary-foreground leading-snug mb-2.5">
+                  <h3 className="text-base font-bold text-slate-900 leading-snug mb-2.5">
                     {t(reason.key)}
                   </h3>
 
                   {/* Description */}
-                  <p className="text-primary-foreground/60 text-[13px] leading-relaxed mb-5 flex-1 line-clamp-3">
+                  <p className="text-slate-600 text-[13px] leading-relaxed mb-5 flex-1 line-clamp-3">
                     {t(reason.descKey)}
                   </p>
 
                   {/* Learn more indicator */}
-                  <div className="flex items-center gap-1.5 text-accent/60 group-hover:text-accent transition-colors duration-300">
+                  <div className="flex items-center gap-1.5 text-accent/70 group-hover:text-accent transition-colors duration-300">
                     <span className="text-[11px] font-semibold tracking-wide">Learn more</span>
                     <ArrowRight className="w-3 h-3 transition-transform duration-300 group-hover:translate-x-0.5" />
                   </div>
