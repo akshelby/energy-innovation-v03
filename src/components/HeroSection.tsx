@@ -210,6 +210,8 @@ export default function HeroSection() {
           >
             <img
               src={img}
+              srcSet={`${img}${img.includes("?") ? "&" : "?"}width=768 768w, ${img} 1920w`}
+              sizes="(max-width: 768px) 768px, 1920px"
               alt={`Industrial scene ${i + 1}`}
               width={1920}
               height={1080}
