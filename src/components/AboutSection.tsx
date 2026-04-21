@@ -2,13 +2,11 @@ import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
-import { useParallax } from "@/hooks/useParallax";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function AboutSection() {
   const { t } = useLanguage();
   const ref = useScrollReveal();
-  const parallaxHeading = useParallax(-0.04);
   const isMobile = useIsMobile();
   const [expanded, setExpanded] = useState(false);
 
