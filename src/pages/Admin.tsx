@@ -293,6 +293,8 @@ export default function Admin() {
   const brandLogoRef = useRef<HTMLInputElement>(null);
   const [brandLogoUploading, setBrandLogoUploading] = useState(false);
   const [logoSize, setLogoSize] = useState(56);
+  const [mobileLogoSize, setMobileLogoSize] = useState(40);
+  const [floatingMobileBottom, setFloatingMobileBottom] = useState(80);
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [whatsappActive, setWhatsappActive] = useState(false);
   const [whatsappMessage, setWhatsappMessage] = useState("Hello, I'm interested in your products and services.");
@@ -561,6 +563,10 @@ export default function Admin() {
       if (brandEntry) setBrandName(brandEntry.value_en);
       const sizeEntry = data.find((d: ContentItem) => d.content_key === "logo.size");
       if (sizeEntry) setLogoSize(parseInt(sizeEntry.value_en) || 56);
+      const mobileSizeEntry = data.find((d: ContentItem) => d.content_key === "header.mobile_logo_size");
+      if (mobileSizeEntry) setMobileLogoSize(parseInt(mobileSizeEntry.value_en) || 40);
+      const floatingBottomEntry = data.find((d: ContentItem) => d.content_key === "floating.mobile_bottom");
+      if (floatingBottomEntry) setFloatingMobileBottom(parseInt(floatingBottomEntry.value_en) || 80);
       const waEntry = data.find((d: ContentItem) => d.content_key === "whatsapp_number");
       if (waEntry) setWhatsappNumber(waEntry.value_en);
       const waActive = data.find((d: ContentItem) => d.content_key === "whatsapp_active");
@@ -1928,6 +1934,7 @@ export default function Admin() {
                     "floating_email", "email_active",
                     "linkedin_url", "linkedin_active",
                     "logo.size", "brand.name",
+                    "header.mobile_logo_size", "floating.mobile_bottom",
                   ]);
                   content.forEach((item) => {
                     const section = item.content_key.split(".")[0] || "other";
