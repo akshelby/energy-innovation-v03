@@ -17,6 +17,7 @@ import hero5Local from "@/assets/hero-5.webp";
 const localImages = [hero1Local, hero2Local, hero3Local, hero4Local, hero5Local];
 const imageFilePattern = /\.\w+$/i;
 const PERSISTENT_HERO_KEY = "ei_hero_active_v1";
+const FIRST_HERO_FILENAME = "Double wall fire shutter.jpg";
 
 interface PersistedHero {
   images: string[];
@@ -68,7 +69,7 @@ export default function HeroSection() {
   const persistedHero = getPersistedHero();
   const initialHero = (cachedHero?.images?.length ? cachedHero : persistedHero) || null;
   const [current, setCurrent] = useState(0);
-  const [images, setImages] = useState<string[]>(initialHero?.images || localImages);
+  const [images, setImages] = useState<string[]>(initialHero?.images || [buildHeroImageUrl(FIRST_HERO_FILENAME)]);
   const [heroReady, setHeroReady] = useState(true);
   const [speed, setSpeed] = useState(initialHero?.speed || 6000);
   const [visibility, setVisibility] = useState<Record<string, boolean>>(initialHero?.visibility || {
