@@ -176,13 +176,13 @@ export default function Footer() {
 
           {/* Product Categories */}
           <div>
-            <h4 className="font-bold mb-5">{t("footer.products")}</h4>
+            <h4 className="font-bold mb-5 text-white">{t("footer.products")}</h4>
             <ul className="space-y-3">
               {productLinks.map((link, i) => (
                 <li key={i}>
                   <button
                     onClick={() => scrollTo("#products")}
-                    className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors text-start"
+                    className="text-sm text-slate-300 hover:text-white transition-colors text-start"
                   >
                     {link}
                   </button>
