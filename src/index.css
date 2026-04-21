@@ -112,11 +112,6 @@
 
   html {
     scroll-behavior: smooth;
-    overflow-x: hidden;
-  }
-
-  body {
-    overflow-x: hidden;
   }
 }
 
@@ -252,10 +247,10 @@
   will-change: opacity, transform;
 }
 .section-reveal-left {
-  transform: translateX(-40px);
+  transform: translateX(-60px);
 }
 .section-reveal-right {
-  transform: translateX(40px);
+  transform: translateX(60px);
 }
 .section-reveal-left.visible,
 .section-reveal-left.is-visible,
@@ -273,10 +268,10 @@
   will-change: opacity, transform;
 }
 .card-slide-left {
-  transform: translateX(-40px);
+  transform: translateX(-60px);
 }
 .card-slide-right {
-  transform: translateX(40px);
+  transform: translateX(60px);
 }
 .card-slide-left.is-visible,
 .card-slide-right.is-visible {
@@ -292,16 +287,16 @@
     transition: opacity 0.35s ease-out, transform 0.35s ease-out;
   }
   .section-reveal-left {
-    transform: translateX(-20px);
+    transform: translateX(-30px);
   }
   .section-reveal-right {
-    transform: translateX(20px);
+    transform: translateX(30px);
   }
   .card-slide-left {
-    transform: translateX(-20px);
+    transform: translateX(-30px);
   }
   .card-slide-right {
-    transform: translateX(20px);
+    transform: translateX(30px);
   }
 }
 
