@@ -152,7 +152,7 @@ export default function Footer() {
             <div className="mb-5">
               {brandReady && <img src={logoUrl} alt={brandName} className="w-auto object-contain" style={{ height: `${Math.round(logoSize * 0.7)}px` }} />}
             </div>
-            <p className="text-primary-foreground/50 text-sm leading-relaxed">
+            <p className="text-slate-300 text-sm leading-relaxed">
               {t("footer.desc")}
             </p>
           </div>
