@@ -17,6 +17,7 @@ import hero5Local from "@/assets/hero-5.webp";
 const localImages = [hero1Local, hero2Local, hero3Local, hero4Local, hero5Local];
 const imageFilePattern = /\.\w+$/i;
 const PERSISTENT_HERO_KEY = "ei_hero_active_v1";
+const FIRST_HERO_FILENAME = "Double wall fire shutter.jpg";
 
 interface PersistedHero {
   images: string[];
