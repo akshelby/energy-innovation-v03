@@ -281,6 +281,12 @@
   .section-reveal-right {
     transform: translateX(30px);
   }
+  .card-slide-left {
+    transform: translateX(-30px);
+  }
+  .card-slide-right {
+    transform: translateX(30px);
+  }
 }
 
 /* Respect users who prefer reduced motion */
@@ -288,7 +294,9 @@
   .scroll-reveal,
   .animate-on-scroll,
   .section-reveal-left,
-  .section-reveal-right {
+  .section-reveal-right,
+  .card-slide-left,
+  .card-slide-right {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
