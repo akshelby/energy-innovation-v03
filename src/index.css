@@ -304,6 +304,7 @@
 @media (prefers-reduced-motion: reduce) {
   .scroll-reveal,
   .animate-on-scroll,
+  .scroll-reveal-fade,
   .section-reveal-left,
   .section-reveal-right,
   .card-slide-left,
