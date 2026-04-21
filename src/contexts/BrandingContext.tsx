@@ -10,10 +10,30 @@ interface BrandingContextType {
 
 const LOGO_STORAGE_PATH = "branding/logo";
 const BRAND_NAME_KEY = "brand.name";
+const CACHED_LOGO_URL_KEY = "ei_logo_url";
+const CACHED_LOGO_VERSION_KEY = "ei_logo_version";
+// Refresh cache-buster at most once per day so the browser can cache the logo
+const LOGO_VERSION_TTL_MS = 24 * 60 * 60 * 1000;
 
-// Pre-compute the public URL with cache-busting timestamp
-const { data: logoData } = supabase.storage.from("images").getPublicUrl(LOGO_STORAGE_PATH);
-const INITIAL_LOGO_URL = logoData?.publicUrl ? `${logoData.publicUrl}?v=${Date.now()}` : "";
+function computeLogoUrl(): string {
+  try {
+    const cachedVersion = localStorage.getItem(CACHED_LOGO_VERSION_KEY);
+    const cachedUrl = localStorage.getItem(CACHED_LOGO_URL_KEY);
+    if (cachedUrl && cachedVersion && Date.now() - parseInt(cachedVersion) < LOGO_VERSION_TTL_MS) {
+      return cachedUrl;
+    }
+  } catch {}
+  const { data } = supabase.storage.from("images").getPublicUrl(LOGO_STORAGE_PATH);
+  if (!data?.publicUrl) return "";
+  const url = `${data.publicUrl}?v=${Date.now()}`;
+  try {
+    localStorage.setItem(CACHED_LOGO_URL_KEY, url);
+    localStorage.setItem(CACHED_LOGO_VERSION_KEY, String(Date.now()));
+  } catch {}
+  return url;
+}
+
+const INITIAL_LOGO_URL = computeLogoUrl();
 
 const BrandingContext = createContext<BrandingContextType>({
   logoUrl: INITIAL_LOGO_URL,
