@@ -1573,6 +1573,72 @@ export default function Admin() {
                 </div>
               </div>
 
+              {/* Mobile Layout Controls */}
+              <div className="bg-card border border-border rounded-2xl p-6">
+                <h3 className="font-semibold text-foreground mb-4">Mobile Layout</h3>
+                <div className="space-y-5">
+                  <div>
+                    <label className="text-sm font-medium text-foreground block mb-1">Mobile Logo Size (px)</label>
+                    <p className="text-xs text-muted-foreground mb-2">Logo height on screens below 768px (default 40)</p>
+                    <div className="flex gap-2">
+                      <Input
+                        type="number"
+                        min={16}
+                        max={120}
+                        value={mobileLogoSize}
+                        onChange={(e) => setMobileLogoSize(parseInt(e.target.value) || 40)}
+                        className="rounded-xl w-32"
+                      />
+                      <Button
+                        onClick={async () => {
+                          try {
+                            await apiCall("content", "POST", storedPassword, {
+                              content_key: "header.mobile_logo_size",
+                              value_en: String(mobileLogoSize),
+                              value_ar: String(mobileLogoSize),
+                            });
+                            toast.success("Mobile logo size saved!");
+                          } catch (err: any) { toast.error(err.message); }
+                        }}
+                        className="gradient-accent text-accent-foreground rounded-xl border-0"
+                      >
+                        <Save className="w-4 h-4 mr-2" />Save
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-foreground block mb-1">Floating Buttons Bottom Position (px)</label>
+                    <p className="text-xs text-muted-foreground mb-2">Bottom offset for WhatsApp/email buttons on mobile (default 80)</p>
+                    <div className="flex gap-2">
+                      <Input
+                        type="number"
+                        min={0}
+                        max={400}
+                        value={floatingMobileBottom}
+                        onChange={(e) => setFloatingMobileBottom(parseInt(e.target.value) || 80)}
+                        className="rounded-xl w-32"
+                      />
+                      <Button
+                        onClick={async () => {
+                          try {
+                            await apiCall("content", "POST", storedPassword, {
+                              content_key: "floating.mobile_bottom",
+                              value_en: String(floatingMobileBottom),
+                              value_ar: String(floatingMobileBottom),
+                            });
+                            toast.success("Floating button position saved!");
+                          } catch (err: any) { toast.error(err.message); }
+                        }}
+                        className="gradient-accent text-accent-foreground rounded-xl border-0"
+                      >
+                        <Save className="w-4 h-4 mr-2" />Save
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {/* Business Name */}
               <div className="bg-card border border-border rounded-2xl p-6">
                 <h3 className="font-semibold text-foreground mb-4">Business Name</h3>
