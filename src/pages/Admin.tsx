@@ -16,7 +16,6 @@ import PdfViewerDialog from "@/components/PdfViewerDialog";
 import { supabase } from "@/integrations/supabase/client";
 import ProductTreeEditor from "@/components/admin/ProductTreeEditor";
 import PhoneInput from "@/components/PhoneInput";
-import { checkServiceImages, type ServiceImageIssue } from "@/lib/serviceImageCheck";
 import { AlertTriangle } from "lucide-react";
 import drawingImg from "@/assets/services/drawing.jpg";
 import installationImg from "@/assets/services/installation.jpg";
