@@ -103,15 +103,20 @@ export default function ServicesSection() {
         </div>
 
         <div className={`transition-opacity duration-500 ${ready ? 'opacity-100' : 'opacity-0'}`}>
-        <StickyCardStack baseTop={72} offsetIncrement={0} scrollSpace="6svh" maxWidthClass="max-w-md">
+        <StickyCardStack baseTop={72} offsetIncrement={0} scrollSpace="6svh" maxWidthClass="max-w-none">
           {services.map((service, i) => {
             const isCustomIcon = service.icon?.startsWith("http") || service.icon?.startsWith("/") || service.icon?.startsWith("data:");
             const Icon = !isCustomIcon ? (iconMap[service.icon] || Wrench) : null;
             return (
               <div
                 key={i}
-                className="scroll-reveal md:!opacity-100 md:!translate-y-0 group relative rounded-2xl cursor-pointer overflow-hidden border-2 border-border hover:border-accent/30 bg-card transition-all duration-300 h-full flex flex-col"
-                style={{ transitionDelay: `${i * 100}ms` }}
+                className="scroll-reveal md:!opacity-100 md:!translate-y-0 group relative cursor-pointer overflow-hidden bg-card transition-all duration-300 h-full flex flex-col"
+                style={{
+                  transitionDelay: `${i * 100}ms`,
+                  minHeight: "420px",
+                  border: "1px solid #e5e7eb",
+                  borderRadius: "20px",
+                }}
                 onClick={() => {
                   if (service.pdf_url) {
                     setPdfSrc(service.pdf_url);
@@ -119,11 +124,8 @@ export default function ServicesSection() {
                   }
                 }}
               >
-                {/* Top accent strip */}
-                <div className="h-1 w-full bg-gradient-to-r from-accent via-accent/60 to-transparent transition-all duration-500 group-hover:from-accent group-hover:via-accent group-hover:to-accent/40" />
-
-                {/* Top half — content */}
-                <div className="p-6 pb-4 flex flex-col">
+                {/* Top content area — 24px padding */}
+                <div className="flex flex-col" style={{ padding: "24px" }}>
                   {/* Tag */}
                   {(isAr ? service.tag_ar : service.tag_en) && (
                     <span className="inline-block self-start text-[10px] font-semibold tracking-wide bg-accent/10 text-accent px-2.5 py-1 rounded-full mb-4">
@@ -131,7 +133,7 @@ export default function ServicesSection() {
                     </span>
                   )}
 
-                  {/* Small icon badge */}
+                  {/* Small icon */}
                   <div className="mb-4">
                     <div className="w-12 h-12 rounded-xl bg-accent/8 flex items-center justify-center transition-colors duration-300 group-hover:bg-destructive/10">
                       {isCustomIcon ? (
@@ -143,63 +145,47 @@ export default function ServicesSection() {
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-base font-bold text-foreground leading-snug mb-2">
+                  <h3 className="text-lg font-bold text-foreground leading-snug mb-2">
                     {isAr ? service.name_ar : service.name_en}
                   </h3>
 
-                  {/* Description */}
-                  <p className="text-muted-foreground text-[13px] leading-relaxed mb-4 line-clamp-2">
+                  {/* Short description */}
+                  <p className="text-muted-foreground text-sm leading-relaxed line-clamp-2">
                     {isAr ? service.description_ar : service.description_en}
                   </p>
 
-                  {/* Footer */}
-                  <div className="flex items-center justify-between pt-3 border-t border-border/60">
-                    {service.pdf_url ? (
-                      <span className="flex items-center gap-1.5 text-xs font-medium text-accent">
-                        <FileText className="w-3.5 h-3.5" />
-                        View Details
-                      </span>
-                    ) : (
-                      <span className="text-[11px] text-muted-foreground/50 font-medium">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                    )}
-                    <div className="w-7 h-7 rounded-full border border-border group-hover:border-accent/30 flex items-center justify-center transition-colors duration-300">
-                      <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-accent transition-colors duration-300" />
-                    </div>
-                  </div>
+                  {service.pdf_url && (
+                    <span className="mt-4 flex items-center gap-1.5 text-xs font-medium text-accent">
+                      <FileText className="w-3.5 h-3.5" />
+                      View Details
+                    </span>
+                  )}
                 </div>
 
-                {/* Bottom half — image or large fallback icon (Apple-style) */}
-                <div className="relative mt-auto h-48 w-full overflow-hidden bg-card">
-                  {service.image_url ? (
-                    <>
-                      <img
-                        src={service.image_url}
-                        alt={isAr ? service.name_ar : service.name_en}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                      {/* Top fade — blends image into card background */}
-                      <div
-                        className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-card to-transparent"
-                        aria-hidden="true"
-                      />
-                    </>
-                  ) : (
-                    <div className="absolute inset-0 flex items-end justify-end p-6">
-                      {isCustomIcon ? (
-                        <img
-                          src={service.icon}
-                          alt=""
-                          className="w-28 h-28 object-contain opacity-15 group-hover:opacity-25 transition-opacity duration-500"
-                        />
-                      ) : Icon ? (
-                        <Icon className="w-32 h-32 text-accent/15 group-hover:text-accent/25 transition-colors duration-500" />
-                      ) : null}
-                    </div>
+                {/* Bottom image area — fixed 200px */}
+                <div
+                  className="relative mt-auto w-full overflow-hidden"
+                  style={{ height: "200px", backgroundColor: "#f5f5f7" }}
+                >
+                  {service.image_url && (
+                    <img
+                      src={service.image_url}
+                      alt={isAr ? service.name_ar : service.name_en}
+                      className="w-full h-full transition-transform duration-700 group-hover:scale-105"
+                      style={{ objectFit: "cover" }}
+                      loading="lazy"
+                      decoding="async"
+                    />
                   )}
+                  {/* Top fade — white to transparent */}
+                  <div
+                    className="pointer-events-none absolute inset-x-0 top-0"
+                    style={{
+                      height: "64px",
+                      background: "linear-gradient(to bottom, hsl(var(--card)) 0%, transparent 100%)",
+                    }}
+                    aria-hidden="true"
+                  />
                 </div>
               </div>
             );
