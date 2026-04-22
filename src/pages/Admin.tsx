@@ -723,6 +723,22 @@ export default function Admin() {
     }
   }, [authenticated, activeTab, fetchLeads, fetchContent, fetchContactAddresses, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding, fetchHighlight, fetchCareers, fetchCareersContent, fetchAdminEmails, fetchProductPages, fetchProductEnquiries]);
 
+  // Validate service images whenever the services list changes
+  useEffect(() => {
+    if (activeTab !== "services" || services.length === 0) {
+      setServiceImageIssues([]);
+      return;
+    }
+    let cancelled = false;
+    setCheckingServiceImages(true);
+    checkServiceImages(services).then((issues) => {
+      if (!cancelled) setServiceImageIssues(issues);
+    }).finally(() => {
+      if (!cancelled) setCheckingServiceImages(false);
+    });
+    return () => { cancelled = true; };
+  }, [activeTab, services]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
