@@ -187,11 +187,13 @@ export default function ServicesSection() {
                   {/* Small icon */}
                   <div className="mb-4">
                     <div className="w-12 h-12 rounded-xl bg-accent/8 flex items-center justify-center transition-colors duration-300 group-hover:bg-destructive/10">
-                      {isCustomIcon ? (
-                        <img src={service.icon} alt="" className="w-6 h-6 object-contain" />
+                      {isCustomIcon && iconStr ? (
+                        <img src={iconStr} alt="" className="w-6 h-6 object-contain" />
                       ) : Icon ? (
                         <Icon className="w-6 h-6 text-accent transition-colors duration-300 group-hover:text-destructive" />
-                      ) : null}
+                      ) : (
+                        <Wrench className="w-6 h-6 text-accent transition-colors duration-300 group-hover:text-destructive" />
+                      )}
                     </div>
                   </div>
 
