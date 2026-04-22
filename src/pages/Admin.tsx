@@ -2219,7 +2219,7 @@ export default function Admin() {
                   <div key={s.id} className="bg-card border border-border rounded-2xl p-4 flex items-center gap-4">
                     <GripVertical className="w-4 h-4 text-muted-foreground shrink-0" />
                     {s.image_url ? (
-                      <img src={s.image_url} alt={s.name_en} className="w-16 h-12 object-cover rounded-lg border border-border shrink-0" />
+                      <img src={resolvePreviewUrl(s.image_url)} alt={s.name_en} className="w-16 h-12 object-cover rounded-lg border border-border shrink-0" />
                     ) : (
                       <div className="w-16 h-12 bg-muted rounded-lg flex items-center justify-center shrink-0">
                         <Briefcase className="w-5 h-5 text-muted-foreground/40" />
