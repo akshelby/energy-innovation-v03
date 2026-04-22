@@ -1,11 +1,11 @@
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 
 const buildId = new Date().toISOString();
 
-const buildVersionPlugin = () => ({
+const buildVersionPlugin = (): Plugin => ({
   name: "build-version-plugin",
   generateBundle() {
     this.emitFile({
