@@ -188,7 +188,7 @@ export default function ServicesSection() {
                   className="relative mt-auto w-full overflow-hidden"
                   style={{ height: "200px", backgroundColor: "#f5f5f7" }}
                 >
-                  {service.image_url && (
+                  {imagesReady && service.image_url && (
                     <img
                       src={service.image_url}
                       alt={isAr ? service.name_ar : service.name_en}
