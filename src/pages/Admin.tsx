@@ -259,6 +259,8 @@ export default function Admin() {
   const [services, setServices] = useState<(ServiceItem & { id: string })[]>([]);
   const [editingProduct, setEditingProduct] = useState<ProductItem | null>(null);
   const [editingService, setEditingService] = useState<ServiceItem | null>(null);
+  const [serviceImageIssues, setServiceImageIssues] = useState<ServiceImageIssue[]>([]);
+  const [checkingServiceImages, setCheckingServiceImages] = useState(false);
 
   // Menu Items state
   const [menuItems, setMenuItems] = useState<(MenuChildItem & { id: string })[]>([]);
