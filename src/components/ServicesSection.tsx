@@ -6,10 +6,32 @@ import StickyCardStack from "@/components/StickyCardStack";
 import { supabase } from "@/integrations/supabase/client";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
 import { getCached, setCache } from "@/lib/cache";
+import drawingImg from "@/assets/services/drawing.jpg";
+import installationImg from "@/assets/services/installation.jpg";
+import maintenanceImg from "@/assets/services/maintenance.jpg";
+import consultingImg from "@/assets/services/consulting.jpg";
 import {
   Flame, DoorOpen, Droplets, Wind, Truck, Shield, Zap, Factory,
   HardHat, Gauge, Cog, Building, PenTool, Wrench, Settings, MessageSquare, FileText, ArrowUpRight, ChevronDown,
 } from "lucide-react";
+
+const assetMap: Record<string, string> = {
+  "asset:drawing": drawingImg,
+  "asset:installation": installationImg,
+  "asset:maintenance": maintenanceImg,
+  "asset:consulting": consultingImg,
+};
+
+const resolveImage = (url: string | null): string | null => {
+  if (!url) return null;
+  if (url.startsWith("asset:")) return assetMap[url] || null;
+  // Legacy /services/*.jpg paths from public folder — map to bundled assets
+  if (url.startsWith("/services/")) {
+    const key = "asset:" + url.replace("/services/", "").replace(".jpg", "");
+    return assetMap[key] || url;
+  }
+  return url;
+};
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Flame, DoorOpen, Droplets, Wind, Truck, Shield, Zap, Factory,
@@ -188,9 +210,9 @@ export default function ServicesSection() {
                   className="relative mt-auto w-full overflow-hidden"
                   style={{ height: "200px", backgroundColor: "#f5f5f7" }}
                 >
-                  {imagesReady && service.image_url && (
+                  {imagesReady && resolveImage(service.image_url) && (
                     <img
-                      src={service.image_url}
+                      src={resolveImage(service.image_url)!}
                       alt={isAr ? service.name_ar : service.name_en}
                       className="w-full h-full transition-transform duration-700 group-hover:scale-105"
                       style={{ objectFit: "cover" }}
