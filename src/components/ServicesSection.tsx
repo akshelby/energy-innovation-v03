@@ -230,9 +230,9 @@ export default function ServicesSection() {
                   className="relative mt-auto w-full overflow-hidden"
                   style={{ height: "200px", backgroundColor: "#f5f5f7" }}
                 >
-                  {imagesReady && resolveImage(service.image_url) && (
+                  {imagesReady && heroImg && (
                     <img
-                      src={resolveImage(service.image_url)!}
+                      src={heroImg}
                       alt={isAr ? service.name_ar : service.name_en}
                       className="w-full h-full transition-transform duration-700 group-hover:scale-105"
                       style={{ objectFit: "cover" }}
