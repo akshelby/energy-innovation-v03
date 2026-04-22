@@ -16,6 +16,8 @@ import PdfViewerDialog from "@/components/PdfViewerDialog";
 import { supabase } from "@/integrations/supabase/client";
 import ProductTreeEditor from "@/components/admin/ProductTreeEditor";
 import PhoneInput from "@/components/PhoneInput";
+import { checkServiceImages, type ServiceImageIssue } from "@/lib/serviceImageCheck";
+import { AlertTriangle } from "lucide-react";
 
 const TRANSLATE_URL = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/translate`;
 
@@ -257,6 +259,8 @@ export default function Admin() {
   const [services, setServices] = useState<(ServiceItem & { id: string })[]>([]);
   const [editingProduct, setEditingProduct] = useState<ProductItem | null>(null);
   const [editingService, setEditingService] = useState<ServiceItem | null>(null);
+  const [serviceImageIssues, setServiceImageIssues] = useState<ServiceImageIssue[]>([]);
+  const [checkingServiceImages, setCheckingServiceImages] = useState(false);
 
   // Menu Items state
   const [menuItems, setMenuItems] = useState<(MenuChildItem & { id: string })[]>([]);
@@ -718,6 +722,22 @@ export default function Admin() {
       else fetchFiles();
     }
   }, [authenticated, activeTab, fetchLeads, fetchContent, fetchContactAddresses, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding, fetchHighlight, fetchCareers, fetchCareersContent, fetchAdminEmails, fetchProductPages, fetchProductEnquiries]);
+
+  // Validate service images whenever the services list changes
+  useEffect(() => {
+    if (activeTab !== "services" || services.length === 0) {
+      setServiceImageIssues([]);
+      return;
+    }
+    let cancelled = false;
+    setCheckingServiceImages(true);
+    checkServiceImages(services).then((issues) => {
+      if (!cancelled) setServiceImageIssues(issues);
+    }).finally(() => {
+      if (!cancelled) setCheckingServiceImages(false);
+    });
+    return () => { cancelled = true; };
+  }, [activeTab, services]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -2134,6 +2154,33 @@ export default function Admin() {
                 </Button>
               </div>
             </div>
+
+            {serviceImageIssues.length > 0 && (
+              <div className="mb-4 rounded-2xl border border-destructive/40 bg-destructive/5 p-4 flex gap-3">
+                <AlertTriangle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-destructive text-sm mb-1">
+                    {serviceImageIssues.length} service{serviceImageIssues.length > 1 ? "s" : ""} {serviceImageIssues.length > 1 ? "have" : "has"} an image problem
+                  </h3>
+                  <ul className="text-xs text-foreground/80 space-y-0.5">
+                    {serviceImageIssues.map((iss) => (
+                      <li key={iss.id}>
+                        <span className="font-medium">{iss.name}</span>
+                        {" — "}
+                        {iss.reason === "missing" && "no image set"}
+                        {iss.reason === "broken" && "image URL failed to load"}
+                        {iss.reason === "unknown-asset" && "references an unknown bundled asset"}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
+            {checkingServiceImages && serviceImageIssues.length === 0 && services.length > 0 && (
+              <div className="mb-4 text-xs text-muted-foreground flex items-center gap-2">
+                <RefreshCw className="w-3 h-3 animate-spin" /> Checking service images…
+              </div>
+            )}
 
             {editingService && renderItemEditor(
               editingService,
