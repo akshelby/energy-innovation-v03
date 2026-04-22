@@ -80,9 +80,12 @@ export default function ServicesSection() {
   const [expanded, setExpanded] = useState(false);
   // Cache stores services WITHOUT image_url to prevent stale images from flashing
   // when admin updates a service image. Images only render after fresh DB fetch.
-  const [services, setServices] = useState<Service[]>(() => getCached<Service[]>("services") || []);
-  const [ready, setReady] = useState(() => services.length > 0);
-  const [imagesReady, setImagesReady] = useState(false);
+  const [services, setServices] = useState<Service[]>(() => {
+    const cached = getCached<Service[]>("services");
+    return cached && cached.length > 0 ? cached : fallbackServices;
+  });
+  const [ready, setReady] = useState(true);
+  const [imagesReady, setImagesReady] = useState(true);
   const [pdfOpen, setPdfOpen] = useState(false);
   const [pdfSrc, setPdfSrc] = useState("");
 
