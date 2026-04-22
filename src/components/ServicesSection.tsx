@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { useIsMobile } from "@/hooks/use-mobile";
 import StickyCardStack from "@/components/StickyCardStack";
 import { supabase } from "@/integrations/supabase/client";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
 import { getCached, setCache } from "@/lib/cache";
 import {
   Flame, DoorOpen, Droplets, Wind, Truck, Shield, Zap, Factory,
-  HardHat, Gauge, Cog, Building, PenTool, Wrench, Settings, MessageSquare, FileText, ArrowUpRight,
+  HardHat, Gauge, Cog, Building, PenTool, Wrench, Settings, MessageSquare, FileText, ArrowUpRight, ChevronDown,
 } from "lucide-react";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -37,6 +38,8 @@ interface Service {
 export default function ServicesSection() {
   const { t, language } = useLanguage();
   const ref = useScrollReveal();
+  const isMobile = useIsMobile();
+  const [expanded, setExpanded] = useState(false);
   const [services, setServices] = useState<Service[]>(() => getCached<Service[]>("services") || []);
   const [ready, setReady] = useState(() => services.length > 0);
   const [pdfOpen, setPdfOpen] = useState(false);
@@ -52,20 +55,51 @@ export default function ServicesSection() {
   }, []);
 
   const isAr = language === "ar";
+  const showToggle = isMobile;
+  const isCollapsed = showToggle && !expanded;
 
   return (
     <section id="services" className="py-12 md:py-20 px-6 bg-background lazy-section" ref={ref}>
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-10 md:mb-16 scroll-reveal">
+        <div className="text-center mb-10 md:mb-16 scroll-reveal-fade">
           <span className="inline-block px-8 py-3.5 text-lg font-bold tracking-wide text-white bg-accent rounded-full mb-4">
             {t("services.tag")}
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
             {t("services.title")}
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            {t("services.desc")}
-          </p>
+          <div className="max-w-2xl mx-auto relative">
+            <div
+              className="overflow-hidden md:!max-h-none md:!opacity-100"
+              style={{
+                maxHeight: showToggle ? (expanded ? "1500px" : "5rem") : "none",
+                opacity: showToggle ? (expanded ? 1 : 0.95) : 1,
+                transition: "max-height 0.8s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.6s ease",
+              }}
+            >
+              <p className="text-muted-foreground text-lg">
+                {t("services.desc")}
+              </p>
+            </div>
+            {isCollapsed && (
+              <div
+                className="md:hidden pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-b from-transparent to-background"
+                aria-hidden="true"
+              />
+            )}
+          </div>
+          {showToggle && (
+            <button
+              onClick={() => setExpanded((v) => !v)}
+              className="md:hidden mt-2 inline-flex items-center gap-1 text-accent text-sm font-medium underline underline-offset-4 hover:opacity-80 transition-opacity"
+              aria-expanded={expanded}
+            >
+              {expanded ? "Read Less" : "Read More"}
+              <ChevronDown
+                className={`w-3.5 h-3.5 transition-transform duration-300 ${expanded ? "rotate-180" : ""}`}
+              />
+            </button>
+          )}
         </div>
 
         <div className={`transition-opacity duration-500 ${ready ? 'opacity-100' : 'opacity-0'}`}>
