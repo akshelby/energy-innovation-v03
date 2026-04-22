@@ -22,15 +22,31 @@ const assetMap: Record<string, string> = {
   "asset:consulting": consultingImg,
 };
 
-const resolveImage = (url: string | null): string | null => {
-  if (!url) return null;
-  if (url.startsWith("asset:")) return assetMap[url] || null;
-  // Legacy /services/*.jpg paths from public folder — map to bundled assets
-  if (url.startsWith("/services/")) {
-    const key = "asset:" + url.replace("/services/", "").replace(".jpg", "");
-    return assetMap[key] || url;
+// Map service NAME (lowercase) to a bundled fallback image so cards always
+// have a hero image even if image_url is missing or points to a stale key.
+const nameFallbackMap: Record<string, string> = {
+  "technical drawing": drawingImg,
+  drawing: drawingImg,
+  installation: installationImg,
+  maintenance: maintenanceImg,
+  consulting: consultingImg,
+};
+
+const resolveImage = (url: string | null, nameEn?: string): string | null => {
+  if (url) {
+    if (url.startsWith("asset:")) {
+      if (assetMap[url]) return assetMap[url];
+    } else if (url.startsWith("/services/")) {
+      const key = "asset:" + url.replace("/services/", "").replace(".jpg", "");
+      if (assetMap[key]) return assetMap[key];
+      return url;
+    } else {
+      return url;
+    }
   }
-  return url;
+  // Fallback: match by service name
+  const key = (nameEn || "").trim().toLowerCase();
+  return nameFallbackMap[key] || null;
 };
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
