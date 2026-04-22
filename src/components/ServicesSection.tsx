@@ -99,9 +99,9 @@ export default function ServicesSection() {
 
                   {/* Icon */}
                   <div className="mb-5">
-                    {service.image_url ? (
+                    {validImageUrl ? (
                       <div className="w-14 h-14 rounded-xl overflow-hidden">
-                        <img src={service.image_url} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" width={56} height={56} />
+                        <img src={validImageUrl} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" width={56} height={56} />
                       </div>
                     ) : (
                       <div className="w-14 h-14 rounded-xl bg-accent/8 flex items-center justify-center transition-colors duration-300 group-hover:bg-destructive/10">
