@@ -73,6 +73,7 @@ export default function ServicesSection() {
           {services.map((service, i) => {
             const isCustomIcon = service.icon?.startsWith("http") || service.icon?.startsWith("/") || service.icon?.startsWith("data:");
             const Icon = !isCustomIcon ? (iconMap[service.icon] || Wrench) : null;
+            const validImageUrl = service.image_url && (service.image_url.startsWith("http") || service.image_url.startsWith("/") || service.image_url.startsWith("data:")) ? service.image_url : null;
             return (
               <div
                 key={i}
@@ -98,9 +99,9 @@ export default function ServicesSection() {
 
                   {/* Icon */}
                   <div className="mb-5">
-                    {service.image_url ? (
+                    {validImageUrl ? (
                       <div className="w-14 h-14 rounded-xl overflow-hidden">
-                        <img src={service.image_url} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" width={56} height={56} />
+                        <img src={validImageUrl} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" width={56} height={56} />
                       </div>
                     ) : (
                       <div className="w-14 h-14 rounded-xl bg-accent/8 flex items-center justify-center transition-colors duration-300 group-hover:bg-destructive/10">
