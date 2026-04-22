@@ -40,8 +40,11 @@ export default function ServicesSection() {
   const ref = useScrollReveal();
   const isMobile = useIsMobile();
   const [expanded, setExpanded] = useState(false);
+  // Cache stores services WITHOUT image_url to prevent stale images from flashing
+  // when admin updates a service image. Images only render after fresh DB fetch.
   const [services, setServices] = useState<Service[]>(() => getCached<Service[]>("services") || []);
   const [ready, setReady] = useState(() => services.length > 0);
+  const [imagesReady, setImagesReady] = useState(false);
   const [pdfOpen, setPdfOpen] = useState(false);
   const [pdfSrc, setPdfSrc] = useState("");
 
@@ -49,7 +52,10 @@ export default function ServicesSection() {
     supabase.from("services").select("*").order("sort_order").then(({ data }) => {
       const result = data && data.length > 0 ? (data as Service[]) : fallbackServices;
       setServices(result);
-      setCache("services", result);
+      setImagesReady(true);
+      // Strip image_url from the cached copy so a future page load never shows a stale image
+      const cacheable = result.map((s) => ({ ...s, image_url: null }));
+      setCache("services", cacheable);
       setReady(true);
     });
   }, []);
