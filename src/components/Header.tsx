@@ -48,10 +48,6 @@ export default function Header() {
   const [productCategories, setProductCategories] = useState<CategoryItem[]>([]);
   const [expandedParents, setExpandedParents] = useState<Set<string>>(new Set());
   const [expandedMobileParents, setExpandedMobileParents] = useState<Set<string>>(new Set());
-  const [mobileLogoSize, setMobileLogoSize] = useState<number>(() => {
-    try { return parseInt(localStorage.getItem("ei_mobile_logo_size") || "") || 40; } catch { return 40; }
-  });
-  const [isMobile, setIsMobile] = useState<boolean>(() => typeof window !== "undefined" && window.innerWidth < 768);
 
   // Fetch product items and categories from Supabase
   useEffect(() => {
@@ -70,24 +66,6 @@ export default function Header() {
       .then(({ data }) => {
         if (data && data.length > 0) setProductCategories(data as CategoryItem[]);
       });
-    supabase
-      .from("site_content")
-      .select("content_key, value_en")
-      .eq("content_key", "header.mobile_logo_size")
-      .then(({ data }) => {
-        const entry = data?.[0];
-        if (entry?.value_en) {
-          const size = parseInt(entry.value_en) || 40;
-          setMobileLogoSize(size);
-          try { localStorage.setItem("ei_mobile_logo_size", String(size)); } catch {}
-        }
-      });
-  }, []);
-
-  useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
   }, []);
 
   // Top-level items (no parent) grouped by category
@@ -320,7 +298,7 @@ export default function Header() {
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-2 md:px-6">
           {/* Logo */}
           <a href="#home" onClick={() => scrollToSection("#home")} className="flex items-center shrink-0">
-            <img src={logoUrl} alt={brandName} className="w-auto object-contain" style={{ height: `${isMobile ? mobileLogoSize : Math.round(logoSize * 0.8)}px` }} loading="eager" fetchPriority="high" decoding="sync" />
+            <img src={logoUrl} alt={brandName} className="w-auto object-contain" style={{ height: `${Math.round(logoSize * 0.8)}px` }} loading="eager" fetchPriority="high" decoding="sync" />
           </a>
 
           {/* Desktop Nav - centered */}
