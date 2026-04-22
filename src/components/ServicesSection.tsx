@@ -239,8 +239,9 @@ export default function ServicesSection() {
                       alt={isAr ? service.name_ar : service.name_en}
                       className="w-full h-full transition-transform duration-700 group-hover:scale-105"
                       style={{ objectFit: "cover" }}
-                      loading="lazy"
+                      loading="eager"
                       decoding="async"
+                      fetchPriority="high"
                     />
                   )}
                   {/* Top fade — white to transparent */}
