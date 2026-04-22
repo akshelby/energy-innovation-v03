@@ -149,8 +149,10 @@ export default function ServicesSection() {
         <div className={`transition-opacity duration-500 ${ready ? 'opacity-100' : 'opacity-0'}`}>
         <StickyCardStack baseTop={72} offsetIncrement={0} scrollSpace="6svh" maxWidthClass="max-w-none">
           {services.map((service, i) => {
-            const isCustomIcon = service.icon?.startsWith("http") || service.icon?.startsWith("/") || service.icon?.startsWith("data:");
-            const Icon = !isCustomIcon ? (iconMap[service.icon] || Wrench) : null;
+            const iconStr = service.icon || "";
+            const isCustomIcon = /^(https?:|\/|data:)/.test(iconStr) && iconStr.length > 5;
+            const Icon = !isCustomIcon ? (iconMap[iconStr] || Wrench) : null;
+            const heroImg = resolveImage(service.image_url, service.name_en);
             return (
               <div
                 key={i}
