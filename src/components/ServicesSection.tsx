@@ -122,29 +122,24 @@ export default function ServicesSection() {
                 {/* Top accent strip */}
                 <div className="h-1 w-full bg-gradient-to-r from-accent via-accent/60 to-transparent transition-all duration-500 group-hover:from-accent group-hover:via-accent group-hover:to-accent/40" />
 
-                <div className="p-6 pb-7 flex flex-col flex-1">
+                {/* Top half — content */}
+                <div className="p-6 pb-4 flex flex-col">
                   {/* Tag */}
                   {(isAr ? service.tag_ar : service.tag_en) && (
-                    <span className="inline-block text-[10px] font-semibold tracking-wide bg-accent/10 text-accent px-2.5 py-1 rounded-full mb-4">
+                    <span className="inline-block self-start text-[10px] font-semibold tracking-wide bg-accent/10 text-accent px-2.5 py-1 rounded-full mb-4">
                       {isAr ? service.tag_ar : service.tag_en}
                     </span>
                   )}
 
-                  {/* Icon */}
-                  <div className="mb-5">
-                    {service.image_url ? (
-                      <div className="w-14 h-14 rounded-xl overflow-hidden">
-                        <img src={service.image_url} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" width={56} height={56} />
-                      </div>
-                    ) : (
-                      <div className="w-14 h-14 rounded-xl bg-accent/8 flex items-center justify-center transition-colors duration-300 group-hover:bg-destructive/10">
-                        {isCustomIcon ? (
-                          <img src={service.icon} alt="" className="w-7 h-7 object-contain" />
-                        ) : Icon ? (
-                          <Icon className="w-7 h-7 text-accent transition-colors duration-300 group-hover:text-destructive" />
-                        ) : null}
-                      </div>
-                    )}
+                  {/* Small icon badge */}
+                  <div className="mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-accent/8 flex items-center justify-center transition-colors duration-300 group-hover:bg-destructive/10">
+                      {isCustomIcon ? (
+                        <img src={service.icon} alt="" className="w-6 h-6 object-contain" />
+                      ) : Icon ? (
+                        <Icon className="w-6 h-6 text-accent transition-colors duration-300 group-hover:text-destructive" />
+                      ) : null}
+                    </div>
                   </div>
 
                   {/* Title */}
@@ -153,12 +148,12 @@ export default function ServicesSection() {
                   </h3>
 
                   {/* Description */}
-                  <p className="text-muted-foreground text-[13px] leading-relaxed mb-5 flex-1 line-clamp-2">
+                  <p className="text-muted-foreground text-[13px] leading-relaxed mb-4 line-clamp-2">
                     {isAr ? service.description_ar : service.description_en}
                   </p>
 
                   {/* Footer */}
-                  <div className="flex items-center justify-between pt-4 border-t border-border/60">
+                  <div className="flex items-center justify-between pt-3 border-t border-border/60">
                     {service.pdf_url ? (
                       <span className="flex items-center gap-1.5 text-xs font-medium text-accent">
                         <FileText className="w-3.5 h-3.5" />
@@ -173,6 +168,38 @@ export default function ServicesSection() {
                       <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-accent transition-colors duration-300" />
                     </div>
                   </div>
+                </div>
+
+                {/* Bottom half — image or large fallback icon (Apple-style) */}
+                <div className="relative mt-auto h-48 w-full overflow-hidden bg-card">
+                  {service.image_url ? (
+                    <>
+                      <img
+                        src={service.image_url}
+                        alt={isAr ? service.name_ar : service.name_en}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                      {/* Top fade — blends image into card background */}
+                      <div
+                        className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-card to-transparent"
+                        aria-hidden="true"
+                      />
+                    </>
+                  ) : (
+                    <div className="absolute inset-0 flex items-end justify-end p-6">
+                      {isCustomIcon ? (
+                        <img
+                          src={service.icon}
+                          alt=""
+                          className="w-28 h-28 object-contain opacity-15 group-hover:opacity-25 transition-opacity duration-500"
+                        />
+                      ) : Icon ? (
+                        <Icon className="w-32 h-32 text-accent/15 group-hover:text-accent/25 transition-colors duration-500" />
+                      ) : null}
+                    </div>
+                  )}
                 </div>
               </div>
             );
