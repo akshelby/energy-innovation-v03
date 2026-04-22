@@ -199,7 +199,7 @@ export default function ServicesSection() {
 
                   {/* Title — Apple-style gradient */}
                   <h3
-                    className="text-lg font-bold leading-snug mb-2"
+                    className="text-2xl md:text-3xl font-bold leading-snug mb-2"
                     style={{
                       backgroundImage:
                         "linear-gradient(90deg, #2BD8FF 0%, #A14BFF 35%, #FF4FCB 65%, #FF6A3D 100%)",
