@@ -117,7 +117,7 @@ export default function ServicesSection() {
                   borderRadius: "20px",
                   padding: "1.5px",
                   backgroundImage:
-                    "linear-gradient(hsl(var(--card)), hsl(var(--card))), linear-gradient(135deg, #2997ff 0%, #a855f7 50%, #ef4444 100%)",
+                    "linear-gradient(hsl(var(--card)), hsl(var(--card))), linear-gradient(135deg, #2BD8FF 0%, #A14BFF 35%, #FF4FCB 65%, #FF6A3D 100%)",
                   backgroundOrigin: "border-box",
                   backgroundClip: "padding-box, border-box",
                   border: "1.5px solid transparent",
