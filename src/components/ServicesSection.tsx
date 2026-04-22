@@ -38,6 +38,8 @@ interface Service {
 export default function ServicesSection() {
   const { t, language } = useLanguage();
   const ref = useScrollReveal();
+  const isMobile = useIsMobile();
+  const [expanded, setExpanded] = useState(false);
   const [services, setServices] = useState<Service[]>(() => getCached<Service[]>("services") || []);
   const [ready, setReady] = useState(() => services.length > 0);
   const [pdfOpen, setPdfOpen] = useState(false);
