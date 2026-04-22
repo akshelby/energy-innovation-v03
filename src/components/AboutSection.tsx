@@ -1,60 +1,25 @@
-import { useState } from "react";
-import { ChevronDown } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useParallax } from "@/hooks/useParallax";
 
 export default function AboutSection() {
   const { t } = useLanguage();
   const ref = useScrollReveal();
-  const isMobile = useIsMobile();
-  const [expanded, setExpanded] = useState(false);
-
-  const showToggle = isMobile;
-  const isCollapsed = showToggle && !expanded;
+  const parallaxHeading = useParallax(-0.04);
 
   return (
     <section id="about" className="py-14 md:py-24 px-6 bg-background" ref={ref}>
       <div className="max-w-6xl mx-auto">
-        <div className="text-center scroll-reveal-fade">
+        <div ref={parallaxHeading} className="text-center scroll-reveal will-change-transform">
           <span className="inline-block px-8 py-3.5 text-lg font-bold tracking-wide text-white bg-accent rounded-full mb-4">
             {t("about.tag")}
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
             {t("about.title")}
           </h2>
-          <div className="max-w-3xl mx-auto relative">
-            <div
-              className="overflow-hidden md:!max-h-none md:!opacity-100"
-              style={{
-                maxHeight: showToggle ? (expanded ? "1200px" : "5.25rem") : "none",
-                opacity: showToggle ? (expanded ? 1 : 0.95) : 1,
-                transition: "max-height 0.8s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.6s ease",
-              }}
-            >
-              <p className="text-muted-foreground text-lg leading-relaxed">
-                {t("about.desc")}
-              </p>
-            </div>
-            {isCollapsed && (
-              <div
-                className="md:hidden pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-b from-transparent to-background"
-                aria-hidden="true"
-              />
-            )}
-          </div>
-          {showToggle && (
-            <button
-              onClick={() => setExpanded((v) => !v)}
-              className="md:hidden mt-2 inline-flex items-center gap-1 text-accent text-sm font-medium underline underline-offset-4 hover:opacity-80 transition-opacity"
-              aria-expanded={expanded}
-            >
-              {expanded ? "Read Less" : "Read More"}
-              <ChevronDown
-                className={`w-3.5 h-3.5 transition-transform duration-300 ${expanded ? "rotate-180" : ""}`}
-              />
-            </button>
-          )}
+          <p className="text-muted-foreground max-w-3xl mx-auto text-lg leading-relaxed">
+            {t("about.desc")}
+          </p>
         </div>
       </div>
     </section>

@@ -16,8 +16,6 @@ import PdfViewerDialog from "@/components/PdfViewerDialog";
 import { supabase } from "@/integrations/supabase/client";
 import ProductTreeEditor from "@/components/admin/ProductTreeEditor";
 import PhoneInput from "@/components/PhoneInput";
-import { checkServiceImages, type ServiceImageIssue } from "@/lib/serviceImageCheck";
-import { AlertTriangle } from "lucide-react";
 
 const TRANSLATE_URL = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/translate`;
 
@@ -259,8 +257,6 @@ export default function Admin() {
   const [services, setServices] = useState<(ServiceItem & { id: string })[]>([]);
   const [editingProduct, setEditingProduct] = useState<ProductItem | null>(null);
   const [editingService, setEditingService] = useState<ServiceItem | null>(null);
-  const [serviceImageIssues, setServiceImageIssues] = useState<ServiceImageIssue[]>([]);
-  const [checkingServiceImages, setCheckingServiceImages] = useState(false);
 
   // Menu Items state
   const [menuItems, setMenuItems] = useState<(MenuChildItem & { id: string })[]>([]);
@@ -297,8 +293,6 @@ export default function Admin() {
   const brandLogoRef = useRef<HTMLInputElement>(null);
   const [brandLogoUploading, setBrandLogoUploading] = useState(false);
   const [logoSize, setLogoSize] = useState(56);
-  const [mobileLogoSize, setMobileLogoSize] = useState(40);
-  const [floatingMobileBottom, setFloatingMobileBottom] = useState(80);
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [whatsappActive, setWhatsappActive] = useState(false);
   const [whatsappMessage, setWhatsappMessage] = useState("Hello, I'm interested in your products and services.");
@@ -567,10 +561,6 @@ export default function Admin() {
       if (brandEntry) setBrandName(brandEntry.value_en);
       const sizeEntry = data.find((d: ContentItem) => d.content_key === "logo.size");
       if (sizeEntry) setLogoSize(parseInt(sizeEntry.value_en) || 56);
-      const mobileSizeEntry = data.find((d: ContentItem) => d.content_key === "header.mobile_logo_size");
-      if (mobileSizeEntry) setMobileLogoSize(parseInt(mobileSizeEntry.value_en) || 40);
-      const floatingBottomEntry = data.find((d: ContentItem) => d.content_key === "floating.mobile_bottom");
-      if (floatingBottomEntry) setFloatingMobileBottom(parseInt(floatingBottomEntry.value_en) || 80);
       const waEntry = data.find((d: ContentItem) => d.content_key === "whatsapp_number");
       if (waEntry) setWhatsappNumber(waEntry.value_en);
       const waActive = data.find((d: ContentItem) => d.content_key === "whatsapp_active");
@@ -722,22 +712,6 @@ export default function Admin() {
       else fetchFiles();
     }
   }, [authenticated, activeTab, fetchLeads, fetchContent, fetchContactAddresses, fetchProducts, fetchServices, fetchMenuItems, fetchCategories, fetchFiles, fetchBranding, fetchHighlight, fetchCareers, fetchCareersContent, fetchAdminEmails, fetchProductPages, fetchProductEnquiries]);
-
-  // Validate service images whenever the services list changes
-  useEffect(() => {
-    if (activeTab !== "services" || services.length === 0) {
-      setServiceImageIssues([]);
-      return;
-    }
-    let cancelled = false;
-    setCheckingServiceImages(true);
-    checkServiceImages(services).then((issues) => {
-      if (!cancelled) setServiceImageIssues(issues);
-    }).finally(() => {
-      if (!cancelled) setCheckingServiceImages(false);
-    });
-    return () => { cancelled = true; };
-  }, [activeTab, services]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1593,72 +1567,6 @@ export default function Admin() {
                 </div>
               </div>
 
-              {/* Mobile Layout Controls */}
-              <div className="bg-card border border-border rounded-2xl p-6">
-                <h3 className="font-semibold text-foreground mb-4">Mobile Layout</h3>
-                <div className="space-y-5">
-                  <div>
-                    <label className="text-sm font-medium text-foreground block mb-1">Mobile Logo Size (px)</label>
-                    <p className="text-xs text-muted-foreground mb-2">Logo height on screens below 768px (default 40)</p>
-                    <div className="flex gap-2">
-                      <Input
-                        type="number"
-                        min={16}
-                        max={120}
-                        value={mobileLogoSize}
-                        onChange={(e) => setMobileLogoSize(parseInt(e.target.value) || 40)}
-                        className="rounded-xl w-32"
-                      />
-                      <Button
-                        onClick={async () => {
-                          try {
-                            await apiCall("content", "POST", storedPassword, {
-                              content_key: "header.mobile_logo_size",
-                              value_en: String(mobileLogoSize),
-                              value_ar: String(mobileLogoSize),
-                            });
-                            toast.success("Mobile logo size saved!");
-                          } catch (err: any) { toast.error(err.message); }
-                        }}
-                        className="gradient-accent text-accent-foreground rounded-xl border-0"
-                      >
-                        <Save className="w-4 h-4 mr-2" />Save
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-foreground block mb-1">Floating Buttons Bottom Position (px)</label>
-                    <p className="text-xs text-muted-foreground mb-2">Bottom offset for WhatsApp/email buttons on mobile (default 80)</p>
-                    <div className="flex gap-2">
-                      <Input
-                        type="number"
-                        min={0}
-                        max={400}
-                        value={floatingMobileBottom}
-                        onChange={(e) => setFloatingMobileBottom(parseInt(e.target.value) || 80)}
-                        className="rounded-xl w-32"
-                      />
-                      <Button
-                        onClick={async () => {
-                          try {
-                            await apiCall("content", "POST", storedPassword, {
-                              content_key: "floating.mobile_bottom",
-                              value_en: String(floatingMobileBottom),
-                              value_ar: String(floatingMobileBottom),
-                            });
-                            toast.success("Floating button position saved!");
-                          } catch (err: any) { toast.error(err.message); }
-                        }}
-                        className="gradient-accent text-accent-foreground rounded-xl border-0"
-                      >
-                        <Save className="w-4 h-4 mr-2" />Save
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
               {/* Business Name */}
               <div className="bg-card border border-border rounded-2xl p-6">
                 <h3 className="font-semibold text-foreground mb-4">Business Name</h3>
@@ -2020,7 +1928,6 @@ export default function Admin() {
                     "floating_email", "email_active",
                     "linkedin_url", "linkedin_active",
                     "logo.size", "brand.name",
-                    "header.mobile_logo_size", "floating.mobile_bottom",
                   ]);
                   content.forEach((item) => {
                     const section = item.content_key.split(".")[0] || "other";
@@ -2154,33 +2061,6 @@ export default function Admin() {
                 </Button>
               </div>
             </div>
-
-            {serviceImageIssues.length > 0 && (
-              <div className="mb-4 rounded-2xl border border-destructive/40 bg-destructive/5 p-4 flex gap-3">
-                <AlertTriangle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-destructive text-sm mb-1">
-                    {serviceImageIssues.length} service{serviceImageIssues.length > 1 ? "s" : ""} {serviceImageIssues.length > 1 ? "have" : "has"} an image problem
-                  </h3>
-                  <ul className="text-xs text-foreground/80 space-y-0.5">
-                    {serviceImageIssues.map((iss) => (
-                      <li key={iss.id}>
-                        <span className="font-medium">{iss.name}</span>
-                        {" — "}
-                        {iss.reason === "missing" && "no image set"}
-                        {iss.reason === "broken" && "image URL failed to load"}
-                        {iss.reason === "unknown-asset" && "references an unknown bundled asset"}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            )}
-            {checkingServiceImages && serviceImageIssues.length === 0 && services.length > 0 && (
-              <div className="mb-4 text-xs text-muted-foreground flex items-center gap-2">
-                <RefreshCw className="w-3 h-3 animate-spin" /> Checking service images…
-              </div>
-            )}
 
             {editingService && renderItemEditor(
               editingService,
