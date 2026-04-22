@@ -14,7 +14,7 @@ function json(data: unknown, status = 200) {
   });
 }
 
-function normalizeSecret(value: string | null | undefined) {
+function normalizeSecret(value: string | null) {
   return (value ?? "")
     .normalize("NFKC")
     .replace(/[\u200B-\u200D\uFEFF]/g, "")
@@ -511,6 +511,6 @@ Deno.serve(async (req) => {
 
     return json({ error: "Not found" }, 404);
   } catch (err) {
-    return json({ error: err instanceof Error ? err.message : String(err) }, 500);
+    return json({ error: err.message }, 500);
   }
 });
