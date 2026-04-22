@@ -105,7 +105,7 @@ export default function StickyCardStack({
 
   // Mobile: sticky stacking cards
   return (
-    <div ref={containerRef} className={`${maxWidthClass} mx-auto px-4`}>
+    <div ref={containerRef} className={`${maxWidthClass} mx-auto px-2`}>
       {React.Children.map(children, (child, i) => (
         <Fragment key={i}>
           <div
