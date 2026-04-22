@@ -18,6 +18,23 @@ import ProductTreeEditor from "@/components/admin/ProductTreeEditor";
 import PhoneInput from "@/components/PhoneInput";
 import { checkServiceImages, type ServiceImageIssue } from "@/lib/serviceImageCheck";
 import { AlertTriangle } from "lucide-react";
+import drawingImg from "@/assets/services/drawing.jpg";
+import installationImg from "@/assets/services/installation.jpg";
+import maintenanceImg from "@/assets/services/maintenance.jpg";
+import consultingImg from "@/assets/services/consulting.jpg";
+
+const ASSET_PREVIEW_MAP: Record<string, string> = {
+  "asset:drawing": drawingImg,
+  "asset:installation": installationImg,
+  "asset:maintenance": maintenanceImg,
+  "asset:consulting": consultingImg,
+};
+
+const resolvePreviewUrl = (url: string | null | undefined): string => {
+  if (!url) return "";
+  if (url.startsWith("asset:")) return ASSET_PREVIEW_MAP[url] || "";
+  return url;
+};
 
 const TRANSLATE_URL = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/translate`;
 
