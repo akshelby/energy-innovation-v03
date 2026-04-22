@@ -18,6 +18,23 @@ import ProductTreeEditor from "@/components/admin/ProductTreeEditor";
 import PhoneInput from "@/components/PhoneInput";
 import { checkServiceImages, type ServiceImageIssue } from "@/lib/serviceImageCheck";
 import { AlertTriangle } from "lucide-react";
+import drawingImg from "@/assets/services/drawing.jpg";
+import installationImg from "@/assets/services/installation.jpg";
+import maintenanceImg from "@/assets/services/maintenance.jpg";
+import consultingImg from "@/assets/services/consulting.jpg";
+
+const ASSET_PREVIEW_MAP: Record<string, string> = {
+  "asset:drawing": drawingImg,
+  "asset:installation": installationImg,
+  "asset:maintenance": maintenanceImg,
+  "asset:consulting": consultingImg,
+};
+
+const resolvePreviewUrl = (url: string | null | undefined): string => {
+  if (!url) return "";
+  if (url.startsWith("asset:")) return ASSET_PREVIEW_MAP[url] || "";
+  return url;
+};
 
 const TRANSLATE_URL = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/translate`;
 
@@ -1371,7 +1388,7 @@ export default function Admin() {
           </div>
           {item.image_url ? (
             <div className="mt-2 flex items-center gap-2">
-              <img src={item.image_url} alt="Preview" className="h-20 w-32 object-cover rounded-lg border border-border" />
+              <img src={resolvePreviewUrl(item.image_url)} alt="Preview" className="h-20 w-32 object-cover rounded-lg border border-border" />
               <span className="text-xs text-green-600 font-medium">✓ Image uploaded</span>
             </div>
           ) : (
@@ -2202,7 +2219,7 @@ export default function Admin() {
                   <div key={s.id} className="bg-card border border-border rounded-2xl p-4 flex items-center gap-4">
                     <GripVertical className="w-4 h-4 text-muted-foreground shrink-0" />
                     {s.image_url ? (
-                      <img src={s.image_url} alt={s.name_en} className="w-16 h-12 object-cover rounded-lg border border-border shrink-0" />
+                      <img src={resolvePreviewUrl(s.image_url)} alt={s.name_en} className="w-16 h-12 object-cover rounded-lg border border-border shrink-0" />
                     ) : (
                       <div className="w-16 h-12 bg-muted rounded-lg flex items-center justify-center shrink-0">
                         <Briefcase className="w-5 h-5 text-muted-foreground/40" />
