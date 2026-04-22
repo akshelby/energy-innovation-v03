@@ -154,7 +154,7 @@ export default function ServicesSection() {
                     className="text-lg font-bold leading-snug mb-2"
                     style={{
                       backgroundImage:
-                        "linear-gradient(90deg, #2997ff 0%, #a855f7 50%, #ef4444 100%)",
+                        "linear-gradient(90deg, #2BD8FF 0%, #A14BFF 35%, #FF4FCB 65%, #FF6A3D 100%)",
                       WebkitBackgroundClip: "text",
                       backgroundClip: "text",
                       WebkitTextFillColor: "transparent",
