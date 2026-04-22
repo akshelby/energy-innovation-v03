@@ -22,15 +22,31 @@ const assetMap: Record<string, string> = {
   "asset:consulting": consultingImg,
 };
 
-const resolveImage = (url: string | null): string | null => {
-  if (!url) return null;
-  if (url.startsWith("asset:")) return assetMap[url] || null;
-  // Legacy /services/*.jpg paths from public folder — map to bundled assets
-  if (url.startsWith("/services/")) {
-    const key = "asset:" + url.replace("/services/", "").replace(".jpg", "");
-    return assetMap[key] || url;
+// Map service NAME (lowercase) to a bundled fallback image so cards always
+// have a hero image even if image_url is missing or points to a stale key.
+const nameFallbackMap: Record<string, string> = {
+  "technical drawing": drawingImg,
+  drawing: drawingImg,
+  installation: installationImg,
+  maintenance: maintenanceImg,
+  consulting: consultingImg,
+};
+
+const resolveImage = (url: string | null, nameEn?: string): string | null => {
+  if (url) {
+    if (url.startsWith("asset:")) {
+      if (assetMap[url]) return assetMap[url];
+    } else if (url.startsWith("/services/")) {
+      const key = "asset:" + url.replace("/services/", "").replace(".jpg", "");
+      if (assetMap[key]) return assetMap[key];
+      return url;
+    } else {
+      return url;
+    }
   }
-  return url;
+  // Fallback: match by service name
+  const key = (nameEn || "").trim().toLowerCase();
+  return nameFallbackMap[key] || null;
 };
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -133,8 +149,10 @@ export default function ServicesSection() {
         <div className={`transition-opacity duration-500 ${ready ? 'opacity-100' : 'opacity-0'}`}>
         <StickyCardStack baseTop={72} offsetIncrement={0} scrollSpace="6svh" maxWidthClass="max-w-none">
           {services.map((service, i) => {
-            const isCustomIcon = service.icon?.startsWith("http") || service.icon?.startsWith("/") || service.icon?.startsWith("data:");
-            const Icon = !isCustomIcon ? (iconMap[service.icon] || Wrench) : null;
+            const iconStr = service.icon || "";
+            const isCustomIcon = /^(https?:|\/|data:)/.test(iconStr) && iconStr.length > 5;
+            const Icon = !isCustomIcon ? (iconMap[iconStr] || Wrench) : null;
+            const heroImg = resolveImage(service.image_url, service.name_en);
             return (
               <div
                 key={i}
@@ -169,11 +187,13 @@ export default function ServicesSection() {
                   {/* Small icon */}
                   <div className="mb-4">
                     <div className="w-12 h-12 rounded-xl bg-accent/8 flex items-center justify-center transition-colors duration-300 group-hover:bg-destructive/10">
-                      {isCustomIcon ? (
-                        <img src={service.icon} alt="" className="w-6 h-6 object-contain" />
+                      {isCustomIcon && iconStr ? (
+                        <img src={iconStr} alt="" className="w-6 h-6 object-contain" />
                       ) : Icon ? (
                         <Icon className="w-6 h-6 text-accent transition-colors duration-300 group-hover:text-destructive" />
-                      ) : null}
+                      ) : (
+                        <Wrench className="w-6 h-6 text-accent transition-colors duration-300 group-hover:text-destructive" />
+                      )}
                     </div>
                   </div>
 
@@ -210,9 +230,9 @@ export default function ServicesSection() {
                   className="relative mt-auto w-full overflow-hidden"
                   style={{ height: "200px", backgroundColor: "#f5f5f7" }}
                 >
-                  {imagesReady && resolveImage(service.image_url) && (
+                  {imagesReady && heroImg && (
                     <img
-                      src={resolveImage(service.image_url)!}
+                      src={heroImg}
                       alt={isAr ? service.name_ar : service.name_en}
                       className="w-full h-full transition-transform duration-700 group-hover:scale-105"
                       style={{ objectFit: "cover" }}
