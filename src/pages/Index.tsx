@@ -1,34 +1,17 @@
 import { useEffect, lazy, Suspense } from "react";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
-import AboutSection from "@/components/AboutSection";
 import SEOHead from "@/components/SEOHead";
 import { loadImageOptimizationSetting } from "@/lib/storage";
 
-// Auto-recover from stale chunk hashes after a redeploy
-const lazyWithRetry = <T,>(factory: () => Promise<T>) =>
-  lazy(() =>
-    (factory() as Promise<any>).catch((err) => {
-      const msg = String(err?.message || "");
-      if (/Failed to fetch dynamically imported module|Importing a module script failed/i.test(msg)) {
-        const key = "lovable_chunk_reload_at";
-        const last = Number(sessionStorage.getItem(key) || 0);
-        if (Date.now() - last > 10000) {
-          sessionStorage.setItem(key, String(Date.now()));
-          window.location.reload();
-        }
-      }
-      throw err;
-    })
-  );
-
-const ProductsSection = lazyWithRetry(() => import("@/components/ProductsSection"));
-const ServicesSection = lazyWithRetry(() => import("@/components/ServicesSection"));
-const HighlightSection = lazyWithRetry(() => import("@/components/HighlightSection"));
-const WhyChooseUsSection = lazyWithRetry(() => import("@/components/WhyChooseUsSection"));
-const ContactSection = lazyWithRetry(() => import("@/components/ContactSection"));
-const Footer = lazyWithRetry(() => import("@/components/Footer"));
-const FloatingButtons = lazyWithRetry(() => import("@/components/FloatingButtons"));
+const AboutSection = lazy(() => import("@/components/AboutSection"));
+const ProductsSection = lazy(() => import("@/components/ProductsSection"));
+const ServicesSection = lazy(() => import("@/components/ServicesSection"));
+const HighlightSection = lazy(() => import("@/components/HighlightSection"));
+const WhyChooseUsSection = lazy(() => import("@/components/WhyChooseUsSection"));
+const ContactSection = lazy(() => import("@/components/ContactSection"));
+const Footer = lazy(() => import("@/components/Footer"));
+const FloatingButtons = lazy(() => import("@/components/FloatingButtons"));
 
 const Index = () => {
   useEffect(() => { loadImageOptimizationSetting(); }, []);
@@ -64,8 +47,8 @@ const Index = () => {
       />
       <Header />
       <HeroSection />
-      <AboutSection />
       <Suspense fallback={null}>
+        <AboutSection />
         <ProductsSection />
         <ServicesSection />
         <HighlightSection />
