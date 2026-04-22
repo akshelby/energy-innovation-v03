@@ -73,6 +73,7 @@ export default function ServicesSection() {
           {services.map((service, i) => {
             const isCustomIcon = service.icon?.startsWith("http") || service.icon?.startsWith("/") || service.icon?.startsWith("data:");
             const Icon = !isCustomIcon ? (iconMap[service.icon] || Wrench) : null;
+            const validImageUrl = service.image_url && (service.image_url.startsWith("http") || service.image_url.startsWith("/") || service.image_url.startsWith("data:")) ? service.image_url : null;
             return (
               <div
                 key={i}
