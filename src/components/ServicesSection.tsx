@@ -78,25 +78,32 @@ export default function ServicesSection() {
   const ref = useScrollReveal();
   const isMobile = useIsMobile();
   const [expanded, setExpanded] = useState(false);
-  // Cache stores services WITHOUT image_url to prevent stale images from flashing
-  // when admin updates a service image. Images only render after fresh DB fetch.
-  const [services, setServices] = useState<Service[]>(() => {
-    const cached = getCached<Service[]>("services");
-    return cached && cached.length > 0 ? cached : fallbackServices;
-  });
-  const [ready, setReady] = useState(true);
-  const [imagesReady, setImagesReady] = useState(true);
+  // Cache full DB records (including image_url) for instant render on repeat visits.
+  // Background refresh keeps content fresh.
+  const initialCached = (typeof window !== "undefined" ? getCached<Service[]>("services") : null) || [];
+  const [services, setServices] = useState<Service[]>(initialCached);
+  const [ready, setReady] = useState(initialCached.length > 0);
+  const [imagesReady, setImagesReady] = useState(initialCached.length > 0);
   const [pdfOpen, setPdfOpen] = useState(false);
   const [pdfSrc, setPdfSrc] = useState("");
 
   useEffect(() => {
     supabase.from("services").select("*").order("sort_order").then(({ data }) => {
-      const result = data && data.length > 0 ? (data as Service[]) : fallbackServices;
-      setServices(result);
+      if (data && data.length > 0) {
+        const result = data as Service[];
+        setServices(result);
+        setCache("services", result);
+        // Warm the browser image cache so subsequent renders are instant
+        result.forEach((s) => {
+          if (s.image_url && /^https?:/.test(s.image_url)) {
+            const img = new Image();
+            img.src = s.image_url;
+          }
+        });
+      } else if (services.length === 0) {
+        setServices(fallbackServices);
+      }
       setImagesReady(true);
-      // Strip image_url from the cached copy so a future page load never shows a stale image
-      const cacheable = result.map((s) => ({ ...s, image_url: null }));
-      setCache("services", cacheable);
       setReady(true);
     });
   }, []);
