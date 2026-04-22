@@ -144,8 +144,18 @@ export default function ServicesSection() {
                     </div>
                   </div>
 
-                  {/* Title */}
-                  <h3 className="text-lg font-bold text-foreground leading-snug mb-2">
+                  {/* Title — Apple-style gradient */}
+                  <h3
+                    className="text-lg font-bold leading-snug mb-2"
+                    style={{
+                      backgroundImage:
+                        "linear-gradient(90deg, #2997ff 0%, #a855f7 50%, #ef4444 100%)",
+                      WebkitBackgroundClip: "text",
+                      backgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      color: "transparent",
+                    }}
+                  >
                     {isAr ? service.name_ar : service.name_en}
                   </h3>
 
