@@ -16,6 +16,8 @@ import PdfViewerDialog from "@/components/PdfViewerDialog";
 import { supabase } from "@/integrations/supabase/client";
 import ProductTreeEditor from "@/components/admin/ProductTreeEditor";
 import PhoneInput from "@/components/PhoneInput";
+import { checkServiceImages, type ServiceImageIssue } from "@/lib/serviceImageCheck";
+import { AlertTriangle } from "lucide-react";
 
 const TRANSLATE_URL = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/translate`;
 
