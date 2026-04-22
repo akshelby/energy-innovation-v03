@@ -114,8 +114,13 @@ export default function ServicesSection() {
                 style={{
                   transitionDelay: `${i * 100}ms`,
                   minHeight: "420px",
-                  border: "1px solid #e5e7eb",
                   borderRadius: "20px",
+                  padding: "1.5px",
+                  backgroundImage:
+                    "linear-gradient(hsl(var(--card)), hsl(var(--card))), linear-gradient(135deg, #2997ff 0%, #a855f7 50%, #ef4444 100%)",
+                  backgroundOrigin: "border-box",
+                  backgroundClip: "padding-box, border-box",
+                  border: "1.5px solid transparent",
                 }}
                 onClick={() => {
                   if (service.pdf_url) {
