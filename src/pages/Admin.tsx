@@ -1388,7 +1388,7 @@ export default function Admin() {
           </div>
           {item.image_url ? (
             <div className="mt-2 flex items-center gap-2">
-              <img src={item.image_url} alt="Preview" className="h-20 w-32 object-cover rounded-lg border border-border" />
+              <img src={resolvePreviewUrl(item.image_url)} alt="Preview" className="h-20 w-32 object-cover rounded-lg border border-border" />
               <span className="text-xs text-green-600 font-medium">✓ Image uploaded</span>
             </div>
           ) : (
