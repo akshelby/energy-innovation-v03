@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,9 +7,16 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Send, Phone, Mail, Globe } from "lucide-react";
-import * as LucideIcons from "lucide-react";
-import PhoneInput from "@/components/PhoneInput";
+import { Send, Phone, Mail, Globe, MapPin, Building, Building2, Home, Navigation, Smartphone, MessageSquare, MessageCircle, AtSign, Send as SendIcon, Headphones, Clock, Map } from "lucide-react";
+const PhoneInput = lazy(() => import("@/components/PhoneInput"));
+
+// Whitelisted set of icons that can be configured for contact cards from the admin.
+// Avoids `import * as LucideIcons` which pulls the whole icon library into the bundle.
+const CONTACT_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  Phone, Mail, Globe, MapPin, Building, Building2, Home, Navigation,
+  Smartphone, MessageSquare, MessageCircle, AtSign, Send: SendIcon,
+  Headphones, Clock, Map,
+};
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, "Name required").max(100),
@@ -127,7 +134,7 @@ export default function ContactSection() {
     if (iconVal.startsWith("http") || iconVal.startsWith("/") || iconVal.startsWith("data:")) {
       return { type: "image" as const, src: iconVal };
     }
-    const IconComp = LucideIcons[iconVal as keyof typeof LucideIcons] as React.ComponentType<{ className?: string }> | undefined;
+    const IconComp = CONTACT_ICONS[iconVal];
     return { type: "lucide" as const, component: IconComp || Phone };
   };
 
@@ -228,10 +235,12 @@ export default function ContactSection() {
             <div className="grid sm:grid-cols-2 gap-5">
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">{t("contact.phone")}</label>
-                <PhoneInput
-                  value={form.phone}
-                  onChange={(val) => setForm({ ...form, phone: val })}
-                />
+                <Suspense fallback={<div className="h-10 rounded-xl bg-muted/50 animate-pulse" />}>
+                  <PhoneInput
+                    value={form.phone}
+                    onChange={(val) => setForm({ ...form, phone: val })}
+                  />
+                </Suspense>
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">{t("contact.company")}</label>
