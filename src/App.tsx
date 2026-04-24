@@ -31,6 +31,7 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/index" element={<Index />} />
               <Route path="/careers" element={<Suspense fallback={null}><Careers /></Suspense>} />
               <Route path="/products/:productId" element={<Suspense fallback={null}><SubProductsPage /></Suspense>} />
               <Route path="/products/item/:itemId" element={<Suspense fallback={null}><SubProductsPage /></Suspense>} />
