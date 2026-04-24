@@ -128,6 +128,60 @@ export type Database = {
         }
         Relationships: []
       }
+      decorations: {
+        Row: {
+          color_token: string
+          created_at: string
+          id: string
+          is_active: boolean
+          opacity: number
+          position_x: string
+          position_y: string
+          rotation: number
+          section_key: string
+          shape_type: string
+          size: number
+          sort_order: number
+          stroke_width: number
+          updated_at: string
+          variant: string
+        }
+        Insert: {
+          color_token?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          opacity?: number
+          position_x?: string
+          position_y?: string
+          rotation?: number
+          section_key: string
+          shape_type?: string
+          size?: number
+          sort_order?: number
+          stroke_width?: number
+          updated_at?: string
+          variant?: string
+        }
+        Update: {
+          color_token?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          opacity?: number
+          position_x?: string
+          position_y?: string
+          rotation?: number
+          section_key?: string
+          shape_type?: string
+          size?: number
+          sort_order?: number
+          stroke_width?: number
+          updated_at?: string
+          variant?: string
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           company: string | null
