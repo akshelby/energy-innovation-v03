@@ -27,16 +27,14 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes("node_modules")) {
-            if (id.includes("lucide-react")) return "icons";
-            if (id.includes("react-router")) return "react-vendor";
-            if (id.includes("react-dom") || id.match(/[\\/]react[\\/]/)) return "react-vendor";
-            if (id.includes("@supabase")) return "supabase";
-            if (id.includes("@radix-ui")) return "ui-radix";
-            if (id.includes("@tanstack")) return "query";
-            if (id.includes("framer-motion")) return "motion";
-            if (id.includes("embla-carousel")) return "embla";
-            return "vendor";
+          // Only split lucide-react into its own chunk to prevent the
+          // 30+ icon waterfall on the hosted site. Keep everything else
+          // in Rollup's default vendor chunking to avoid circular-
+          // dependency / temporal-dead-zone errors that arise when React,
+          // React-DOM, Router and other tightly coupled libs are split
+          // across separate chunks.
+          if (id.includes("node_modules") && id.includes("lucide-react")) {
+            return "icons";
           }
         },
       },
