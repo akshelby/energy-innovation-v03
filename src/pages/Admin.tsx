@@ -3819,9 +3819,23 @@ export default function Admin() {
                   <div>
                     <Label className="text-xs">Background Color</Label>
                     <div className="flex gap-2 items-center">
-                      <input type="color" value={placeholderBg} onChange={(e) => setPlaceholderBg(e.target.value)} className="w-10 h-10 rounded border border-border cursor-pointer" />
-                      <Input value={placeholderBg} onChange={(e) => setPlaceholderBg(e.target.value)} placeholder="#1e293b" />
+                      <input
+                        type="color"
+                        value={placeholderBg === "transparent" ? "#000000" : placeholderBg}
+                        onChange={(e) => setPlaceholderBg(e.target.value)}
+                        disabled={placeholderBg === "transparent"}
+                        className="w-10 h-10 rounded border border-border cursor-pointer disabled:opacity-40"
+                      />
+                      <Input value={placeholderBg} onChange={(e) => setPlaceholderBg(e.target.value)} placeholder="#1e293b or transparent" />
                     </div>
+                    <label className="flex items-center gap-2 mt-2 text-xs text-muted-foreground cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={placeholderBg === "transparent"}
+                        onChange={(e) => setPlaceholderBg(e.target.checked ? "transparent" : "#1e293b")}
+                      />
+                      Transparent background
+                    </label>
                   </div>
                   <div>
                     <Label className="text-xs">Text Color</Label>
