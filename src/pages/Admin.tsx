@@ -3767,6 +3767,133 @@ export default function Admin() {
           </div>
         )}
 
+        {/* ─── Partners Tab ──────── */}
+        {activeTab === "partners" && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-foreground">Partners</h2>
+              <div className="flex gap-2">
+                <Button size="sm" onClick={() => setEditingPartner({ name_en: "", name_ar: "", logo_url: null, website_url: "", sort_order: partners.length, is_active: true })} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                  <Plus className="w-4 h-4 mr-2" />Add Partner
+                </Button>
+                <Button variant="outline" size="sm" onClick={fetchPartners} disabled={loading} className="rounded-xl">
+                  <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
+                </Button>
+              </div>
+            </div>
+
+            {/* Section text editor */}
+            <div className="bg-card border border-border rounded-2xl p-6 mb-6">
+              <h3 className="font-semibold text-foreground mb-4">Section Heading</h3>
+              <div className="grid md:grid-cols-3 gap-4">
+                <div>
+                  <Label className="text-xs">Tag</Label>
+                  <Input value={partnersTag} onChange={(e) => setPartnersTag(e.target.value)} placeholder="Our Partners" />
+                </div>
+                <div>
+                  <Label className="text-xs">Title</Label>
+                  <Input value={partnersTitle} onChange={(e) => setPartnersTitle(e.target.value)} placeholder="Trusted by Industry Leaders" />
+                </div>
+                <div>
+                  <Label className="text-xs">Subtitle</Label>
+                  <Input value={partnersSubtitle} onChange={(e) => setPartnersSubtitle(e.target.value)} placeholder="Subtitle..." />
+                </div>
+              </div>
+              <Button size="sm" onClick={handleSavePartnersText} disabled={loading} className="mt-4 gradient-accent text-accent-foreground rounded-xl border-0">
+                <Save className="w-4 h-4 mr-2" />Save Section Text
+              </Button>
+              <p className="text-xs text-muted-foreground mt-2">Arabic translations are generated automatically.</p>
+            </div>
+
+            {/* Editor */}
+            {editingPartner && (
+              <div className="bg-card border-2 border-accent/40 rounded-2xl p-6 mb-6">
+                <h3 className="font-semibold text-foreground mb-4">{editingPartner.id ? "Edit Partner" : "New Partner"}</h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-xs">Name (English)</Label>
+                    <Input value={editingPartner.name_en} onChange={(e) => setEditingPartner({ ...editingPartner, name_en: e.target.value })} placeholder="Siemens" />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Website URL (optional)</Label>
+                    <Input value={editingPartner.website_url || ""} onChange={(e) => setEditingPartner({ ...editingPartner, website_url: e.target.value })} placeholder="https://..." />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Sort Order</Label>
+                    <Input type="number" value={editingPartner.sort_order} onChange={(e) => setEditingPartner({ ...editingPartner, sort_order: parseInt(e.target.value) || 0 })} />
+                  </div>
+                  <div className="flex items-center gap-3 mt-6">
+                    <input type="checkbox" id="partner-active" checked={editingPartner.is_active} onChange={(e) => setEditingPartner({ ...editingPartner, is_active: e.target.checked })} />
+                    <Label htmlFor="partner-active">Active</Label>
+                  </div>
+                </div>
+
+                {/* Logo upload */}
+                <div className="mt-4">
+                  <Label className="text-xs">Logo</Label>
+                  <div className="flex items-center gap-4 mt-2">
+                    {editingPartner.logo_url ? (
+                      <img src={resolvePreviewUrl(editingPartner.logo_url)} alt="logo" className="w-20 h-20 object-contain rounded-lg border border-border bg-muted/40" />
+                    ) : (
+                      <div className="w-20 h-20 rounded-lg border border-border bg-muted/40 flex items-center justify-center">
+                        <Building className="w-6 h-6 text-muted-foreground/40" />
+                      </div>
+                    )}
+                    <input ref={partnerLogoRef} type="file" accept="image/*" className="hidden" onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleFormFileUpload(file, "images", "partners", (url) => setEditingPartner({ ...editingPartner!, logo_url: url }));
+                    }} />
+                    <Button variant="outline" size="sm" onClick={() => partnerLogoRef.current?.click()} className="rounded-xl">
+                      <Upload className="w-4 h-4 mr-2" />Upload Logo
+                    </Button>
+                    {editingPartner.logo_url && (
+                      <Button variant="outline" size="sm" onClick={() => setEditingPartner({ ...editingPartner, logo_url: null })} className="rounded-xl">
+                        Remove
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex gap-2 mt-6">
+                  <Button onClick={() => handleSavePartner(editingPartner)} disabled={loading || !editingPartner.name_en} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                    <Save className="w-4 h-4 mr-2" />Save
+                  </Button>
+                  <Button variant="outline" onClick={() => setEditingPartner(null)} className="rounded-xl">Cancel</Button>
+                </div>
+              </div>
+            )}
+
+            {partners.length === 0 && !editingPartner ? (
+              <div className="text-center py-16 text-muted-foreground">
+                <Building className="w-12 h-12 mx-auto mb-4 opacity-30" /><p>No partners yet. Add your first one!</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {partners.map((p) => (
+                  <div key={p.id} className="bg-card border border-border rounded-2xl p-4 flex items-center gap-4">
+                    <GripVertical className="w-4 h-4 text-muted-foreground shrink-0" />
+                    {p.logo_url ? (
+                      <img src={resolvePreviewUrl(p.logo_url)} alt={p.name_en} className="w-14 h-14 object-contain rounded-lg border border-border bg-muted/40 shrink-0" />
+                    ) : (
+                      <div className="w-14 h-14 bg-muted rounded-lg flex items-center justify-center shrink-0">
+                        <Building className="w-5 h-5 text-muted-foreground/40" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-foreground truncate">{p.name_en || "Untitled"}</h3>
+                      <p className="text-xs text-muted-foreground truncate">{p.website_url || "No website"} · #{p.sort_order} · {p.is_active ? "Active" : "Hidden"}</p>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={() => setEditingPartner(p)} className="rounded-xl">Edit</Button>
+                    <Button variant="outline" size="sm" onClick={() => handleDeletePartner(p.id)} className="rounded-xl text-destructive hover:text-destructive">
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* ─── Email Templates Tab ──────── */}
         {activeTab === "email-templates" && (
           <div>
