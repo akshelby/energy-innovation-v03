@@ -66,29 +66,20 @@ export default function PartnersSection() {
               "linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%)",
           }}
         >
-          <div className="flex w-max animate-marquee gap-3 md:gap-12">
+          <div className="flex w-max animate-marquee items-center gap-10 md:gap-20">
             {loop.map((p, i) => {
               const name = language === "ar" ? p.name_ar || p.name_en : p.name_en;
-              const Inner = (
-                <div className="flex flex-col items-center justify-center gap-3 w-[28vw] max-w-[180px] min-w-[100px] md:min-w-[180px] px-3 md:px-4 py-4 md:py-5 rounded-2xl bg-card border border-border/60 hover:border-accent/60 transition-colors duration-300">
-                  <div className="w-14 h-14 md:w-24 md:h-24 flex items-center justify-center rounded-xl bg-muted/40 overflow-hidden">
-                    {p.logo_url ? (
-                      <img
-                        src={p.logo_url}
-                        alt={name}
-                        loading="lazy"
-                        className="max-w-full max-h-full object-contain"
-                      />
-                    ) : (
-                      <span className="text-xl md:text-2xl font-black text-muted-foreground/70 tracking-tight">
-                        {(name || "?").slice(0, 2).toUpperCase()}
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-sm md:text-base font-semibold text-foreground text-center line-clamp-1">
-                    {name}
-                  </span>
-                </div>
+              const Inner = p.logo_url ? (
+                <img
+                  src={p.logo_url}
+                  alt={name}
+                  loading="lazy"
+                  className="h-12 md:h-20 w-auto max-w-[140px] md:max-w-[200px] object-contain opacity-70 hover:opacity-100 grayscale hover:grayscale-0 transition-all duration-300"
+                />
+              ) : (
+                <span className="text-lg md:text-2xl font-bold text-muted-foreground/70 hover:text-foreground transition-colors duration-300 whitespace-nowrap">
+                  {name}
+                </span>
               );
               return p.website_url ? (
                 <a
@@ -96,12 +87,12 @@ export default function PartnersSection() {
                   href={p.website_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="shrink-0"
+                  className="shrink-0 flex items-center justify-center"
                 >
                   {Inner}
                 </a>
               ) : (
-                <div key={`${p.id}-${i}`} className="shrink-0">
+                <div key={`${p.id}-${i}`} className="shrink-0 flex items-center justify-center">
                   {Inner}
                 </div>
               );
