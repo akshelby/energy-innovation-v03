@@ -281,7 +281,7 @@ export default function Admin() {
   const [checkingServiceImages, setCheckingServiceImages] = useState(false);
 
   // Partners state
-  type PartnerItem = { id?: string; name_en: string; name_ar: string; logo_url: string | null; website_url: string | null; sort_order: number; is_active: boolean };
+  type PartnerItem = { id?: string; name_en: string; name_ar: string; logo_url: string | null; website_url: string | null; sort_order: number; is_active: boolean; logo_height?: number };
   const [partners, setPartners] = useState<(PartnerItem & { id: string })[]>([]);
   const [editingPartner, setEditingPartner] = useState<PartnerItem | null>(null);
   const [partnersTag, setPartnersTag] = useState("Our Partners");
@@ -3774,7 +3774,7 @@ export default function Admin() {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold text-foreground">Partners</h2>
               <div className="flex gap-2">
-                <Button size="sm" onClick={() => setEditingPartner({ name_en: "", name_ar: "", logo_url: null, website_url: "", sort_order: partners.length, is_active: true })} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                <Button size="sm" onClick={() => setEditingPartner({ name_en: "", name_ar: "", logo_url: null, website_url: "", sort_order: partners.length, is_active: true, logo_height: 80 })} className="gradient-accent text-accent-foreground rounded-xl border-0">
                   <Plus className="w-4 h-4 mr-2" />Add Partner
                 </Button>
                 <Button variant="outline" size="sm" onClick={fetchPartners} disabled={loading} className="rounded-xl">
@@ -3822,6 +3822,10 @@ export default function Admin() {
                   <div>
                     <Label className="text-xs">Sort Order</Label>
                     <Input type="number" value={editingPartner.sort_order} onChange={(e) => setEditingPartner({ ...editingPartner, sort_order: parseInt(e.target.value) || 0 })} />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Logo Height (px) — desktop. Mobile auto-scales to ~60%.</Label>
+                    <Input type="number" min={24} max={200} value={editingPartner.logo_height ?? 80} onChange={(e) => setEditingPartner({ ...editingPartner, logo_height: Math.max(24, Math.min(200, parseInt(e.target.value) || 80)) })} />
                   </div>
                   <div className="flex items-center gap-3 mt-6">
                     <input type="checkbox" id="partner-active" checked={editingPartner.is_active} onChange={(e) => setEditingPartner({ ...editingPartner, is_active: e.target.checked })} />

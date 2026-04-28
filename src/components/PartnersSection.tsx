@@ -9,6 +9,7 @@ interface Partner {
   name_ar: string;
   logo_url: string | null;
   website_url: string | null;
+  logo_height?: number | null;
 }
 
 const CACHE_KEY = "partners_v1";
@@ -23,7 +24,7 @@ export default function PartnersSection() {
     (async () => {
       const { data, error } = await supabase
         .from("partners")
-        .select("id, name_en, name_ar, logo_url, website_url, sort_order, is_active")
+        .select("id, name_en, name_ar, logo_url, website_url, sort_order, is_active, logo_height")
         .eq("is_active", true)
         .order("sort_order", { ascending: true });
       if (cancelled) return;
