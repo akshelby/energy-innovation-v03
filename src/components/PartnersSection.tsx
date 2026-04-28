@@ -70,12 +70,15 @@ export default function PartnersSection() {
           <div className="flex w-max animate-marquee items-center gap-10 md:gap-20">
             {loop.map((p, i) => {
               const name = language === "ar" ? p.name_ar || p.name_en : p.name_en;
+              const desktopH = p.logo_height && p.logo_height > 0 ? p.logo_height : 80;
+              const mobileH = Math.max(24, Math.round(desktopH * 0.6));
               const Inner = p.logo_url ? (
                 <img
                   src={p.logo_url}
                   alt={name}
                   loading="lazy"
-                  className="h-12 md:h-20 w-auto max-w-[140px] md:max-w-[200px] object-contain opacity-70 hover:opacity-100 grayscale hover:grayscale-0 transition-all duration-300"
+                  style={{ height: `var(--logo-h)`, ['--logo-h-mobile' as any]: `${mobileH}px`, ['--logo-h-desktop' as any]: `${desktopH}px` }}
+                  className="w-auto max-w-[40vw] md:max-w-[260px] object-contain opacity-70 hover:opacity-100 grayscale hover:grayscale-0 transition-all duration-300 [height:var(--logo-h-mobile)] md:[height:var(--logo-h-desktop)]"
                 />
               ) : (
                 <span className="text-lg md:text-2xl font-bold text-muted-foreground/70 hover:text-foreground transition-colors duration-300 whitespace-nowrap">
