@@ -73,13 +73,18 @@ export default function PartnersSection() {
               const desktopH = p.logo_height && p.logo_height > 0 ? p.logo_height : 80;
               const mobileH = Math.max(24, Math.round(desktopH * 0.6));
               const Inner = p.logo_url ? (
-                <img
-                  src={p.logo_url}
-                  alt={name}
-                  loading="lazy"
-                  style={{ height: `var(--logo-h)`, ['--logo-h-mobile' as any]: `${mobileH}px`, ['--logo-h-desktop' as any]: `${desktopH}px` }}
-                  className="w-auto max-w-[40vw] md:max-w-[260px] object-contain opacity-70 hover:opacity-100 grayscale hover:grayscale-0 transition-all duration-300 [height:var(--logo-h-mobile)] md:[height:var(--logo-h-desktop)]"
-                />
+                <picture>
+                  <source media="(min-width: 768px)" srcSet={p.logo_url} />
+                  <img
+                    src={p.logo_url}
+                    alt={name}
+                    loading="lazy"
+                    style={{ height: `var(--ph)` } as any}
+                    className="partner-logo w-auto max-w-[40vw] md:max-w-[260px] object-contain opacity-70 hover:opacity-100 grayscale hover:grayscale-0 transition-all duration-300"
+                    data-mobile-h={mobileH}
+                    data-desktop-h={desktopH}
+                  />
+                </picture>
               ) : (
                 <span className="text-lg md:text-2xl font-bold text-muted-foreground/70 hover:text-foreground transition-colors duration-300 whitespace-nowrap">
                   {name}
