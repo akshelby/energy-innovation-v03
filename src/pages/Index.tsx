@@ -71,6 +71,7 @@ const Index = () => {
         <ServicesSection />
         <HighlightSection />
         <WhyChooseUsSection />
+        <PartnersSection />
         <ContactSection />
         <Footer />
         <FloatingButtons />
