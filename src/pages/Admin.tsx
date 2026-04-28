@@ -252,7 +252,7 @@ const emptyService: ServiceItem = {
   tag_en: "", tag_ar: "", image_url: null, pdf_url: null, icon: "Wrench", sort_order: 0,
 };
 
-type TabKey = "leads" | "content" | "products" | "services" | "images" | "branding" | "highlight" | "careers" | "admin-emails" | "product-enquiries" | "footer" | "contact" | "email-templates" | "seo";
+type TabKey = "leads" | "content" | "products" | "services" | "images" | "branding" | "highlight" | "careers" | "admin-emails" | "product-enquiries" | "footer" | "contact" | "email-templates" | "seo" | "partners";
 
 const emptyMenuChild: MenuChildItem = {
   category_key: "cat.fire", parent_id: null, name_en: "", name_ar: "", pdf_url: null, image_url: null, sort_order: 0, is_active: true,
