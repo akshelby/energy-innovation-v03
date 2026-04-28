@@ -9,6 +9,7 @@ interface Partner {
   name_ar: string;
   logo_url: string | null;
   website_url: string | null;
+  logo_height?: number | null;
 }
 
 const CACHE_KEY = "partners_v1";
@@ -23,7 +24,7 @@ export default function PartnersSection() {
     (async () => {
       const { data, error } = await supabase
         .from("partners")
-        .select("id, name_en, name_ar, logo_url, website_url, sort_order, is_active")
+        .select("id, name_en, name_ar, logo_url, website_url, sort_order, is_active, logo_height")
         .eq("is_active", true)
         .order("sort_order", { ascending: true });
       if (cancelled) return;
@@ -69,13 +70,20 @@ export default function PartnersSection() {
           <div className="flex w-max animate-marquee items-center gap-10 md:gap-20">
             {loop.map((p, i) => {
               const name = language === "ar" ? p.name_ar || p.name_en : p.name_en;
+              const desktopH = p.logo_height && p.logo_height > 0 ? p.logo_height : 80;
+              const mobileH = Math.max(24, Math.round(desktopH * 0.6));
               const Inner = p.logo_url ? (
-                <img
-                  src={p.logo_url}
-                  alt={name}
-                  loading="lazy"
-                  className="h-12 md:h-20 w-auto max-w-[140px] md:max-w-[200px] object-contain opacity-70 hover:opacity-100 grayscale hover:grayscale-0 transition-all duration-300"
-                />
+                <div
+                  style={{ ['--ph-m' as any]: `${mobileH}px`, ['--ph-d' as any]: `${desktopH}px` }}
+                  className="flex items-center justify-center h-[var(--ph-m)] md:h-[var(--ph-d)]"
+                >
+                  <img
+                    src={p.logo_url}
+                    alt={name}
+                    loading="lazy"
+                    className="h-full w-auto max-w-[40vw] md:max-w-[260px] object-contain opacity-70 hover:opacity-100 grayscale hover:grayscale-0 transition-all duration-300"
+                  />
+                </div>
               ) : (
                 <span className="text-lg md:text-2xl font-bold text-muted-foreground/70 hover:text-foreground transition-colors duration-300 whitespace-nowrap">
                   {name}
