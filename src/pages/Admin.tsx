@@ -287,6 +287,9 @@ export default function Admin() {
   const [partnersTag, setPartnersTag] = useState("Our Partners");
   const [partnersTitle, setPartnersTitle] = useState("Trusted by Industry Leaders");
   const [partnersSubtitle, setPartnersSubtitle] = useState("We collaborate with world-class brands to deliver excellence.");
+  const [placeholderBg, setPlaceholderBg] = useState("#1e293b");
+  const [placeholderText, setPlaceholderText] = useState("#ffffff");
+  const [placeholderShape, setPlaceholderShape] = useState<"rounded" | "pill" | "square">("rounded");
   const partnerLogoRef = useRef<HTMLInputElement>(null);
 
   // Menu Items state
@@ -531,9 +534,15 @@ export default function Admin() {
       const tag = content.find((c: ContentItem) => c.content_key === "partners.tag");
       const title = content.find((c: ContentItem) => c.content_key === "partners.title");
       const sub = content.find((c: ContentItem) => c.content_key === "partners.subtitle");
+      const phBg = content.find((c: ContentItem) => c.content_key === "partners.placeholder_bg");
+      const phText = content.find((c: ContentItem) => c.content_key === "partners.placeholder_text");
+      const phShape = content.find((c: ContentItem) => c.content_key === "partners.placeholder_shape");
       if (tag) setPartnersTag(tag.value_en || "");
       if (title) setPartnersTitle(title.value_en || "");
       if (sub) setPartnersSubtitle(sub.value_en || "");
+      if (phBg?.value_en) setPlaceholderBg(phBg.value_en);
+      if (phText?.value_en) setPlaceholderText(phText.value_en);
+      if (phShape?.value_en) setPlaceholderShape((phShape.value_en as any) || "rounded");
     } catch (e: any) { toast.error(e.message); }
     finally { setLoading(false); }
   }, [storedPassword]);
@@ -578,6 +587,9 @@ export default function Admin() {
       await apiCall("content", "POST", storedPassword, { content_key: "partners.tag", value_en: partnersTag, value_ar: tagAr });
       await apiCall("content", "POST", storedPassword, { content_key: "partners.title", value_en: partnersTitle, value_ar: titleAr });
       await apiCall("content", "POST", storedPassword, { content_key: "partners.subtitle", value_en: partnersSubtitle, value_ar: subtitleAr });
+      await apiCall("content", "POST", storedPassword, { content_key: "partners.placeholder_bg", value_en: placeholderBg, value_ar: placeholderBg });
+      await apiCall("content", "POST", storedPassword, { content_key: "partners.placeholder_text", value_en: placeholderText, value_ar: placeholderText });
+      await apiCall("content", "POST", storedPassword, { content_key: "partners.placeholder_shape", value_en: placeholderShape, value_ar: placeholderShape });
       toast.success("Section text saved");
     } catch (e: any) { toast.error(e.message); }
     finally { setLoading(false); }
@@ -3800,6 +3812,44 @@ export default function Admin() {
                   <Input value={partnersSubtitle} onChange={(e) => setPartnersSubtitle(e.target.value)} placeholder="Subtitle..." />
                 </div>
               </div>
+
+              <div className="mt-6 pt-6 border-t border-border">
+                <h4 className="font-semibold text-foreground mb-3 text-sm">Placeholder Style (shown when partner has no logo)</h4>
+                <div className="grid md:grid-cols-3 gap-4">
+                  <div>
+                    <Label className="text-xs">Background Color</Label>
+                    <div className="flex gap-2 items-center">
+                      <input type="color" value={placeholderBg} onChange={(e) => setPlaceholderBg(e.target.value)} className="w-10 h-10 rounded border border-border cursor-pointer" />
+                      <Input value={placeholderBg} onChange={(e) => setPlaceholderBg(e.target.value)} placeholder="#1e293b" />
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-xs">Text Color</Label>
+                    <div className="flex gap-2 items-center">
+                      <input type="color" value={placeholderText} onChange={(e) => setPlaceholderText(e.target.value)} className="w-10 h-10 rounded border border-border cursor-pointer" />
+                      <Input value={placeholderText} onChange={(e) => setPlaceholderText(e.target.value)} placeholder="#ffffff" />
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-xs">Shape</Label>
+                    <select value={placeholderShape} onChange={(e) => setPlaceholderShape(e.target.value as any)} className="w-full h-10 px-3 rounded-md border border-border bg-background text-foreground">
+                      <option value="rounded">Rounded</option>
+                      <option value="pill">Pill</option>
+                      <option value="square">Square</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="mt-4 flex items-center gap-3">
+                  <span className="text-xs text-muted-foreground">Preview:</span>
+                  <span
+                    className={`inline-flex items-center px-5 py-2.5 font-bold text-base ${placeholderShape === "pill" ? "rounded-full" : placeholderShape === "square" ? "rounded-none" : "rounded-lg"}`}
+                    style={{ backgroundColor: placeholderBg, color: placeholderText }}
+                  >
+                    Siemens
+                  </span>
+                </div>
+              </div>
+
               <Button size="sm" onClick={handleSavePartnersText} disabled={loading} className="mt-4 gradient-accent text-accent-foreground rounded-xl border-0">
                 <Save className="w-4 h-4 mr-2" />Save Section Text
               </Button>
