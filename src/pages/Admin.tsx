@@ -279,6 +279,15 @@ export default function Admin() {
   const [serviceImageIssues, setServiceImageIssues] = useState<ServiceImageIssue[]>([]);
   const [checkingServiceImages, setCheckingServiceImages] = useState(false);
 
+  // Partners state
+  type PartnerItem = { id?: string; name_en: string; name_ar: string; logo_url: string | null; website_url: string | null; sort_order: number; is_active: boolean };
+  const [partners, setPartners] = useState<(PartnerItem & { id: string })[]>([]);
+  const [editingPartner, setEditingPartner] = useState<PartnerItem | null>(null);
+  const [partnersTag, setPartnersTag] = useState("Our Partners");
+  const [partnersTitle, setPartnersTitle] = useState("Trusted by Industry Leaders");
+  const [partnersSubtitle, setPartnersSubtitle] = useState("We collaborate with world-class brands to deliver excellence.");
+  const partnerLogoRef = useRef<HTMLInputElement>(null);
+
   // Menu Items state
   const [menuItems, setMenuItems] = useState<(MenuChildItem & { id: string })[]>([]);
   const [editingMenuItem, setEditingMenuItem] = useState<MenuChildItem | null>(null);
