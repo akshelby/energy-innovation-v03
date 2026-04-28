@@ -66,7 +66,7 @@ export default function PartnersSection() {
               "linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%)",
           }}
         >
-          <div className="flex w-max animate-marquee gap-8 md:gap-12">
+          <div className="flex w-max animate-marquee gap-3 md:gap-12">
             {loop.map((p, i) => {
               const name = language === "ar" ? p.name_ar || p.name_en : p.name_en;
               const Inner = (
