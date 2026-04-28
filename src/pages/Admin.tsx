@@ -1553,6 +1553,7 @@ export default function Admin() {
             { key: "contact" as TabKey, icon: Phone, label: "Contact Section" },
             { key: "footer" as TabKey, icon: Globe, label: "Footer" },
             { key: "admin-emails" as TabKey, icon: Shield, label: `Admin Access (${adminEmails.length})` },
+            { key: "partners" as TabKey, icon: Building, label: `Partners (${partners.length})` },
             { key: "email-templates" as TabKey, icon: Mail, label: "Email Templates" },
           ]).map((tab) => (
             <Button key={tab.key} variant={activeTab === tab.key ? "default" : "outline"} onClick={() => setActiveTab(tab.key)} className="rounded-xl">
