@@ -23,7 +23,7 @@ export default function AboutSection() {
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
             {t("about.title")}
           </h2>
-          <div className="max-w-3xl mx-auto relative">
+          <div className="w-full mx-auto relative">
             <div
               className="overflow-hidden md:!max-h-none md:!opacity-100"
               style={{
