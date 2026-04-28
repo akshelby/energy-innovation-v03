@@ -66,16 +66,15 @@ const Index = () => {
       <Header />
       <HeroSection />
       <AboutSection />
-      <Suspense fallback={null}>
-        <ProductsSection />
-        <ServicesSection />
-        <HighlightSection />
-        <WhyChooseUsSection />
-        <PartnersSection />
-        <ContactSection />
-        <Footer />
-        <FloatingButtons />
-      </Suspense>
+      {/* Per-section Suspense so each chunk paints independently */}
+      <Suspense fallback={null}><ProductsSection /></Suspense>
+      <Suspense fallback={null}><ServicesSection /></Suspense>
+      <Suspense fallback={null}><HighlightSection /></Suspense>
+      <Suspense fallback={null}><WhyChooseUsSection /></Suspense>
+      <Suspense fallback={null}><PartnersSection /></Suspense>
+      <Suspense fallback={null}><ContactSection /></Suspense>
+      <Suspense fallback={null}><Footer /></Suspense>
+      <Suspense fallback={null}><FloatingButtons /></Suspense>
     </main>
   );
 };
