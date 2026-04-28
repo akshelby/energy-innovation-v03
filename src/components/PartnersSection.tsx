@@ -68,27 +68,38 @@ export default function PartnersSection() {
           }}
         >
           <div className="flex w-max animate-marquee items-center gap-10 md:gap-20">
-            {loop.map((p, i) => {
-              const name = language === "ar" ? p.name_ar || p.name_en : p.name_en;
-              const desktopH = p.logo_height && p.logo_height > 0 ? p.logo_height : 80;
-              const mobileH = Math.max(24, Math.round(desktopH * 0.6));
-              const Inner = p.logo_url ? (
-                <div
-                  style={{ ['--ph-m' as any]: `${mobileH}px`, ['--ph-d' as any]: `${desktopH}px` }}
-                  className="flex items-center justify-center h-[var(--ph-m)] md:h-[var(--ph-d)]"
-                >
-                  <img
-                    src={p.logo_url}
-                    alt={name}
-                    loading="lazy"
-                    className="h-full w-auto max-w-[40vw] md:max-w-[260px] object-contain opacity-70 hover:opacity-100 grayscale hover:grayscale-0 transition-all duration-300"
-                  />
-                </div>
-              ) : (
-                <span className="text-lg md:text-2xl font-bold text-muted-foreground/70 hover:text-foreground transition-colors duration-300 whitespace-nowrap">
-                  {name}
-                </span>
-              );
+            {(() => {
+              const phBgRaw = t("partners.placeholder_bg");
+              const phTextRaw = t("partners.placeholder_text");
+              const phShapeRaw = t("partners.placeholder_shape");
+              const phBg = phBgRaw && phBgRaw !== "partners.placeholder_bg" ? phBgRaw : "hsl(var(--muted))";
+              const phText = phTextRaw && phTextRaw !== "partners.placeholder_text" ? phTextRaw : "hsl(var(--foreground))";
+              const phShape = phShapeRaw && phShapeRaw !== "partners.placeholder_shape" ? phShapeRaw : "rounded";
+              const shapeClass = phShape === "pill" ? "rounded-full" : phShape === "square" ? "rounded-none" : "rounded-lg";
+              return loop.map((p, i) => {
+                const name = language === "ar" ? p.name_ar || p.name_en : p.name_en;
+                const desktopH = p.logo_height && p.logo_height > 0 ? p.logo_height : 80;
+                const mobileH = Math.max(24, Math.round(desktopH * 0.6));
+                const Inner = p.logo_url ? (
+                  <div
+                    style={{ ['--ph-m' as any]: `${mobileH}px`, ['--ph-d' as any]: `${desktopH}px` }}
+                    className="flex items-center justify-center h-[var(--ph-m)] md:h-[var(--ph-d)]"
+                  >
+                    <img
+                      src={p.logo_url}
+                      alt={name}
+                      loading="lazy"
+                      className="h-full w-auto max-w-[40vw] md:max-w-[260px] object-contain opacity-70 hover:opacity-100 grayscale hover:grayscale-0 transition-all duration-300"
+                    />
+                  </div>
+                ) : (
+                  <span
+                    style={{ backgroundColor: phBg, color: phText }}
+                    className={`inline-flex items-center px-4 md:px-6 py-2 md:py-3 text-sm md:text-lg font-bold whitespace-nowrap ${shapeClass} transition-transform duration-300 hover:scale-105`}
+                  >
+                    {name}
+                  </span>
+                );
               return p.website_url ? (
                 <a
                   key={`${p.id}-${i}`}
