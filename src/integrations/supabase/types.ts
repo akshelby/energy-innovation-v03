@@ -163,6 +163,7 @@ export type Database = {
           created_at: string
           id: string
           is_active: boolean
+          logo_height: number
           logo_url: string | null
           name_ar: string
           name_en: string
@@ -174,6 +175,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          logo_height?: number
           logo_url?: string | null
           name_ar?: string
           name_en?: string
@@ -185,6 +187,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          logo_height?: number
           logo_url?: string | null
           name_ar?: string
           name_en?: string
