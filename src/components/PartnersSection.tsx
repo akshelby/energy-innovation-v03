@@ -70,8 +70,8 @@ export default function PartnersSection() {
             {loop.map((p, i) => {
               const name = language === "ar" ? p.name_ar || p.name_en : p.name_en;
               const Inner = (
-                <div className="flex flex-col items-center justify-center gap-3 min-w-[140px] md:min-w-[180px] px-4 py-5 rounded-2xl bg-card border border-border/60 hover:border-accent/60 transition-colors duration-300">
-                  <div className="w-20 h-20 md:w-24 md:h-24 flex items-center justify-center rounded-xl bg-muted/40 overflow-hidden">
+                <div className="flex flex-col items-center justify-center gap-3 w-[28vw] max-w-[180px] min-w-[100px] md:min-w-[180px] px-3 md:px-4 py-4 md:py-5 rounded-2xl bg-card border border-border/60 hover:border-accent/60 transition-colors duration-300">
+                  <div className="w-14 h-14 md:w-24 md:h-24 flex items-center justify-center rounded-xl bg-muted/40 overflow-hidden">
                     {p.logo_url ? (
                       <img
                         src={p.logo_url}
