@@ -581,6 +581,8 @@ export default function Admin() {
     } catch (e: any) { toast.error(e.message); }
     finally { setLoading(false); }
   };
+
+  const fetchMenuItems = useCallback(async () => {
     setLoading(true);
     try {
       const data = await apiCall("product-items", "GET", storedPassword);
