@@ -520,7 +520,67 @@ export default function Admin() {
     finally { setLoading(false); }
   }, [storedPassword]);
 
-  const fetchMenuItems = useCallback(async () => {
+  const fetchPartners = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await apiCall("partners", "GET", storedPassword);
+      setPartners(data);
+      // Load section text from site_content
+      const content = await apiCall("content", "GET", storedPassword);
+      const tag = content.find((c: ContentItem) => c.content_key === "partners.tag");
+      const title = content.find((c: ContentItem) => c.content_key === "partners.title");
+      const sub = content.find((c: ContentItem) => c.content_key === "partners.subtitle");
+      if (tag) setPartnersTag(tag.value_en || "");
+      if (title) setPartnersTitle(title.value_en || "");
+      if (sub) setPartnersSubtitle(sub.value_en || "");
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  }, [storedPassword]);
+
+  const handleSavePartner = async (item: PartnerItem) => {
+    try {
+      setLoading(true);
+      let name_ar = item.name_ar;
+      if (!name_ar && item.name_en) {
+        try {
+          const result = await translateTexts({ name: item.name_en });
+          name_ar = result.name || item.name_en;
+        } catch { name_ar = item.name_en; }
+      }
+      await apiCall("partners", "POST", storedPassword, { ...item, name_ar });
+      toast.success("Partner saved");
+      setEditingPartner(null);
+      fetchPartners();
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  };
+
+  const handleDeletePartner = async (id: string) => {
+    if (!confirm("Delete this partner?")) return;
+    try {
+      await apiCall("partners", "DELETE", storedPassword, { id });
+      toast.success("Partner deleted");
+      fetchPartners();
+    } catch (e: any) { toast.error(e.message); }
+  };
+
+  const handleSavePartnersText = async () => {
+    try {
+      setLoading(true);
+      let tagAr = "", titleAr = "", subtitleAr = "";
+      try {
+        const result = await translateTexts({ tag: partnersTag, title: partnersTitle, subtitle: partnersSubtitle });
+        tagAr = result.tag || partnersTag;
+        titleAr = result.title || partnersTitle;
+        subtitleAr = result.subtitle || partnersSubtitle;
+      } catch { /* proceed */ }
+      await apiCall("content", "POST", storedPassword, { content_key: "partners.tag", value_en: partnersTag, value_ar: tagAr });
+      await apiCall("content", "POST", storedPassword, { content_key: "partners.title", value_en: partnersTitle, value_ar: titleAr });
+      await apiCall("content", "POST", storedPassword, { content_key: "partners.subtitle", value_en: partnersSubtitle, value_ar: subtitleAr });
+      toast.success("Section text saved");
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  };
     setLoading(true);
     try {
       const data = await apiCall("product-items", "GET", storedPassword);
