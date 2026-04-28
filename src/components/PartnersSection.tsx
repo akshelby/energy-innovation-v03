@@ -100,22 +100,23 @@ export default function PartnersSection() {
                     {name}
                   </span>
                 );
-              return p.website_url ? (
-                <a
-                  key={`${p.id}-${i}`}
-                  href={p.website_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="shrink-0 flex items-center justify-center"
-                >
-                  {Inner}
-                </a>
-              ) : (
-                <div key={`${p.id}-${i}`} className="shrink-0 flex items-center justify-center">
-                  {Inner}
-                </div>
-              );
-            })}
+                return p.website_url ? (
+                  <a
+                    key={`${p.id}-${i}`}
+                    href={p.website_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shrink-0 flex items-center justify-center"
+                  >
+                    {Inner}
+                  </a>
+                ) : (
+                  <div key={`${p.id}-${i}`} className="shrink-0 flex items-center justify-center">
+                    {Inner}
+                  </div>
+                );
+              });
+            })()}
           </div>
         </div>
       </div>
