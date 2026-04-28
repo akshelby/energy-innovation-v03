@@ -17,7 +17,17 @@ const ProductPageView = lazy(() => import("./pages/ProductPage.tsx"));
 const SubProductsPage = lazy(() => import("./pages/SubProductsPage.tsx"));
 const Admin = lazy(() => import("./pages/Admin.tsx"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,   // 5 min — avoid refetch on every mount
+      gcTime: 30 * 60 * 1000,     // keep in cache 30 min
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      retry: 1,
+    },
+  },
+});
 
 const App = () => (
   <HelmetProvider>
