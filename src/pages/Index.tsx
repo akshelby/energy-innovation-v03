@@ -26,6 +26,7 @@ const ProductsSection = lazyWithRetry(() => import("@/components/ProductsSection
 const ServicesSection = lazyWithRetry(() => import("@/components/ServicesSection"));
 const HighlightSection = lazyWithRetry(() => import("@/components/HighlightSection"));
 const WhyChooseUsSection = lazyWithRetry(() => import("@/components/WhyChooseUsSection"));
+const PartnersSection = lazyWithRetry(() => import("@/components/PartnersSection"));
 const ContactSection = lazyWithRetry(() => import("@/components/ContactSection"));
 const Footer = lazyWithRetry(() => import("@/components/Footer"));
 const FloatingButtons = lazyWithRetry(() => import("@/components/FloatingButtons"));
