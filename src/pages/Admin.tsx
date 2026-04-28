@@ -287,6 +287,9 @@ export default function Admin() {
   const [partnersTag, setPartnersTag] = useState("Our Partners");
   const [partnersTitle, setPartnersTitle] = useState("Trusted by Industry Leaders");
   const [partnersSubtitle, setPartnersSubtitle] = useState("We collaborate with world-class brands to deliver excellence.");
+  const [placeholderBg, setPlaceholderBg] = useState("#1e293b");
+  const [placeholderText, setPlaceholderText] = useState("#ffffff");
+  const [placeholderShape, setPlaceholderShape] = useState<"rounded" | "pill" | "square">("rounded");
   const partnerLogoRef = useRef<HTMLInputElement>(null);
 
   // Menu Items state
@@ -531,9 +534,15 @@ export default function Admin() {
       const tag = content.find((c: ContentItem) => c.content_key === "partners.tag");
       const title = content.find((c: ContentItem) => c.content_key === "partners.title");
       const sub = content.find((c: ContentItem) => c.content_key === "partners.subtitle");
+      const phBg = content.find((c: ContentItem) => c.content_key === "partners.placeholder_bg");
+      const phText = content.find((c: ContentItem) => c.content_key === "partners.placeholder_text");
+      const phShape = content.find((c: ContentItem) => c.content_key === "partners.placeholder_shape");
       if (tag) setPartnersTag(tag.value_en || "");
       if (title) setPartnersTitle(title.value_en || "");
       if (sub) setPartnersSubtitle(sub.value_en || "");
+      if (phBg?.value_en) setPlaceholderBg(phBg.value_en);
+      if (phText?.value_en) setPlaceholderText(phText.value_en);
+      if (phShape?.value_en) setPlaceholderShape((phShape.value_en as any) || "rounded");
     } catch (e: any) { toast.error(e.message); }
     finally { setLoading(false); }
   }, [storedPassword]);
@@ -578,6 +587,9 @@ export default function Admin() {
       await apiCall("content", "POST", storedPassword, { content_key: "partners.tag", value_en: partnersTag, value_ar: tagAr });
       await apiCall("content", "POST", storedPassword, { content_key: "partners.title", value_en: partnersTitle, value_ar: titleAr });
       await apiCall("content", "POST", storedPassword, { content_key: "partners.subtitle", value_en: partnersSubtitle, value_ar: subtitleAr });
+      await apiCall("content", "POST", storedPassword, { content_key: "partners.placeholder_bg", value_en: placeholderBg, value_ar: placeholderBg });
+      await apiCall("content", "POST", storedPassword, { content_key: "partners.placeholder_text", value_en: placeholderText, value_ar: placeholderText });
+      await apiCall("content", "POST", storedPassword, { content_key: "partners.placeholder_shape", value_en: placeholderShape, value_ar: placeholderShape });
       toast.success("Section text saved");
     } catch (e: any) { toast.error(e.message); }
     finally { setLoading(false); }
