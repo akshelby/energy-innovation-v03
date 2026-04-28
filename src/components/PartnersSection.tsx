@@ -89,7 +89,7 @@ export default function PartnersSection() {
                       src={p.logo_url}
                       alt={name}
                       loading="lazy"
-                      className="h-full w-auto max-w-[40vw] md:max-w-[260px] object-contain opacity-70 hover:opacity-100 grayscale hover:grayscale-0 transition-all duration-300 dark:brightness-0 dark:invert"
+                      className="h-full w-auto max-w-[40vw] md:max-w-[260px] object-contain opacity-80 hover:opacity-100 transition-all duration-300"
                     />
                   </div>
                 ) : (
