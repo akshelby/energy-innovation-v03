@@ -246,17 +246,17 @@ export default function HeroSection() {
       )}
 
       <div className="relative z-10 h-full flex flex-col justify-end pb-8 md:pb-12 text-center px-6">
-        {visibility["hero.show_headline"] && (
-          <h1 className={`text-xl sm:text-3xl md:text-5xl lg:text-6xl font-black text-primary-foreground w-full max-w-none mx-auto leading-tight animate-fade-in-up drop-shadow-lg transition-opacity duration-300 ${contentLoaded ? 'opacity-100' : 'opacity-0'}`}>
+        {contentLoaded && visibility["hero.show_headline"] && (
+          <h1 className="text-xl sm:text-3xl md:text-5xl lg:text-6xl font-black text-primary-foreground w-full max-w-none mx-auto leading-tight animate-fade-in-up drop-shadow-lg">
             {t("hero.headline")}
           </h1>
         )}
-        {visibility["hero.show_subtext"] && (
-          <p className={`mt-4 text-sm md:text-base font-medium text-primary-foreground/80 max-w-xl mx-auto animate-fade-in-up transition-opacity duration-300 ${contentLoaded ? 'opacity-100' : 'opacity-0'}`} style={{ animationDelay: "0.2s" }}>
+        {contentLoaded && visibility["hero.show_subtext"] && (
+          <p className="mt-4 text-sm md:text-base font-medium text-primary-foreground/80 max-w-xl mx-auto animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
             {t("hero.subtext")}
           </p>
         )}
-        {(visibility["hero.show_explore_btn"] || visibility["hero.show_contact_btn"]) && (
+        {contentLoaded && (visibility["hero.show_explore_btn"] || visibility["hero.show_contact_btn"]) && (
           <div className="mt-6 flex flex-wrap gap-3 justify-center animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
             {visibility["hero.show_explore_btn"] && (
               <Button
@@ -275,6 +275,23 @@ export default function HeroSection() {
               </Button>
             )}
           </div>
+        )}
+
+        {visibility["hero.show_dots"] && (
+          <div className="flex gap-2 justify-center mt-6">
+            {images.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrent(i)}
+                className={`w-2 h-2 rounded-full transition-all ${
+                  i === current ? "w-8 bg-accent" : "bg-primary-foreground/40"
+                }`}
+                aria-label={`Go to slide ${i + 1}`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
         )}
 
         {visibility["hero.show_dots"] && (
