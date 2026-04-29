@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Building2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { getCached, setCache } from "@/lib/cache";
