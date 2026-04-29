@@ -198,13 +198,13 @@ export default function Footer() {
           <div>
             <h4 className="font-bold mb-5 text-white">{t("footer.contactInfo")}</h4>
             <ul className="space-y-3 text-sm text-white">
-              <li className="flex items-center gap-2">
+              <li className="flex items-center gap-2 min-w-0">
                 <Mail className="w-4 h-4 shrink-0 text-white/85" />
-                <a href={`mailto:${contactEmail}`} className="text-white hover:text-white/80 transition-colors">{contactEmail}</a>
+                <a href={`mailto:${contactEmail}`} className="text-white hover:text-white/80 transition-colors truncate min-w-0">{contactEmail}</a>
               </li>
-              <li className="flex items-center gap-2">
+              <li className="flex items-center gap-2 min-w-0">
                 <Globe className="w-4 h-4 shrink-0 text-white/85" />
-                <span className="text-white">{contactWebsite}</span>
+                <span className="text-white truncate min-w-0">{contactWebsite}</span>
               </li>
             </ul>
 
@@ -216,8 +216,8 @@ export default function Footer() {
               const body = language === "ar" ? addr.body_ar : addr.body_en;
               return (
                 <div key={i} className={i === 0 ? "mt-6" : "mt-5"}>
-                  <h5 className="font-bold mb-2 text-white text-base md:text-lg">{heading}</h5>
-                  <p className="text-sm text-white/85 leading-relaxed whitespace-pre-line">
+                  <h5 className="font-bold mb-2 text-white text-base md:text-lg break-words">{heading}</h5>
+                  <p className="text-sm text-white/85 leading-relaxed whitespace-pre-line break-words">
                     {body}
                   </p>
                 </div>
