@@ -665,6 +665,7 @@ export default function Admin() {
     finally { setLoading(false); }
   };
 
+  const fetchMenuItems = useCallback(async () => {
     setLoading(true);
     try {
       const data = await apiCall("product-items", "GET", storedPassword);
