@@ -77,30 +77,31 @@ export default function SubProductsPage() {
         }
         setParentItem(parent as ProductItem);
 
-        // Build breadcrumb chain by walking up parent_id
+        // Build breadcrumb by fetching ALL items in this category at once, then walk the tree in memory
+        const { data: allCategoryItems } = await supabase
+          .from("product_items")
+          .select("id,name_en,name_ar,parent_id")
+          .eq("category_key", parent.category_key);
+
+        const itemMap = new Map((allCategoryItems || []).map((i) => [i.id, i]));
         const crumbs: BreadcrumbItem[] = [];
-        let currentParent = parent;
-        while (currentParent.parent_id) {
-          const { data: ancestor } = await supabase
-            .from("product_items")
-            .select("id,name_en,name_ar,parent_id")
-            .eq("id", currentParent.parent_id)
-            .single();
+        let currentId = parent.parent_id;
+        while (currentId) {
+          const ancestor = itemMap.get(currentId);
           if (!ancestor) break;
           crumbs.unshift({
             label: isAr ? ancestor.name_ar : ancestor.name_en,
             path: `/products/item/${ancestor.id}`,
           });
-          currentParent = ancestor as any;
+          currentId = ancestor.parent_id;
         }
 
-        // Find the root product for this category
-        const { data: rootProd } = await supabase
-          .from("products")
-          .select("id,name_en,name_ar,description_en,description_ar,image_url,category_key")
-          .eq("category_key", parent.category_key)
-          .single();
-
+        // Find the root product for this category in parallel with children fetch
+        const [rootProdResult] = await Promise.all([
+          supabase.from("products").select("id,name_en,name_ar,description_en,description_ar,image_url,category_key").eq("category_key", parent.category_key).single(),
+          fetchChildren(parent.category_key, parent.id),
+        ]);
+        const rootProd = rootProdResult.data;
         if (rootProd) {
           setProduct(rootProd as Product);
           crumbs.unshift({
@@ -108,11 +109,7 @@ export default function SubProductsPage() {
             path: `/products/${rootProd.id}`,
           });
         }
-
         setBreadcrumbs(crumbs);
-
-        // Fetch children of this item
-        await fetchChildren(parent.category_key, parent.id);
       } else if (productId) {
         // Viewing top-level items for a product category
         const { data: prod } = await supabase
