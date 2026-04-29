@@ -36,8 +36,8 @@ export default function WhyChooseUsSection() {
   }, []);
 
   return (
-    <section className="py-14 md:py-24 px-6 gradient-primary overflow-hidden">
-      <div className="max-w-6xl mx-auto">
+    <section className="py-14 md:py-24 px-6 md:px-12 lg:px-20 gradient-primary overflow-hidden">
+      <div className="w-full mx-auto">
         <div className="text-center mb-10 md:mb-16">
           <span className="inline-block px-8 py-3.5 text-lg font-bold tracking-wide text-white bg-accent rounded-full mb-4">
             {t("why.tag")}

@@ -70,8 +70,8 @@ export default function ProductsSection() {
   const isAr = language === "ar";
 
   return (
-    <section id="products" className="py-10 md:py-20 px-0 md:px-6 bg-secondary/30 lazy-section" ref={ref}>
-      <div className="max-w-6xl mx-auto">
+    <section id="products" className="py-10 md:py-20 px-6 md:px-12 lg:px-20 bg-secondary/30 lazy-section" ref={ref}>
+      <div className="w-full mx-auto">
         <div className="text-center mb-6 md:mb-16 scroll-reveal">
           <span className="inline-block px-8 py-3.5 text-lg font-bold tracking-wide text-white bg-accent rounded-full mb-4">
             {t("products.tag")}
