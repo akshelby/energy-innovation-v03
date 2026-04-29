@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Send, ChevronRight, ChevronLeft, ArrowRight } from "lucide-react";
+import ProductDetailLayout from "@/components/ProductDetailLayout";
 
 const enquirySchema = z.object({
   name: z.string().trim().min(1, "Name required").max(100),
@@ -30,6 +31,8 @@ interface ProductItem {
   has_page: boolean;
 }
 
+interface Rating { value: string; label_en: string; label_ar: string }
+
 interface ProductPage {
   id: string;
   product_item_id: string;
@@ -40,6 +43,15 @@ interface ProductPage {
   sub_description_en: string;
   sub_description_ar: string;
   is_active: boolean;
+  certifications_en?: string[] | null;
+  certifications_ar?: string[] | null;
+  ratings?: Rating[] | null;
+  operation_modes_en?: string[] | null;
+  operation_modes_ar?: string[] | null;
+  applications_en?: string[] | null;
+  applications_ar?: string[] | null;
+  tagline_en?: string | null;
+  tagline_ar?: string | null;
 }
 
 interface PageImage {
