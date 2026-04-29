@@ -134,7 +134,7 @@ export default function Footer() {
   return (
     <footer
       className={`pt-12 pb-8 px-6 transition-opacity duration-500 ${ready ? 'opacity-100' : 'opacity-0'}`}
-      style={{ background: 'linear-gradient(135deg, hsl(213 90% 88%) 0%, hsl(213 95% 92%) 100%)', color: 'hsl(213 60% 18%)' }}
+      style={{ background: '#ffffff', color: '#000000' }}
     >
       <div className="max-w-6xl mx-auto">
         {/* Social Icons Row */}
@@ -147,7 +147,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={s.label}
-                className="text-navy/70 hover:text-navy transition-colors"
+                className="text-black/70 hover:text-black transition-colors"
               >
                 {s.icon}
               </a>
@@ -162,20 +162,20 @@ export default function Footer() {
             <div className="mb-5">
               {brandReady && <img src={logoUrl} alt={brandName} className="w-auto object-contain" style={{ height: `${Math.round(logoSize * 0.7)}px` }} />}
             </div>
-            <p className="text-navy/80 text-sm leading-relaxed">
+            <p className="text-black/80 text-sm leading-relaxed">
               {t("footer.desc")}
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-bold mb-5 text-navy">{t("footer.quick")}</h4>
+            <h4 className="font-bold mb-5 text-black">{t("footer.quick")}</h4>
             <ul className="space-y-3">
               {quickLinks.map((link) => (
                 <li key={link.href}>
                   <button
                     onClick={() => scrollTo(link.href)}
-                    className="text-sm text-navy/80 hover:text-navy transition-colors"
+                    className="text-sm text-black/80 hover:text-black transition-colors"
                   >
                     {link.label}
                   </button>
@@ -186,13 +186,13 @@ export default function Footer() {
 
           {/* Product Categories */}
           <div>
-            <h4 className="font-bold mb-5 text-navy">{t("footer.products")}</h4>
+            <h4 className="font-bold mb-5 text-black">{t("footer.products")}</h4>
             <ul className="space-y-3">
               {productLinks.map((link, i) => (
                 <li key={i}>
                   <button
                     onClick={() => scrollTo("#products")}
-                    className="text-sm text-navy/80 hover:text-navy transition-colors text-start"
+                    className="text-sm text-black/80 hover:text-black transition-colors text-start"
                   >
                     {link}
                   </button>
@@ -203,28 +203,28 @@ export default function Footer() {
 
           {/* Contact Info */}
           <div>
-            <h4 className="font-bold mb-5 text-navy">{t("footer.contactInfo")}</h4>
-            <ul className="space-y-3 text-sm text-navy">
+            <h4 className="font-bold mb-5 text-black">{t("footer.contactInfo")}</h4>
+            <ul className="space-y-3 text-sm text-black">
               <li className="flex items-center gap-2 min-w-0">
-                <Mail className="w-4 h-4 shrink-0 text-navy/80" />
+                <Mail className="w-4 h-4 shrink-0 text-black/80" />
                 <button
                   type="button"
                   onClick={() => setPopup({ title: t("footer.contactInfo"), value: contactEmail, href: `mailto:${contactEmail}` })}
-                  className="text-navy hover:text-navy/70 transition-colors truncate min-w-0 text-start"
+                  className="text-black hover:text-black/70 transition-colors truncate min-w-0 text-start"
                   title={contactEmail}
                 >
                   {contactEmail}
                 </button>
               </li>
               <li className="flex items-center gap-2 min-w-0">
-                <Globe className="w-4 h-4 shrink-0 text-navy/80" />
+                <Globe className="w-4 h-4 shrink-0 text-black/80" />
                 <button
                   type="button"
                   onClick={() => {
                     const href = contactWebsite.startsWith("http") ? contactWebsite : `https://${contactWebsite}`;
                     setPopup({ title: t("footer.contactInfo"), value: contactWebsite, href });
                   }}
-                  className="text-navy hover:text-navy/70 transition-colors truncate min-w-0 text-start"
+                  className="text-black hover:text-black/70 transition-colors truncate min-w-0 text-start"
                   title={contactWebsite}
                 >
                   {contactWebsite}
@@ -240,8 +240,8 @@ export default function Footer() {
               const body = language === "ar" ? addr.body_ar : addr.body_en;
               return (
                 <div key={i} className={i === 0 ? "mt-6" : "mt-5"}>
-                  <h5 className="font-bold mb-2 text-navy text-base md:text-lg break-words">{heading}</h5>
-                  <p className="text-sm text-navy/80 leading-relaxed whitespace-pre-line break-words">
+                  <h5 className="font-bold mb-2 text-black text-base md:text-lg break-words">{heading}</h5>
+                  <p className="text-sm text-black/80 leading-relaxed whitespace-pre-line break-words">
                     {body}
                   </p>
                 </div>
@@ -252,7 +252,7 @@ export default function Footer() {
 
         {/* Copyright */}
         <div className="border-t border-navy/15 pt-8 flex items-center justify-center">
-          <p className="text-sm text-navy/70">
+          <p className="text-sm text-black/70">
             © {new Date().getFullYear()} {brandName}. {t("footer.rights")}
           </p>
         </div>
