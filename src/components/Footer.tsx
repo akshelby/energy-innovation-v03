@@ -5,6 +5,7 @@ import { Mail, Globe } from "lucide-react";
 import { useBranding } from "@/contexts/BrandingContext";
 import { supabase } from "@/integrations/supabase/client";
 import { getCached, setCache } from "@/lib/cache";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface SocialLinks {
   linkedin: string;
@@ -32,6 +33,7 @@ export default function Footer() {
 
   const [footerData, setFooterData] = useState<Record<string, { en: string; ar: string }>>(() => getCached<Record<string, { en: string; ar: string }>>("footer") || {});
   const [ready, setReady] = useState(() => Object.keys(footerData).length > 0);
+  const [popup, setPopup] = useState<{ title: string; value: string; href?: string } | null>(null);
 
   useEffect(() => {
     const fetchFooterContent = async () => {
@@ -200,11 +202,28 @@ export default function Footer() {
             <ul className="space-y-3 text-sm text-white">
               <li className="flex items-center gap-2 min-w-0">
                 <Mail className="w-4 h-4 shrink-0 text-white/85" />
-                <a href={`mailto:${contactEmail}`} className="text-white hover:text-white/80 transition-colors truncate min-w-0">{contactEmail}</a>
+                <button
+                  type="button"
+                  onClick={() => setPopup({ title: t("footer.contactInfo"), value: contactEmail, href: `mailto:${contactEmail}` })}
+                  className="text-white hover:text-white/80 transition-colors truncate min-w-0 text-start"
+                  title={contactEmail}
+                >
+                  {contactEmail}
+                </button>
               </li>
               <li className="flex items-center gap-2 min-w-0">
                 <Globe className="w-4 h-4 shrink-0 text-white/85" />
-                <span className="text-white truncate min-w-0">{contactWebsite}</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const href = contactWebsite.startsWith("http") ? contactWebsite : `https://${contactWebsite}`;
+                    setPopup({ title: t("footer.contactInfo"), value: contactWebsite, href });
+                  }}
+                  className="text-white hover:text-white/80 transition-colors truncate min-w-0 text-start"
+                  title={contactWebsite}
+                >
+                  {contactWebsite}
+                </button>
               </li>
             </ul>
 
@@ -233,6 +252,26 @@ export default function Footer() {
           </p>
         </div>
       </div>
+
+      <Dialog open={!!popup} onOpenChange={(open) => !open && setPopup(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>{popup?.title}</DialogTitle>
+          </DialogHeader>
+          {popup?.href ? (
+            <a
+              href={popup.href}
+              target={popup.href.startsWith("http") ? "_blank" : undefined}
+              rel="noopener noreferrer"
+              className="text-primary hover:underline break-all text-sm"
+            >
+              {popup.value}
+            </a>
+          ) : (
+            <p className="break-all text-sm">{popup?.value}</p>
+          )}
+        </DialogContent>
+      </Dialog>
     </footer>
   );
 }
