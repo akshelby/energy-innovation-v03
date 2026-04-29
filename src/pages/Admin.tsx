@@ -604,7 +604,67 @@ export default function Admin() {
     finally { setLoading(false); }
   };
 
-  const fetchMenuItems = useCallback(async () => {
+  const fetchCountries = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await apiCall("countries", "GET", storedPassword);
+      setCountries(data);
+      const content = await apiCall("content", "GET", storedPassword);
+      const tag = content.find((c: ContentItem) => c.content_key === "countries.tag");
+      const title = content.find((c: ContentItem) => c.content_key === "countries.title");
+      const sub = content.find((c: ContentItem) => c.content_key === "countries.subtitle");
+      if (tag) setCountriesTag(tag.value_en || "");
+      if (title) setCountriesTitle(title.value_en || "");
+      if (sub) setCountriesSubtitle(sub.value_en || "");
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  }, [storedPassword]);
+
+  const handleSaveCountry = async (item: CountryItem) => {
+    try {
+      setLoading(true);
+      let name_ar = item.name_ar;
+      if (!name_ar && item.name_en) {
+        try {
+          const result = await translateTexts({ name: item.name_en });
+          name_ar = result.name || item.name_en;
+        } catch { name_ar = item.name_en; }
+      }
+      await apiCall("countries", "POST", storedPassword, { ...item, name_ar });
+      toast.success("Country saved");
+      setEditingCountry(null);
+      fetchCountries();
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  };
+
+  const handleDeleteCountry = async (id: string) => {
+    if (!confirm("Delete this country?")) return;
+    try {
+      await apiCall("countries", "DELETE", storedPassword, { id });
+      toast.success("Country deleted");
+      fetchCountries();
+    } catch (e: any) { toast.error(e.message); }
+  };
+
+  const handleSaveCountriesText = async () => {
+    try {
+      setLoading(true);
+      let tagAr = "", titleAr = "", subtitleAr = "";
+      try {
+        const result = await translateTexts({ tag: countriesTag, title: countriesTitle, subtitle: countriesSubtitle });
+        tagAr = result.tag || countriesTag;
+        titleAr = result.title || countriesTitle;
+        subtitleAr = result.subtitle || countriesSubtitle;
+      } catch { /* proceed */ }
+      await apiCall("content", "POST", storedPassword, { content_key: "countries.tag", value_en: countriesTag, value_ar: tagAr });
+      await apiCall("content", "POST", storedPassword, { content_key: "countries.title", value_en: countriesTitle, value_ar: titleAr });
+      await apiCall("content", "POST", storedPassword, { content_key: "countries.subtitle", value_en: countriesSubtitle, value_ar: subtitleAr });
+      toast.success("Section text saved");
+    } catch (e: any) { toast.error(e.message); }
+    finally { setLoading(false); }
+  };
+
     setLoading(true);
     try {
       const data = await apiCall("product-items", "GET", storedPassword);
