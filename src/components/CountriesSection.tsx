@@ -20,6 +20,7 @@ export default function CountriesSection() {
     () => getCached<Country[]>(CACHE_KEY) ?? []
   );
   const [loaded, setLoaded] = useState(false);
+  const { containerRef, trackRef } = useSwipeableMarquee();
 
   useEffect(() => {
     let cancelled = false;
