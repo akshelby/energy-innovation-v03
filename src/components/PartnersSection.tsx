@@ -61,7 +61,8 @@ export default function PartnersSection() {
         </div>
 
         <div
-          className="relative w-full"
+          ref={containerRef}
+          className="relative w-full select-none"
           style={{
             maskImage:
               "linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%)",
@@ -69,7 +70,7 @@ export default function PartnersSection() {
               "linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%)",
           }}
         >
-          <div className="flex w-max animate-marquee items-center gap-10 md:gap-20">
+          <div ref={trackRef} className="flex w-max animate-marquee items-center gap-10 md:gap-20">
             {(() => {
               const phBgRaw = t("partners.placeholder_bg");
               const phTextRaw = t("partners.placeholder_text");
