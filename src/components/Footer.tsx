@@ -252,7 +252,6 @@ export default function Footer() {
           </p>
         </div>
       </div>
-      </div>
 
       <Dialog open={!!popup} onOpenChange={(open) => !open && setPopup(null)}>
         <DialogContent className="max-w-sm">
