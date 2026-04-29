@@ -135,7 +135,7 @@ export default function Footer() {
     >
       <div className="max-w-6xl mx-auto">
         {/* Social Icons Row */}
-        {socialItems.length > 0 && (
+        {socialItems.length > 0 && socialEnabled && (
           <div className="flex items-center justify-center gap-5 pb-8 mb-10 border-b border-primary-foreground/10">
             {socialItems.map((s) => (
               <a
