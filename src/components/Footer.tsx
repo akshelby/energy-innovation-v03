@@ -259,21 +259,25 @@ export default function Footer() {
       </div>
 
       <Dialog open={!!popup} onOpenChange={(open) => !open && setPopup(null)}>
-        <DialogContent className="max-w-sm">
+        <DialogContent
+          className="max-w-sm"
+          style={{ background: '#ffffff', color: '#000000' }}
+        >
           <DialogHeader>
-            <DialogTitle>{popup?.title}</DialogTitle>
+            <DialogTitle style={{ color: '#000000' }}>{popup?.title}</DialogTitle>
           </DialogHeader>
           {popup?.href ? (
             <a
               href={popup.href}
               target={popup.href.startsWith("http") ? "_blank" : undefined}
               rel="noopener noreferrer"
-              className="text-primary hover:underline break-all text-sm"
+              className="hover:underline break-all text-sm"
+              style={{ color: '#1e3a8a' }}
             >
               {popup.value}
             </a>
           ) : (
-            <p className="break-all text-sm">{popup?.value}</p>
+            <p className="break-all text-sm" style={{ color: '#000000' }}>{popup?.value}</p>
           )}
         </DialogContent>
       </Dialog>
