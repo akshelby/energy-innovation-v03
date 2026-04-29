@@ -260,6 +260,11 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
         } catch { /* proceed */ }
       }
       const saved = await apiCall("product-pages", "POST", password, page);
+      // Keep has_page in sync — item row must reflect that a page exists
+      const targetItem = allItems.find(i => i.id === page.product_item_id);
+      if (targetItem && !targetItem.has_page) {
+        await apiCall("product-items", "POST", password, { ...targetItem, has_page: true });
+      }
       toast.success("Product page saved");
       if (!editingPage.id && saved.id) {
         setEditingPage({ ...page, id: saved.id } as any);
@@ -274,7 +279,15 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
 
   const handleDeletePage = async (pageId: string) => {
     try {
+      const pageToDelete = allPages.find(p => (p as any).id === pageId);
       await apiCall("product-pages", "DELETE", password, { id: pageId });
+      // Sync has_page flag back to false on the item
+      if (pageToDelete) {
+        const targetItem = allItems.find(i => i.id === pageToDelete.product_item_id);
+        if (targetItem) {
+          await apiCall("product-items", "POST", password, { ...targetItem, has_page: false });
+        }
+      }
       toast.success("Product page deleted");
       await fetchAll();
     } catch (e: any) { toast.error(e.message); }
