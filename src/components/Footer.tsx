@@ -129,7 +129,7 @@ export default function Footer() {
       className={`text-primary-foreground pt-12 pb-8 px-6 transition-opacity duration-500 ${ready ? 'opacity-100' : 'opacity-0'}`}
       style={{ background: 'linear-gradient(135deg, hsl(213 70% 38%) 0%, hsl(213 65% 48%) 100%)' }}
     >
-      <div className="max-w-7xl mx-auto px-2 lg:px-8">
+      <div className="max-w-6xl mx-auto">
         {/* Social Icons Row */}
         {socialItems.length > 0 && (
           <div className="flex items-center justify-center gap-5 pb-8 mb-10 border-b border-primary-foreground/10">
