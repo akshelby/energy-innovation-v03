@@ -356,8 +356,8 @@ export default function ProductPageView() {
 
       {/* Child Products Section */}
       {children.length > 0 && (
-        <section className="py-12 md:py-16 px-6 bg-secondary/30">
-          <div className="max-w-6xl mx-auto">
+        <section className="py-12 md:py-16 px-6 md:px-12 lg:px-20 bg-secondary/30">
+          <div className="w-full mx-auto">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-8">
               {isAr ? "المنتجات ذات الصلة" : "Related Products"}
             </h2>
