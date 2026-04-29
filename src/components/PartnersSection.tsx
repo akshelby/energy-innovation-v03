@@ -97,12 +97,14 @@ export default function PartnersSection() {
                     />
                   </div>
                 ) : (
-                  <span
-                    style={{ backgroundColor: phBg, color: phText }}
-                    className={`inline-flex items-center px-4 md:px-6 py-2 md:py-3 text-sm md:text-lg font-bold whitespace-nowrap ${shapeClass} transition-transform duration-300 hover:scale-105`}
-                  >
-                    {name}
-                  </span>
+                  <div className="group flex flex-col items-center gap-2 md:gap-3">
+                    <div className="flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-full bg-white border border-navy/15 text-navy shadow-sm transition-all duration-300 ease-out group-hover:bg-destructive group-hover:text-white group-hover:border-destructive group-hover:shadow-lg group-hover:-translate-y-0.5 will-change-transform transform-gpu">
+                      <Building2 className="w-7 h-7 md:w-9 md:h-9" strokeWidth={1.75} />
+                    </div>
+                    <span className="text-xs md:text-sm font-medium text-foreground/80 group-hover:text-destructive transition-colors duration-300 whitespace-nowrap">
+                      {name}
+                    </span>
+                  </div>
                 );
                 return p.website_url ? (
                   <a
