@@ -34,6 +34,7 @@ export default function Footer() {
   const [footerData, setFooterData] = useState<Record<string, { en: string; ar: string }>>(() => getCached<Record<string, { en: string; ar: string }>>("footer") || {});
   const [ready, setReady] = useState(() => Object.keys(footerData).length > 0);
   const [popup, setPopup] = useState<{ title: string; value: string; href?: string } | null>(null);
+  const [footerProducts, setFooterProducts] = useState<{ id: string; name_en: string; name_ar: string }[]>([]);
 
   useEffect(() => {
     const fetchFooterContent = async () => {
@@ -49,6 +50,13 @@ export default function Footer() {
           });
           setFooterData(map);
           setCache("footer", map);
+        }
+        const { data: prodData } = await supabase
+          .from("products")
+          .select("id, name_en, name_ar")
+          .order("sort_order");
+        if (prodData && prodData.length > 0) {
+          setFooterProducts(prodData);
         }
         setReady(true);
       } catch { setReady(true); }
@@ -77,13 +85,6 @@ export default function Footer() {
     { label: t("nav.contact"), href: "#contact" },
   ];
 
-  const productLinks = [
-    t("cat.fire"),
-    t("cat.roller"),
-    t("cat.oil"),
-    t("cat.hvac"),
-    t("cat.loading"),
-  ];
 
   const scrollTo = useCallback((href: string) => {
     if (location.pathname !== "/") {
@@ -188,13 +189,13 @@ export default function Footer() {
           <div>
             <h4 className="font-bold mb-5 text-black">{t("footer.products")}</h4>
             <ul className="space-y-3">
-              {productLinks.map((link, i) => (
-                <li key={i}>
+              {footerProducts.map((product) => (
+                <li key={product.id}>
                   <button
-                    onClick={() => scrollTo("#products")}
+                    onClick={() => navigate(`/products/${product.id}`)}
                     className="text-sm text-black/80 hover:text-destructive hover:translate-x-1 rtl:hover:-translate-x-1 transition-all duration-200 text-start inline-block"
                   >
-                    {link}
+                    {language === "ar" ? product.name_ar : product.name_en}
                   </button>
                 </li>
               ))}
