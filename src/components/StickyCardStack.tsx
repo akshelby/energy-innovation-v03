@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useRef } from "react";
+import React, { Fragment, useRef } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface StickyCardStackProps {
