@@ -34,6 +34,7 @@ export default function Footer() {
   const [footerData, setFooterData] = useState<Record<string, { en: string; ar: string }>>(() => getCached<Record<string, { en: string; ar: string }>>("footer") || {});
   const [ready, setReady] = useState(() => Object.keys(footerData).length > 0);
   const [popup, setPopup] = useState<{ title: string; value: string; href?: string } | null>(null);
+  const [footerProducts, setFooterProducts] = useState<{ id: string; name_en: string; name_ar: string }[]>([]);
 
   useEffect(() => {
     const fetchFooterContent = async () => {
@@ -49,6 +50,13 @@ export default function Footer() {
           });
           setFooterData(map);
           setCache("footer", map);
+        }
+        const { data: prodData } = await supabase
+          .from("products")
+          .select("id, name_en, name_ar")
+          .order("sort_order");
+        if (prodData && prodData.length > 0) {
+          setFooterProducts(prodData);
         }
         setReady(true);
       } catch { setReady(true); }
