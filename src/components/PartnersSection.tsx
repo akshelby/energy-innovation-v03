@@ -44,7 +44,7 @@ export default function PartnersSection() {
   const loop = [...partners, ...partners];
 
   return (
-    <section className="py-14 md:py-20 px-6 md:px-12 lg:px-20 bg-background overflow-hidden">
+    <section className="py-14 md:py-12 px-6 md:px-12 lg:px-20 bg-background overflow-hidden">
       <div className="w-full mx-auto">
         <div className="text-center mb-10 md:mb-14">
           <span className="inline-block px-8 py-3.5 text-lg font-bold tracking-wide text-white bg-accent rounded-full mb-4">
