@@ -221,8 +221,8 @@ export default function SubProductsPage() {
     return (
       <main className="min-h-screen">
         <Header />
-        <section className="pt-20 md:pt-24 pb-10 md:pb-16 bg-secondary/30">
-          <div className="max-w-6xl mx-auto px-6">
+        <section className="pt-20 md:pt-24 pb-10 md:pb-16 px-6 md:px-12 lg:px-20 bg-secondary/30">
+          <div className="w-full mx-auto">
             <div className="h-4 w-48 bg-muted animate-pulse rounded mt-4" />
             <div className="text-center mt-10">
               <div className="h-12 w-56 bg-muted animate-pulse rounded-full mx-auto mb-6" />
