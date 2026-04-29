@@ -302,8 +302,8 @@ export default function SubProductsPage() {
       <Header />
 
       {/* Hero */}
-      <section className="pt-20 md:pt-24 pb-10 md:pb-16 bg-secondary/30">
-        <div className="max-w-6xl mx-auto px-6">
+      <section className="pt-20 md:pt-24 pb-10 md:pb-16 px-6 md:px-12 lg:px-20 bg-secondary/30">
+        <div className="w-full mx-auto">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-1.5 text-sm text-muted-foreground py-4 flex-wrap">
             <Link to="/" className="hover:text-foreground transition-colors">
