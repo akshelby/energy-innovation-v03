@@ -292,23 +292,6 @@ export default function HeroSection() {
           </div>
         )}
       </div>
-        )}
-
-        {visibility["hero.show_dots"] && (
-          <div className="flex gap-2 justify-center mt-6">
-            {images.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrent(i)}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  i === current ? "w-8 bg-accent" : "bg-primary-foreground/40"
-                }`}
-                aria-label={`Go to slide ${i + 1}`}
-              />
-            ))}
-          </div>
-        )}
-      </div>
     </section>
   );
 }
