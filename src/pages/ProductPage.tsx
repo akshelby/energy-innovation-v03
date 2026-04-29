@@ -94,7 +94,7 @@ export default function ProductPageView() {
 
       if (!itemData) { setLoading(false); return; }
       setItem(itemData as ProductItem);
-      setPage(pageData as ProductPage | null);
+      setPage(pageData as unknown as ProductPage | null);
 
       // Images — only if page exists
       if (pageData) {
