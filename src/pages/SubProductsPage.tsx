@@ -436,10 +436,24 @@ export default function SubProductsPage() {
               })}
             </div>
           ) : (
-            <div className="text-center py-20">
-              <p className="text-muted-foreground text-lg">
-                {isAr ? "لا توجد منتجات فرعية حالياً" : "No sub-products available yet"}
+            <div className="text-center py-20 flex flex-col items-center gap-4">
+              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-2">
+                <span className="text-3xl">📦</span>
+              </div>
+              <h3 className="text-xl font-semibold text-foreground">
+                {isAr ? "قريباً" : "Coming Soon"}
+              </h3>
+              <p className="text-muted-foreground max-w-sm">
+                {isAr
+                  ? "نعمل على إضافة المنتجات لهذا القسم. يرجى التواصل معنا للاستفسار."
+                  : "We're working on adding products to this section. Contact us for enquiries."}
               </p>
+              <a
+                href="/#contact"
+                className="mt-2 inline-flex items-center gap-2 px-6 py-3 rounded-full bg-accent text-white font-semibold text-sm hover:opacity-90 transition-opacity"
+              >
+                {isAr ? "تواصل معنا" : "Contact Us"}
+              </a>
             </div>
           )}
         </div>
