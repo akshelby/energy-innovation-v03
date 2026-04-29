@@ -544,7 +544,94 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
           </div>
         </div>
 
-        <label className="flex items-center gap-2 cursor-pointer">
+        {/* ── Luxury Detail Layout content ─────────────────── */}
+        <div
+          className="border-t border-border pt-5 space-y-5 rounded-xl p-5 -mx-1"
+          style={{ background: "#faf8f5" }}
+        >
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-semibold" style={{ color: "#1a1a1a", fontFamily: "'Playfair Display', serif" }}>
+              Detail Layout Content
+            </h4>
+            <span className="text-[10px] uppercase tracking-wider" style={{ color: "#6b6b6b" }}>
+              Empty sections auto-hide on the live page
+            </span>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Tagline (EN)</label>
+              <Input value={editingPage.tagline_en || ""} onChange={(e) => setEditingPage({ ...editingPage, tagline_en: e.target.value })} placeholder="Short italic line at the bottom" className="rounded-xl" />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Tagline (AR)</label>
+              <Input value={editingPage.tagline_ar || ""} onChange={(e) => setEditingPage({ ...editingPage, tagline_ar: e.target.value })} placeholder="auto-generated" className="rounded-xl bg-muted/50" dir="rtl" />
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <ChipListField label="Certifications (EN)" items={editingPage.certifications_en || []} onChange={(next) => setEditingPage({ ...editingPage, certifications_en: next })} placeholder="e.g. CE Marked — EN 1366-7" />
+            <ChipListField label="Certifications (AR)" items={editingPage.certifications_ar || []} onChange={(next) => setEditingPage({ ...editingPage, certifications_ar: next })} placeholder="auto-generated" dir="rtl" />
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-xs font-medium text-muted-foreground">Ratings (key specs row, max 4)</label>
+              <Button
+                type="button" variant="outline" size="sm"
+                onClick={() => {
+                  const next = [...(editingPage.ratings || []), { value: "", label_en: "", label_ar: "" }];
+                  setEditingPage({ ...editingPage, ratings: next });
+                }}
+                disabled={(editingPage.ratings || []).length >= 4}
+                className="rounded-xl text-xs h-7"
+              >
+                <Plus className="w-3 h-3 mr-1" />Add Rating
+              </Button>
+            </div>
+            <div className="space-y-2">
+              {(editingPage.ratings || []).map((r, i) => (
+                <div key={i} className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 items-center">
+                  <Input value={r.value} onChange={(e) => {
+                    const next = [...(editingPage.ratings || [])]; next[i] = { ...next[i], value: e.target.value };
+                    setEditingPage({ ...editingPage, ratings: next });
+                  }} placeholder="Value" className="rounded-xl" />
+                  <Input value={r.label_en || ""} onChange={(e) => {
+                    const next = [...(editingPage.ratings || [])]; next[i] = { ...next[i], label_en: e.target.value };
+                    setEditingPage({ ...editingPage, ratings: next });
+                  }} placeholder="Label EN" className="rounded-xl" />
+                  <Input value={r.label_ar || ""} onChange={(e) => {
+                    const next = [...(editingPage.ratings || [])]; next[i] = { ...next[i], label_ar: e.target.value };
+                    setEditingPage({ ...editingPage, ratings: next });
+                  }} placeholder="Label AR" className="rounded-xl bg-muted/50" dir="rtl" />
+                  <Button type="button" variant="ghost" size="sm"
+                    onClick={() => {
+                      const next = (editingPage.ratings || []).filter((_, idx) => idx !== i);
+                      setEditingPage({ ...editingPage, ratings: next });
+                    }}
+                    className="text-destructive hover:bg-destructive/10 rounded-xl h-9 w-9 p-0"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+              ))}
+              {(editingPage.ratings || []).length === 0 && (
+                <p className="text-xs text-muted-foreground py-2">No ratings yet.</p>
+              )}
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <ChipListField label="Operation Modes (EN)" items={editingPage.operation_modes_en || []} onChange={(next) => setEditingPage({ ...editingPage, operation_modes_en: next })} placeholder="e.g. Automatic" />
+            <ChipListField label="Operation Modes (AR)" items={editingPage.operation_modes_ar || []} onChange={(next) => setEditingPage({ ...editingPage, operation_modes_ar: next })} placeholder="auto-generated" dir="rtl" />
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <ChipListField label="Applications (EN)" items={editingPage.applications_en || []} onChange={(next) => setEditingPage({ ...editingPage, applications_en: next })} placeholder="e.g. Hotels" />
+            <ChipListField label="Applications (AR)" items={editingPage.applications_ar || []} onChange={(next) => setEditingPage({ ...editingPage, applications_ar: next })} placeholder="auto-generated" dir="rtl" />
+          </div>
+        </div>
+
           <input type="checkbox" checked={editingPage.is_active} onChange={(e) => setEditingPage({ ...editingPage, is_active: e.target.checked })} className="rounded" />
           <span className="text-sm text-foreground">Active</span>
         </label>
