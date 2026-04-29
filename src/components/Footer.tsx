@@ -216,7 +216,7 @@ export default function Footer() {
               const body = language === "ar" ? addr.body_ar : addr.body_en;
               return (
                 <div key={i} className={i === 0 ? "mt-6" : "mt-5"}>
-                  <h5 className="font-semibold mb-1.5 text-white text-sm">{heading}</h5>
+                  <h5 className="font-bold mb-2 text-white text-base md:text-lg">{heading}</h5>
                   <p className="text-sm text-white/85 leading-relaxed whitespace-pre-line">
                     {body}
                   </p>
