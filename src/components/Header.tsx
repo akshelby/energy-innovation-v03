@@ -388,7 +388,7 @@ export default function Header() {
 
             <Button
               onClick={() => scrollToSection("#contact")}
-              className="hidden md:inline-flex rounded-full px-5 text-[15px] font-semibold border-0 shrink-0 text-white bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_100%] bg-left hover:bg-right transition-all duration-700 shadow-lg"
+              className="hidden md:inline-flex rounded-full px-5 text-[15px] font-semibold border-0 shrink-0 text-white bg-[linear-gradient(90deg,#2BD8FF_0%,#A14BFF_25%,#FF4FCB_50%,#FF6A3D_75%,#2BD8FF_100%)] bg-[length:200%_100%] bg-left hover:bg-right transition-all duration-700 shadow-lg"
             >
               {t("nav.contact")}
             </Button>
@@ -446,7 +446,7 @@ export default function Header() {
             </nav>
             <Button
               onClick={() => scrollToSection("#contact")}
-              className="w-full mt-6 rounded-full font-semibold border-0 text-white bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_100%] bg-left hover:bg-right transition-all duration-700 shadow-lg"
+              className="w-full mt-6 rounded-full font-semibold border-0 text-white bg-[linear-gradient(90deg,#2BD8FF_0%,#A14BFF_25%,#FF4FCB_50%,#FF6A3D_75%,#2BD8FF_100%)] bg-[length:200%_100%] bg-left hover:bg-right transition-all duration-700 shadow-lg"
             >
               {t("nav.contact")}
             </Button>

@@ -269,7 +269,7 @@ export default function HeroSection() {
             {visibility["hero.show_contact_btn"] && (
               <Button
                 onClick={() => scrollTo("#contact")}
-                className="rounded-full px-6 py-5 text-sm font-semibold border-0 text-white bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_100%] bg-left hover:bg-right transition-all duration-700 shadow-lg"
+                className="rounded-full px-6 py-5 text-sm font-semibold border-0 text-white bg-[linear-gradient(90deg,#2BD8FF_0%,#A14BFF_25%,#FF4FCB_50%,#FF6A3D_75%,#2BD8FF_100%)] bg-[length:200%_100%] bg-left hover:bg-right transition-all duration-700 shadow-lg"
               >
                 {t("hero.contact")}
               </Button>
