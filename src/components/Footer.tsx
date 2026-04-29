@@ -189,13 +189,13 @@ export default function Footer() {
           <div>
             <h4 className="font-bold mb-5 text-black">{t("footer.products")}</h4>
             <ul className="space-y-3">
-              {productLinks.map((link, i) => (
-                <li key={i}>
+              {footerProducts.map((product) => (
+                <li key={product.id}>
                   <button
-                    onClick={() => scrollTo("#products")}
+                    onClick={() => navigate(`/products/${product.id}`)}
                     className="text-sm text-black/80 hover:text-destructive hover:translate-x-1 rtl:hover:-translate-x-1 transition-all duration-200 text-start inline-block"
                   >
-                    {link}
+                    {language === "ar" ? product.name_ar : product.name_en}
                   </button>
                 </li>
               ))}
