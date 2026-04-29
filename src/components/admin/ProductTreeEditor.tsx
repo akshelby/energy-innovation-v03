@@ -81,8 +81,6 @@ interface ProductItemNode {
   pdf_url: string | null;
 }
 
-interface Rating { value: string; label_en: string; label_ar: string }
-
 interface ProductPage {
   id?: string;
   product_item_id: string;
@@ -93,15 +91,6 @@ interface ProductPage {
   sub_description_en: string;
   sub_description_ar: string;
   is_active: boolean;
-  certifications_en?: string[];
-  certifications_ar?: string[];
-  ratings?: Rating[];
-  operation_modes_en?: string[];
-  operation_modes_ar?: string[];
-  applications_en?: string[];
-  applications_ar?: string[];
-  tagline_en?: string;
-  tagline_ar?: string;
 }
 
 interface PageImage {
@@ -488,179 +477,6 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
           <span className="text-sm text-foreground">Active</span>
         </label>
 
-        {/* ─── Luxury Layout Fields (warm cream styled) ─── */}
-        <div
-          className="rounded-2xl border p-5 space-y-5"
-          style={{ background: "#faf8f5", borderColor: "#e8e2d9" }}
-        >
-          <h4 className="text-sm font-bold" style={{ color: "#1a1a1a", fontFamily: "'Playfair Display', serif" }}>
-            ✨ Luxury Detail Layout Fields <span className="text-xs font-normal" style={{ color: "#6b6b6b" }}>(optional — empty sections are hidden on the live site)</span>
-          </h4>
-
-          {/* CHIP LIST — generic helper */}
-          {(() => {
-            const ChipList = ({
-              label, dir, values, onChange,
-            }: { label: string; dir?: "rtl" | "ltr"; values: string[]; onChange: (v: string[]) => void }) => {
-              const [draft, setDraft] = useState("");
-              return (
-                <div>
-                  <label className="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style={{ color: "#6b6b6b" }}>{label}</label>
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    {values.map((v, i) => (
-                      <span key={i} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm" style={{ background: "#f0ebe3", color: "#4a4a4a" }} dir={dir}>
-                        {v}
-                        <button type="button" onClick={() => onChange(values.filter((_, idx) => idx !== i))} className="hover:text-destructive">
-                          <Trash2 className="w-3 h-3" />
-                        </button>
-                      </span>
-                    ))}
-                    {values.length === 0 && <span className="text-xs italic" style={{ color: "#b0a898" }}>No items yet</span>}
-                  </div>
-                  <div className="flex gap-2">
-                    <Input
-                      value={draft}
-                      dir={dir}
-                      onChange={(e) => setDraft(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && draft.trim()) {
-                          e.preventDefault();
-                          onChange([...values, draft.trim()]);
-                          setDraft("");
-                        }
-                      }}
-                      placeholder="Type and press Enter"
-                      className="rounded-xl bg-white"
-                      style={{ borderColor: "#e8e2d9" }}
-                    />
-                    <Button
-                      type="button" variant="outline" size="sm"
-                      onClick={() => { if (draft.trim()) { onChange([...values, draft.trim()]); setDraft(""); } }}
-                      className="rounded-xl shrink-0"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              );
-            };
-
-            const certEn = editingPage.certifications_en || [];
-            const certAr = editingPage.certifications_ar || [];
-            const modesEn = editingPage.operation_modes_en || [];
-            const modesAr = editingPage.operation_modes_ar || [];
-            const appsEn = editingPage.applications_en || [];
-            const appsAr = editingPage.applications_ar || [];
-            const ratings = editingPage.ratings || [];
-
-            return (
-              <div className="space-y-5">
-                {/* Certifications */}
-                <div className="grid md:grid-cols-2 gap-4">
-                  <ChipList label="Certifications (EN)" values={certEn} onChange={(v) => setEditingPage({ ...editingPage, certifications_en: v })} />
-                  <ChipList label="Certifications (AR)" dir="rtl" values={certAr} onChange={(v) => setEditingPage({ ...editingPage, certifications_ar: v })} />
-                </div>
-
-                {/* Ratings */}
-                <div>
-                  <label className="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style={{ color: "#6b6b6b" }}>
-                    Ratings / Key Specs <span className="font-normal normal-case" style={{ color: "#b0a898" }}>(value + label EN + label AR)</span>
-                  </label>
-                  <div className="space-y-2">
-                    {ratings.map((r, i) => (
-                      <div key={i} className="grid grid-cols-12 gap-2 items-center">
-                        <Input
-                          value={r.value}
-                          onChange={(e) => {
-                            const next = [...ratings]; next[i] = { ...next[i], value: e.target.value };
-                            setEditingPage({ ...editingPage, ratings: next });
-                          }}
-                          placeholder="60"
-                          className="rounded-xl bg-white col-span-3"
-                          style={{ borderColor: "#e8e2d9" }}
-                        />
-                        <Input
-                          value={r.label_en}
-                          onChange={(e) => {
-                            const next = [...ratings]; next[i] = { ...next[i], label_en: e.target.value };
-                            setEditingPage({ ...editingPage, ratings: next });
-                          }}
-                          placeholder="Minutes"
-                          className="rounded-xl bg-white col-span-4"
-                          style={{ borderColor: "#e8e2d9" }}
-                        />
-                        <Input
-                          value={r.label_ar}
-                          dir="rtl"
-                          onChange={(e) => {
-                            const next = [...ratings]; next[i] = { ...next[i], label_ar: e.target.value };
-                            setEditingPage({ ...editingPage, ratings: next });
-                          }}
-                          placeholder="دقيقة"
-                          className="rounded-xl bg-white col-span-4"
-                          style={{ borderColor: "#e8e2d9" }}
-                        />
-                        <Button
-                          type="button" variant="ghost" size="sm"
-                          onClick={() => setEditingPage({ ...editingPage, ratings: ratings.filter((_, idx) => idx !== i) })}
-                          className="text-destructive col-span-1 h-9 w-9 p-0"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    ))}
-                    {ratings.length === 0 && <span className="text-xs italic" style={{ color: "#b0a898" }}>No ratings yet</span>}
-                    <Button
-                      type="button" variant="outline" size="sm"
-                      onClick={() => setEditingPage({ ...editingPage, ratings: [...ratings, { value: "", label_en: "", label_ar: "" }] })}
-                      className="rounded-xl mt-1"
-                    >
-                      <Plus className="w-3 h-3 mr-1" />Add rating
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Operation Modes */}
-                <div className="grid md:grid-cols-2 gap-4">
-                  <ChipList label="Operation Modes (EN)" values={modesEn} onChange={(v) => setEditingPage({ ...editingPage, operation_modes_en: v })} />
-                  <ChipList label="Operation Modes (AR)" dir="rtl" values={modesAr} onChange={(v) => setEditingPage({ ...editingPage, operation_modes_ar: v })} />
-                </div>
-
-                {/* Applications */}
-                <div className="grid md:grid-cols-2 gap-4">
-                  <ChipList label="Applications (EN)" values={appsEn} onChange={(v) => setEditingPage({ ...editingPage, applications_en: v })} />
-                  <ChipList label="Applications (AR)" dir="rtl" values={appsAr} onChange={(v) => setEditingPage({ ...editingPage, applications_ar: v })} />
-                </div>
-
-                {/* Tagline */}
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style={{ color: "#6b6b6b" }}>Tagline (EN)</label>
-                    <Input
-                      value={editingPage.tagline_en || ""}
-                      onChange={(e) => setEditingPage({ ...editingPage, tagline_en: e.target.value })}
-                      placeholder="Engineered for life-safety excellence."
-                      className="rounded-xl bg-white"
-                      style={{ borderColor: "#e8e2d9" }}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style={{ color: "#6b6b6b" }}>Tagline (AR)</label>
-                    <Input
-                      value={editingPage.tagline_ar || ""}
-                      dir="rtl"
-                      onChange={(e) => setEditingPage({ ...editingPage, tagline_ar: e.target.value })}
-                      placeholder="مصممة للتميز في السلامة من الحرائق"
-                      className="rounded-xl bg-white"
-                      style={{ borderColor: "#e8e2d9" }}
-                    />
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
-        </div>
-
         {/* Gallery Images */}
         {(editingPage as any).id && (
           <div className="border-t border-border pt-4">
@@ -850,11 +666,6 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
                       description_en: "", description_ar: "",
                       sub_description_en: "", sub_description_ar: "",
                       is_active: true,
-                      certifications_en: [], certifications_ar: [],
-                      ratings: [],
-                      operation_modes_en: [], operation_modes_ar: [],
-                      applications_en: [], applications_ar: [],
-                      tagline_en: "", tagline_ar: "",
                     });
                     if (!isExpanded) toggleNode(item.id);
                   }}
