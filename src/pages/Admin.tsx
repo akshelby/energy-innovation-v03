@@ -3565,9 +3565,26 @@ export default function Admin() {
                 ].map(({ key, label, placeholder }) => {
                   const item = content.find((c) => c.content_key === key);
                   const edited = editedContent[key];
+                  const enabledKey = `${key}_enabled`;
+                  const enabledItem = content.find((c) => c.content_key === enabledKey);
+                  const enabled = (enabledItem?.value_en ?? "true").toLowerCase() !== "false";
                   return (
-                    <div key={key} className="flex flex-col sm:flex-row gap-2">
-                      <div className="flex items-center gap-2 min-w-[120px]">
+                    <div key={key} className="flex flex-col sm:flex-row gap-2 sm:items-center">
+                      <div className="flex items-center gap-2 min-w-[140px]">
+                        <Switch
+                          checked={enabled}
+                          onCheckedChange={async (checked) => {
+                            try {
+                              await apiCall("content", "POST", storedPassword, {
+                                content_key: enabledKey,
+                                value_en: String(checked),
+                                value_ar: String(checked),
+                              });
+                              toast.success(`${label} ${checked ? "shown" : "hidden"}`);
+                              fetchContent();
+                            } catch (e: any) { toast.error(e.message); }
+                          }}
+                        />
                         <span className="text-sm font-medium text-foreground">{label}</span>
                       </div>
                       <Input
@@ -3577,6 +3594,7 @@ export default function Admin() {
                           [key]: { value_en: e.target.value, value_ar: e.target.value },
                         }))}
                         placeholder={placeholder}
+                        disabled={!enabled}
                         className="rounded-xl flex-1 text-sm"
                       />
                       {edited && (
