@@ -5,6 +5,7 @@ import { Mail, Globe } from "lucide-react";
 import { useBranding } from "@/contexts/BrandingContext";
 import { supabase } from "@/integrations/supabase/client";
 import { getCached, setCache } from "@/lib/cache";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface SocialLinks {
   linkedin: string;
