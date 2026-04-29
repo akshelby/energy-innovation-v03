@@ -140,7 +140,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={s.label}
-                className="text-primary-foreground/50 hover:text-primary-foreground transition-colors"
+                className="text-white/70 hover:text-primary-foreground transition-colors"
               >
                 {s.icon}
               </a>
@@ -155,7 +155,7 @@ export default function Footer() {
             <div className="mb-5">
               {brandReady && <img src={logoUrl} alt={brandName} className="w-auto object-contain" style={{ height: `${Math.round(logoSize * 0.7)}px` }} />}
             </div>
-            <p className="text-slate-300 text-sm leading-relaxed">
+            <p className="text-white/85 text-sm leading-relaxed">
               {t("footer.desc")}
             </p>
           </div>
@@ -168,7 +168,7 @@ export default function Footer() {
                 <li key={link.href}>
                   <button
                     onClick={() => scrollTo(link.href)}
-                    className="text-sm text-slate-300 hover:text-white transition-colors"
+                    className="text-sm text-white/85 hover:text-white transition-colors"
                   >
                     {link.label}
                   </button>
@@ -185,7 +185,7 @@ export default function Footer() {
                 <li key={i}>
                   <button
                     onClick={() => scrollTo("#products")}
-                    className="text-sm text-slate-300 hover:text-white transition-colors text-start"
+                    className="text-sm text-white/85 hover:text-white transition-colors text-start"
                   >
                     {link}
                   </button>
@@ -199,11 +199,11 @@ export default function Footer() {
             <h4 className="font-bold mb-5 text-white">{t("footer.contactInfo")}</h4>
             <ul className="space-y-3 text-sm text-white">
               <li className="flex items-center gap-2">
-                <Mail className="w-4 h-4 shrink-0 text-slate-300" />
+                <Mail className="w-4 h-4 shrink-0 text-white/85" />
                 <a href={`mailto:${contactEmail}`} className="text-white hover:text-white/80 transition-colors">{contactEmail}</a>
               </li>
               <li className="flex items-center gap-2">
-                <Globe className="w-4 h-4 shrink-0 text-slate-300" />
+                <Globe className="w-4 h-4 shrink-0 text-white/85" />
                 <span className="text-white">{contactWebsite}</span>
               </li>
             </ul>
@@ -216,8 +216,8 @@ export default function Footer() {
               const body = language === "ar" ? addr.body_ar : addr.body_en;
               return (
                 <div key={i} className={i === 0 ? "mt-6" : "mt-5"}>
-                  <h5 className="font-semibold mb-1.5 text-accent text-sm">{heading}</h5>
-                  <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-line">
+                  <h5 className="font-semibold mb-1.5 text-white text-sm">{heading}</h5>
+                  <p className="text-sm text-white/85 leading-relaxed whitespace-pre-line">
                     {body}
                   </p>
                 </div>
@@ -228,7 +228,7 @@ export default function Footer() {
 
         {/* Copyright */}
         <div className="border-t border-primary-foreground/10 pt-8 flex items-center justify-center">
-          <p className="text-sm text-primary-foreground/40">
+          <p className="text-sm text-white/70">
             © {new Date().getFullYear()} {brandName}. {t("footer.rights")}
           </p>
         </div>
