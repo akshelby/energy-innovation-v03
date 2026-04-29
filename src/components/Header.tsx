@@ -446,7 +446,7 @@ export default function Header() {
             </nav>
             <Button
               onClick={() => scrollToSection("#contact")}
-              className="w-full mt-6 gradient-accent text-accent-foreground rounded-full font-semibold border-0"
+              className="w-full mt-6 rounded-full font-semibold border-0 text-white bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_100%] bg-left hover:bg-right transition-all duration-700 shadow-lg"
             >
               {t("nav.contact")}
             </Button>
