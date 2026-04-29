@@ -133,7 +133,7 @@ export default function Footer() {
 
   return (
     <footer
-      className={`text-primary-foreground pt-12 pb-8 px-6 transition-opacity duration-500 ${ready ? 'opacity-100' : 'opacity-0'}`}
+      className={`pt-12 pb-8 px-6 transition-opacity duration-500 ${ready ? 'opacity-100' : 'opacity-0'}`}
       style={{ background: 'linear-gradient(135deg, hsl(213 90% 88%) 0%, hsl(213 95% 92%) 100%)', color: 'hsl(213 60% 18%)' }}
     >
       <div className="max-w-6xl mx-auto">
