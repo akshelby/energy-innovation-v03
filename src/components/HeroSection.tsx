@@ -72,7 +72,6 @@ export default function HeroSection() {
   const [images, setImages] = useState<string[]>(initialHero?.images || [buildHeroImageUrl(FIRST_HERO_FILENAME)]);
   const [heroReady, setHeroReady] = useState(true);
   const [speed, setSpeed] = useState(initialHero?.speed || 6000);
-  const [contentReady, setContentReady] = useState<boolean>(!!initialHero?.visibility);
   const [visibility, setVisibility] = useState<Record<string, boolean>>(initialHero?.visibility || {
     "hero.show_headline": true,
     "hero.show_subtext": true,
@@ -119,7 +118,6 @@ export default function HeroSection() {
         vis[k] = entry ? entry.value_en !== "false" : true;
       });
       setVisibility(vis);
-      setContentReady(true);
 
       if (activeList.length > 0) {
         const urls = activeList.map((fileName) => buildHeroImageUrl(fileName));
@@ -247,7 +245,7 @@ export default function HeroSection() {
         </>
       )}
 
-      <div className={`relative z-10 h-full flex flex-col justify-end pb-8 md:pb-12 text-center px-6 transition-opacity duration-300 ${contentReady ? 'opacity-100' : 'opacity-0'}`}>
+      <div className="relative z-10 h-full flex flex-col justify-end pb-8 md:pb-12 text-center px-6">
         {visibility["hero.show_headline"] && (
           <h1 className="text-xl sm:text-3xl md:text-5xl lg:text-6xl font-black text-primary-foreground w-full max-w-none mx-auto leading-tight animate-fade-in-up drop-shadow-lg">
             {t("hero.headline")}
