@@ -70,6 +70,7 @@ const Index = () => {
       {/* Per-section Suspense so each chunk paints independently */}
       <Suspense fallback={null}><ProductsSection /></Suspense>
       <Suspense fallback={null}><ServicesSection /></Suspense>
+      <Suspense fallback={null}><CountriesSection /></Suspense>
       <Suspense fallback={null}><HighlightSection /></Suspense>
       <Suspense fallback={null}><WhyChooseUsSection /></Suspense>
       <Suspense fallback={null}><PartnersSection /></Suspense>
