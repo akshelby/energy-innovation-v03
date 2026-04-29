@@ -8,6 +8,7 @@ interface LanguageContextType {
   setLanguage: (lang: Language) => void;
   t: (key: string) => string;
   isRTL: boolean;
+  contentLoaded: boolean;
 }
 
 const translations: Record<Language, Record<string, string>> = {
