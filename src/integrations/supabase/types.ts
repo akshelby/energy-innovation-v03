@@ -352,10 +352,6 @@ export type Database = {
       }
       product_pages: {
         Row: {
-          applications_ar: string[] | null
-          applications_en: string[] | null
-          certifications_ar: string[] | null
-          certifications_en: string[] | null
           created_at: string
           description_ar: string
           description_en: string
@@ -363,21 +359,12 @@ export type Database = {
           headline_en: string
           id: string
           is_active: boolean
-          operation_modes_ar: string[] | null
-          operation_modes_en: string[] | null
           product_item_id: string
-          ratings: Json | null
           sub_description_ar: string
           sub_description_en: string
-          tagline_ar: string | null
-          tagline_en: string | null
           updated_at: string
         }
         Insert: {
-          applications_ar?: string[] | null
-          applications_en?: string[] | null
-          certifications_ar?: string[] | null
-          certifications_en?: string[] | null
           created_at?: string
           description_ar?: string
           description_en?: string
@@ -385,21 +372,12 @@ export type Database = {
           headline_en?: string
           id?: string
           is_active?: boolean
-          operation_modes_ar?: string[] | null
-          operation_modes_en?: string[] | null
           product_item_id: string
-          ratings?: Json | null
           sub_description_ar?: string
           sub_description_en?: string
-          tagline_ar?: string | null
-          tagline_en?: string | null
           updated_at?: string
         }
         Update: {
-          applications_ar?: string[] | null
-          applications_en?: string[] | null
-          certifications_ar?: string[] | null
-          certifications_en?: string[] | null
           created_at?: string
           description_ar?: string
           description_en?: string
@@ -407,14 +385,9 @@ export type Database = {
           headline_en?: string
           id?: string
           is_active?: boolean
-          operation_modes_ar?: string[] | null
-          operation_modes_en?: string[] | null
           product_item_id?: string
-          ratings?: Json | null
           sub_description_ar?: string
           sub_description_en?: string
-          tagline_ar?: string | null
-          tagline_en?: string | null
           updated_at?: string
         }
         Relationships: [
