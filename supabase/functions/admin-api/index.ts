@@ -186,6 +186,34 @@ Deno.serve(async (req) => {
       }
     }
 
+    // COUNTRIES CRUD
+    if (path === "countries") {
+      if (method === "GET") {
+        const { data, error } = await supabase
+          .from("countries")
+          .select("*")
+          .order("sort_order", { ascending: true });
+        if (error) throw error;
+        return json(data);
+      }
+      if (method === "POST") {
+        const body = await req.json();
+        const { data, error } = await supabase
+          .from("countries")
+          .upsert({ ...body, updated_at: new Date().toISOString() }, { onConflict: "id" })
+          .select()
+          .single();
+        if (error) throw error;
+        return json(data);
+      }
+      if (method === "DELETE") {
+        const { id } = await req.json();
+        const { error } = await supabase.from("countries").delete().eq("id", id);
+        if (error) throw error;
+        return json({ success: true });
+      }
+    }
+
     // PARTNERS CRUD
     if (path === "partners") {
       if (method === "GET") {

@@ -24,6 +24,7 @@ const lazyWithRetry = <T,>(factory: () => Promise<T>) =>
 
 const ProductsSection = lazyWithRetry(() => import("@/components/ProductsSection"));
 const ServicesSection = lazyWithRetry(() => import("@/components/ServicesSection"));
+const CountriesSection = lazyWithRetry(() => import("@/components/CountriesSection"));
 const HighlightSection = lazyWithRetry(() => import("@/components/HighlightSection"));
 const WhyChooseUsSection = lazyWithRetry(() => import("@/components/WhyChooseUsSection"));
 const PartnersSection = lazyWithRetry(() => import("@/components/PartnersSection"));
@@ -69,6 +70,7 @@ const Index = () => {
       {/* Per-section Suspense so each chunk paints independently */}
       <Suspense fallback={null}><ProductsSection /></Suspense>
       <Suspense fallback={null}><ServicesSection /></Suspense>
+      <Suspense fallback={null}><CountriesSection /></Suspense>
       <Suspense fallback={null}><HighlightSection /></Suspense>
       <Suspense fallback={null}><WhyChooseUsSection /></Suspense>
       <Suspense fallback={null}><PartnersSection /></Suspense>
