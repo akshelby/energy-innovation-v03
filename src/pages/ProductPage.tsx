@@ -348,6 +348,24 @@ export default function ProductPageView() {
         </div>
       </section>
 
+      {/* Luxury Warm Minimal detail layout (hidden when no rich data) */}
+      {page && (
+        <section className="px-6 md:px-12 lg:px-20 py-8 md:py-12">
+          <div className="w-full mx-auto">
+            <ProductDetailLayout
+              isAr={isAr}
+              name={headline || productName}
+              description={subDescription || description}
+              certifications={(isAr ? page.certifications_ar : page.certifications_en) || []}
+              ratings={(page.ratings || []) as { value: string; label_en: string; label_ar: string }[]}
+              operationModes={(isAr ? page.operation_modes_ar : page.operation_modes_en) || []}
+              applications={(isAr ? page.applications_ar : page.applications_en) || []}
+              tagline={(isAr ? page.tagline_ar : page.tagline_en) || ""}
+            />
+          </div>
+        </section>
+      )}
+
       {/* Child Products Section */}
       {children.length > 0 && (
         <section className="py-12 md:py-16 px-6 md:px-12 lg:px-20 bg-secondary/30">
