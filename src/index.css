@@ -93,6 +93,27 @@
     --sidebar-border: 213 25% 20%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
+  /* Force light theme tokens on header regardless of dark mode */
+  .dark [data-theme-scope="light"] {
+    --background: 210 20% 98%;
+    --foreground: 213 39% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 213 39% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 213 39% 10%;
+    --primary: 213 94% 20%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 213 39% 10%;
+    --muted: 210 20% 95%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 100%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 213 94% 20%;
+  }
 }
 
 @layer base {
