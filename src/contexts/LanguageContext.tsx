@@ -236,9 +236,11 @@ function readCachedContent(): Record<string, { en: string; ar: string }> {
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>("en");
-  const initialCached = readCachedContent();
-  const [dynamicContent, setDynamicContent] = useState<Record<string, { en: string; ar: string }>>(initialCached);
-  const [contentLoaded, setContentLoaded] = useState<boolean>(Object.keys(initialCached).length > 0);
+  // Always start empty — never trust cached content as "loaded".
+  // We only mark contentLoaded=true after a fresh DB fetch completes,
+  // so the UI never flashes stale/removed text.
+  const [dynamicContent, setDynamicContent] = useState<Record<string, { en: string; ar: string }>>({});
+  const [contentLoaded, setContentLoaded] = useState<boolean>(false);
 
   const isRTL = language === "ar";
 
