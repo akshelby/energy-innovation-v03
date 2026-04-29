@@ -313,7 +313,8 @@ export default function Header() {
     <>
       {/* Navigation Bar */}
       <header
-        className={`fixed top-0 left-0 z-50 w-full bg-card transition-all duration-300 ${
+        data-theme-scope="light"
+        className={`light fixed top-0 left-0 z-50 w-full bg-card transition-all duration-300 ${
           scrolled ? "shadow-md" : ""
         } ${headerVisible ? "translate-y-0" : "-translate-y-full"}`}
       >
