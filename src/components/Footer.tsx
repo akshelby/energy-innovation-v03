@@ -149,7 +149,7 @@ export default function Footer() {
         )}
 
         {/* 4-Column Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-10 mb-14">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 sm:gap-x-12 gap-y-10 mb-14">
           {/* Brand */}
           <div>
             <div className="mb-5">
