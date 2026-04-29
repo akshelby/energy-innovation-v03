@@ -346,6 +346,36 @@ export default function ProductPageView() {
         </div>
       </section>
 
+      {/* Luxury Detail Layout — only renders sections with data */}
+      {page && (
+        (page.certifications_en?.length || page.ratings?.length ||
+         page.operation_modes_en?.length || page.applications_en?.length ||
+         page.tagline_en) ? (
+          <section className="px-6 md:px-12 lg:px-20 mt-2 mb-8">
+            <div className="w-full mx-auto">
+              <ProductDetailLayout
+                isAr={isAr}
+                productLabel={isAr ? "منتج" : "Product"}
+                name={headline}
+                description={description}
+                certificationsTitle={isAr ? "الامتثال والشهادات" : "Compliance & Certification"}
+                certifications={(isAr ? page.certifications_ar : page.certifications_en) || []}
+                ratings={(page.ratings || []).map((r) => ({
+                  label_en: r.label_en,
+                  label_ar: r.label_ar,
+                  value: r.value,
+                }))}
+                operationModesTitle={isAr ? "أوضاع التشغيل" : "Operation Modes"}
+                operationModes={(isAr ? page.operation_modes_ar : page.operation_modes_en) || []}
+                applicationsTitle={isAr ? "التطبيقات" : "Applications"}
+                applications={(isAr ? page.applications_ar : page.applications_en) || []}
+                tagline={(isAr ? page.tagline_ar : page.tagline_en) || ""}
+              />
+            </div>
+          </section>
+        ) : null
+      )}
+
       {/* Child Products Section */}
       {children.length > 0 && (
         <section className="py-12 md:py-16 px-6 md:px-12 lg:px-20 bg-secondary/30">
