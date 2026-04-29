@@ -352,8 +352,8 @@ export default function SubProductsPage() {
       </section>
 
       {/* Sub-products Grid */}
-      <section className="py-6 md:py-10 px-6">
-        <div className="max-w-6xl mx-auto">
+      <section className="py-6 md:py-10 px-6 md:px-12 lg:px-20">
+        <div className="w-full mx-auto">
           {items.length > 0 ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {items.map((item) => {
