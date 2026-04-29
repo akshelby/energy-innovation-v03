@@ -31,64 +31,7 @@ export default function StickyCardStack({
   const count = React.Children.count(children);
   const isMobile = useIsMobile();
 
-  // Scroll-driven depth effect — only on mobile
-  useEffect(() => {
-    if (!isMobile) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    const container = containerRef.current;
-    if (!container) return;
-
-    const cards = container.querySelectorAll<HTMLElement>("[data-sticky-card]");
-    if (!cards.length) return;
-
-    let ticking = false;
-
-    const update = () => {
-      const stuckStates: boolean[] = [];
-      cards.forEach((card, i) => {
-        const rect = card.getBoundingClientRect();
-        const targetTop = baseTop + i * offsetIncrement;
-        stuckStates.push(rect.top <= targetTop + 4);
-      });
-
-      cards.forEach((card, i) => {
-        if (!stuckStates[i]) {
-          card.style.transform = "";
-          card.style.filter = "";
-          return;
-        }
-
-        let cardsAbove = 0;
-        for (let j = i + 1; j < cards.length; j++) {
-          if (stuckStates[j]) cardsAbove++;
-        }
-
-        if (cardsAbove > 0) {
-          const scale = 1 - cardsAbove * 0.025;
-          const brightness = 1 - cardsAbove * 0.06;
-          card.style.transform = `scale(${Math.max(scale, 0.88)})`;
-          card.style.filter = `brightness(${Math.max(brightness, 0.7)})`;
-        } else {
-          card.style.transform = "";
-          card.style.filter = "";
-        }
-      });
-
-      ticking = false;
-    };
-
-    const onScroll = () => {
-      if (!ticking) {
-        ticking = true;
-        requestAnimationFrame(update);
-      }
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    requestAnimationFrame(update);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [baseTop, offsetIncrement, count, isMobile]);
+  // Scroll-linked depth effect disabled — no scroll-speed animations.
 
   // Desktop/tablet: plain list without sticky behavior
   if (!isMobile) {
