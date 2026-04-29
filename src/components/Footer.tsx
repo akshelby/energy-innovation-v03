@@ -202,11 +202,28 @@ export default function Footer() {
             <ul className="space-y-3 text-sm text-white">
               <li className="flex items-center gap-2 min-w-0">
                 <Mail className="w-4 h-4 shrink-0 text-white/85" />
-                <a href={`mailto:${contactEmail}`} className="text-white hover:text-white/80 transition-colors truncate min-w-0">{contactEmail}</a>
+                <button
+                  type="button"
+                  onClick={() => setPopup({ title: t("footer.contactInfo"), value: contactEmail, href: `mailto:${contactEmail}` })}
+                  className="text-white hover:text-white/80 transition-colors truncate min-w-0 text-start"
+                  title={contactEmail}
+                >
+                  {contactEmail}
+                </button>
               </li>
               <li className="flex items-center gap-2 min-w-0">
                 <Globe className="w-4 h-4 shrink-0 text-white/85" />
-                <span className="text-white truncate min-w-0">{contactWebsite}</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const href = contactWebsite.startsWith("http") ? contactWebsite : `https://${contactWebsite}`;
+                    setPopup({ title: t("footer.contactInfo"), value: contactWebsite, href });
+                  }}
+                  className="text-white hover:text-white/80 transition-colors truncate min-w-0 text-start"
+                  title={contactWebsite}
+                >
+                  {contactWebsite}
+                </button>
               </li>
             </ul>
 
