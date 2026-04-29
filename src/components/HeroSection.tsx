@@ -72,6 +72,7 @@ export default function HeroSection() {
   const [images, setImages] = useState<string[]>(initialHero?.images || [buildHeroImageUrl(FIRST_HERO_FILENAME)]);
   const [heroReady, setHeroReady] = useState(true);
   const [speed, setSpeed] = useState(initialHero?.speed || 6000);
+  const [contentReady, setContentReady] = useState<boolean>(!!initialHero?.visibility);
   const [visibility, setVisibility] = useState<Record<string, boolean>>(initialHero?.visibility || {
     "hero.show_headline": true,
     "hero.show_subtext": true,
