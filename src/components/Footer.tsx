@@ -129,7 +129,7 @@ export default function Footer() {
       className={`text-primary-foreground pt-12 pb-8 px-6 transition-opacity duration-500 ${ready ? 'opacity-100' : 'opacity-0'}`}
       style={{ background: 'linear-gradient(135deg, hsl(213 70% 38%) 0%, hsl(213 65% 48%) 100%)' }}
     >
-      <div className="max-w-7xl mx-auto px-2 lg:px-8">
+      <div className="max-w-6xl mx-auto">
         {/* Social Icons Row */}
         {socialItems.length > 0 && (
           <div className="flex items-center justify-center gap-5 pb-8 mb-10 border-b border-primary-foreground/10">
@@ -149,7 +149,7 @@ export default function Footer() {
         )}
 
         {/* 4-Column Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-10 mb-14">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 sm:gap-x-12 gap-y-10 mb-14">
           {/* Brand */}
           <div>
             <div className="mb-5">
