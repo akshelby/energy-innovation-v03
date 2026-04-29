@@ -14,7 +14,7 @@ export default function AboutSection() {
   const isCollapsed = showToggle && !expanded;
 
   return (
-    <section id="about" className="py-14 md:py-24 px-6 md:px-12 lg:px-20 bg-background" ref={ref}>
+    <section id="about" className="py-14 md:py-14 px-6 md:px-12 lg:px-20 bg-background" ref={ref}>
       <div className="w-full mx-auto">
         <div className="text-center scroll-reveal-fade">
           <span className="inline-block px-8 py-3.5 text-lg font-bold tracking-wide text-white bg-accent rounded-full mb-4">
