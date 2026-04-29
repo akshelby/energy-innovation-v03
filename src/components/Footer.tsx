@@ -147,7 +147,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={s.label}
-                className="text-black/70 hover:text-black transition-colors"
+                className="text-black/70 hover:text-destructive hover:-translate-y-0.5 hover:scale-110 transition-all duration-200"
               >
                 {s.icon}
               </a>
@@ -175,7 +175,7 @@ export default function Footer() {
                 <li key={link.href}>
                   <button
                     onClick={() => scrollTo(link.href)}
-                    className="text-sm text-black/80 hover:text-black transition-colors"
+                    className="text-sm text-black/80 hover:text-destructive hover:translate-x-1 rtl:hover:-translate-x-1 transition-all duration-200 inline-block"
                   >
                     {link.label}
                   </button>
@@ -192,7 +192,7 @@ export default function Footer() {
                 <li key={i}>
                   <button
                     onClick={() => scrollTo("#products")}
-                    className="text-sm text-black/80 hover:text-black transition-colors text-start"
+                    className="text-sm text-black/80 hover:text-destructive hover:translate-x-1 rtl:hover:-translate-x-1 transition-all duration-200 text-start inline-block"
                   >
                     {link}
                   </button>
@@ -205,26 +205,26 @@ export default function Footer() {
           <div>
             <h4 className="font-bold mb-5 text-black">{t("footer.contactInfo")}</h4>
             <ul className="space-y-3 text-sm text-black">
-              <li className="flex items-center gap-2 min-w-0">
-                <Mail className="w-4 h-4 shrink-0 text-black/80" />
+              <li className="flex items-center gap-2 min-w-0 group">
+                <Mail className="w-4 h-4 shrink-0 text-black/80 group-hover:text-destructive transition-colors" />
                 <button
                   type="button"
                   onClick={() => setPopup({ title: t("footer.contactInfo"), value: contactEmail, href: `mailto:${contactEmail}` })}
-                  className="text-black hover:text-black/70 transition-colors truncate min-w-0 text-start"
+                  className="text-black group-hover:text-destructive hover:text-destructive transition-colors truncate min-w-0 text-start"
                   title={contactEmail}
                 >
                   {contactEmail}
                 </button>
               </li>
-              <li className="flex items-center gap-2 min-w-0">
-                <Globe className="w-4 h-4 shrink-0 text-black/80" />
+              <li className="flex items-center gap-2 min-w-0 group">
+                <Globe className="w-4 h-4 shrink-0 text-black/80 group-hover:text-destructive transition-colors" />
                 <button
                   type="button"
                   onClick={() => {
                     const href = contactWebsite.startsWith("http") ? contactWebsite : `https://${contactWebsite}`;
                     setPopup({ title: t("footer.contactInfo"), value: contactWebsite, href });
                   }}
-                  className="text-black hover:text-black/70 transition-colors truncate min-w-0 text-start"
+                  className="text-black group-hover:text-destructive hover:text-destructive transition-colors truncate min-w-0 text-start"
                   title={contactWebsite}
                 >
                   {contactWebsite}
