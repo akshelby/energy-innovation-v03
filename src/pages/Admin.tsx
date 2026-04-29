@@ -292,6 +292,15 @@ export default function Admin() {
   const [placeholderShape, setPlaceholderShape] = useState<"rounded" | "pill" | "square">("rounded");
   const partnerLogoRef = useRef<HTMLInputElement>(null);
 
+  // Countries state
+  type CountryItem = { id?: string; name_en: string; name_ar: string; flag_url: string | null; country_code: string; sort_order: number; is_active: boolean };
+  const [countries, setCountries] = useState<(CountryItem & { id: string })[]>([]);
+  const [editingCountry, setEditingCountry] = useState<CountryItem | null>(null);
+  const [countriesTag, setCountriesTag] = useState("Global Reach");
+  const [countriesTitle, setCountriesTitle] = useState("Proudly serving our customers in the Middle East");
+  const [countriesSubtitle, setCountriesSubtitle] = useState("Trusted partners across the region");
+  const countryFlagRef = useRef<HTMLInputElement>(null);
+
   // Menu Items state
   const [menuItems, setMenuItems] = useState<(MenuChildItem & { id: string })[]>([]);
   const [editingMenuItem, setEditingMenuItem] = useState<MenuChildItem | null>(null);
