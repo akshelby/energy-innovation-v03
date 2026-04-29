@@ -243,8 +243,8 @@ export default function ProductPageView() {
       />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Header />
-      <section className="pt-20 md:pt-24">
-        <div className="max-w-6xl mx-auto px-6">
+      <section className="pt-20 md:pt-24 px-6 md:px-12 lg:px-20">
+        <div className="w-full mx-auto">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-1.5 text-sm text-muted-foreground py-4 flex-wrap">
             <Link to="/" className="hover:text-foreground transition-colors">
