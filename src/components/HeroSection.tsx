@@ -247,7 +247,7 @@ export default function HeroSection() {
         </>
       )}
 
-      <div className="relative z-10 h-full flex flex-col justify-end pb-8 md:pb-12 text-center px-6">
+      <div className={`relative z-10 h-full flex flex-col justify-end pb-8 md:pb-12 text-center px-6 transition-opacity duration-300 ${contentReady ? 'opacity-100' : 'opacity-0'}`}>
         {visibility["hero.show_headline"] && (
           <h1 className="text-xl sm:text-3xl md:text-5xl lg:text-6xl font-black text-primary-foreground w-full max-w-none mx-auto leading-tight animate-fade-in-up drop-shadow-lg">
             {t("hero.headline")}
