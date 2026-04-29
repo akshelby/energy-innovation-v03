@@ -129,11 +129,11 @@ export default function ProductsSection() {
                 className="scroll-reveal md:!opacity-100 md:!translate-y-0 group rounded-2xl cursor-pointer overflow-hidden bg-card border border-border hover:border-accent/20 transition-all duration-300 h-full flex flex-col"
                 style={{ transitionDelay: `${i * 80}ms` }}
                 onClick={() => {
-                  if (product.category_key) {
-                    navigate(`/products/${product.id}`);
-                  } else if (product.pdf_url) {
+                  if (product.pdf_url && !product.category_key) {
                     setPdfSrc(product.pdf_url);
                     setPdfOpen(true);
+                  } else {
+                    navigate(`/products/${product.id}`);
                   }
                 }}
               >

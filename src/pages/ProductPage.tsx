@@ -73,25 +73,18 @@ export default function ProductPageView() {
     setActiveImage(0);
 
     const fetchData = async () => {
-      // Fetch product item
-      const { data: itemData } = await supabase
-        .from("product_items")
-        .select("*")
-        .eq("id", id)
-        .single();
+      // Fetch item, page, and children in parallel
+      const [{ data: itemData }, { data: pageData }, { data: childData }] = await Promise.all([
+        supabase.from("product_items").select("*").eq("id", id).single(),
+        supabase.from("product_pages").select("*").eq("product_item_id", id).eq("is_active", true).single(),
+        supabase.from("product_items").select("*").eq("parent_id", id).eq("is_active", true).order("sort_order"),
+      ]);
+
       if (!itemData) { setLoading(false); return; }
       setItem(itemData as ProductItem);
-
-      // Fetch product page
-      const { data: pageData } = await supabase
-        .from("product_pages")
-        .select("*")
-        .eq("product_item_id", id)
-        .eq("is_active", true)
-        .single();
       setPage(pageData as ProductPage | null);
 
-      // Fetch images
+      // Images — only if page exists
       if (pageData) {
         const { data: imgData } = await supabase
           .from("product_page_images")
@@ -101,14 +94,6 @@ export default function ProductPageView() {
         setImages((imgData || []) as PageImage[]);
       }
 
-      // Fetch children with pages
-      const { data: childData } = await supabase
-        .from("product_items")
-        .select("*")
-        .eq("parent_id", id)
-        .eq("is_active", true)
-        .order("sort_order");
-      
       if (childData && childData.length > 0) {
         // Check which children have active pages
         const childIds = childData.map(c => c.id);
@@ -123,21 +108,18 @@ export default function ProductPageView() {
         setChildren([]);
       }
 
-      // Build breadcrumb
+      // Build breadcrumb by fetching all items in category at once
+      const { data: allItems } = await supabase
+        .from("product_items")
+        .select("id,name_en,name_ar,parent_id,category_key")
+        .eq("category_key", itemData.category_key);
+
+      const allItemMap = new Map((allItems || []).map((i) => [i.id, i]));
       const crumbs: { id: string; name: string }[] = [];
-      let current = itemData;
-      while (current) {
-        crumbs.unshift({ id: current.id, name: isAr ? current.name_ar : current.name_en });
-        if (current.parent_id) {
-          const { data: parent } = await supabase
-            .from("product_items")
-            .select("*")
-            .eq("id", current.parent_id)
-            .single();
-          current = parent;
-        } else {
-          current = null;
-        }
+      let cur: typeof itemData | undefined = itemData;
+      while (cur) {
+        crumbs.unshift({ id: cur.id, name: isAr ? cur.name_ar : cur.name_en });
+        cur = cur.parent_id ? (allItemMap.get(cur.parent_id) as any) : undefined;
       }
       setBreadcrumb(crumbs);
       setLoading(false);
