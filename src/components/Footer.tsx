@@ -252,6 +252,27 @@ export default function Footer() {
           </p>
         </div>
       </div>
+      </div>
+
+      <Dialog open={!!popup} onOpenChange={(open) => !open && setPopup(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>{popup?.title}</DialogTitle>
+          </DialogHeader>
+          {popup?.href ? (
+            <a
+              href={popup.href}
+              target={popup.href.startsWith("http") ? "_blank" : undefined}
+              rel="noopener noreferrer"
+              className="text-primary hover:underline break-all text-sm"
+            >
+              {popup.value}
+            </a>
+          ) : (
+            <p className="break-all text-sm">{popup?.value}</p>
+          )}
+        </DialogContent>
+      </Dialog>
     </footer>
   );
 }
