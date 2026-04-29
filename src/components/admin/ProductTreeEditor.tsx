@@ -489,16 +489,37 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
             onClick={async () => {
               try {
                 setTranslating(true);
-                const result = await translateTexts({
+                const baseTexts: Record<string, string> = {
                   headline_en: editingPage.headline_en,
                   description_en: editingPage.description_en,
                   sub_description_en: editingPage.sub_description_en,
-                });
+                  tagline_en: editingPage.tagline_en || "",
+                };
+                (editingPage.certifications_en || []).forEach((v, i) => { baseTexts[`cert_${i}`] = v; });
+                (editingPage.operation_modes_en || []).forEach((v, i) => { baseTexts[`mode_${i}`] = v; });
+                (editingPage.applications_en || []).forEach((v, i) => { baseTexts[`app_${i}`] = v; });
+                (editingPage.ratings || []).forEach((r, i) => { if (r.label_en) baseTexts[`rating_${i}`] = r.label_en; });
+
+                const result = await translateTexts(baseTexts);
+
+                const certs_ar = (editingPage.certifications_en || []).map((_, i) => result[`cert_${i}`] || (editingPage.certifications_ar || [])[i] || "");
+                const modes_ar = (editingPage.operation_modes_en || []).map((_, i) => result[`mode_${i}`] || (editingPage.operation_modes_ar || [])[i] || "");
+                const apps_ar = (editingPage.applications_en || []).map((_, i) => result[`app_${i}`] || (editingPage.applications_ar || [])[i] || "");
+                const ratings_next = (editingPage.ratings || []).map((r, i) => ({
+                  ...r,
+                  label_ar: result[`rating_${i}`] || r.label_ar || "",
+                }));
+
                 setEditingPage({
                   ...editingPage,
                   headline_ar: result.headline_ar || editingPage.headline_ar,
                   description_ar: result.description_ar || editingPage.description_ar,
                   sub_description_ar: result.sub_description_ar || editingPage.sub_description_ar,
+                  tagline_ar: result.tagline_ar || editingPage.tagline_ar || "",
+                  certifications_ar: certs_ar,
+                  operation_modes_ar: modes_ar,
+                  applications_ar: apps_ar,
+                  ratings: ratings_next,
                 });
                 toast.success("Arabic translations generated");
               } catch (e: any) { toast.error(e.message); }
