@@ -632,6 +632,7 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
           </div>
         </div>
 
+        <label className="flex items-center gap-2 cursor-pointer">
           <input type="checkbox" checked={editingPage.is_active} onChange={(e) => setEditingPage({ ...editingPage, is_active: e.target.checked })} className="rounded" />
           <span className="text-sm text-foreground">Active</span>
         </label>
