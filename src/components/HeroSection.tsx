@@ -119,6 +119,7 @@ export default function HeroSection() {
         vis[k] = entry ? entry.value_en !== "false" : true;
       });
       setVisibility(vis);
+      setContentReady(true);
 
       if (activeList.length > 0) {
         const urls = activeList.map((fileName) => buildHeroImageUrl(fileName));
