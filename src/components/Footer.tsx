@@ -135,7 +135,7 @@ export default function Footer() {
   return (
     <footer
       className={`pt-12 pb-8 px-6 transition-opacity duration-500 ${ready ? 'opacity-100' : 'opacity-0'}`}
-      style={{ background: '#ffffff', color: '#000000' }}
+      style={{ background: '#f3f4f6', color: '#000000' }}
     >
       <div className="max-w-6xl mx-auto">
         {/* Social Icons Row */}
