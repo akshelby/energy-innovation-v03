@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Send, ChevronRight, ChevronLeft, ArrowRight } from "lucide-react";
+import ProductDetailLayout from "@/components/ProductDetailLayout";
 
 const enquirySchema = z.object({
   name: z.string().trim().min(1, "Name required").max(100),
@@ -40,6 +41,15 @@ interface ProductPage {
   sub_description_en: string;
   sub_description_ar: string;
   is_active: boolean;
+  certifications_en?: string[] | null;
+  certifications_ar?: string[] | null;
+  ratings?: Array<{ label_en?: string; label_ar?: string; value: string }> | null;
+  operation_modes_en?: string[] | null;
+  operation_modes_ar?: string[] | null;
+  applications_en?: string[] | null;
+  applications_ar?: string[] | null;
+  tagline_en?: string | null;
+  tagline_ar?: string | null;
 }
 
 interface PageImage {
@@ -82,7 +92,7 @@ export default function ProductPageView() {
 
       if (!itemData) { setLoading(false); return; }
       setItem(itemData as ProductItem);
-      setPage(pageData as ProductPage | null);
+      setPage(pageData as unknown as ProductPage | null);
 
       // Images — only if page exists
       if (pageData) {
@@ -335,6 +345,36 @@ export default function ProductPageView() {
           </div>
         </div>
       </section>
+
+      {/* Luxury Detail Layout — only renders sections with data */}
+      {page && (
+        (page.certifications_en?.length || page.ratings?.length ||
+         page.operation_modes_en?.length || page.applications_en?.length ||
+         page.tagline_en) ? (
+          <section className="px-6 md:px-12 lg:px-20 mt-2 mb-8">
+            <div className="w-full mx-auto">
+              <ProductDetailLayout
+                isAr={isAr}
+                productLabel={isAr ? "منتج" : "Product"}
+                name={headline}
+                description={description}
+                certificationsTitle={isAr ? "الامتثال والشهادات" : "Compliance & Certification"}
+                certifications={(isAr ? page.certifications_ar : page.certifications_en) || []}
+                ratings={(page.ratings || []).map((r) => ({
+                  label_en: r.label_en,
+                  label_ar: r.label_ar,
+                  value: r.value,
+                }))}
+                operationModesTitle={isAr ? "أوضاع التشغيل" : "Operation Modes"}
+                operationModes={(isAr ? page.operation_modes_ar : page.operation_modes_en) || []}
+                applicationsTitle={isAr ? "التطبيقات" : "Applications"}
+                applications={(isAr ? page.applications_ar : page.applications_en) || []}
+                tagline={(isAr ? page.tagline_ar : page.tagline_en) || ""}
+              />
+            </div>
+          </section>
+        ) : null
+      )}
 
       {/* Child Products Section */}
       {children.length > 0 && (

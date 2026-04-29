@@ -81,6 +81,12 @@ interface ProductItemNode {
   pdf_url: string | null;
 }
 
+interface RatingRow {
+  label_en?: string;
+  label_ar?: string;
+  value: string;
+}
+
 interface ProductPage {
   id?: string;
   product_item_id: string;
@@ -91,6 +97,15 @@ interface ProductPage {
   sub_description_en: string;
   sub_description_ar: string;
   is_active: boolean;
+  certifications_en?: string[];
+  certifications_ar?: string[];
+  ratings?: RatingRow[];
+  operation_modes_en?: string[];
+  operation_modes_ar?: string[];
+  applications_en?: string[];
+  applications_ar?: string[];
+  tagline_en?: string;
+  tagline_ar?: string;
 }
 
 interface PageImage {
@@ -98,6 +113,63 @@ interface PageImage {
   product_page_id: string;
   image_url: string;
   sort_order: number;
+}
+
+// ─── Chip list editor ────────────────────────────────
+function ChipListField({
+  label, items, onChange, placeholder, dir,
+}: {
+  label: string;
+  items: string[];
+  onChange: (next: string[]) => void;
+  placeholder?: string;
+  dir?: "ltr" | "rtl";
+}) {
+  const [draft, setDraft] = useState("");
+  const add = () => {
+    const v = draft.trim();
+    if (!v) return;
+    onChange([...(items || []), v]);
+    setDraft("");
+  };
+  return (
+    <div>
+      <label className="text-xs font-medium text-muted-foreground mb-1.5 block">{label}</label>
+      <div className="flex gap-2">
+        <Input
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); add(); } }}
+          placeholder={placeholder}
+          className={`rounded-xl flex-1 ${dir === "rtl" ? "bg-muted/50" : ""}`}
+          dir={dir}
+        />
+        <Button type="button" variant="outline" size="sm" onClick={add} className="rounded-xl shrink-0">
+          <Plus className="w-3.5 h-3.5" />
+        </Button>
+      </div>
+      {(items || []).length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mt-2" dir={dir}>
+          {(items || []).map((it, i) => (
+            <span
+              key={i}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary text-secondary-foreground text-xs"
+            >
+              {it}
+              <button
+                type="button"
+                onClick={() => onChange(items.filter((_, idx) => idx !== i))}
+                className="text-muted-foreground hover:text-destructive"
+                aria-label="Remove"
+              >
+                <Trash2 className="w-3 h-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 interface Props {
@@ -417,16 +489,37 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
             onClick={async () => {
               try {
                 setTranslating(true);
-                const result = await translateTexts({
+                const baseTexts: Record<string, string> = {
                   headline_en: editingPage.headline_en,
                   description_en: editingPage.description_en,
                   sub_description_en: editingPage.sub_description_en,
-                });
+                  tagline_en: editingPage.tagline_en || "",
+                };
+                (editingPage.certifications_en || []).forEach((v, i) => { baseTexts[`cert_${i}`] = v; });
+                (editingPage.operation_modes_en || []).forEach((v, i) => { baseTexts[`mode_${i}`] = v; });
+                (editingPage.applications_en || []).forEach((v, i) => { baseTexts[`app_${i}`] = v; });
+                (editingPage.ratings || []).forEach((r, i) => { if (r.label_en) baseTexts[`rating_${i}`] = r.label_en; });
+
+                const result = await translateTexts(baseTexts);
+
+                const certs_ar = (editingPage.certifications_en || []).map((_, i) => result[`cert_${i}`] || (editingPage.certifications_ar || [])[i] || "");
+                const modes_ar = (editingPage.operation_modes_en || []).map((_, i) => result[`mode_${i}`] || (editingPage.operation_modes_ar || [])[i] || "");
+                const apps_ar = (editingPage.applications_en || []).map((_, i) => result[`app_${i}`] || (editingPage.applications_ar || [])[i] || "");
+                const ratings_next = (editingPage.ratings || []).map((r, i) => ({
+                  ...r,
+                  label_ar: result[`rating_${i}`] || r.label_ar || "",
+                }));
+
                 setEditingPage({
                   ...editingPage,
                   headline_ar: result.headline_ar || editingPage.headline_ar,
                   description_ar: result.description_ar || editingPage.description_ar,
                   sub_description_ar: result.sub_description_ar || editingPage.sub_description_ar,
+                  tagline_ar: result.tagline_ar || editingPage.tagline_ar || "",
+                  certifications_ar: certs_ar,
+                  operation_modes_ar: modes_ar,
+                  applications_ar: apps_ar,
+                  ratings: ratings_next,
                 });
                 toast.success("Arabic translations generated");
               } catch (e: any) { toast.error(e.message); }
@@ -469,6 +562,94 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
           <div>
             <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Sub Description (AR)</label>
             <Textarea value={editingPage.sub_description_ar} onChange={(e) => setEditingPage({ ...editingPage, sub_description_ar: e.target.value })} rows={2} className="rounded-xl resize-none bg-muted/50" dir="rtl" />
+          </div>
+        </div>
+
+        {/* ── Luxury Detail Layout content ─────────────────── */}
+        <div
+          className="border-t border-border pt-5 space-y-5 rounded-xl p-5 -mx-1"
+          style={{ background: "#faf8f5" }}
+        >
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-semibold" style={{ color: "#1a1a1a", fontFamily: "'Playfair Display', serif" }}>
+              Detail Layout Content
+            </h4>
+            <span className="text-[10px] uppercase tracking-wider" style={{ color: "#6b6b6b" }}>
+              Empty sections auto-hide on the live page
+            </span>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Tagline (EN)</label>
+              <Input value={editingPage.tagline_en || ""} onChange={(e) => setEditingPage({ ...editingPage, tagline_en: e.target.value })} placeholder="Short italic line at the bottom" className="rounded-xl" />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Tagline (AR)</label>
+              <Input value={editingPage.tagline_ar || ""} onChange={(e) => setEditingPage({ ...editingPage, tagline_ar: e.target.value })} placeholder="auto-generated" className="rounded-xl bg-muted/50" dir="rtl" />
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <ChipListField label="Certifications (EN)" items={editingPage.certifications_en || []} onChange={(next) => setEditingPage({ ...editingPage, certifications_en: next })} placeholder="e.g. CE Marked — EN 1366-7" />
+            <ChipListField label="Certifications (AR)" items={editingPage.certifications_ar || []} onChange={(next) => setEditingPage({ ...editingPage, certifications_ar: next })} placeholder="auto-generated" dir="rtl" />
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-xs font-medium text-muted-foreground">Ratings (key specs row, max 4)</label>
+              <Button
+                type="button" variant="outline" size="sm"
+                onClick={() => {
+                  const next = [...(editingPage.ratings || []), { value: "", label_en: "", label_ar: "" }];
+                  setEditingPage({ ...editingPage, ratings: next });
+                }}
+                disabled={(editingPage.ratings || []).length >= 4}
+                className="rounded-xl text-xs h-7"
+              >
+                <Plus className="w-3 h-3 mr-1" />Add Rating
+              </Button>
+            </div>
+            <div className="space-y-2">
+              {(editingPage.ratings || []).map((r, i) => (
+                <div key={i} className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 items-center">
+                  <Input value={r.value} onChange={(e) => {
+                    const next = [...(editingPage.ratings || [])]; next[i] = { ...next[i], value: e.target.value };
+                    setEditingPage({ ...editingPage, ratings: next });
+                  }} placeholder="Value" className="rounded-xl" />
+                  <Input value={r.label_en || ""} onChange={(e) => {
+                    const next = [...(editingPage.ratings || [])]; next[i] = { ...next[i], label_en: e.target.value };
+                    setEditingPage({ ...editingPage, ratings: next });
+                  }} placeholder="Label EN" className="rounded-xl" />
+                  <Input value={r.label_ar || ""} onChange={(e) => {
+                    const next = [...(editingPage.ratings || [])]; next[i] = { ...next[i], label_ar: e.target.value };
+                    setEditingPage({ ...editingPage, ratings: next });
+                  }} placeholder="Label AR" className="rounded-xl bg-muted/50" dir="rtl" />
+                  <Button type="button" variant="ghost" size="sm"
+                    onClick={() => {
+                      const next = (editingPage.ratings || []).filter((_, idx) => idx !== i);
+                      setEditingPage({ ...editingPage, ratings: next });
+                    }}
+                    className="text-destructive hover:bg-destructive/10 rounded-xl h-9 w-9 p-0"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+              ))}
+              {(editingPage.ratings || []).length === 0 && (
+                <p className="text-xs text-muted-foreground py-2">No ratings yet.</p>
+              )}
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <ChipListField label="Operation Modes (EN)" items={editingPage.operation_modes_en || []} onChange={(next) => setEditingPage({ ...editingPage, operation_modes_en: next })} placeholder="e.g. Automatic" />
+            <ChipListField label="Operation Modes (AR)" items={editingPage.operation_modes_ar || []} onChange={(next) => setEditingPage({ ...editingPage, operation_modes_ar: next })} placeholder="auto-generated" dir="rtl" />
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <ChipListField label="Applications (EN)" items={editingPage.applications_en || []} onChange={(next) => setEditingPage({ ...editingPage, applications_en: next })} placeholder="e.g. Hotels" />
+            <ChipListField label="Applications (AR)" items={editingPage.applications_ar || []} onChange={(next) => setEditingPage({ ...editingPage, applications_ar: next })} placeholder="auto-generated" dir="rtl" />
           </div>
         </div>
 
@@ -659,14 +840,19 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
                   variant="outline" size="sm"
                   onClick={() => {
                     setEditingItem(null);
-                    setEditingPage({
-                      product_item_id: item.id,
-                      headline_en: item.name_en,
-                      headline_ar: item.name_ar,
-                      description_en: "", description_ar: "",
-                      sub_description_en: "", sub_description_ar: "",
-                      is_active: true,
-                    });
+                  setEditingPage({
+                    product_item_id: item.id,
+                    headline_en: item.name_en,
+                    headline_ar: item.name_ar,
+                    description_en: "", description_ar: "",
+                    sub_description_en: "", sub_description_ar: "",
+                    is_active: true,
+                    certifications_en: [], certifications_ar: [],
+                    ratings: [],
+                    operation_modes_en: [], operation_modes_ar: [],
+                    applications_en: [], applications_ar: [],
+                    tagline_en: "", tagline_ar: "",
+                  });
                     if (!isExpanded) toggleNode(item.id);
                   }}
                   className="rounded-xl text-xs h-7 px-2 text-primary"
