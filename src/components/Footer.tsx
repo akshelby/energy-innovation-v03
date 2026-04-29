@@ -85,13 +85,6 @@ export default function Footer() {
     { label: t("nav.contact"), href: "#contact" },
   ];
 
-  const productLinks = [
-    t("cat.fire"),
-    t("cat.roller"),
-    t("cat.oil"),
-    t("cat.hvac"),
-    t("cat.loading"),
-  ];
 
   const scrollTo = useCallback((href: string) => {
     if (location.pathname !== "/") {
