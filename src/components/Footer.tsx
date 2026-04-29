@@ -140,7 +140,7 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto">
         {/* Social Icons Row */}
         {socialItems.length > 0 && socialEnabled && (
-          <div className="flex items-center justify-center gap-5 pb-8 mb-10 border-b border-navy/15">
+          <div className="flex items-center justify-center gap-3 sm:gap-4 pb-8 mb-10 border-b border-navy/15">
             {socialItems.map((s) => (
               <a
                 key={s.label}
@@ -148,9 +148,11 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={s.label}
-                className="text-black/70 hover:text-destructive hover:-translate-y-0.5 hover:scale-110 transition-all duration-200"
+                className="group relative inline-flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white border border-navy/15 text-navy shadow-sm hover:shadow-lg hover:border-destructive hover:text-white hover:bg-destructive hover:-translate-y-1 transition-all duration-300"
               >
-                {s.icon}
+                <span className="transition-transform duration-300 group-hover:scale-110">
+                  {s.icon}
+                </span>
               </a>
             ))}
           </div>
