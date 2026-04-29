@@ -355,8 +355,9 @@ export default function SubProductsPage() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {items.map((item) => {
                 const itemName = isAr ? item.name_ar : item.name_en;
-                const hasDetailPage = item.has_page && item.pageActive;
-                const isContainer = item.hasChildren;
+                // Trust pageActive (live from DB) over has_page (denormalized flag that can be stale)
+                const hasDetailPage = item.pageActive === true;
+                const isContainer = item.hasChildren && !hasDetailPage;
                 const isClickable = hasDetailPage || isContainer;
 
                 return (
@@ -365,7 +366,7 @@ export default function SubProductsPage() {
                     onClick={() => {
                       if (hasDetailPage) {
                         navigate(`/product/${item.id}`);
-                      } else if (isContainer) {
+                      } else if (item.hasChildren) {
                         navigate(`/products/item/${item.id}`);
                       }
                     }}
