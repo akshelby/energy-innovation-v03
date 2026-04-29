@@ -192,7 +192,7 @@ export default function Footer() {
                 <li key={i}>
                   <button
                     onClick={() => scrollTo("#products")}
-                    className="text-sm text-black/80 hover:text-black transition-colors text-start"
+                    className="text-sm text-black/80 hover:text-destructive hover:translate-x-1 rtl:hover:-translate-x-1 transition-all duration-200 text-start inline-block"
                   >
                     {link}
                   </button>
