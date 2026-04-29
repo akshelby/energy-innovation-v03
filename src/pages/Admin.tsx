@@ -3525,11 +3525,36 @@ export default function Admin() {
 
             {/* Social Media Links */}
             <div className="bg-card border border-border rounded-2xl p-6 mb-6">
-              <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
-                <Globe className="w-4 h-4 text-accent" />
-                Social Media Links
-              </h3>
-              <p className="text-xs text-muted-foreground mb-4">Leave a URL empty to hide that social icon from the footer.</p>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-accent" />
+                  Social Media Links
+                </h3>
+                {(() => {
+                  const enabledItem = content.find((c) => c.content_key === "footer.social_enabled");
+                  const enabled = (enabledItem?.value_en ?? "true").toLowerCase() !== "false";
+                  return (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">{enabled ? "Visible" : "Hidden"}</span>
+                      <Switch
+                        checked={enabled}
+                        onCheckedChange={async (checked) => {
+                          try {
+                            await apiCall("content", "POST", storedPassword, {
+                              content_key: "footer.social_enabled",
+                              value_en: String(checked),
+                              value_ar: String(checked),
+                            });
+                            toast.success(`Social icons ${checked ? "shown" : "hidden"}`);
+                            fetchContent();
+                          } catch (e: any) { toast.error(e.message); }
+                        }}
+                      />
+                    </div>
+                  );
+                })()}
+              </div>
+              <p className="text-xs text-muted-foreground mb-4">Toggle the section on/off, or leave a URL empty to hide a single icon.</p>
               <div className="space-y-3">
                 {[
                   { key: "footer.social_linkedin", label: "LinkedIn", placeholder: "https://linkedin.com/company/..." },
