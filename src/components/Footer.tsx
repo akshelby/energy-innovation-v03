@@ -147,7 +147,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={s.label}
-                className="text-black/70 hover:text-black transition-colors"
+                className="text-black/70 hover:text-destructive hover:-translate-y-0.5 hover:scale-110 transition-all duration-200"
               >
                 {s.icon}
               </a>
