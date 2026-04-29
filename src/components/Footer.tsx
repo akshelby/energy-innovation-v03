@@ -150,7 +150,7 @@ export default function Footer() {
                 aria-label={s.label}
                 className="group relative inline-flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white border border-navy/15 text-navy shadow-sm hover:shadow-lg hover:border-destructive hover:text-white hover:bg-destructive hover:-translate-y-0.5 transition-[transform,background-color,color,border-color,box-shadow] duration-300 ease-out will-change-transform transform-gpu"
               >
-                <span className="transition-transform duration-300 group-hover:scale-110">
+                <span className="transition-transform duration-300 ease-out group-hover:scale-105 will-change-transform transform-gpu">
                   {s.icon}
                 </span>
               </a>
