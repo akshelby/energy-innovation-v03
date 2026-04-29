@@ -133,7 +133,7 @@ export default function ProductsSection() {
                     setPdfSrc(product.pdf_url);
                     setPdfOpen(true);
                   } else {
-                    navigate(`/products/${product.id}`);
+                    window.open(`/products/${product.id}`, "_blank", "noopener,noreferrer");
                   }
                 }}
               >
