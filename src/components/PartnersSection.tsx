@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { getCached, setCache } from "@/lib/cache";
+import { useSwipeableMarquee } from "@/hooks/useSwipeableMarquee";
 
 interface Partner {
   id: string;
@@ -18,6 +19,7 @@ export default function PartnersSection() {
   const { t, language } = useLanguage();
   const [partners, setPartners] = useState<Partner[]>(() => getCached<Partner[]>(CACHE_KEY) ?? []);
   const [loaded, setLoaded] = useState(false);
+  const { containerRef, trackRef } = useSwipeableMarquee();
 
   useEffect(() => {
     let cancelled = false;
@@ -59,7 +61,8 @@ export default function PartnersSection() {
         </div>
 
         <div
-          className="relative w-full"
+          ref={containerRef}
+          className="relative w-full select-none"
           style={{
             maskImage:
               "linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%)",
@@ -67,7 +70,7 @@ export default function PartnersSection() {
               "linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%)",
           }}
         >
-          <div className="flex w-max animate-marquee items-center gap-10 md:gap-20">
+          <div ref={trackRef} className="flex w-max animate-marquee items-center gap-10 md:gap-20">
             {(() => {
               const phBgRaw = t("partners.placeholder_bg");
               const phTextRaw = t("partners.placeholder_text");
