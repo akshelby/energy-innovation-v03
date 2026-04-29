@@ -8,6 +8,7 @@ interface LanguageContextType {
   setLanguage: (lang: Language) => void;
   t: (key: string) => string;
   isRTL: boolean;
+  contentLoaded: boolean;
 }
 
 const translations: Record<Language, Record<string, string>> = {
@@ -221,9 +222,23 @@ const translations: Record<Language, Record<string, string>> = {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
+const CONTENT_CACHE_KEY = "ei_site_content_v1";
+
+function readCachedContent(): Record<string, { en: string; ar: string }> {
+  try {
+    const raw = localStorage.getItem(CONTENT_CACHE_KEY);
+    if (!raw) return {};
+    return JSON.parse(raw) || {};
+  } catch {
+    return {};
+  }
+}
+
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>("en");
-  const [dynamicContent, setDynamicContent] = useState<Record<string, { en: string; ar: string }>>({});
+  const initialCached = readCachedContent();
+  const [dynamicContent, setDynamicContent] = useState<Record<string, { en: string; ar: string }>>(initialCached);
+  const [contentLoaded, setContentLoaded] = useState<boolean>(Object.keys(initialCached).length > 0);
 
   const isRTL = language === "ar";
 
@@ -243,9 +258,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
             contentMap[item.content_key] = { en: item.value_en, ar: item.value_ar };
           });
           setDynamicContent(contentMap);
+          try { localStorage.setItem(CONTENT_CACHE_KEY, JSON.stringify(contentMap)); } catch {}
         }
       } catch {
         // Silently fall back to hardcoded translations
+      } finally {
+        setContentLoaded(true);
       }
     };
     fetchContent();
@@ -260,7 +278,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, [language, dynamicContent]);
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, isRTL }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t, isRTL, contentLoaded }}>
       {children}
     </LanguageContext.Provider>
   );

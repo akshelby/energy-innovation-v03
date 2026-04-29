@@ -63,7 +63,7 @@ const buildHeroImageUrl = (fileName: string, version?: string) => {
 
 // Pre-compute the first hero image URL synchronously so it renders on first paint
 export default function HeroSection() {
-  const { t } = useLanguage();
+  const { t, contentLoaded } = useLanguage();
   const parallaxBg = useParallax(0.15);
   const cachedHero = getCached<{ images: string[]; speed: number; visibility: Record<string, boolean> }>("hero");
   const persistedHero = getPersistedHero();
@@ -247,12 +247,12 @@ export default function HeroSection() {
 
       <div className="relative z-10 h-full flex flex-col justify-end pb-8 md:pb-12 text-center px-6">
         {visibility["hero.show_headline"] && (
-          <h1 className="text-xl sm:text-3xl md:text-5xl lg:text-6xl font-black text-primary-foreground w-full max-w-none mx-auto leading-tight animate-fade-in-up drop-shadow-lg">
+          <h1 className={`text-xl sm:text-3xl md:text-5xl lg:text-6xl font-black text-primary-foreground w-full max-w-none mx-auto leading-tight animate-fade-in-up drop-shadow-lg transition-opacity duration-300 ${contentLoaded ? 'opacity-100' : 'opacity-0'}`}>
             {t("hero.headline")}
           </h1>
         )}
         {visibility["hero.show_subtext"] && (
-          <p className="mt-4 text-sm md:text-base font-medium text-primary-foreground/80 max-w-xl mx-auto animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
+          <p className={`mt-4 text-sm md:text-base font-medium text-primary-foreground/80 max-w-xl mx-auto animate-fade-in-up transition-opacity duration-300 ${contentLoaded ? 'opacity-100' : 'opacity-0'}`} style={{ animationDelay: "0.2s" }}>
             {t("hero.subtext")}
           </p>
         )}
