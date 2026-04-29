@@ -230,8 +230,8 @@ export default function SubProductsPage() {
             </div>
           </div>
         </section>
-        <section className="py-6 md:py-10 px-6">
-          <div className="max-w-6xl mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <section className="py-6 md:py-10 px-6 md:px-12 lg:px-20">
+          <div className="w-full mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="bg-card rounded-2xl border border-border overflow-hidden">
                 <div className="aspect-[4/3] bg-muted animate-pulse" />
