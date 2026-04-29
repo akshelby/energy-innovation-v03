@@ -115,6 +115,63 @@ interface PageImage {
   sort_order: number;
 }
 
+// ─── Chip list editor ────────────────────────────────
+function ChipListField({
+  label, items, onChange, placeholder, dir,
+}: {
+  label: string;
+  items: string[];
+  onChange: (next: string[]) => void;
+  placeholder?: string;
+  dir?: "ltr" | "rtl";
+}) {
+  const [draft, setDraft] = useState("");
+  const add = () => {
+    const v = draft.trim();
+    if (!v) return;
+    onChange([...(items || []), v]);
+    setDraft("");
+  };
+  return (
+    <div>
+      <label className="text-xs font-medium text-muted-foreground mb-1.5 block">{label}</label>
+      <div className="flex gap-2">
+        <Input
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); add(); } }}
+          placeholder={placeholder}
+          className={`rounded-xl flex-1 ${dir === "rtl" ? "bg-muted/50" : ""}`}
+          dir={dir}
+        />
+        <Button type="button" variant="outline" size="sm" onClick={add} className="rounded-xl shrink-0">
+          <Plus className="w-3.5 h-3.5" />
+        </Button>
+      </div>
+      {(items || []).length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mt-2" dir={dir}>
+          {(items || []).map((it, i) => (
+            <span
+              key={i}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary text-secondary-foreground text-xs"
+            >
+              {it}
+              <button
+                type="button"
+                onClick={() => onChange(items.filter((_, idx) => idx !== i))}
+                className="text-muted-foreground hover:text-destructive"
+                aria-label="Remove"
+              >
+                <Trash2 className="w-3 h-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 interface Props {
   password: string;
   isViewer: boolean;
