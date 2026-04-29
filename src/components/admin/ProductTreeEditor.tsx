@@ -677,6 +677,11 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
                       description_en: "", description_ar: "",
                       sub_description_en: "", sub_description_ar: "",
                       is_active: true,
+                      certifications_en: [], certifications_ar: [],
+                      ratings: [],
+                      operation_modes_en: [], operation_modes_ar: [],
+                      applications_en: [], applications_ar: [],
+                      tagline_en: "", tagline_ar: "",
                     });
                     if (!isExpanded) toggleNode(item.id);
                   }}
