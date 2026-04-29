@@ -4078,6 +4078,139 @@ export default function Admin() {
           </div>
         )}
 
+        {/* ─── Countries Tab ──────── */}
+        {activeTab === "countries" && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-foreground">Countries</h2>
+              <div className="flex gap-2">
+                <Button size="sm" onClick={() => setEditingCountry({ name_en: "", name_ar: "", flag_url: null, country_code: "", sort_order: countries.length, is_active: true })} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                  <Plus className="w-4 h-4 mr-2" />Add Country
+                </Button>
+                <Button variant="outline" size="sm" onClick={fetchCountries} disabled={loading} className="rounded-xl">
+                  <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />Refresh
+                </Button>
+              </div>
+            </div>
+
+            {/* Section text editor */}
+            <div className="bg-card border border-border rounded-2xl p-6 mb-6">
+              <h3 className="font-semibold text-foreground mb-4">Section Heading</h3>
+              <div className="grid md:grid-cols-3 gap-4">
+                <div>
+                  <Label className="text-xs">Tag</Label>
+                  <Input value={countriesTag} onChange={(e) => setCountriesTag(e.target.value)} placeholder="Global Reach" />
+                </div>
+                <div>
+                  <Label className="text-xs">Title</Label>
+                  <Input value={countriesTitle} onChange={(e) => setCountriesTitle(e.target.value)} placeholder="Proudly serving our customers..." />
+                </div>
+                <div>
+                  <Label className="text-xs">Subtitle</Label>
+                  <Input value={countriesSubtitle} onChange={(e) => setCountriesSubtitle(e.target.value)} placeholder="Subtitle..." />
+                </div>
+              </div>
+              <Button size="sm" onClick={handleSaveCountriesText} disabled={loading} className="mt-4 gradient-accent text-accent-foreground rounded-xl border-0">
+                <Save className="w-4 h-4 mr-2" />Save Section Text
+              </Button>
+              <p className="text-xs text-muted-foreground mt-2">Arabic translations are generated automatically.</p>
+            </div>
+
+            {/* Editor */}
+            {editingCountry && (
+              <div className="bg-card border-2 border-accent/40 rounded-2xl p-6 mb-6">
+                <h3 className="font-semibold text-foreground mb-4">{editingCountry.id ? "Edit Country" : "New Country"}</h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-xs">Name (English)</Label>
+                    <Input value={editingCountry.name_en} onChange={(e) => setEditingCountry({ ...editingCountry, name_en: e.target.value })} placeholder="Saudi Arabia" />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Country Code (ISO 2-letter, e.g. SA, AE)</Label>
+                    <Input value={editingCountry.country_code} onChange={(e) => setEditingCountry({ ...editingCountry, country_code: e.target.value.toUpperCase().slice(0, 2) })} placeholder="SA" />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Sort Order</Label>
+                    <Input type="number" value={editingCountry.sort_order} onChange={(e) => setEditingCountry({ ...editingCountry, sort_order: parseInt(e.target.value) || 0 })} />
+                  </div>
+                  <div className="flex items-center gap-3 mt-6">
+                    <input type="checkbox" id="country-active" checked={editingCountry.is_active} onChange={(e) => setEditingCountry({ ...editingCountry, is_active: e.target.checked })} />
+                    <Label htmlFor="country-active">Active</Label>
+                  </div>
+                </div>
+
+                {/* Flag */}
+                <div className="mt-4">
+                  <Label className="text-xs">Flag</Label>
+                  <div className="flex items-center gap-4 mt-2">
+                    {editingCountry.flag_url ? (
+                      <img src={resolvePreviewUrl(editingCountry.flag_url)} alt="flag" className="w-20 h-20 object-cover rounded-full border border-border bg-muted/40" />
+                    ) : (
+                      <div className="w-20 h-20 rounded-full border border-border bg-muted/40 flex items-center justify-center">
+                        <Globe className="w-6 h-6 text-muted-foreground/40" />
+                      </div>
+                    )}
+                    <input ref={countryFlagRef} type="file" accept="image/*" className="hidden" onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleFormFileUpload(file, "images", "countries", (url) => setEditingCountry({ ...editingCountry!, flag_url: url }));
+                    }} />
+                    <Button variant="outline" size="sm" onClick={() => countryFlagRef.current?.click()} className="rounded-xl">
+                      <Upload className="w-4 h-4 mr-2" />Upload Flag
+                    </Button>
+                    {editingCountry.country_code && (
+                      <Button variant="outline" size="sm" onClick={() => setEditingCountry({ ...editingCountry, flag_url: `https://flagcdn.com/w320/${editingCountry.country_code.toLowerCase()}.png` })} className="rounded-xl">
+                        Use Default Flag ({editingCountry.country_code})
+                      </Button>
+                    )}
+                    {editingCountry.flag_url && (
+                      <Button variant="outline" size="sm" onClick={() => setEditingCountry({ ...editingCountry, flag_url: null })} className="rounded-xl">
+                        Remove
+                      </Button>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">Tip: Set the country code first, then click "Use Default Flag" to auto-fetch the official flag.</p>
+                </div>
+
+                <div className="flex gap-2 mt-6">
+                  <Button onClick={() => handleSaveCountry(editingCountry)} disabled={loading || !editingCountry.name_en} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                    <Save className="w-4 h-4 mr-2" />Save
+                  </Button>
+                  <Button variant="outline" onClick={() => setEditingCountry(null)} className="rounded-xl">Cancel</Button>
+                </div>
+              </div>
+            )}
+
+            {countries.length === 0 && !editingCountry ? (
+              <div className="text-center py-16 text-muted-foreground">
+                <Globe className="w-12 h-12 mx-auto mb-4 opacity-30" /><p>No countries yet. Add your first one!</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {countries.map((c) => (
+                  <div key={c.id} className="bg-card border border-border rounded-2xl p-4 flex items-center gap-4">
+                    <GripVertical className="w-4 h-4 text-muted-foreground shrink-0" />
+                    {c.flag_url ? (
+                      <img src={resolvePreviewUrl(c.flag_url)} alt={c.name_en} className="w-14 h-14 object-cover rounded-full border border-border bg-muted/40 shrink-0" />
+                    ) : (
+                      <div className="w-14 h-14 bg-muted rounded-full flex items-center justify-center shrink-0">
+                        <Globe className="w-5 h-5 text-muted-foreground/40" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-foreground truncate">{c.name_en || "Untitled"}</h3>
+                      <p className="text-xs text-muted-foreground truncate">{c.country_code || "—"} · #{c.sort_order} · {c.is_active ? "Active" : "Hidden"}</p>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={() => setEditingCountry(c)} className="rounded-xl">Edit</Button>
+                    <Button variant="outline" size="sm" onClick={() => handleDeleteCountry(c.id)} className="rounded-xl text-destructive hover:text-destructive">
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* ─── Email Templates Tab ──────── */}
         {activeTab === "email-templates" && (
           <div>
