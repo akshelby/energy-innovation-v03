@@ -133,13 +133,13 @@ export default function Footer() {
 
   return (
     <footer
-      className={`text-primary-foreground pt-12 pb-8 px-6 transition-opacity duration-500 ${ready ? 'opacity-100' : 'opacity-0'}`}
-      style={{ background: 'linear-gradient(135deg, hsl(213 70% 38%) 0%, hsl(213 65% 48%) 100%)' }}
+      className={`pt-12 pb-8 px-6 transition-opacity duration-500 ${ready ? 'opacity-100' : 'opacity-0'}`}
+      style={{ background: 'linear-gradient(135deg, hsl(213 90% 88%) 0%, hsl(213 95% 92%) 100%)', color: 'hsl(213 60% 18%)' }}
     >
       <div className="max-w-6xl mx-auto">
         {/* Social Icons Row */}
         {socialItems.length > 0 && socialEnabled && (
-          <div className="flex items-center justify-center gap-5 pb-8 mb-10 border-b border-primary-foreground/10">
+          <div className="flex items-center justify-center gap-5 pb-8 mb-10 border-b border-navy/15">
             {socialItems.map((s) => (
               <a
                 key={s.label}
@@ -147,7 +147,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={s.label}
-                className="text-white/70 hover:text-primary-foreground transition-colors"
+                className="text-navy/70 hover:text-navy transition-colors"
               >
                 {s.icon}
               </a>
@@ -162,20 +162,20 @@ export default function Footer() {
             <div className="mb-5">
               {brandReady && <img src={logoUrl} alt={brandName} className="w-auto object-contain" style={{ height: `${Math.round(logoSize * 0.7)}px` }} />}
             </div>
-            <p className="text-white/85 text-sm leading-relaxed">
+            <p className="text-navy/80 text-sm leading-relaxed">
               {t("footer.desc")}
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-bold mb-5 text-white">{t("footer.quick")}</h4>
+            <h4 className="font-bold mb-5 text-navy">{t("footer.quick")}</h4>
             <ul className="space-y-3">
               {quickLinks.map((link) => (
                 <li key={link.href}>
                   <button
                     onClick={() => scrollTo(link.href)}
-                    className="text-sm text-white/85 hover:text-white transition-colors"
+                    className="text-sm text-navy/80 hover:text-navy transition-colors"
                   >
                     {link.label}
                   </button>
@@ -186,13 +186,13 @@ export default function Footer() {
 
           {/* Product Categories */}
           <div>
-            <h4 className="font-bold mb-5 text-white">{t("footer.products")}</h4>
+            <h4 className="font-bold mb-5 text-navy">{t("footer.products")}</h4>
             <ul className="space-y-3">
               {productLinks.map((link, i) => (
                 <li key={i}>
                   <button
                     onClick={() => scrollTo("#products")}
-                    className="text-sm text-white/85 hover:text-white transition-colors text-start"
+                    className="text-sm text-navy/80 hover:text-navy transition-colors text-start"
                   >
                     {link}
                   </button>
@@ -203,28 +203,28 @@ export default function Footer() {
 
           {/* Contact Info */}
           <div>
-            <h4 className="font-bold mb-5 text-white">{t("footer.contactInfo")}</h4>
-            <ul className="space-y-3 text-sm text-white">
+            <h4 className="font-bold mb-5 text-navy">{t("footer.contactInfo")}</h4>
+            <ul className="space-y-3 text-sm text-navy">
               <li className="flex items-center gap-2 min-w-0">
-                <Mail className="w-4 h-4 shrink-0 text-white/85" />
+                <Mail className="w-4 h-4 shrink-0 text-navy/80" />
                 <button
                   type="button"
                   onClick={() => setPopup({ title: t("footer.contactInfo"), value: contactEmail, href: `mailto:${contactEmail}` })}
-                  className="text-white hover:text-white/80 transition-colors truncate min-w-0 text-start"
+                  className="text-navy hover:text-navy/70 transition-colors truncate min-w-0 text-start"
                   title={contactEmail}
                 >
                   {contactEmail}
                 </button>
               </li>
               <li className="flex items-center gap-2 min-w-0">
-                <Globe className="w-4 h-4 shrink-0 text-white/85" />
+                <Globe className="w-4 h-4 shrink-0 text-navy/80" />
                 <button
                   type="button"
                   onClick={() => {
                     const href = contactWebsite.startsWith("http") ? contactWebsite : `https://${contactWebsite}`;
                     setPopup({ title: t("footer.contactInfo"), value: contactWebsite, href });
                   }}
-                  className="text-white hover:text-white/80 transition-colors truncate min-w-0 text-start"
+                  className="text-navy hover:text-navy/70 transition-colors truncate min-w-0 text-start"
                   title={contactWebsite}
                 >
                   {contactWebsite}
@@ -240,8 +240,8 @@ export default function Footer() {
               const body = language === "ar" ? addr.body_ar : addr.body_en;
               return (
                 <div key={i} className={i === 0 ? "mt-6" : "mt-5"}>
-                  <h5 className="font-bold mb-2 text-white text-base md:text-lg break-words">{heading}</h5>
-                  <p className="text-sm text-white/85 leading-relaxed whitespace-pre-line break-words">
+                  <h5 className="font-bold mb-2 text-navy text-base md:text-lg break-words">{heading}</h5>
+                  <p className="text-sm text-navy/80 leading-relaxed whitespace-pre-line break-words">
                     {body}
                   </p>
                 </div>
@@ -251,8 +251,8 @@ export default function Footer() {
         </div>
 
         {/* Copyright */}
-        <div className="border-t border-primary-foreground/10 pt-8 flex items-center justify-center">
-          <p className="text-sm text-white/70">
+        <div className="border-t border-navy/15 pt-8 flex items-center justify-center">
+          <p className="text-sm text-navy/70">
             © {new Date().getFullYear()} {brandName}. {t("footer.rights")}
           </p>
         </div>
