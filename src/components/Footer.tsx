@@ -33,6 +33,7 @@ export default function Footer() {
 
   const [footerData, setFooterData] = useState<Record<string, { en: string; ar: string }>>(() => getCached<Record<string, { en: string; ar: string }>>("footer") || {});
   const [ready, setReady] = useState(() => Object.keys(footerData).length > 0);
+  const [popup, setPopup] = useState<{ title: string; value: string; href?: string } | null>(null);
 
   useEffect(() => {
     const fetchFooterContent = async () => {
