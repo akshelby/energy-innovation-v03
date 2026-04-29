@@ -81,6 +81,12 @@ interface ProductItemNode {
   pdf_url: string | null;
 }
 
+interface RatingRow {
+  label_en?: string;
+  label_ar?: string;
+  value: string;
+}
+
 interface ProductPage {
   id?: string;
   product_item_id: string;
@@ -91,6 +97,15 @@ interface ProductPage {
   sub_description_en: string;
   sub_description_ar: string;
   is_active: boolean;
+  certifications_en?: string[];
+  certifications_ar?: string[];
+  ratings?: RatingRow[];
+  operation_modes_en?: string[];
+  operation_modes_ar?: string[];
+  applications_en?: string[];
+  applications_ar?: string[];
+  tagline_en?: string;
+  tagline_ar?: string;
 }
 
 interface PageImage {
