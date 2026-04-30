@@ -123,6 +123,7 @@ export default function CountriesSection() {
             })}
           </div>
         </div>
+        </div>
       </div>
     </section>
   );
