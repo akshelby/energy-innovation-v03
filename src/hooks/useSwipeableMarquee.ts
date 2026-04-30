@@ -175,7 +175,7 @@ export function useSwipeableMarquee() {
 
       const finalX = getTranslateX(track);
       // Decay flick gestures into a glide; small drags settle immediately.
-      if (Math.abs(velocity) > 0.05) {
+      if (Math.abs(velocity) > 0.02) {
         runMomentum(finalX, velocity);
       } else {
         resumeAt(track, finalX);
