@@ -144,6 +144,7 @@ export default function PartnersSection() {
             })()}
           </div>
         </div>
+        </div>
       </div>
     </section>
   );
