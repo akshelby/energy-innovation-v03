@@ -1,17 +1,18 @@
 import { useCallback, useEffect, useRef } from "react";
 
 /**
- * Adds touch/mouse swipe + arrow-button control to a CSS-animated marquee
- * that loops `translateX(0)` → `translateX(-50%)` (i.e. our `animate-marquee`
- * class).
+ * Swipe + arrow-button control for a CSS-animated marquee that loops
+ * `translateX(0)` → `translateX(-50%)` (our `animate-marquee` class).
  *
- * - Drag in either direction is supported with a smooth momentum/inertia
- *   release (velocity-based glide that decays before the auto-marquee
- *   resumes from the final offset).
- * - Vertical scroll is preserved on touch devices: we only hijack the
- *   gesture once horizontal intent is clear.
- *
- * Returns a `nudge(delta)` function for arrow buttons.
+ * Design notes:
+ * - During a drag, the CSS animation is paused and we drive the transform
+ *   directly. On release, an inertial glide continues using the release
+ *   velocity (so glide distance/duration scale linearly with swipe speed),
+ *   and ONLY when the glide is fully done do we resume the CSS animation
+ *   from the final offset. This avoids the "two animations fighting"
+ *   glitch that happens if the auto-marquee resumes mid-glide.
+ * - On touch we only hijack the gesture once horizontal intent is clear,
+ *   so vertical page scrolling stays smooth.
  */
 export function useSwipeableMarquee() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -38,8 +39,11 @@ export function useSwipeableMarquee() {
     if (halfWidth <= 0) return;
     let normalized = finalX % halfWidth;
     if (normalized > 0) normalized -= halfWidth;
-    const progress = -normalized / halfWidth;
+    const progress = -normalized / halfWidth; // 0 → 1
     const duration = getAnimDurationMs(track);
+    // Set the delay first, then in the SAME frame clear the inline transform
+    // and animation-play-state so the animation picks up exactly where the
+    // glide left off — no visible jump.
     track.style.animationDelay = `-${progress * duration}ms`;
     track.style.transform = "";
     track.style.animationPlayState = "";
@@ -67,10 +71,26 @@ export function useSwipeableMarquee() {
     let startY = 0;
     let currentTranslate = 0;
     let pointerId: number | null = null;
-    let lastX = 0;
-    let lastT = 0;
-    let velocity = 0; // px / ms
     let momentumRaf = 0;
+
+    // Velocity tracking via a small ring buffer of recent samples — gives a
+    // much more stable release velocity than a single last-delta reading.
+    type Sample = { x: number; t: number };
+    const samples: Sample[] = [];
+    const pushSample = (x: number, t: number) => {
+      samples.push({ x, t });
+      // keep ~80ms of history
+      const cutoff = t - 80;
+      while (samples.length > 1 && samples[0].t < cutoff) samples.shift();
+    };
+    const releaseVelocity = () => {
+      if (samples.length < 2) return 0;
+      const a = samples[0];
+      const b = samples[samples.length - 1];
+      const dt = b.t - a.t;
+      if (dt <= 0) return 0;
+      return (b.x - a.x) / dt; // px / ms
+    };
 
     const cancelMomentum = () => {
       if (momentumRaf) {
@@ -79,21 +99,31 @@ export function useSwipeableMarquee() {
       }
     };
 
+    /**
+     * Inertial glide using exponential decay:
+     *   x(t) = x0 + v0 * τ * (1 - exp(-t/τ))
+     * Total travel = v0 * τ. So glide distance is proportional to release
+     * velocity → speed feels naturally linked to swipe speed.
+     */
     const runMomentum = (fromX: number, v0: number) => {
       cancelMomentum();
-      let x = fromX;
-      let v = v0;
-      // Higher friction value = slower decay = longer, smoother glide.
-      const friction = 0.97; // per ~16ms frame
-      const minV = 0.01; // px/ms — stop threshold
-      let last = performance.now();
+      const tau = 220; // ms — time constant; larger = longer glide
+      const minV = 0.015; // px/ms — stop threshold
+      const maxV = 4; // clamp absurd flick speeds (px/ms)
+      const v = Math.max(-maxV, Math.min(maxV, v0));
+      if (Math.abs(v) < minV) {
+        resumeAt(track, fromX);
+        return;
+      }
+      const startT = performance.now();
       const step = (now: number) => {
-        const dt = Math.min(32, now - last);
-        last = now;
-        x += v * dt;
+        const t = now - startT;
+        const decay = Math.exp(-t / tau);
+        const offset = v * tau * (1 - decay);
+        const x = fromX + offset;
         track.style.transform = `translateX(${x}px)`;
-        v *= Math.pow(friction, dt / 16);
-        if (Math.abs(v) > minV) {
+        const currentV = v * decay; // px/ms
+        if (Math.abs(currentV) > minV && t < 1500) {
           momentumRaf = requestAnimationFrame(step);
         } else {
           momentumRaf = 0;
@@ -109,13 +139,14 @@ export function useSwipeableMarquee() {
       if (target?.closest("[data-marquee-arrow]")) return;
       cancelMomentum();
       isDragging = true;
-      directionLocked = e.pointerType === "mouse"; // mouse: lock immediately
+      directionLocked = e.pointerType === "mouse";
       isHorizontal = e.pointerType === "mouse";
       pointerId = e.pointerId;
-      startX = lastX = e.clientX;
+      startX = e.clientX;
       startY = e.clientY;
-      lastT = performance.now();
-      velocity = 0;
+      samples.length = 0;
+      pushSample(e.clientX, performance.now());
+      // Snapshot current translate BEFORE pausing so we don't miss a frame.
       currentTranslate = getTranslateX(track);
       track.style.animationPlayState = "paused";
       track.style.transform = `translateX(${currentTranslate}px)`;
@@ -131,16 +162,13 @@ export function useSwipeableMarquee() {
       const dy = e.clientY - startY;
 
       if (!directionLocked) {
-        // Engage sooner on touch — a small flick should immediately start
-        // moving the marquee instead of feeling sticky.
-        const threshold = e.pointerType === "touch" ? 3 : 5;
+        const threshold = e.pointerType === "touch" ? 4 : 5;
         if (Math.abs(dx) < threshold && Math.abs(dy) < threshold) return;
         if (Math.abs(dx) > Math.abs(dy)) {
           isHorizontal = true;
           container.setPointerCapture?.(e.pointerId);
           container.style.cursor = "grabbing";
         } else {
-          // vertical scroll — release control
           isHorizontal = false;
           isDragging = false;
           resumeAt(track, currentTranslate);
@@ -151,14 +179,7 @@ export function useSwipeableMarquee() {
 
       if (!isHorizontal) return;
       e.preventDefault?.();
-      const now = performance.now();
-      const dt = Math.max(1, now - lastT);
-      // Smooth instantaneous velocity with an EMA so a single jittery
-      // sample at release doesn't ruin the glide.
-      const sample = (e.clientX - lastX) / dt; // px / ms
-      velocity = velocity * 0.7 + sample * 0.3;
-      lastX = e.clientX;
-      lastT = now;
+      pushSample(e.clientX, performance.now());
       track.style.transform = `translateX(${currentTranslate + dx}px)`;
     };
 
@@ -173,13 +194,10 @@ export function useSwipeableMarquee() {
         return;
       }
 
+      pushSample(e.clientX, performance.now());
       const finalX = getTranslateX(track);
-      // Decay flick gestures into a glide; small drags settle immediately.
-      if (Math.abs(velocity) > 0.02) {
-        runMomentum(finalX, velocity);
-      } else {
-        resumeAt(track, finalX);
-      }
+      const v = releaseVelocity();
+      runMomentum(finalX, v);
     };
 
     container.style.cursor = "grab";
