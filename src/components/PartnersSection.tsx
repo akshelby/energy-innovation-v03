@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Building2 } from "lucide-react";
+import { Building2, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { getCached, setCache } from "@/lib/cache";
@@ -20,7 +20,7 @@ export default function PartnersSection() {
   const { t, language } = useLanguage();
   const [partners, setPartners] = useState<Partner[]>(() => getCached<Partner[]>(CACHE_KEY) ?? []);
   const [loaded, setLoaded] = useState(false);
-  const { containerRef, trackRef } = useSwipeableMarquee();
+  const { containerRef, trackRef, nudge } = useSwipeableMarquee();
 
   useEffect(() => {
     let cancelled = false;
@@ -61,6 +61,25 @@ export default function PartnersSection() {
           </p>
         </div>
 
+        <div className="relative w-full">
+        <button
+          type="button"
+          aria-label="Scroll left"
+          data-marquee-arrow
+          onClick={() => nudge(240)}
+          className="absolute left-1 md:left-2 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-full bg-white/90 dark:bg-card/90 backdrop-blur border border-border text-foreground shadow-md hover:bg-destructive hover:text-white hover:border-destructive transition-all duration-300"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+        <button
+          type="button"
+          aria-label="Scroll right"
+          data-marquee-arrow
+          onClick={() => nudge(-240)}
+          className="absolute right-1 md:right-2 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-full bg-white/90 dark:bg-card/90 backdrop-blur border border-border text-foreground shadow-md hover:bg-destructive hover:text-white hover:border-destructive transition-all duration-300"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
         <div
           ref={containerRef}
           className="relative w-full select-none"
@@ -124,6 +143,7 @@ export default function PartnersSection() {
               });
             })()}
           </div>
+        </div>
         </div>
       </div>
     </section>
