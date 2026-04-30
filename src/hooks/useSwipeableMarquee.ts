@@ -83,8 +83,9 @@ export function useSwipeableMarquee() {
       cancelMomentum();
       let x = fromX;
       let v = v0;
-      const friction = 0.94; // per frame
-      const minV = 0.02; // px/ms
+      // Higher friction value = slower decay = longer, smoother glide.
+      const friction = 0.97; // per ~16ms frame
+      const minV = 0.01; // px/ms — stop threshold
       let last = performance.now();
       const step = (now: number) => {
         const dt = Math.min(32, now - last);
@@ -130,7 +131,10 @@ export function useSwipeableMarquee() {
       const dy = e.clientY - startY;
 
       if (!directionLocked) {
-        if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+        // Engage sooner on touch — a small flick should immediately start
+        // moving the marquee instead of feeling sticky.
+        const threshold = e.pointerType === "touch" ? 3 : 5;
+        if (Math.abs(dx) < threshold && Math.abs(dy) < threshold) return;
         if (Math.abs(dx) > Math.abs(dy)) {
           isHorizontal = true;
           container.setPointerCapture?.(e.pointerId);
@@ -149,7 +153,10 @@ export function useSwipeableMarquee() {
       e.preventDefault?.();
       const now = performance.now();
       const dt = Math.max(1, now - lastT);
-      velocity = (e.clientX - lastX) / dt; // px / ms
+      // Smooth instantaneous velocity with an EMA so a single jittery
+      // sample at release doesn't ruin the glide.
+      const sample = (e.clientX - lastX) / dt; // px / ms
+      velocity = velocity * 0.7 + sample * 0.3;
       lastX = e.clientX;
       lastT = now;
       track.style.transform = `translateX(${currentTranslate + dx}px)`;
