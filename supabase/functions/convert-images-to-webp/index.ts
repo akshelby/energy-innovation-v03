@@ -1,11 +1,11 @@
-// One-off maintenance function: scans products / product_items / product_page_images
-// for non-WebP image_url values, downloads each image, re-encodes it as WebP using
-// the imagescript Deno library, uploads the .webp to the same bucket path, and
-// updates the DB row to point at the new URL. Old originals are left in place
-// so nothing breaks if a CDN cache still references them.
+// One-off maintenance function: converts ONE image per call to WebP.
+// The frontend loops, calling this repeatedly with an incrementing offset,
+// so we stay well under the edge-runtime CPU limit (~2s) per invocation.
 //
-// Trigger via: POST /functions/v1/convert-images-to-webp  (admin password required)
-// Body: { password: string, dryRun?: boolean, limit?: number }
+// POST /functions/v1/convert-images-to-webp
+// Body: { password: string, mode: "list" | "convert", index?: number }
+//   - mode "list": returns the full list of eligible targets (no decoding).
+//   - mode "convert": converts targets[index] and returns the result.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { decode, Image } from "https://deno.land/x/imagescript@1.2.17/mod.ts";
@@ -32,14 +32,12 @@ interface Target {
 }
 
 const isConvertible = (url: string) => {
-  // Only touch our own Supabase storage URLs in the `images` bucket.
   if (!url.startsWith(`${PUBLIC_PREFIX}${BUCKET}/`)) return false;
   const lower = url.split("?")[0].toLowerCase();
   if (lower.endsWith(".webp") || lower.endsWith(".svg")) return false;
   return /\.(jpe?g|png)$/i.test(lower);
 };
 
-// Convert a public URL into the storage object key inside the bucket.
 const toStorageKey = (url: string) => {
   const withoutPrefix = url.slice(`${PUBLIC_PREFIX}${BUCKET}/`.length);
   const noQuery = withoutPrefix.split("?")[0];
@@ -52,30 +50,24 @@ async function listTargets(): Promise<Target[]> {
   const out: Target[] = [];
 
   const { data: products } = await supabase
-    .from("products")
-    .select("id,image_url");
+    .from("products").select("id,image_url");
   (products || []).forEach((r: any) => {
-    if (r.image_url && isConvertible(r.image_url)) {
+    if (r.image_url && isConvertible(r.image_url))
       out.push({ table: "products", id: r.id, url: r.image_url });
-    }
   });
 
   const { data: items } = await supabase
-    .from("product_items")
-    .select("id,image_url");
+    .from("product_items").select("id,image_url");
   (items || []).forEach((r: any) => {
-    if (r.image_url && isConvertible(r.image_url)) {
+    if (r.image_url && isConvertible(r.image_url))
       out.push({ table: "product_items", id: r.id, url: r.image_url });
-    }
   });
 
   const { data: pageImgs } = await supabase
-    .from("product_page_images")
-    .select("id,image_url");
+    .from("product_page_images").select("id,image_url");
   (pageImgs || []).forEach((r: any) => {
-    if (r.image_url && isConvertible(r.image_url)) {
+    if (r.image_url && isConvertible(r.image_url))
       out.push({ table: "product_page_images", id: r.id, url: r.image_url });
-    }
   });
 
   return out;
@@ -85,28 +77,25 @@ async function convertOne(t: Target) {
   const oldKey = toStorageKey(t.url);
   const newKey = swapExt(oldKey);
 
-  // Download original from storage (avoids CDN-cache content negotiation).
   const { data: blob, error: dlErr } = await supabase.storage
-    .from(BUCKET)
-    .download(oldKey);
+    .from(BUCKET).download(oldKey);
   if (dlErr || !blob) throw new Error(`download failed: ${dlErr?.message}`);
 
   const bytes = new Uint8Array(await blob.arrayBuffer());
   const img = await decode(bytes);
   if (!(img instanceof Image)) throw new Error("decode produced non-Image");
 
-  // imagescript encodes WebP losslessly only; for lossy use JPEG. To get
-  // smaller WebP at quality ~82 we re-encode via Image.encode (lossless WebP)
-  // then fall back to JPEG-style quality if file ends up larger than original.
-  // imagescript's `encode(quality)` produces PNG; `encodeJPEG(q)` produces JPEG.
-  // For WebP we use `encodeWEBP()` (lossless). If lossless is bigger than the
-  // original, we still proceed because WebP decoding is faster and modern
-  // browsers cache it well — but in practice photos shrink significantly.
+  // Downscale very large images before re-encoding to keep CPU usage low.
+  const MAX = 1920;
+  if (img.width > MAX || img.height > MAX) {
+    const scale = Math.min(MAX / img.width, MAX / img.height);
+    img.resize(Math.round(img.width * scale), Math.round(img.height * scale));
+  }
+
   const webpBytes = await img.encodeWEBP();
 
   const { error: upErr } = await supabase.storage.from(BUCKET).upload(
-    newKey,
-    webpBytes,
+    newKey, webpBytes,
     { contentType: "image/webp", upsert: true },
   );
   if (upErr) throw new Error(`upload failed: ${upErr.message}`);
@@ -115,18 +104,12 @@ async function convertOne(t: Target) {
   const newUrl = pub.publicUrl;
 
   const { error: updErr } = await supabase
-    .from(t.table)
-    .update({ image_url: newUrl })
-    .eq("id", t.id);
+    .from(t.table).update({ image_url: newUrl }).eq("id", t.id);
   if (updErr) throw new Error(`db update failed: ${updErr.message}`);
 
   return {
-    table: t.table,
-    id: t.id,
-    oldKey,
-    newKey,
-    oldBytes: bytes.byteLength,
-    newBytes: webpBytes.byteLength,
+    table: t.table, id: t.id, oldKey, newKey,
+    oldBytes: bytes.byteLength, newBytes: webpBytes.byteLength,
     saved: bytes.byteLength - webpBytes.byteLength,
   };
 }
@@ -143,40 +126,35 @@ Deno.serve(async (req) => {
       });
     }
 
-    const dryRun = !!body.dryRun;
-    const limit = typeof body.limit === "number" ? body.limit : 100;
+    const mode = body.mode || (body.dryRun ? "list" : "list");
 
-    const targets = (await listTargets()).slice(0, limit);
-
-    if (dryRun) {
+    if (mode === "list") {
+      const targets = await listTargets();
       return new Response(
-        JSON.stringify({ dryRun: true, count: targets.length, targets }),
+        JSON.stringify({ count: targets.length, targets }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    const results: any[] = [];
-    const errors: any[] = [];
-    for (const t of targets) {
-      try {
-        results.push(await convertOne(t));
-      } catch (e) {
-        errors.push({ table: t.table, id: t.id, url: t.url, error: String(e) });
+    if (mode === "convert") {
+      const target = body.target as Target | undefined;
+      if (!target?.url || !target?.id || !target?.table) {
+        return new Response(JSON.stringify({ error: "missing target" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
+      const result = await convertOne(target);
+      return new Response(
+        JSON.stringify({ ok: true, result }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
     }
 
-    const totalSaved = results.reduce((s, r) => s + (r.saved || 0), 0);
-    return new Response(
-      JSON.stringify({
-        converted: results.length,
-        failed: errors.length,
-        totalSavedBytes: totalSaved,
-        totalSavedKB: Math.round(totalSaved / 1024),
-        results,
-        errors,
-      }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
+    return new Response(JSON.stringify({ error: "unknown mode" }), {
+      status: 400,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (e) {
     return new Response(JSON.stringify({ error: String(e) }), {
       status: 500,

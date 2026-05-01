@@ -2085,11 +2085,11 @@ export default function Admin() {
                         const res = await fetch(
                           `https://${PROJECT_ID}.supabase.co/functions/v1/convert-images-to-webp`,
                           { method: "POST", headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ password: storedPassword, dryRun: true }) }
+                            body: JSON.stringify({ password: storedPassword, mode: "list" }) }
                         );
                         const data = await res.json();
                         if (!res.ok) throw new Error(data.error || "failed");
-                        setWebpResult(`Dry run: ${data.count} image(s) would be converted.`);
+                        setWebpResult(`${data.count} image(s) would be converted.`);
                         toast.success(`${data.count} image(s) eligible`);
                       } catch (err: any) { toast.error(err.message); }
                       finally { setConvertingWebp(false); }
@@ -2101,18 +2101,41 @@ export default function Admin() {
                   <Button
                     disabled={convertingWebp || isViewer}
                     onClick={async () => {
-                      if (!confirm("Convert all eligible images to WebP now? This may take a minute.")) return;
+                      if (!confirm("Convert all eligible images to WebP now? This may take a few minutes.")) return;
                       setConvertingWebp(true); setWebpResult("");
                       try {
-                        const res = await fetch(
-                          `https://${PROJECT_ID}.supabase.co/functions/v1/convert-images-to-webp`,
-                          { method: "POST", headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ password: storedPassword, limit: 500 }) }
-                        );
-                        const data = await res.json();
-                        if (!res.ok) throw new Error(data.error || "failed");
-                        setWebpResult(`Converted: ${data.converted} • Failed: ${data.failed} • Saved: ${data.totalSavedKB} KB`);
-                        toast.success(`Converted ${data.converted} images, saved ${data.totalSavedKB} KB`);
+                        const url = `https://${PROJECT_ID}.supabase.co/functions/v1/convert-images-to-webp`;
+                        // 1) fetch list
+                        const listRes = await fetch(url, {
+                          method: "POST", headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ password: storedPassword, mode: "list" }),
+                        });
+                        const listData = await listRes.json();
+                        if (!listRes.ok) throw new Error(listData.error || "list failed");
+                        const targets = listData.targets || [];
+                        if (targets.length === 0) {
+                          setWebpResult("Nothing to convert.");
+                          toast.success("All images already WebP");
+                          return;
+                        }
+                        // 2) convert one-by-one
+                        let converted = 0, failed = 0, saved = 0;
+                        for (let i = 0; i < targets.length; i++) {
+                          setWebpResult(`Converting ${i + 1} / ${targets.length}…`);
+                          try {
+                            const r = await fetch(url, {
+                              method: "POST", headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ password: storedPassword, mode: "convert", target: targets[i] }),
+                            });
+                            const d = await r.json();
+                            if (!r.ok || !d.ok) { failed++; continue; }
+                            converted++;
+                            saved += d.result?.saved || 0;
+                          } catch { failed++; }
+                        }
+                        const savedKB = Math.round(saved / 1024);
+                        setWebpResult(`Converted: ${converted} • Failed: ${failed} • Saved: ${savedKB} KB`);
+                        toast.success(`Converted ${converted} images, saved ${savedKB} KB`);
                       } catch (err: any) { toast.error(err.message); }
                       finally { setConvertingWebp(false); }
                     }}
