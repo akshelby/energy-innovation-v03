@@ -567,37 +567,39 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
             } ${!item.is_active ? "opacity-60" : ""}`}
             style={{ marginLeft: `${depth * (window.innerWidth < 640 ? 10 : 20)}px` }}
           >
-            {/* Expand toggle */}
-            <button
-              onClick={() => toggleNode(item.id)}
-              className="w-5 h-5 flex items-center justify-center shrink-0 text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {(hasChildren || page) ? (
-                isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />
-              ) : (
-                <span className="w-3.5" />
-              )}
-            </button>
+            <div className="flex items-center gap-2 flex-1 min-w-0 w-full">
+              {/* Expand toggle */}
+              <button
+                onClick={() => toggleNode(item.id)}
+                className="w-5 h-5 flex items-center justify-center shrink-0 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {(hasChildren || page) ? (
+                  isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />
+                ) : (
+                  <span className="w-3.5" />
+                )}
+              </button>
 
-            {depth > 0 && <span className="text-muted-foreground text-xs select-none">└</span>}
+              {depth > 0 && <span className="text-muted-foreground text-xs select-none">└</span>}
 
-            {/* Item info */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className={`text-sm ${depth === 0 ? "font-bold" : "font-medium"} ${item.is_active ? "text-foreground" : "text-muted-foreground line-through"}`}>
-                  {item.name_en}
-                </span>
-                <span className="text-xs text-muted-foreground">/ {item.name_ar}</span>
-                {item.pdf_url && <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full font-medium">PDF ✓</span>}
-                {hasChildren && <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">{children.length} sub</span>}
-                {page && <span className="text-[10px] bg-blue-500/10 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full font-medium">📄 Page</span>}
-                {item.image_url && <span className="text-[10px] bg-blue-500/10 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full font-medium">IMG ✓</span>}
-                {!item.is_active && <span className="text-[10px] bg-destructive/10 text-destructive px-2 py-0.5 rounded-full font-medium">Inactive</span>}
+              {/* Item info */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className={`text-sm break-words ${depth === 0 ? "font-bold" : "font-medium"} ${item.is_active ? "text-foreground" : "text-muted-foreground line-through"}`}>
+                    {item.name_en}
+                  </span>
+                  <span className="text-xs text-muted-foreground hidden sm:inline">/ {item.name_ar}</span>
+                  {item.pdf_url && <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded-full font-medium">PDF</span>}
+                  {hasChildren && <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full font-medium">{children.length}</span>}
+                  {page && <span className="text-[10px] bg-blue-500/10 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded-full font-medium">📄</span>}
+                  {item.image_url && <span className="text-[10px] bg-blue-500/10 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded-full font-medium">IMG</span>}
+                  {!item.is_active && <span className="text-[10px] bg-destructive/10 text-destructive px-1.5 py-0.5 rounded-full font-medium">Inactive</span>}
+                </div>
               </div>
             </div>
 
             {/* Actions */}
-            <div className="flex gap-1 items-center shrink-0">
+            <div className="flex gap-1 items-center flex-wrap sm:flex-nowrap sm:shrink-0 w-full sm:w-auto justify-end pl-7 sm:pl-0">
               {/* Active toggle */}
               <label className="flex items-center gap-1 cursor-pointer mr-1" title={item.is_active ? "Deactivate" : "Activate"}>
                 <span className="text-[10px] text-muted-foreground">{item.is_active ? "On" : "Off"}</span>
