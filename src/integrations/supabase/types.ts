@@ -469,6 +469,7 @@ export type Database = {
           created_at: string
           description_ar: string
           description_en: string
+          homepage_sort_order: number
           icon: string
           id: string
           image_url: string | null
@@ -476,6 +477,7 @@ export type Database = {
           name_ar: string
           name_en: string
           pdf_url: string | null
+          show_on_homepage: boolean
           sort_order: number
           tag_ar: string
           tag_en: string
@@ -485,6 +487,7 @@ export type Database = {
           created_at?: string
           description_ar?: string
           description_en?: string
+          homepage_sort_order?: number
           icon?: string
           id?: string
           image_url?: string | null
@@ -492,6 +495,7 @@ export type Database = {
           name_ar?: string
           name_en?: string
           pdf_url?: string | null
+          show_on_homepage?: boolean
           sort_order?: number
           tag_ar?: string
           tag_en?: string
@@ -501,6 +505,7 @@ export type Database = {
           created_at?: string
           description_ar?: string
           description_en?: string
+          homepage_sort_order?: number
           icon?: string
           id?: string
           image_url?: string | null
@@ -508,6 +513,7 @@ export type Database = {
           name_ar?: string
           name_en?: string
           pdf_url?: string | null
+          show_on_homepage?: boolean
           sort_order?: number
           tag_ar?: string
           tag_en?: string
