@@ -132,7 +132,25 @@ export default function SubProductsPage() {
           return;
         }
 
-        await fetchChildren(prod.category_key, null);
+        const hasTopLevelItems = await fetchChildren(prod.category_key, null);
+        if (!hasTopLevelItems) {
+          const productName = prod.name_en?.trim();
+          if (productName) {
+            const { data: matchingRootItems } = await supabase
+              .from("product_items")
+              .select("id")
+              .eq("is_active", true)
+              .is("parent_id", null)
+              .ilike("name_en", productName)
+              .limit(1);
+
+            const matchingRootItem = matchingRootItems?.[0];
+            if (matchingRootItem) {
+              navigate(`/products/item/${matchingRootItem.id}`, { replace: true });
+              return;
+            }
+          }
+        }
       }
     };
 
@@ -160,7 +178,7 @@ export default function SubProductsPage() {
       if (!itemsData || itemsData.length === 0) {
         setItems([]);
         setLoading(false);
-        return;
+        return false;
       }
 
       const itemIds = itemsData.map((i) => i.id);
@@ -210,6 +228,7 @@ export default function SubProductsPage() {
         })) as DisplayItem[]
       );
       setLoading(false);
+      return true;
     };
 
     fetchData();
