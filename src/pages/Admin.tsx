@@ -91,6 +91,8 @@ interface ProductItem {
   pdf_url: string | null;
   icon: string;
   sort_order: number;
+  category_key?: string | null;
+  linked_item_id?: string | null;
 }
 
 interface ServiceItem {
