@@ -1,95 +1,75 @@
-// One-off maintenance helper for existing product images.
-// Heavy image decoding/encoding is intentionally done in the browser.
-// This function only lists eligible database URLs and updates one URL per call,
-// keeping each invocation below Supabase Edge CPU limits.
-//
-// POST /functions/v1/convert-images-to-webp
-// Body: { password: string, mode: "list" | "convert", target?: Target, newUrl?: string }
-//   - mode "list": returns the full list of eligible targets (no decoding).
-//   - mode "convert": validates and updates the DB URL after browser upload.
-
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+// Lightweight maintenance helper for existing product images.
+// The browser performs WebP conversion/upload; this function only lists and
+// updates database URLs via REST to avoid Edge Function CPU limits.
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const ADMIN_PASSWORD = Deno.env.get("ADMIN_PASSWORD")!;
+const PUBLIC_PREFIX = `${SUPABASE_URL}/storage/v1/object/public/images/`;
 
-const supabase = createClient(SUPABASE_URL, SERVICE_ROLE);
+type TableName = "products" | "product_items" | "product_page_images";
+type Target = { table: TableName; id: string; url: string; oldKey?: string; newKey?: string };
 
-const PUBLIC_PREFIX = `${SUPABASE_URL}/storage/v1/object/public/`;
-const BUCKET = "images";
-
-interface Target {
-  table: "products" | "product_items" | "product_page_images";
-  id: string;
-  url: string;
-  oldKey?: string;
-  newKey?: string;
-}
-
-const VALID_TABLES = new Set(["products", "product_items", "product_page_images"]);
+const tables: TableName[] = ["products", "product_items", "product_page_images"];
+const json = (data: unknown, status = 200) => new Response(JSON.stringify(data), {
+  status,
+  headers: { ...corsHeaders, "Content-Type": "application/json" },
+});
 
 const isConvertible = (url: string) => {
-  if (!url.startsWith(`${PUBLIC_PREFIX}${BUCKET}/`)) return false;
-  const lower = url.split("?")[0].toLowerCase();
-  if (lower.endsWith(".webp") || lower.endsWith(".svg")) return false;
-  return /\.(jpe?g|png)$/i.test(lower);
+  const clean = url.split("?")[0].toLowerCase();
+  return url.startsWith(PUBLIC_PREFIX) && /\.(jpe?g|png)$/.test(clean);
 };
 
-const toStorageKey = (url: string) => {
-  const withoutPrefix = url.slice(`${PUBLIC_PREFIX}${BUCKET}/`.length);
-  const noQuery = withoutPrefix.split("?")[0];
-  return decodeURIComponent(noQuery);
-};
-
+const toStorageKey = (url: string) => decodeURIComponent(url.slice(PUBLIC_PREFIX.length).split("?")[0]);
 const swapExt = (key: string) => key.replace(/\.(jpe?g|png)$/i, ".webp");
 
-async function listTargets(): Promise<Target[]> {
-  const out: Target[] = [];
-
-  const { data: products } = await supabase
-    .from("products").select("id,image_url");
-  (products || []).forEach((r: any) => {
-    if (r.image_url && isConvertible(r.image_url))
-      out.push({ table: "products", id: r.id, url: r.image_url, oldKey: toStorageKey(r.image_url), newKey: swapExt(toStorageKey(r.image_url)) });
+async function rest(path: string, init?: RequestInit) {
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    ...init,
+    headers: {
+      apikey: SERVICE_ROLE,
+      Authorization: `Bearer ${SERVICE_ROLE}`,
+      "Content-Type": "application/json",
+      ...(init?.headers || {}),
+    },
   });
-
-  const { data: items } = await supabase
-    .from("product_items").select("id,image_url");
-  (items || []).forEach((r: any) => {
-    if (r.image_url && isConvertible(r.image_url))
-      out.push({ table: "product_items", id: r.id, url: r.image_url, oldKey: toStorageKey(r.image_url), newKey: swapExt(toStorageKey(r.image_url)) });
-  });
-
-  const { data: pageImgs } = await supabase
-    .from("product_page_images").select("id,image_url");
-  (pageImgs || []).forEach((r: any) => {
-    if (r.image_url && isConvertible(r.image_url))
-      out.push({ table: "product_page_images", id: r.id, url: r.image_url, oldKey: toStorageKey(r.image_url), newKey: swapExt(toStorageKey(r.image_url)) });
-  });
-
-  return out;
+  if (!response.ok) throw new Error(await response.text());
+  return response;
 }
 
-async function updateOne(t: Target, newUrl: string) {
-  if (!VALID_TABLES.has(t.table) || !t.id || !isConvertible(t.url)) {
-    throw new Error("invalid target");
-  }
-  if (!newUrl.startsWith(`${PUBLIC_PREFIX}${BUCKET}/`) || !newUrl.split("?")[0].toLowerCase().endsWith(".webp")) {
+async function listTargets() {
+  const results = await Promise.all(tables.map(async (table) => {
+    const response = await rest(`${table}?select=id,image_url&image_url=not.is.null&limit=1000`);
+    const rows = await response.json();
+    return (rows as { id: string; image_url: string }[])
+      .filter((row) => isConvertible(row.image_url))
+      .map((row) => {
+        const oldKey = toStorageKey(row.image_url);
+        return { table, id: row.id, url: row.image_url, oldKey, newKey: swapExt(oldKey) } satisfies Target;
+      });
+  }));
+  return results.flat();
+}
+
+async function updateOne(target: Target, newUrl: string) {
+  if (!tables.includes(target.table) || !target.id || !isConvertible(target.url)) throw new Error("invalid target");
+  if (!newUrl.startsWith(PUBLIC_PREFIX) || !newUrl.split("?")[0].toLowerCase().endsWith(".webp")) {
     throw new Error("invalid webp url");
   }
 
-  const { error: updErr } = await supabase
-    .from(t.table).update({ image_url: newUrl }).eq("id", t.id);
-  if (updErr) throw new Error(`db update failed: ${updErr.message}`);
+  await rest(`${target.table}?id=eq.${encodeURIComponent(target.id)}`, {
+    method: "PATCH",
+    headers: { Prefer: "return=minimal" },
+    body: JSON.stringify({ image_url: newUrl }),
+  });
 
-  return { table: t.table, id: t.id, oldKey: toStorageKey(t.url), newKey: toStorageKey(newUrl) };
+  return { table: target.table, id: target.id, oldKey: toStorageKey(target.url), newKey: toStorageKey(newUrl) };
 }
 
 Deno.serve(async (req) => {
@@ -97,47 +77,20 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json().catch(() => ({}));
-    if (body?.password !== ADMIN_PASSWORD) {
-      return new Response(JSON.stringify({ error: "unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    if (body?.password !== ADMIN_PASSWORD) return json({ error: "unauthorized" }, 401);
 
-    const mode = body.mode || (body.dryRun ? "list" : "list");
-
-    if (mode === "list") {
+    if (body.mode === "list" || body.dryRun) {
       const targets = await listTargets();
-      return new Response(
-        JSON.stringify({ count: targets.length, targets }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+      return json({ count: targets.length, targets });
     }
 
-    if (mode === "convert") {
-      const target = body.target as Target | undefined;
-      const newUrl = String(body.newUrl || "");
-      if (!target?.url || !target?.id || !target?.table) {
-        return new Response(JSON.stringify({ error: "missing target" }), {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      const result = await updateOne(target, newUrl);
-      return new Response(
-        JSON.stringify({ ok: true, result }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+    if (body.mode === "convert") {
+      if (!body.target || !body.newUrl) return json({ error: "missing target or newUrl" }, 400);
+      return json({ ok: true, result: await updateOne(body.target, String(body.newUrl)) });
     }
 
-    return new Response(JSON.stringify({ error: "unknown mode" }), {
-      status: 400,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  } catch (e) {
-    return new Response(JSON.stringify({ error: String(e) }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return json({ error: "unknown mode" }, 400);
+  } catch (error) {
+    return json({ error: error instanceof Error ? error.message : String(error) }, 500);
   }
 });
