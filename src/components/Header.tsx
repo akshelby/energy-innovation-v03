@@ -127,8 +127,10 @@ export default function Header() {
   };
 
   const handleItemClick = (item: ProductItem) => {
-    // If item has a dedicated product page, navigate to it
-    if (item.has_page) {
+    // Check children in memory instead of relying on stale has_page flag.
+    // If it's a leaf (no children), go to detail page.
+    const itemHasChildren = productItems.some((p) => p.parent_id === item.id);
+    if (!itemHasChildren) {
       setProductsOpen(false);
       setMobileOpen(false);
       setMobileProductsOpen(false);
