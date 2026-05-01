@@ -16,6 +16,7 @@ const Careers = lazy(() => import("./pages/Careers.tsx"));
 const ProductPageView = lazy(() => import("./pages/ProductPage.tsx"));
 const SubProductsPage = lazy(() => import("./pages/SubProductsPage.tsx"));
 const Admin = lazy(() => import("./pages/Admin.tsx"));
+const FooterLinksDiagnostic = lazy(() => import("./pages/FooterLinksDiagnostic.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
