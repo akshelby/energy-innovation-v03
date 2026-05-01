@@ -272,6 +272,8 @@ export default function Admin() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [content, setContent] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [convertingWebp, setConvertingWebp] = useState(false);
+  const [webpResult, setWebpResult] = useState<string>("");
   const [editedContent, setEditedContent] = useState<Record<string, { value_en: string; value_ar: string }>>({});
 
   // Products & Services state
