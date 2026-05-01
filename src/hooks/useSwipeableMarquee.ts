@@ -124,7 +124,7 @@ export function useSwipeableMarquee() {
         const x = fromX + offset;
         track.style.transform = `translateX(${x}px)`;
         const currentV = v * decay; // px/ms
-        if (Math.abs(currentV) > minV && t < 1500) {
+        if (Math.abs(currentV) > minV && t < 2200) {
           momentumRaf = requestAnimationFrame(step);
         } else {
           momentumRaf = 0;
@@ -198,7 +198,7 @@ export function useSwipeableMarquee() {
       pushSample(e.clientX, performance.now());
       const finalX = getTranslateX(track);
       const v = releaseVelocity();
-      runMomentum(finalX, v);
+      runMomentum(finalX, v, e.pointerType === "touch");
     };
 
     container.style.cursor = "grab";
