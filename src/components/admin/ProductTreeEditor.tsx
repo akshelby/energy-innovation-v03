@@ -931,6 +931,103 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
         </Button>
       </div>
 
+      {/* Homepage Items Summary */}
+      {(() => {
+        const homepageProducts = products
+          .filter(p => p.show_on_homepage)
+          .sort((a, b) => (a.homepage_sort_order ?? 0) - (b.homepage_sort_order ?? 0));
+        const homepageItems = allItems
+          .filter(i => i.show_on_homepage)
+          .sort((a, b) => (a.homepage_sort_order ?? 0) - (b.homepage_sort_order ?? 0));
+
+        const getItemPath = (item: ProductItemNode): string => {
+          const parts: string[] = [item.name_en || "(untitled)"];
+          let cur: ProductItemNode | undefined = item;
+          while (cur?.parent_id) {
+            const parent = allItems.find(x => x.id === cur!.parent_id);
+            if (!parent) break;
+            parts.unshift(parent.name_en || "(untitled)");
+            cur = parent;
+          }
+          const rootProduct = products.find(p => p.category_key === item.category_key);
+          if (rootProduct) parts.unshift(rootProduct.name_en || "(untitled)");
+          return parts.join(" › ");
+        };
+
+        const total = homepageProducts.length + homepageItems.length;
+        return (
+          <div className="mb-6 border-2 border-amber-500/30 bg-amber-500/5 rounded-2xl p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-base">⭐</span>
+                <h3 className="text-sm font-semibold text-foreground">Homepage Items</h3>
+                <span className="text-xs bg-amber-500/15 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full font-medium">
+                  {total}
+                </span>
+              </div>
+              <span className="text-[11px] text-muted-foreground">Currently visible on the homepage</span>
+            </div>
+
+            {total === 0 ? (
+              <p className="text-xs text-muted-foreground py-2">
+                Nothing flagged for the homepage yet. Toggle ⭐ on a product card or check "Show on homepage" inside an item form.
+              </p>
+            ) : (
+              <div className="grid sm:grid-cols-2 gap-2">
+                {homepageProducts.map(p => (
+                  <div key={`p-${p.id}`} className="flex items-center justify-between gap-2 bg-background border border-border rounded-lg px-3 py-2">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] uppercase tracking-wide text-amber-600 dark:text-amber-400 font-semibold">Root</span>
+                        <span className="text-xs font-medium text-foreground truncate">{p.name_en || "(untitled)"}</span>
+                      </div>
+                      <div className="text-[10px] text-muted-foreground">Order: {p.homepage_sort_order ?? 0}</div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 text-[11px] text-destructive hover:text-destructive"
+                      onClick={() => handleToggleProductHomepage(p)}
+                      disabled={isViewer}
+                    >
+                      Hide
+                    </Button>
+                  </div>
+                ))}
+                {homepageItems.map(i => (
+                  <div key={`i-${i.id}`} className="flex items-center justify-between gap-2 bg-background border border-border rounded-lg px-3 py-2">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] uppercase tracking-wide text-primary font-semibold">Item</span>
+                        <span className="text-xs font-medium text-foreground truncate">{i.name_en || "(untitled)"}</span>
+                      </div>
+                      <div className="text-[10px] text-muted-foreground truncate" title={getItemPath(i)}>
+                        {getItemPath(i)} · Order: {i.homepage_sort_order ?? 0}
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 text-[11px] text-destructive hover:text-destructive"
+                      onClick={async () => {
+                        try {
+                          await apiCall("product-items", "POST", password, { ...i, show_on_homepage: false });
+                          setAllItems(prev => prev.map(x => x.id === i.id ? { ...x, show_on_homepage: false } : x));
+                          toast.success("Hidden from homepage");
+                        } catch (e: any) { toast.error(e.message); }
+                      }}
+                      disabled={isViewer}
+                    >
+                      Hide
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })()}
+
       <div className="space-y-3">
         {products.map(renderProductCard)}
       </div>
