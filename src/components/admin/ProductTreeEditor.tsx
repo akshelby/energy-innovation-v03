@@ -79,6 +79,8 @@ interface ProductItemNode {
   sort_order: number;
   image_url: string | null;
   pdf_url: string | null;
+  show_on_homepage?: boolean;
+  homepage_sort_order?: number;
 }
 
 interface ProductPage {
