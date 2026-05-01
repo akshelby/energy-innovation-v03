@@ -365,10 +365,12 @@ export default function SubProductsPage() {
                   <div
                     key={item.id}
                     onClick={() => {
-                      if (hasDetailPage) {
-                        navigate(`/product/${item.id}`);
-                      } else if (item.hasChildren) {
+                      // Prefer drilling into children when present (matches Header behavior).
+                      // Only navigate to the detail page when this item is a leaf.
+                      if (item.hasChildren) {
                         navigate(`/products/item/${item.id}`);
+                      } else if (hasDetailPage) {
+                        navigate(`/product/${item.id}`);
                       }
                     }}
                     className={`group bg-card rounded-2xl border border-border overflow-hidden transition-all duration-300 hover:border-destructive/30 hover:shadow-lg ${
