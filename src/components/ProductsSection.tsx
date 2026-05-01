@@ -67,12 +67,13 @@ export default function ProductsSection() {
   useEffect(() => {
     (async () => {
       // 1) Prefer items explicitly flagged in the Product Tree.
-      const { data: featuredItems } = await supabase
+      const { data: featuredItemsRaw } = await (supabase as any)
         .from("product_items")
         .select("id, name_en, name_ar, image_url, pdf_url, has_page, homepage_sort_order")
         .eq("show_on_homepage", true)
         .eq("is_active", true)
         .order("homepage_sort_order", { ascending: true });
+      const featuredItems = featuredItemsRaw as Array<any> | null;
 
       if (featuredItems && featuredItems.length > 0) {
         // Pull descriptions from product pages (only for items that have one)
