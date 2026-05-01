@@ -91,6 +91,8 @@ interface ProductItem {
   pdf_url: string | null;
   icon: string;
   sort_order: number;
+  category_key?: string | null;
+  linked_item_id?: string | null;
 }
 
 interface ServiceItem {
@@ -1577,6 +1579,46 @@ export default function Admin() {
           )}
         </div>
       </div>
+
+      {/* Linked Tree Node (products only) */}
+      {type === "product" && (
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
+            Linked Tree Node <span className="text-muted-foreground/70">(optional — clicking this homepage card will drill into this node)</span>
+          </label>
+          <select
+            value={(item as ProductItem).linked_item_id || ""}
+            onChange={(e) => setItem({ ...item, linked_item_id: e.target.value || null } as ProductItem)}
+            className="w-full h-10 rounded-xl border border-input bg-background px-3 text-sm"
+          >
+            <option value="">— None (use default behaviour) —</option>
+            {(() => {
+              // Build a path label for each item by walking up parent_id
+              const byId = new Map(menuItems.map(m => [m.id, m]));
+              const pathOf = (id: string): string => {
+                const parts: string[] = [];
+                let cur: any = byId.get(id);
+                let guard = 0;
+                while (cur && guard++ < 20) {
+                  parts.unshift(cur.name_en || "(untitled)");
+                  cur = cur.parent_id ? byId.get(cur.parent_id) : null;
+                }
+                return parts.join("  →  ");
+              };
+              return menuItems
+                .filter(m => m.is_active)
+                .map(m => ({ id: m.id, label: pathOf(m.id) }))
+                .sort((a, b) => a.label.localeCompare(b.label))
+                .map(opt => (
+                  <option key={opt.id} value={opt.id}>{opt.label}</option>
+                ));
+            })()}
+          </select>
+          <p className="mt-1.5 text-[11px] text-muted-foreground">
+            Pick any node from the Product Tree. The card will open that node and let visitors drill into its sub-products until they reach a final product page.
+          </p>
+        </div>
+      )}
 
       {/* Actions */}
       <div className="flex gap-2 pt-2">

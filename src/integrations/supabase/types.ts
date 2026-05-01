@@ -472,6 +472,7 @@ export type Database = {
           icon: string
           id: string
           image_url: string | null
+          linked_item_id: string | null
           name_ar: string
           name_en: string
           pdf_url: string | null
@@ -487,6 +488,7 @@ export type Database = {
           icon?: string
           id?: string
           image_url?: string | null
+          linked_item_id?: string | null
           name_ar?: string
           name_en?: string
           pdf_url?: string | null
@@ -502,6 +504,7 @@ export type Database = {
           icon?: string
           id?: string
           image_url?: string | null
+          linked_item_id?: string | null
           name_ar?: string
           name_en?: string
           pdf_url?: string | null
@@ -509,7 +512,15 @@ export type Database = {
           tag_ar?: string
           tag_en?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "products_linked_item_id_fkey"
+            columns: ["linked_item_id"]
+            isOneToOne: false
+            referencedRelation: "product_items"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       services: {
         Row: {
