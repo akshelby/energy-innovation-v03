@@ -562,10 +562,10 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
         {/* Node row */}
         {!isEditingThisItem && (
           <div
-            className={`flex items-center gap-2 p-2.5 rounded-xl border transition-colors ${
+            className={`flex flex-col sm:flex-row sm:items-center gap-2 p-2.5 rounded-xl border transition-colors ${
               depth === 0 ? "bg-card border-border" : "bg-secondary/30 border-border/50"
             } ${!item.is_active ? "opacity-60" : ""}`}
-            style={{ marginLeft: `${depth * 20}px` }}
+            style={{ marginLeft: `${depth * (window.innerWidth < 640 ? 10 : 20)}px` }}
           >
             {/* Expand toggle */}
             <button
