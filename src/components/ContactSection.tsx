@@ -8,7 +8,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Send, Phone, Mail, Globe, MapPin, Building, Building2, Home, Navigation, Smartphone, MessageSquare, MessageCircle, AtSign, Send as SendIcon, Headphones, Clock, Map } from "lucide-react";
-const PhoneInput = lazy(() => import("@/components/PhoneInput"));
+const PhoneInput = lazy(() =>
+  import("@/components/PhoneInput").catch((err) => {
+    const msg = String(err?.message || "");
+    if (/Failed to fetch dynamically imported module|Importing a module script failed/i.test(msg)) {
+      const key = "lovable_chunk_reload_at";
+      const last = Number(sessionStorage.getItem(key) || 0);
+      if (Date.now() - last > 10000) {
+        sessionStorage.setItem(key, String(Date.now()));
+        window.location.reload();
+      }
+    }
+    throw err;
+  })
+);
 
 // Whitelisted set of icons that can be configured for contact cards from the admin.
 // Avoids `import * as LucideIcons` which pulls the whole icon library into the bundle.
