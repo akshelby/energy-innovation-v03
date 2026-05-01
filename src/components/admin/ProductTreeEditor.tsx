@@ -229,6 +229,16 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
     } catch (e: any) { toast.error(e.message); }
   };
 
+  // Toggle "show on homepage" directly on a top-level Product card
+  const handleToggleProductHomepage = async (product: Product & { id: string }) => {
+    try {
+      const next = !product.show_on_homepage;
+      await apiCall("products", "POST", password, { ...product, show_on_homepage: next });
+      setProducts(prev => prev.map(p => p.id === product.id ? { ...p, show_on_homepage: next } : p));
+      toast.success(next ? "Shown on homepage" : "Hidden from homepage");
+    } catch (e: any) { toast.error(e.message); }
+  };
+
   // Bulk activate all items at a given level
   const handleActivateAll = async (items: ProductItemNode[]) => {
     const inactive = items.filter(i => !i.is_active);
