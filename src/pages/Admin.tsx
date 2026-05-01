@@ -245,6 +245,42 @@ async function uploadFileAndGetUrl(
   return result.url;
 }
 
+async function convertRemoteImageToWebP(url: string, filePath: string, password: string) {
+  const response = await fetch(url, { mode: "cors", cache: "no-store" });
+  if (!response.ok) throw new Error(`Download failed (${response.status})`);
+
+  const sourceBlob = await response.blob();
+  const bitmap = await createImageBitmap(sourceBlob);
+  const maxSize = 1600;
+  const scale = Math.min(1, maxSize / Math.max(bitmap.width, bitmap.height));
+  const width = Math.max(1, Math.round(bitmap.width * scale));
+  const height = Math.max(1, Math.round(bitmap.height * scale));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Image conversion unavailable");
+  ctx.drawImage(bitmap, 0, 0, width, height);
+  bitmap.close();
+
+  const webpBlob = await new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("WebP conversion failed")), "image/webp", 0.8);
+  });
+
+  const fileName = filePath.split("/").pop() || "image.webp";
+  const webpFile = new File([webpBlob], fileName, { type: "image/webp" });
+  const base64 = await fileToBase64(webpFile);
+  const result = await apiCall("upload", "POST", password, {
+    bucket: "images",
+    filePath,
+    base64,
+    contentType: "image/webp",
+  });
+
+  return { url: result.url as string, oldBytes: sourceBlob.size, newBytes: webpBlob.size };
+}
+
 const emptyProduct: ProductItem = {
   name_en: "", name_ar: "", description_en: "", description_ar: "",
   tag_en: "", tag_ar: "", image_url: null, pdf_url: null, icon: "Flame", sort_order: 0,
@@ -2118,19 +2154,23 @@ export default function Admin() {
                           toast.success("All images already WebP");
                           return;
                         }
-                        // 2) convert one-by-one
+                        // 2) convert one-by-one in the browser, then ask the function to update the DB.
                         let converted = 0, failed = 0, saved = 0;
                         for (let i = 0; i < targets.length; i++) {
                           setWebpResult(`Converting ${i + 1} / ${targets.length}…`);
                           try {
+                            const target = targets[i];
+                            const newKey = target.newKey || target.oldKey?.replace(/\.(jpe?g|png)$/i, ".webp");
+                            if (!newKey) throw new Error("Missing image path");
+                            const upload = await convertRemoteImageToWebP(target.url, newKey, storedPassword);
                             const r = await fetch(url, {
                               method: "POST", headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({ password: storedPassword, mode: "convert", target: targets[i] }),
+                              body: JSON.stringify({ password: storedPassword, mode: "convert", target, newUrl: upload.url }),
                             });
                             const d = await r.json();
                             if (!r.ok || !d.ok) { failed++; continue; }
                             converted++;
-                            saved += d.result?.saved || 0;
+                            saved += upload.oldBytes - upload.newBytes;
                           } catch { failed++; }
                         }
                         const savedKB = Math.round(saved / 1024);
