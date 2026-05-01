@@ -34,7 +34,7 @@ export default function Footer() {
   const [footerData, setFooterData] = useState<Record<string, { en: string; ar: string }>>(() => getCached<Record<string, { en: string; ar: string }>>("footer") || {});
   const [ready, setReady] = useState(() => Object.keys(footerData).length > 0);
   const [popup, setPopup] = useState<{ title: string; value: string; href?: string } | null>(null);
-  const [footerProducts, setFooterProducts] = useState<{ id: string; name_en: string; name_ar: string }[]>([]);
+  const [footerProducts, setFooterProducts] = useState<Array<{ id: string; name_en: string; name_ar: string; category_key: string | null; pdf_url: string | null; linked_item_id: string | null }>>([]);
 
   useEffect(() => {
     const fetchFooterContent = async () => {
