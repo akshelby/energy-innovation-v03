@@ -140,14 +140,16 @@ export default function SubProductsPage() {
       let query = supabase
         .from("product_items")
         .select("id,name_en,name_ar,category_key,parent_id,is_active,has_page,sort_order,image_url")
-        .eq("category_key", categoryKey)
         .eq("is_active", true)
         .order("sort_order");
 
       if (parentId) {
+        // Fetch by parent_id only — don't filter by category_key
+        // because deep children may not have category_key set
         query = query.eq("parent_id", parentId);
       } else {
-        query = query.is("parent_id", null);
+        // Top-level items — use category_key + parent_id IS NULL
+        query = query.eq("category_key", categoryKey).is("parent_id", null);
       }
 
       const [{ data: itemsData }, { data: pages }] = await Promise.all([
