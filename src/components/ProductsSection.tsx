@@ -108,8 +108,13 @@ export default function ProductsSection() {
         return;
       }
 
-      // 2) Fallback to legacy curated `products` table (unchanged behaviour).
-      const { data } = await supabase.from("products").select("*").order("sort_order");
+      // 2) Fallback to legacy curated `products` table — only those marked show_on_homepage.
+      const { data } = await (supabase as any)
+        .from("products")
+        .select("*")
+        .eq("show_on_homepage", true)
+        .order("homepage_sort_order", { ascending: true })
+        .order("sort_order", { ascending: true });
       const result = data && data.length > 0 ? (data as Product[]) : fallbackProducts;
       setProducts(result);
       setCache("products", result);
