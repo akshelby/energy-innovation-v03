@@ -623,6 +623,7 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
                   {hasChildren && <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full font-medium">{children.length}</span>}
                   {page && <span className="text-[10px] bg-blue-500/10 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded-full font-medium">📄</span>}
                   {item.image_url && <span className="text-[10px] bg-blue-500/10 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded-full font-medium">IMG</span>}
+                  {item.show_on_homepage && <span className="text-[10px] bg-amber-500/15 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded-full font-medium" title="Featured on homepage">⭐ Home</span>}
                   {!item.is_active && <span className="text-[10px] bg-destructive/10 text-destructive px-1.5 py-0.5 rounded-full font-medium">Inactive</span>}
                 </div>
               </div>
