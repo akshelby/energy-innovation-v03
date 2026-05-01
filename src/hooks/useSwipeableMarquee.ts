@@ -105,11 +105,12 @@ export function useSwipeableMarquee() {
      * Total travel = v0 * τ. So glide distance is proportional to release
      * velocity → speed feels naturally linked to swipe speed.
      */
-    const runMomentum = (fromX: number, v0: number) => {
+    const runMomentum = (fromX: number, v0: number, isTouch: boolean) => {
       cancelMomentum();
-      const tau = 220; // ms — time constant; larger = longer glide
-      const minV = 0.015; // px/ms — stop threshold
-      const maxV = 4; // clamp absurd flick speeds (px/ms)
+      // Touch gets a longer time constant for a smoother, more natural feel.
+      const tau = isTouch ? 380 : 240;
+      const minV = 0.01; // px/ms — stop threshold
+      const maxV = 5; // clamp absurd flick speeds (px/ms)
       const v = Math.max(-maxV, Math.min(maxV, v0));
       if (Math.abs(v) < minV) {
         resumeAt(track, fromX);
