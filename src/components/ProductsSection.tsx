@@ -65,12 +65,56 @@ export default function ProductsSection() {
   const isCollapsed = showToggle && !expanded;
 
   useEffect(() => {
-    supabase.from("products").select("*").order("sort_order").then(({ data }) => {
+    (async () => {
+      // 1) Prefer items explicitly flagged in the Product Tree.
+      const { data: featuredItemsRaw } = await (supabase as any)
+        .from("product_items")
+        .select("id, name_en, name_ar, image_url, pdf_url, has_page, homepage_sort_order")
+        .eq("show_on_homepage", true)
+        .eq("is_active", true)
+        .order("homepage_sort_order", { ascending: true });
+      const featuredItems = featuredItemsRaw as Array<any> | null;
+
+      if (featuredItems && featuredItems.length > 0) {
+        // Pull descriptions from product pages (only for items that have one)
+        const ids = featuredItems.map((i) => i.id);
+        const { data: pages } = await supabase
+          .from("product_pages")
+          .select("product_item_id, headline_en, headline_ar, description_en, description_ar, tagline_en, tagline_ar")
+          .in("product_item_id", ids)
+          .eq("is_active", true);
+        const pageByItem = new Map((pages || []).map((p) => [p.product_item_id, p]));
+
+        const mapped: Product[] = featuredItems.map((it: any) => {
+          const p: any = pageByItem.get(it.id);
+          return {
+            id: it.id,
+            name_en: it.name_en || "",
+            name_ar: it.name_ar || "",
+            description_en: p?.description_en || "",
+            description_ar: p?.description_ar || "",
+            tag_en: p?.tagline_en || "",
+            tag_ar: p?.tagline_ar || "",
+            icon: "Flame",
+            image_url: it.image_url || null,
+            pdf_url: it.pdf_url || null,
+            category_key: "",
+            linked_item_id: it.id,
+          };
+        });
+        setProducts(mapped);
+        setCache("products", mapped);
+        setReady(true);
+        return;
+      }
+
+      // 2) Fallback to legacy curated `products` table (unchanged behaviour).
+      const { data } = await supabase.from("products").select("*").order("sort_order");
       const result = data && data.length > 0 ? (data as Product[]) : fallbackProducts;
       setProducts(result);
       setCache("products", result);
       setReady(true);
-    });
+    })();
   }, []);
 
   const isAr = language === "ar";

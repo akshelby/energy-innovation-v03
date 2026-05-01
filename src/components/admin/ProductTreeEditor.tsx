@@ -79,6 +79,8 @@ interface ProductItemNode {
   sort_order: number;
   image_url: string | null;
   pdf_url: string | null;
+  show_on_homepage?: boolean;
+  homepage_sort_order?: number;
 }
 
 interface ProductPage {
@@ -387,9 +389,37 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
 
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Sort Order</label>
+            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Sort Order (within tree)</label>
             <Input type="number" value={editingItem.sort_order ?? 0} onChange={(e) => setEditingItem({ ...editingItem, sort_order: parseInt(e.target.value) || 0 })} className="rounded-xl" />
           </div>
+          <div>
+            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Homepage Sort Order</label>
+            <Input
+              type="number"
+              value={editingItem.homepage_sort_order ?? 0}
+              onChange={(e) => setEditingItem({ ...editingItem, homepage_sort_order: parseInt(e.target.value) || 0 })}
+              className="rounded-xl"
+              disabled={!editingItem.show_on_homepage}
+              placeholder="Lower = first"
+            />
+          </div>
+        </div>
+
+        {/* Show on homepage toggle */}
+        <div className="flex items-start gap-3 p-3 rounded-xl border border-accent/30 bg-accent/5">
+          <input
+            id="show_on_homepage"
+            type="checkbox"
+            checked={!!editingItem.show_on_homepage}
+            onChange={(e) => setEditingItem({ ...editingItem, show_on_homepage: e.target.checked })}
+            className="w-4 h-4 mt-0.5 accent-primary cursor-pointer"
+          />
+          <label htmlFor="show_on_homepage" className="cursor-pointer flex-1">
+            <span className="text-sm font-semibold text-foreground">⭐ Show on homepage</span>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              When on, this item appears as a card in the homepage Products section. Clicking it drills into its sub-products (or opens its product page if it's a final item).
+            </p>
+          </label>
         </div>
 
         <div className="flex gap-2 pt-2">
@@ -593,6 +623,7 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
                   {hasChildren && <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full font-medium">{children.length}</span>}
                   {page && <span className="text-[10px] bg-blue-500/10 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded-full font-medium">📄</span>}
                   {item.image_url && <span className="text-[10px] bg-blue-500/10 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded-full font-medium">IMG</span>}
+                  {item.show_on_homepage && <span className="text-[10px] bg-amber-500/15 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded-full font-medium" title="Featured on homepage">⭐ Home</span>}
                   {!item.is_active && <span className="text-[10px] bg-destructive/10 text-destructive px-1.5 py-0.5 rounded-full font-medium">Inactive</span>}
                 </div>
               </div>
