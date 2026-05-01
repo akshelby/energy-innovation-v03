@@ -2063,7 +2063,68 @@ export default function Admin() {
               </div>
             </div>
 
-            {/* LinkedIn Button */}
+            {/* Bulk WebP Conversion */}
+            <div className="md:col-span-2 bg-card border border-border rounded-2xl p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h3 className="font-semibold text-foreground">Convert existing product images to WebP</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Scans all products, sub-products and detail-page images. Any JPG/PNG hosted in our storage is re-encoded as WebP and the database URL is updated. Originals are kept on storage so cached pages don't break. External (Unsplash) images are skipped.
+                  </p>
+                  {webpResult && (
+                    <p className="text-xs mt-2 text-muted-foreground whitespace-pre-wrap">{webpResult}</p>
+                  )}
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2 shrink-0">
+                  <Button
+                    variant="outline"
+                    disabled={convertingWebp || isViewer}
+                    onClick={async () => {
+                      setConvertingWebp(true); setWebpResult("");
+                      try {
+                        const res = await fetch(
+                          `https://${PROJECT_ID}.supabase.co/functions/v1/convert-images-to-webp`,
+                          { method: "POST", headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ password: storedPassword, dryRun: true }) }
+                        );
+                        const data = await res.json();
+                        if (!res.ok) throw new Error(data.error || "failed");
+                        setWebpResult(`Dry run: ${data.count} image(s) would be converted.`);
+                        toast.success(`${data.count} image(s) eligible`);
+                      } catch (err: any) { toast.error(err.message); }
+                      finally { setConvertingWebp(false); }
+                    }}
+                    className="rounded-xl"
+                  >
+                    Preview
+                  </Button>
+                  <Button
+                    disabled={convertingWebp || isViewer}
+                    onClick={async () => {
+                      if (!confirm("Convert all eligible images to WebP now? This may take a minute.")) return;
+                      setConvertingWebp(true); setWebpResult("");
+                      try {
+                        const res = await fetch(
+                          `https://${PROJECT_ID}.supabase.co/functions/v1/convert-images-to-webp`,
+                          { method: "POST", headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ password: storedPassword, limit: 500 }) }
+                        );
+                        const data = await res.json();
+                        if (!res.ok) throw new Error(data.error || "failed");
+                        setWebpResult(`Converted: ${data.converted} • Failed: ${data.failed} • Saved: ${data.totalSavedKB} KB`);
+                        toast.success(`Converted ${data.converted} images, saved ${data.totalSavedKB} KB`);
+                      } catch (err: any) { toast.error(err.message); }
+                      finally { setConvertingWebp(false); }
+                    }}
+                    className="gradient-accent text-accent-foreground rounded-xl border-0"
+                  >
+                    {convertingWebp ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <Image className="w-4 h-4 mr-2" />}
+                    {convertingWebp ? "Converting…" : "Convert now"}
+                  </Button>
+                </div>
+              </div>
+            </div>
+
             <div className="bg-card rounded-2xl border border-border p-5 space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-foreground">LinkedIn Button</h3>
