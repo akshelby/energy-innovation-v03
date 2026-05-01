@@ -48,6 +48,7 @@ interface Product {
   tag_en: string;
   tag_ar: string;
   category_key: string;
+  linked_item_id?: string | null;
 }
 
 export default function ProductsSection() {
