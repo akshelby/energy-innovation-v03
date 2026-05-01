@@ -356,19 +356,22 @@ export default function SubProductsPage() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {items.map((item) => {
                 const itemName = isAr ? item.name_ar : item.name_en;
-                // Trust pageActive (live from DB) over has_page (denormalized flag that can be stale)
-                const hasDetailPage = item.pageActive === true;
-                const isContainer = item.hasChildren && !hasDetailPage;
-                const isClickable = hasDetailPage || isContainer;
+                // Containers (items with children) take precedence over detail pages,
+                // matching the click handler and header navigation behavior.
+                const isContainer = item.hasChildren;
+                const hasDetailPage = !isContainer && item.pageActive === true;
+                const isClickable = isContainer || hasDetailPage;
 
                 return (
                   <div
                     key={item.id}
                     onClick={() => {
-                      if (hasDetailPage) {
-                        navigate(`/product/${item.id}`);
-                      } else if (item.hasChildren) {
+                      // Prefer drilling into children when present (matches Header behavior).
+                      // Only navigate to the detail page when this item is a leaf.
+                      if (item.hasChildren) {
                         navigate(`/products/item/${item.id}`);
+                      } else if (hasDetailPage) {
+                        navigate(`/product/${item.id}`);
                       }
                     }}
                     className={`group bg-card rounded-2xl border border-border overflow-hidden transition-all duration-300 hover:border-destructive/30 hover:shadow-lg ${
