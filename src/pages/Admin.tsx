@@ -2154,19 +2154,23 @@ export default function Admin() {
                           toast.success("All images already WebP");
                           return;
                         }
-                        // 2) convert one-by-one
+                        // 2) convert one-by-one in the browser, then ask the function to update the DB.
                         let converted = 0, failed = 0, saved = 0;
                         for (let i = 0; i < targets.length; i++) {
                           setWebpResult(`Converting ${i + 1} / ${targets.length}…`);
                           try {
+                            const target = targets[i];
+                            const newKey = target.newKey || target.oldKey?.replace(/\.(jpe?g|png)$/i, ".webp");
+                            if (!newKey) throw new Error("Missing image path");
+                            const upload = await convertRemoteImageToWebP(target.url, newKey, storedPassword);
                             const r = await fetch(url, {
                               method: "POST", headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({ password: storedPassword, mode: "convert", target: targets[i] }),
+                              body: JSON.stringify({ password: storedPassword, mode: "convert", target, newUrl: upload.url }),
                             });
                             const d = await r.json();
                             if (!r.ok || !d.ok) { failed++; continue; }
                             converted++;
-                            saved += d.result?.saved || 0;
+                            saved += upload.oldBytes - upload.newBytes;
                           } catch { failed++; }
                         }
                         const savedKB = Math.round(saved / 1024);
