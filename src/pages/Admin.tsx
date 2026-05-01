@@ -1636,7 +1636,7 @@ export default function Admin() {
     <div className="min-h-screen bg-background">
       <SEOHead title="Admin" noindex />
       <header className="border-b border-border bg-card px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <div className="w-full flex items-center justify-between">
           <div className="flex items-center gap-3">
             <h1 className="text-xl font-bold text-foreground">Energy Innovation Admin</h1>
             {isViewer && (
@@ -1657,13 +1657,13 @@ export default function Admin() {
       </header>
       {isViewer && (
         <div className="bg-muted border-b border-border px-6 py-2">
-          <div className="max-w-7xl mx-auto">
+          <div className="w-full">
             <p className="text-sm text-muted-foreground text-center">🔒 You have <strong>view-only</strong> access. All edit, save, and delete actions are disabled.</p>
           </div>
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
         {/* Tabs */}
         <div className="flex flex-wrap gap-2 mb-8">
           {([
