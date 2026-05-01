@@ -121,8 +121,6 @@ export default function HeroSection() {
 
       if (activeList.length > 0) {
         const urls = activeList.map((fileName) => buildHeroImageUrl(fileName));
-        // Preload first image before swapping to avoid blank flash
-        await preloadImage(urls[0]);
         setCurrent(0);
         setImages(urls);
         setHeroReady(true);
@@ -158,7 +156,6 @@ export default function HeroSection() {
         );
 
         const finalUrls = urls.length > 0 ? urls : activeList.length > 0 ? [] : localImages;
-        if (finalUrls.length > 0) await preloadImage(finalUrls[0]);
         setCurrent(0);
         setImages(finalUrls);
         setHeroReady(true);
