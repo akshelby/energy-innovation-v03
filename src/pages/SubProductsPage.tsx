@@ -167,8 +167,7 @@ export default function SubProductsPage() {
       const { data: childCounts } = await supabase
         .from("product_items")
         .select("parent_id")
-        .in("parent_id", itemIds)
-        .eq("is_active", true);
+        .in("parent_id", itemIds);
 
       const parentIdsWithChildren = new Set((childCounts || []).map((c) => c.parent_id));
 
