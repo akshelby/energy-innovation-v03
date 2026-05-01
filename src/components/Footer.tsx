@@ -197,7 +197,15 @@ export default function Footer() {
               {footerProducts.map((product) => (
                 <li key={product.id}>
                   <button
-                    onClick={() => navigate(`/products/${product.id}`)}
+                    onClick={() => {
+                      if (product.linked_item_id) {
+                        window.open(`/products/item/${product.linked_item_id}`, "_blank", "noopener,noreferrer");
+                      } else if (product.pdf_url && !product.category_key) {
+                        window.open(product.pdf_url, "_blank", "noopener,noreferrer");
+                      } else {
+                        window.open(`/products/${product.id}`, "_blank", "noopener,noreferrer");
+                      }
+                    }}
                     className="text-sm text-black/80 hover:text-destructive hover:translate-x-1 rtl:hover:-translate-x-1 transition-all duration-200 text-start inline-block"
                   >
                     {language === "ar" ? product.name_ar : product.name_en}
