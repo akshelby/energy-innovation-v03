@@ -48,6 +48,7 @@ const App = () => (
               <Route path="/products/item/:itemId" element={<Suspense fallback={null}><SubProductsPage /></Suspense>} />
               <Route path="/product/:id" element={<Suspense fallback={null}><ProductPageView /></Suspense>} />
               <Route path="/admin" element={<Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading…</div>}><Admin /></Suspense>} />
+              <Route path="/diag/footer-links" element={<Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading…</div>}><FooterLinksDiagnostic /></Suspense>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<Suspense fallback={null}><NotFound /></Suspense>} />
             </Routes>
