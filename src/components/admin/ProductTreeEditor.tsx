@@ -822,7 +822,7 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
           )}
 
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-0.5">
+            <div className="flex items-center gap-2 mb-0.5 flex-wrap">
               <h3 className="font-semibold text-foreground truncate">{product.name_en || "Untitled"}</h3>
               {product.tag_en && <span className="text-xs bg-accent/10 text-accent px-2 py-0.5 rounded-full shrink-0">{product.tag_en}</span>}
               {product.category_key && (
@@ -830,9 +830,27 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
                   {topLevelItems.length} sub-product{topLevelItems.length !== 1 ? "s" : ""}
                 </span>
               )}
+              {product.show_on_homepage && (
+                <span className="text-[10px] bg-amber-500/15 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded-full font-medium" title="Featured on homepage">⭐ Home</span>
+              )}
             </div>
             <p className="text-xs text-muted-foreground truncate">{product.description_en || "No description"}</p>
           </div>
+
+          {/* Show on homepage toggle (root product) */}
+          <label
+            className="flex items-center gap-1.5 shrink-0 cursor-pointer pl-2 pr-1"
+            onClick={(e) => e.stopPropagation()}
+            title={product.show_on_homepage ? "Hide from homepage" : "Show on homepage"}
+          >
+            <span className="text-[11px] text-muted-foreground hidden sm:inline">⭐ Home</span>
+            <input
+              type="checkbox"
+              checked={!!product.show_on_homepage}
+              onChange={() => handleToggleProductHomepage(product)}
+              className="w-4 h-4 accent-primary cursor-pointer"
+            />
+          </label>
         </div>
 
         {/* Expanded tree */}
