@@ -34,7 +34,7 @@ export default function Footer() {
   const [footerData, setFooterData] = useState<Record<string, { en: string; ar: string }>>(() => getCached<Record<string, { en: string; ar: string }>>("footer") || {});
   const [ready, setReady] = useState(() => Object.keys(footerData).length > 0);
   const [popup, setPopup] = useState<{ title: string; value: string; href?: string } | null>(null);
-  const [footerProducts, setFooterProducts] = useState<{ id: string; name_en: string; name_ar: string }[]>([]);
+  const [footerProducts, setFooterProducts] = useState<Array<{ id: string; name_en: string; name_ar: string; category_key: string | null; pdf_url: string | null; linked_item_id: string | null }>>([]);
 
   useEffect(() => {
     const fetchFooterContent = async () => {
@@ -51,10 +51,13 @@ export default function Footer() {
           setFooterData(map);
           setCache("footer", map);
         }
-        const { data: prodData } = await supabase
+        const { data: prodData } = await (supabase as any)
           .from("products")
-          .select("id, name_en, name_ar")
-          .order("sort_order");
+          .select("id, name_en, name_ar, category_key, pdf_url, linked_item_id")
+          .eq("is_active", true)
+          .eq("show_on_homepage", true)
+          .order("homepage_sort_order", { ascending: true })
+          .order("sort_order", { ascending: true });
         if (prodData && prodData.length > 0) {
           setFooterProducts(prodData);
         }
@@ -194,7 +197,15 @@ export default function Footer() {
               {footerProducts.map((product) => (
                 <li key={product.id}>
                   <button
-                    onClick={() => navigate(`/products/${product.id}`)}
+                    onClick={() => {
+                      if (product.linked_item_id) {
+                        window.open(`/products/item/${product.linked_item_id}`, "_blank", "noopener,noreferrer");
+                      } else if (product.pdf_url && !product.category_key) {
+                        window.open(product.pdf_url, "_blank", "noopener,noreferrer");
+                      } else {
+                        window.open(`/products/${product.id}`, "_blank", "noopener,noreferrer");
+                      }
+                    }}
                     className="text-sm text-black/80 hover:text-destructive hover:translate-x-1 rtl:hover:-translate-x-1 transition-all duration-200 text-start inline-block"
                   >
                     {language === "ar" ? product.name_ar : product.name_en}
