@@ -66,6 +66,8 @@ interface Product {
   icon: string;
   sort_order: number;
   category_key: string | null;
+  show_on_homepage?: boolean;
+  homepage_sort_order?: number;
 }
 
 interface ProductItemNode {
