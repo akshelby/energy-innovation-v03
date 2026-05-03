@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Award, CheckCircle, Target, Headphones, ArrowRight } from "lucide-react";
+import { Award, CheckCircle, Target, Headphones } from "lucide-react";
 
 const reasons = [
   { key: "why.expertise", descKey: "why.expertise.desc", icon: Award, num: "01" },
@@ -55,7 +55,7 @@ export default function WhyChooseUsSection() {
               <div
                 key={reason.key}
                 ref={(el) => (cardsRef.current[i] = el)}
-                className={`${slideClass} group relative rounded-2xl overflow-hidden`}
+                className={`${slideClass} group relative h-full`}
                 style={{
                   transitionDelay: `${i * 100}ms`,
                   transitionDuration: "1.2s",
@@ -63,34 +63,43 @@ export default function WhyChooseUsSection() {
                   transitionProperty: "opacity, transform",
                 }}
               >
-                {/* Left accent edge */}
-                <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-accent via-accent/60 to-accent/20 transition-all duration-500 group-hover:w-1.5 z-10" />
+                <div className="relative h-full overflow-hidden rounded-2xl bg-white border border-black/5 shadow-lg shadow-black/10 transition-all duration-500 ease-out group-hover:-translate-y-1.5 group-hover:shadow-2xl group-hover:shadow-black/20">
+                  {/* Diagonal corner accent */}
+                  <div
+                    className="absolute top-0 right-0 w-28 h-28 bg-accent transition-colors duration-500 group-hover:bg-destructive"
+                    style={{ clipPath: "polygon(100% 0, 0 0, 100% 100%)" }}
+                    aria-hidden="true"
+                  />
+                  <span className="absolute top-2.5 right-3.5 z-10 text-white text-sm font-black tracking-wider select-none">
+                    {reason.num}
+                  </span>
 
-                <div className="pl-6 pr-6 py-7 bg-white border border-black/5 border-l-0 rounded-r-2xl shadow-lg shadow-black/10 transition-shadow duration-300 group-hover:shadow-xl group-hover:shadow-black/20 flex flex-col h-full">
-                  {/* Number + Icon row */}
-                  <div className="flex items-center justify-between mb-5">
-                    <div className="w-12 h-12 rounded-xl bg-accent border border-accent flex items-center justify-center transition-colors duration-300 group-hover:bg-destructive group-hover:border-destructive">
-                      <Icon className="w-6 h-6 text-white" />
+                  {/* Subtle backdrop number watermark */}
+                  <span
+                    className="absolute -bottom-6 -left-2 text-[110px] font-black leading-none text-accent/[0.05] select-none pointer-events-none"
+                    aria-hidden="true"
+                  >
+                    {reason.num}
+                  </span>
+
+                  <div className="relative z-10 px-6 pt-7 pb-6 flex flex-col h-full">
+                    {/* Icon tile */}
+                    <div className="size-12 rounded-xl bg-accent/10 border border-accent/15 flex items-center justify-center mb-5 transition-all duration-500 group-hover:bg-destructive/10 group-hover:border-destructive/25 group-hover:rotate-3">
+                      <Icon className="w-6 h-6 text-accent transition-colors duration-500 group-hover:text-destructive" strokeWidth={2} />
                     </div>
-                    <span className="text-3xl font-black text-accent/80 select-none">
-                      {reason.num}
-                    </span>
-                  </div>
 
-                  {/* Title */}
-                  <h3 className="text-base font-bold text-slate-900 leading-snug mb-2.5">
-                    {t(reason.key)}
-                  </h3>
+                    {/* Title */}
+                    <h3 className="text-base font-bold text-slate-900 leading-snug mb-2.5 pr-12">
+                      {t(reason.key)}
+                    </h3>
 
-                  {/* Description */}
-                  <p className="text-slate-600 text-[13px] leading-relaxed mb-5 flex-1 line-clamp-3 min-h-[calc(1.625em*3)]">
-                    {t(reason.descKey)}
-                  </p>
+                    {/* Description */}
+                    <p className="text-slate-600 text-[13px] leading-relaxed mb-5 flex-1 line-clamp-3 min-h-[calc(1.625em*3)]">
+                      {t(reason.descKey)}
+                    </p>
 
-                  {/* Learn more indicator */}
-                  <div className="flex items-center gap-1.5 text-accent/70 group-hover:text-accent transition-colors duration-300">
-                    <span className="text-[11px] font-semibold tracking-wide">Learn more</span>
-                    <ArrowRight className="w-3 h-3 transition-transform duration-300 group-hover:translate-x-0.5" />
+                    {/* Animated underline accent */}
+                    <div className="h-px w-10 bg-accent transition-all duration-500 group-hover:w-20 group-hover:bg-destructive" />
                   </div>
                 </div>
               </div>
