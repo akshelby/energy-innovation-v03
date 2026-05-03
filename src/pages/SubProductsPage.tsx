@@ -443,11 +443,7 @@ export default function SubProductsPage() {
                           <span className="text-sm text-accent font-medium">
                             {isAr ? "عرض المنتجات" : "View Products"} →
                           </span>
-                        ) : (
-                          <span className="text-sm text-muted-foreground">
-                            {isAr ? "قريباً" : "Coming soon"}
-                          </span>
-                        )}
+                        ) : null}
                       </div>
                       {isClickable && (
                         <div className="w-9 h-9 rounded-full border border-border group-hover:border-destructive/30 group-hover:bg-destructive/10 flex items-center justify-center shrink-0 transition-all duration-300">

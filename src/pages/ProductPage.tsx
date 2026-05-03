@@ -360,9 +360,7 @@ export default function ProductPageView() {
                           <ArrowRight className={`w-4 h-4 ${isAr ? "rotate-180" : ""}`} />
                         </Button>
                       </Link>
-                    ) : (
-                      <span className="text-sm text-muted-foreground">{isAr ? "قريباً" : "Coming soon"}</span>
-                    )}
+                    ) : null}
                   </div>
                 );
               })}
