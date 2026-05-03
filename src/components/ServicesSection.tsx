@@ -166,11 +166,11 @@ export default function ServicesSection() {
             return (
               <div
                 key={i}
-                className="scroll-reveal md:!opacity-100 md:!translate-y-0 group relative cursor-pointer overflow-hidden bg-card transition-all duration-300 h-full flex flex-col"
+                className="scroll-reveal md:!opacity-100 md:!translate-y-0 group relative cursor-pointer overflow-hidden bg-card transition-all duration-500 h-full flex flex-col hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/15 shadow-lg shadow-foreground/5"
                 style={{
                   transitionDelay: `${i * 100}ms`,
-                  minHeight: "420px",
-                  borderRadius: "20px",
+                  minHeight: "400px",
+                  borderRadius: "24px",
                   padding: "1.5px",
                   backgroundImage:
                     "linear-gradient(hsl(var(--card)), hsl(var(--card))), linear-gradient(135deg, #2BD8FF 0%, #A14BFF 35%, #FF4FCB 65%, #FF6A3D 100%)",
@@ -185,31 +185,29 @@ export default function ServicesSection() {
                   }
                 }}
               >
-                {/* Top content area — 24px padding */}
-                <div className="flex flex-col" style={{ padding: "24px" }}>
-                  {/* Tag */}
-                  {(isAr ? service.tag_ar : service.tag_en) && (
-                    <span className="inline-block self-start text-[10px] font-semibold tracking-wide bg-accent/10 text-accent px-2.5 py-1 rounded-full mb-4">
-                      {isAr ? service.tag_ar : service.tag_en}
-                    </span>
-                  )}
-
-                  {/* Small icon */}
-                  <div className="mb-4">
-                    <div className="w-12 h-12 rounded-xl bg-accent/8 flex items-center justify-center transition-colors duration-300 group-hover:bg-destructive/10">
+                {/* Top content area */}
+                <div className="flex flex-col gap-3 p-5 md:p-6">
+                  {/* Header row: icon + tag */}
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="w-11 h-11 md:w-12 md:h-12 rounded-2xl bg-gradient-to-br from-accent/15 to-primary/10 flex items-center justify-center transition-all duration-300 group-hover:from-destructive/15 group-hover:to-accent/10 group-hover:scale-110 shrink-0">
                       {isCustomIcon && iconStr ? (
                         <img src={iconStr} alt="" className="w-6 h-6 object-contain" />
                       ) : Icon ? (
-                        <Icon className="w-6 h-6 text-accent transition-colors duration-300 group-hover:text-destructive" />
+                        <Icon className="w-5 h-5 md:w-6 md:h-6 text-accent transition-colors duration-300 group-hover:text-destructive" />
                       ) : (
-                        <Wrench className="w-6 h-6 text-accent transition-colors duration-300 group-hover:text-destructive" />
+                        <Wrench className="w-5 h-5 md:w-6 md:h-6 text-accent transition-colors duration-300 group-hover:text-destructive" />
                       )}
                     </div>
+                    {(isAr ? service.tag_ar : service.tag_en) && (
+                      <span className="inline-block text-[10px] font-semibold uppercase tracking-wider bg-accent/10 text-accent px-2.5 py-1 rounded-full truncate">
+                        {isAr ? service.tag_ar : service.tag_en}
+                      </span>
+                    )}
                   </div>
 
                   {/* Title — Apple-style gradient */}
                   <h3
-                    className="text-2xl md:text-3xl font-bold leading-snug mb-2"
+                    className="text-xl md:text-2xl lg:text-[1.7rem] font-bold leading-tight tracking-tight"
                     style={{
                       backgroundImage:
                         "linear-gradient(90deg, #2BD8FF 0%, #A14BFF 35%, #FF4FCB 65%, #FF6A3D 100%)",
@@ -217,6 +215,7 @@ export default function ServicesSection() {
                       backgroundClip: "text",
                       WebkitTextFillColor: "transparent",
                       color: "transparent",
+                      textWrap: "balance" as any,
                     }}
                   >
                     {isAr ? service.name_ar : service.name_en}
@@ -228,34 +227,35 @@ export default function ServicesSection() {
                   </p>
 
                   {service.pdf_url && (
-                    <span className="mt-4 flex items-center gap-1.5 text-xs font-medium text-accent">
+                    <span className="self-start mt-1 inline-flex items-center gap-1.5 text-xs font-semibold text-accent bg-accent/10 px-3 py-1.5 rounded-full transition-all duration-300 group-hover:bg-accent group-hover:text-accent-foreground">
                       <FileText className="w-3.5 h-3.5" />
                       View Details
+                      <ArrowUpRight className="w-3 h-3 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                     </span>
                   )}
                 </div>
 
-                {/* Bottom image area — fixed 200px */}
+                {/* Bottom image area */}
                 <div
-                  className="relative mt-auto w-full overflow-hidden"
-                  style={{ height: "200px", backgroundColor: "#f5f5f7" }}
+                  className="relative mt-auto w-full overflow-hidden bg-muted"
+                  style={{ height: "200px" }}
                 >
                   {imagesReady && heroImg && (
                     <img
                       src={heroImg}
                       alt={isAr ? service.name_ar : service.name_en}
-                      className="w-full h-full transition-transform duration-700 group-hover:scale-105"
+                      className="w-full h-full transition-transform duration-700 group-hover:scale-110"
                       style={{ objectFit: "cover" }}
                       loading="eager"
                       decoding="async"
                       fetchPriority="high"
                     />
                   )}
-                  {/* Top fade — white to transparent */}
+                  {/* Top fade for seamless blend */}
                   <div
                     className="pointer-events-none absolute inset-x-0 top-0"
                     style={{
-                      height: "64px",
+                      height: "72px",
                       background: "linear-gradient(to bottom, hsl(var(--card)) 0%, transparent 100%)",
                     }}
                     aria-hidden="true"
