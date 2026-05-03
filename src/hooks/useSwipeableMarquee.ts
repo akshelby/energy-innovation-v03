@@ -51,26 +51,28 @@ export function useSwipeableMarquee(opts?: { speed?: number }) {
     if (!container || !track) return;
 
     // ---- Loop wrapping ----
-    // We render content twice; halfWidth is the width of one copy. Whenever
-    // scrollLeft crosses [halfWidth, 2*halfWidth] we subtract halfWidth (and
-    // mirror for the other side) so the user never reaches an edge.
-    const getHalf = () => track.scrollWidth / 2;
+    // Content is rendered 3x. `unit` = width of one copy. We keep scrollLeft
+    // inside the middle copy: any time the user (or auto-tick) crosses into
+    // the first or last copy, we jump by ±unit. Because the jump happens
+    // far from the edges, native momentum / inertia is never cancelled, so
+    // swipes feel truly infinite.
+    const getUnit = () => track.scrollWidth / 3;
 
     const wrap = () => {
-      const half = getHalf();
-      if (half <= 0) return;
+      const unit = getUnit();
+      if (unit <= 0) return;
       const sl = container.scrollLeft;
-      if (sl >= half * 2 - 1) {
-        container.scrollLeft = sl - half;
-      } else if (sl <= 0) {
-        container.scrollLeft = sl + half;
+      if (sl >= unit * 2) {
+        container.scrollLeft = sl - unit;
+      } else if (sl < unit) {
+        container.scrollLeft = sl + unit;
       }
     };
 
-    // Start in the middle so the user can swipe in either direction freely.
+    // Start centered in the middle copy.
     const initScroll = () => {
-      const half = getHalf();
-      if (half > 0) container.scrollLeft = half / 2;
+      const unit = getUnit();
+      if (unit > 0) container.scrollLeft = unit + unit / 2;
     };
     // Wait a frame for layout/images to settle.
     const initRaf = requestAnimationFrame(initScroll);
