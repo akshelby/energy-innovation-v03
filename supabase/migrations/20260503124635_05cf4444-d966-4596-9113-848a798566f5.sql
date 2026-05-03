@@ -1,0 +1,1 @@
+UPDATE products SET linked_item_id = 'fe253cbb-ced7-4f34-ab40-d2754a04c730', category_key = 'cat.hvac' WHERE id = '46d56d81-ad17-4c05-b048-84fcaa493f43'
