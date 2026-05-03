@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Award, CheckCircle, Target, Headphones, ArrowRight } from "lucide-react";
+import { Award, CheckCircle, Target, Headphones } from "lucide-react";
 
 const reasons = [
   { key: "why.expertise", descKey: "why.expertise.desc", icon: Award, num: "01" },
