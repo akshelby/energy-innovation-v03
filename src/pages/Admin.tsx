@@ -4155,9 +4155,9 @@ export default function Admin() {
 
             {/* Editor */}
             {editingPartner && (
-              <div className="bg-card border-2 border-accent/40 rounded-2xl p-6 mb-6">
+              <div className="bg-card border-2 border-accent/40 rounded-2xl p-4 sm:p-6 mb-6">
                 <h3 className="font-semibold text-foreground mb-4">{editingPartner.id ? "Edit Partner" : "New Partner"}</h3>
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <Label className="text-xs">Name (English)</Label>
                     <Input value={editingPartner.name_en} onChange={(e) => setEditingPartner({ ...editingPartner, name_en: e.target.value })} placeholder="Siemens" />
@@ -4171,23 +4171,24 @@ export default function Admin() {
                     <Input type="number" value={editingPartner.sort_order} onChange={(e) => setEditingPartner({ ...editingPartner, sort_order: parseInt(e.target.value) || 0 })} />
                   </div>
                   <div>
-                    <Label className="text-xs">Logo Height (px) — desktop. Mobile auto-scales to ~60%.</Label>
+                    <Label className="text-xs">Logo Height (px)</Label>
                     <Input type="number" min={24} max={200} value={editingPartner.logo_height ?? 80} onChange={(e) => setEditingPartner({ ...editingPartner, logo_height: Math.max(24, Math.min(200, parseInt(e.target.value) || 80)) })} />
+                    <p className="text-[11px] text-muted-foreground mt-1">Desktop size. Mobile auto-scales to ~60%.</p>
                   </div>
-                  <div className="flex items-center gap-3 mt-6">
-                    <input type="checkbox" id="partner-active" checked={editingPartner.is_active} onChange={(e) => setEditingPartner({ ...editingPartner, is_active: e.target.checked })} />
-                    <Label htmlFor="partner-active">Active</Label>
+                  <div className="flex items-center gap-3 sm:col-span-2">
+                    <Switch id="partner-active" checked={editingPartner.is_active} onCheckedChange={(checked) => setEditingPartner({ ...editingPartner, is_active: checked })} />
+                    <Label htmlFor="partner-active" className="cursor-pointer">Active</Label>
                   </div>
                 </div>
 
                 {/* Logo upload */}
                 <div className="mt-4">
                   <Label className="text-xs">Logo</Label>
-                  <div className="flex items-center gap-4 mt-2">
+                  <div className="flex items-center gap-3 mt-2 flex-wrap">
                     {editingPartner.logo_url ? (
-                      <img src={resolvePreviewUrl(editingPartner.logo_url)} alt="logo" className="w-20 h-20 object-contain rounded-lg border border-border bg-muted/40" />
+                      <img src={resolvePreviewUrl(editingPartner.logo_url)} alt="logo" className="w-16 h-16 object-contain rounded-lg border border-border bg-muted/40 shrink-0" />
                     ) : (
-                      <div className="w-20 h-20 rounded-lg border border-border bg-muted/40 flex items-center justify-center">
+                      <div className="w-16 h-16 rounded-lg border border-border bg-muted/40 flex items-center justify-center shrink-0">
                         <Building className="w-6 h-6 text-muted-foreground/40" />
                       </div>
                     )}
@@ -4196,7 +4197,7 @@ export default function Admin() {
                       if (file) handleFormFileUpload(file, "images", "partners", (url) => setEditingPartner({ ...editingPartner!, logo_url: url }));
                     }} />
                     <Button variant="outline" size="sm" onClick={() => partnerLogoRef.current?.click()} className="rounded-xl">
-                      <Upload className="w-4 h-4 mr-2" />Upload Logo
+                      <Upload className="w-4 h-4 mr-2" />Upload
                     </Button>
                     {editingPartner.logo_url && (
                       <Button variant="outline" size="sm" onClick={() => setEditingPartner({ ...editingPartner, logo_url: null })} className="rounded-xl">
@@ -4207,10 +4208,10 @@ export default function Admin() {
                 </div>
 
                 <div className="flex gap-2 mt-6">
-                  <Button onClick={() => handleSavePartner(editingPartner)} disabled={loading || !editingPartner.name_en} className="gradient-accent text-accent-foreground rounded-xl border-0">
+                  <Button onClick={() => handleSavePartner(editingPartner)} disabled={loading || !editingPartner.name_en} className="gradient-accent text-accent-foreground rounded-xl border-0 flex-1 sm:flex-none">
                     <Save className="w-4 h-4 mr-2" />Save
                   </Button>
-                  <Button variant="outline" onClick={() => setEditingPartner(null)} className="rounded-xl">Cancel</Button>
+                  <Button variant="outline" onClick={() => setEditingPartner(null)} className="rounded-xl flex-1 sm:flex-none">Cancel</Button>
                 </div>
               </div>
             )}
