@@ -4233,7 +4233,25 @@ export default function Admin() {
                     )}
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-foreground truncate">{p.name_en || "Untitled"}</h3>
-                      <p className="text-xs text-muted-foreground truncate">{p.website_url || "No website"} · #{p.sort_order} · {p.is_active ? "Active" : "Hidden"}</p>
+                      <p className="text-xs text-muted-foreground truncate">{p.website_url || "No website"} · #{p.sort_order}</p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className={`text-xs font-medium ${p.is_active ? "text-green-600" : "text-muted-foreground"}`}>
+                        {p.is_active ? "Active" : "Hidden"}
+                      </span>
+                      <Switch
+                        checked={p.is_active}
+                        onCheckedChange={async (checked) => {
+                          setPartners((prev) => prev.map((x) => x.id === p.id ? { ...x, is_active: checked } : x));
+                          try {
+                            await apiCall("partners", "POST", storedPassword, { ...p, is_active: checked });
+                            toast.success(`Partner ${checked ? "activated" : "hidden"}`);
+                          } catch {
+                            setPartners((prev) => prev.map((x) => x.id === p.id ? { ...x, is_active: !checked } : x));
+                            toast.error("Failed to update");
+                          }
+                        }}
+                      />
                     </div>
                     <Button variant="outline" size="sm" onClick={() => setEditingPartner(p)} className="rounded-xl">Edit</Button>
                     <Button variant="outline" size="sm" onClick={() => handleDeletePartner(p.id)} className="rounded-xl text-destructive hover:text-destructive">
@@ -4366,7 +4384,25 @@ export default function Admin() {
                     )}
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-foreground truncate">{c.name_en || "Untitled"}</h3>
-                      <p className="text-xs text-muted-foreground truncate">{c.country_code || "—"} · #{c.sort_order} · {c.is_active ? "Active" : "Hidden"}</p>
+                      <p className="text-xs text-muted-foreground truncate">{c.country_code || "—"} · #{c.sort_order}</p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className={`text-xs font-medium ${c.is_active ? "text-green-600" : "text-muted-foreground"}`}>
+                        {c.is_active ? "Active" : "Hidden"}
+                      </span>
+                      <Switch
+                        checked={c.is_active}
+                        onCheckedChange={async (checked) => {
+                          setCountries((prev) => prev.map((x) => x.id === c.id ? { ...x, is_active: checked } : x));
+                          try {
+                            await apiCall("countries", "POST", storedPassword, { ...c, is_active: checked });
+                            toast.success(`Country ${checked ? "activated" : "hidden"}`);
+                          } catch {
+                            setCountries((prev) => prev.map((x) => x.id === c.id ? { ...x, is_active: !checked } : x));
+                            toast.error("Failed to update");
+                          }
+                        }}
+                      />
                     </div>
                     <Button variant="outline" size="sm" onClick={() => setEditingCountry(c)} className="rounded-xl">Edit</Button>
                     <Button variant="outline" size="sm" onClick={() => handleDeleteCountry(c.id)} className="rounded-xl text-destructive hover:text-destructive">
