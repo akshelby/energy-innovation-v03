@@ -46,8 +46,9 @@ export default function CountriesSection() {
 
   if (loaded && countries.length === 0) return null;
 
-  // Duplicate list for seamless infinite marquee
-  const loop = [...countries, ...countries];
+  // Triple the list so the swipeable marquee can wrap from the middle copy
+  // without ever exposing an edge (preserves native momentum on swipe).
+  const loop = [...countries, ...countries, ...countries];
 
   return (
     <section className="py-14 md:py-12 px-6 md:px-12 lg:px-20 bg-background overflow-hidden">
