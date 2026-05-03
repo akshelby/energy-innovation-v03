@@ -1,0 +1,1 @@
+ALTER TABLE public.product_items ADD COLUMN IF NOT EXISTS open_in_new_tab boolean NOT NULL DEFAULT true;

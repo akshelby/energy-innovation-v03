@@ -314,6 +314,7 @@ export type Database = {
           is_active: boolean
           name_ar: string
           name_en: string
+          open_in_new_tab: boolean
           parent_id: string | null
           pdf_url: string | null
           sort_order: number
@@ -327,6 +328,7 @@ export type Database = {
           is_active?: boolean
           name_ar?: string
           name_en?: string
+          open_in_new_tab?: boolean
           parent_id?: string | null
           pdf_url?: string | null
           sort_order?: number
@@ -340,6 +342,7 @@ export type Database = {
           is_active?: boolean
           name_ar?: string
           name_en?: string
+          open_in_new_tab?: boolean
           parent_id?: string | null
           pdf_url?: string | null
           sort_order?: number
