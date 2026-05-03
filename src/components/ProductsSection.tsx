@@ -125,7 +125,7 @@ export default function ProductsSection() {
   const isAr = language === "ar";
 
   return (
-    <section id="products" className="py-10 md:py-12 px-6 md:px-12 lg:px-20 bg-secondary/30 lazy-section" ref={ref}>
+    <section id="products" className="py-10 md:py-12 px-3 md:px-12 lg:px-20 bg-secondary/30 lazy-section" ref={ref}>
       <div className="w-full mx-auto">
         <div className="text-center mb-6 md:mb-16 scroll-reveal">
           <span className="inline-block px-8 py-3.5 text-lg font-bold tracking-wide text-white bg-accent rounded-full mb-4">
