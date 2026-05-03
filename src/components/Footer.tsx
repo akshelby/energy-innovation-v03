@@ -54,7 +54,6 @@ export default function Footer() {
         const { data: prodData } = await (supabase as any)
           .from("products")
           .select("id, name_en, name_ar, category_key, pdf_url, linked_item_id")
-          .eq("is_active", true)
           .eq("show_on_homepage", true)
           .order("homepage_sort_order", { ascending: true })
           .order("sort_order", { ascending: true });
