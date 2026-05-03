@@ -86,9 +86,9 @@ export default function PartnersSection() {
           className="relative w-full select-none overflow-x-auto overflow-y-hidden no-scrollbar overscroll-x-contain"
           style={{
             maskImage:
-              "linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%)",
+              "linear-gradient(to right, transparent 0, #000 4%, #000 96%, transparent 100%)",
             WebkitMaskImage:
-              "linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%)",
+              "linear-gradient(to right, transparent 0, #000 4%, #000 96%, transparent 100%)",
             scrollBehavior: "auto",
             WebkitOverflowScrolling: "touch",
           }}
