@@ -10,7 +10,7 @@ import {
   Lock, Trash2, Save, RefreshCw, Database, FileText, MessageSquare,
   LogOut, Image, Upload, Plus, Package, Briefcase, GripVertical, List, Palette, Languages, Sun, Moon,
   Star, Award, TrendingUp, Users, Clock, Globe, Phone, Mail, UserPlus, Heart,
-  Zap, Shield, icons, FileImage, Inbox, Building, Edit2,
+  Zap, Shield, icons, FileImage, Inbox, Building, Pencil,
 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
@@ -4253,7 +4253,7 @@ export default function Admin() {
                         }}
                       />
                       <Button variant="outline" size="icon" onClick={() => setEditingPartner(p)} className="rounded-xl h-9 w-9" title="Edit">
-                        <Edit2 className="w-4 h-4" />
+                        <Pencil className="w-4 h-4" />
                       </Button>
                       <Button variant="outline" size="icon" onClick={() => handleDeletePartner(p.id)} className="rounded-xl h-9 w-9 text-destructive hover:text-destructive" title="Delete">
                         <Trash2 className="w-4 h-4" />
@@ -4406,7 +4406,7 @@ export default function Admin() {
                         }}
                       />
                       <Button variant="outline" size="icon" onClick={() => setEditingCountry(c)} className="rounded-xl h-9 w-9" title="Edit">
-                        <Edit2 className="w-4 h-4" />
+                        <Pencil className="w-4 h-4" />
                       </Button>
                       <Button variant="outline" size="icon" onClick={() => handleDeleteCountry(c.id)} className="rounded-xl h-9 w-9 text-destructive hover:text-destructive" title="Delete">
                         <Trash2 className="w-4 h-4" />
