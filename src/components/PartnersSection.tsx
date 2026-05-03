@@ -82,15 +82,17 @@ export default function PartnersSection() {
         </button>
         <div
           ref={containerRef}
-          className="relative w-full select-none"
+          className="relative w-full select-none overflow-x-auto overflow-y-hidden no-scrollbar overscroll-x-contain"
           style={{
             maskImage:
               "linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%)",
             WebkitMaskImage:
               "linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%)",
+            scrollBehavior: "auto",
+            WebkitOverflowScrolling: "touch",
           }}
         >
-          <div ref={trackRef} className="flex w-max animate-marquee items-center gap-10 md:gap-20">
+          <div ref={trackRef} className="flex w-fit animate-none items-center gap-10 md:gap-20">
             {(() => {
               const phBgRaw = t("partners.placeholder_bg");
               const phTextRaw = t("partners.placeholder_text");
