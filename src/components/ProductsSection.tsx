@@ -49,6 +49,7 @@ interface Product {
   tag_ar: string;
   category_key: string;
   linked_item_id?: string | null;
+  open_in_new_tab?: boolean;
 }
 
 export default function ProductsSection() {
