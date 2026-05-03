@@ -86,7 +86,12 @@ export default function WhyChooseUsSection() {
 
                   {/* Subtle backdrop number watermark */}
                   <span
-                    className="absolute -bottom-6 -left-2 text-[110px] font-black leading-none text-accent/[0.05] select-none pointer-events-none"
+                    className="absolute -bottom-6 -left-2 text-[110px] font-black leading-none select-none pointer-events-none bg-clip-text text-transparent"
+                    style={{
+                      backgroundImage:
+                        "linear-gradient(135deg, #2BD8FF 0%, #A14BFF 35%, #FF4FCB 65%, #FF6A3D 100%)",
+                      opacity: 0.18,
+                    }}
                     aria-hidden="true"
                   >
                     {reason.num}
