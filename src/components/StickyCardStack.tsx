@@ -36,7 +36,7 @@ export default function StickyCardStack({
   // Desktop/tablet: plain list without sticky behavior
   if (!isMobile) {
     return (
-      <div className="w-full grid grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+      <div className="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
         {React.Children.map(children, (child, i) => (
           <div key={i} className="rounded-2xl h-full [&>*]:h-full">
             {child}
