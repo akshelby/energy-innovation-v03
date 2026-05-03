@@ -68,6 +68,7 @@ interface Product {
   category_key: string | null;
   show_on_homepage?: boolean;
   homepage_sort_order?: number;
+  linked_item_id?: string | null;
 }
 
 interface ProductItemNode {
