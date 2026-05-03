@@ -34,17 +34,30 @@ export function useSwipeableMarquee() {
     return d.endsWith("ms") ? v : v * 1000;
   };
 
+  // Normalize any translateX into the loop range [-halfWidth, 0] so the
+  // animated content visually stays in place even though the underlying
+  // value wraps. Used both during drag/momentum and on resume so there is
+  // never a visible jump when the CSS animation re-attaches.
+  const normalizeX = (track: HTMLElement, x: number) => {
+    const halfWidth = track.scrollWidth / 2;
+    if (halfWidth <= 0) return x;
+    let n = x % halfWidth;
+    if (n > 0) n -= halfWidth;
+    return n;
+  };
+
   const resumeAt = (track: HTMLElement, finalX: number) => {
     const halfWidth = track.scrollWidth / 2;
     if (halfWidth <= 0) return;
-    let normalized = finalX % halfWidth;
-    if (normalized > 0) normalized -= halfWidth;
+    const normalized = normalizeX(track, finalX);
     const progress = -normalized / halfWidth; // 0 → 1
     const duration = getAnimDurationMs(track);
-    // Set the delay first, then in the SAME frame clear the inline transform
-    // and animation-play-state so the animation picks up exactly where the
-    // glide left off — no visible jump.
+    // Pin the inline transform to the normalized value first so clearing it
+    // in the same frame as setting the new animation-delay produces no jump.
+    track.style.transform = `translateX(${normalized}px)`;
     track.style.animationDelay = `-${progress * duration}ms`;
+    // Force style flush, then clear inline transform + resume animation.
+    void track.offsetWidth;
     track.style.transform = "";
     track.style.animationPlayState = "";
   };
@@ -121,7 +134,7 @@ export function useSwipeableMarquee() {
         const t = now - startT;
         const decay = Math.exp(-t / tau);
         const offset = v * tau * (1 - decay);
-        const x = fromX + offset;
+        const x = normalizeX(track, fromX + offset);
         track.style.transform = `translateX(${x}px)`;
         const currentV = v * decay; // px/ms
         if (Math.abs(currentV) > minV && t < 2200) {
@@ -181,7 +194,7 @@ export function useSwipeableMarquee() {
       if (!isHorizontal) return;
       e.preventDefault?.();
       pushSample(e.clientX, performance.now());
-      track.style.transform = `translateX(${currentTranslate + dx}px)`;
+      track.style.transform = `translateX(${normalizeX(track, currentTranslate + dx)}px)`;
     };
 
     const endDrag = (e: PointerEvent) => {
