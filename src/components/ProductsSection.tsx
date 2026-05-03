@@ -70,7 +70,7 @@ export default function ProductsSection() {
       // 1) Prefer items explicitly flagged in the Product Tree.
       const { data: featuredItemsRaw } = await (supabase as any)
         .from("product_items")
-        .select("id, name_en, name_ar, image_url, pdf_url, has_page, homepage_sort_order")
+        .select("id, name_en, name_ar, image_url, pdf_url, has_page, homepage_sort_order, open_in_new_tab")
         .eq("show_on_homepage", true)
         .eq("is_active", true)
         .order("homepage_sort_order", { ascending: true });
