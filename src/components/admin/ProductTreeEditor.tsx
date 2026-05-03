@@ -84,6 +84,7 @@ interface ProductItemNode {
   pdf_url: string | null;
   show_on_homepage?: boolean;
   homepage_sort_order?: number;
+  open_in_new_tab?: boolean;
 }
 
 interface ProductPage {
