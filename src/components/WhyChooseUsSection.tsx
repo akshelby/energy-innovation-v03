@@ -83,7 +83,7 @@ export default function WhyChooseUsSection() {
                   </h3>
 
                   {/* Description */}
-                  <p className="text-slate-600 text-[13px] leading-relaxed mb-5 flex-1 line-clamp-3">
+                  <p className="text-slate-600 text-[13px] leading-relaxed mb-5 flex-1 line-clamp-3 min-h-[calc(1.625em*3)]">
                     {t(reason.descKey)}
                   </p>
 
