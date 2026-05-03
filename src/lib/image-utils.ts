@@ -19,13 +19,25 @@ export async function convertToWebP(
 
   try {
     const bitmap = await createImageBitmap(file);
-    const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+    const canvas = document.createElement("canvas");
+    canvas.width = bitmap.width;
+    canvas.height = bitmap.height;
     const ctx = canvas.getContext("2d");
-    if (!ctx) return file;
+    if (!ctx) {
+      bitmap.close();
+      return file;
+    }
 
     ctx.drawImage(bitmap, 0, 0);
-    const blob = await canvas.convertToBlob({ type: "image/webp", quality });
     bitmap.close();
+
+    const blob = await new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob(
+        (output) => (output ? resolve(output) : reject(new Error("WebP conversion failed"))),
+        "image/webp",
+        quality
+      );
+    });
 
     // Build new filename: replace extension with .webp
     const nameWithoutExt = file.name.replace(/\.[^.]+$/, "");
