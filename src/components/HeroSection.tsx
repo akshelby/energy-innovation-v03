@@ -244,17 +244,17 @@ export default function HeroSection() {
       )}
 
       <div className="relative z-10 h-full flex flex-col justify-end pb-8 md:pb-12 text-center px-6">
-        {contentLoaded && visibility["hero.show_headline"] && (
+        {visibility["hero.show_headline"] && (
           <h1 className="text-xl sm:text-3xl md:text-5xl lg:text-6xl font-black text-primary-foreground w-full max-w-none mx-auto leading-tight animate-fade-in-up drop-shadow-lg">
             {t("hero.headline")}
           </h1>
         )}
-        {contentLoaded && visibility["hero.show_subtext"] && (
+        {visibility["hero.show_subtext"] && (
           <p className="mt-4 text-sm md:text-base font-medium text-primary-foreground/80 max-w-xl mx-auto animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
             {t("hero.subtext")}
           </p>
         )}
-        {contentLoaded && (visibility["hero.show_explore_btn"] || visibility["hero.show_contact_btn"]) && (
+        {(visibility["hero.show_explore_btn"] || visibility["hero.show_contact_btn"]) && (
           <div className="mt-6 flex flex-wrap gap-3 justify-center animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
             {visibility["hero.show_explore_btn"] && (
               <Button
