@@ -4222,21 +4222,21 @@ export default function Admin() {
             ) : (
               <div className="space-y-3">
                 {partners.map((p) => (
-                  <div key={p.id} className="bg-card border border-border rounded-2xl p-4 flex items-center gap-4">
-                    <GripVertical className="w-4 h-4 text-muted-foreground shrink-0" />
+                  <div key={p.id} className="bg-card border border-border rounded-2xl p-3 sm:p-4 flex flex-wrap items-center gap-3 sm:gap-4">
+                    <GripVertical className="w-4 h-4 text-muted-foreground shrink-0 hidden sm:block" />
                     {p.logo_url ? (
-                      <img src={resolvePreviewUrl(p.logo_url)} alt={p.name_en} className="w-14 h-14 object-contain rounded-lg border border-border bg-muted/40 shrink-0" />
+                      <img src={resolvePreviewUrl(p.logo_url)} alt={p.name_en} className="w-12 h-12 sm:w-14 sm:h-14 object-contain rounded-lg border border-border bg-muted/40 shrink-0" />
                     ) : (
-                      <div className="w-14 h-14 bg-muted rounded-lg flex items-center justify-center shrink-0">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 bg-muted rounded-lg flex items-center justify-center shrink-0">
                         <Building className="w-5 h-5 text-muted-foreground/40" />
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-foreground truncate">{p.name_en || "Untitled"}</h3>
+                      <h3 className="font-semibold text-foreground truncate text-sm sm:text-base">{p.name_en || "Untitled"}</h3>
                       <p className="text-xs text-muted-foreground truncate">{p.website_url || "No website"} · #{p.sort_order}</p>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className={`text-xs font-medium ${p.is_active ? "text-green-600" : "text-muted-foreground"}`}>
+                    <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-auto">
+                      <span className={`text-[10px] sm:text-xs font-medium px-2 py-0.5 rounded-full ${p.is_active ? "bg-green-500/10 text-green-600" : "bg-muted text-muted-foreground"}`}>
                         {p.is_active ? "Active" : "Hidden"}
                       </span>
                       <Switch
@@ -4252,11 +4252,13 @@ export default function Admin() {
                           }
                         }}
                       />
+                      <Button variant="outline" size="icon" onClick={() => setEditingPartner(p)} className="rounded-xl h-9 w-9" title="Edit">
+                        <Edit2 className="w-4 h-4" />
+                      </Button>
+                      <Button variant="outline" size="icon" onClick={() => handleDeletePartner(p.id)} className="rounded-xl h-9 w-9 text-destructive hover:text-destructive" title="Delete">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
-                    <Button variant="outline" size="sm" onClick={() => setEditingPartner(p)} className="rounded-xl">Edit</Button>
-                    <Button variant="outline" size="sm" onClick={() => handleDeletePartner(p.id)} className="rounded-xl text-destructive hover:text-destructive">
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
                   </div>
                 ))}
               </div>
@@ -4373,21 +4375,21 @@ export default function Admin() {
             ) : (
               <div className="space-y-3">
                 {countries.map((c) => (
-                  <div key={c.id} className="bg-card border border-border rounded-2xl p-4 flex items-center gap-4">
-                    <GripVertical className="w-4 h-4 text-muted-foreground shrink-0" />
+                  <div key={c.id} className="bg-card border border-border rounded-2xl p-3 sm:p-4 flex flex-wrap items-center gap-3 sm:gap-4">
+                    <GripVertical className="w-4 h-4 text-muted-foreground shrink-0 hidden sm:block" />
                     {c.flag_url ? (
-                      <img src={resolvePreviewUrl(c.flag_url)} alt={c.name_en} className="w-14 h-14 object-cover rounded-full border border-border bg-muted/40 shrink-0" />
+                      <img src={resolvePreviewUrl(c.flag_url)} alt={c.name_en} className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded-full border border-border bg-muted/40 shrink-0" />
                     ) : (
-                      <div className="w-14 h-14 bg-muted rounded-full flex items-center justify-center shrink-0">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 bg-muted rounded-full flex items-center justify-center shrink-0">
                         <Globe className="w-5 h-5 text-muted-foreground/40" />
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-foreground truncate">{c.name_en || "Untitled"}</h3>
+                      <h3 className="font-semibold text-foreground truncate text-sm sm:text-base">{c.name_en || "Untitled"}</h3>
                       <p className="text-xs text-muted-foreground truncate">{c.country_code || "—"} · #{c.sort_order}</p>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className={`text-xs font-medium ${c.is_active ? "text-green-600" : "text-muted-foreground"}`}>
+                    <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-auto">
+                      <span className={`text-[10px] sm:text-xs font-medium px-2 py-0.5 rounded-full ${c.is_active ? "bg-green-500/10 text-green-600" : "bg-muted text-muted-foreground"}`}>
                         {c.is_active ? "Active" : "Hidden"}
                       </span>
                       <Switch
@@ -4403,11 +4405,13 @@ export default function Admin() {
                           }
                         }}
                       />
+                      <Button variant="outline" size="icon" onClick={() => setEditingCountry(c)} className="rounded-xl h-9 w-9" title="Edit">
+                        <Edit2 className="w-4 h-4" />
+                      </Button>
+                      <Button variant="outline" size="icon" onClick={() => handleDeleteCountry(c.id)} className="rounded-xl h-9 w-9 text-destructive hover:text-destructive" title="Delete">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
-                    <Button variant="outline" size="sm" onClick={() => setEditingCountry(c)} className="rounded-xl">Edit</Button>
-                    <Button variant="outline" size="sm" onClick={() => handleDeleteCountry(c.id)} className="rounded-xl text-destructive hover:text-destructive">
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
                   </div>
                 ))}
               </div>
