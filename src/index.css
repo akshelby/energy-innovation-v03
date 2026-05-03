@@ -381,3 +381,12 @@
   content-visibility: auto;
   contain-intrinsic-size: auto 600px;
 }
+
+/* Hide scrollbar visually but keep native scroll behavior (used by marquees) */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
