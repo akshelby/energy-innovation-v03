@@ -101,6 +101,7 @@ export default function ProductsSection() {
             pdf_url: it.pdf_url || null,
             category_key: "",
             linked_item_id: it.id,
+            open_in_new_tab: it.open_in_new_tab !== false,
           };
         });
         setProducts(mapped);
