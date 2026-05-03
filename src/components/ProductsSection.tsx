@@ -49,6 +49,7 @@ interface Product {
   tag_ar: string;
   category_key: string;
   linked_item_id?: string | null;
+  open_in_new_tab?: boolean;
 }
 
 export default function ProductsSection() {
@@ -69,7 +70,7 @@ export default function ProductsSection() {
       // 1) Prefer items explicitly flagged in the Product Tree.
       const { data: featuredItemsRaw } = await (supabase as any)
         .from("product_items")
-        .select("id, name_en, name_ar, image_url, pdf_url, has_page, homepage_sort_order")
+        .select("id, name_en, name_ar, image_url, pdf_url, has_page, homepage_sort_order, open_in_new_tab")
         .eq("show_on_homepage", true)
         .eq("is_active", true)
         .order("homepage_sort_order", { ascending: true });
@@ -100,6 +101,7 @@ export default function ProductsSection() {
             pdf_url: it.pdf_url || null,
             category_key: "",
             linked_item_id: it.id,
+            open_in_new_tab: it.open_in_new_tab !== false,
           };
         });
         setProducts(mapped);
@@ -179,13 +181,18 @@ export default function ProductsSection() {
                 className="scroll-reveal md:!opacity-100 md:!translate-y-0 group rounded-2xl cursor-pointer overflow-hidden bg-card border border-border hover:border-accent/20 transition-all duration-300 h-full flex flex-col"
                 style={{ transitionDelay: `${i * 80}ms` }}
                 onClick={() => {
+                  const newTab = product.open_in_new_tab !== false;
+                  const go = (url: string) => {
+                    if (newTab) window.open(url, "_blank", "noopener,noreferrer");
+                    else navigate(url);
+                  };
                   if (product.linked_item_id) {
-                    window.open(`/products/item/${product.linked_item_id}`, "_blank", "noopener,noreferrer");
+                    go(`/products/item/${product.linked_item_id}`);
                   } else if (product.pdf_url && !product.category_key) {
                     setPdfSrc(product.pdf_url);
                     setPdfOpen(true);
                   } else {
-                    window.open(`/products/${product.id}`, "_blank", "noopener,noreferrer");
+                    go(`/products/${product.id}`);
                   }
                 }}
               >
