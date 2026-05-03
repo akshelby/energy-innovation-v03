@@ -1,0 +1,1 @@
+UPDATE products SET category_key = 'cat.exhaust' WHERE id = '46d56d81-ad17-4c05-b048-84fcaa493f43'

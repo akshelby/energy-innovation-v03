@@ -68,6 +68,7 @@ interface Product {
   category_key: string | null;
   show_on_homepage?: boolean;
   homepage_sort_order?: number;
+  linked_item_id?: string | null;
 }
 
 interface ProductItemNode {
@@ -168,6 +169,11 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
 
   // ─── Tree helpers ─────────────────────────────────
   const getItemsForProduct = (product: Product & { id: string }) => {
+    // If product is explicitly linked to an item, surface that item as the root of the tree
+    if (product.linked_item_id) {
+      const linked = allItems.find(i => i.id === product.linked_item_id);
+      return linked ? [linked] : [];
+    }
     if (!product.category_key) return [];
     return allItems.filter(i => i.category_key === product.category_key && !i.parent_id)
       .sort((a, b) => a.sort_order - b.sort_order);
