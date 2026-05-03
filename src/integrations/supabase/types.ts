@@ -476,6 +476,7 @@ export type Database = {
           linked_item_id: string | null
           name_ar: string
           name_en: string
+          open_in_new_tab: boolean
           pdf_url: string | null
           show_on_homepage: boolean
           sort_order: number
@@ -494,6 +495,7 @@ export type Database = {
           linked_item_id?: string | null
           name_ar?: string
           name_en?: string
+          open_in_new_tab?: boolean
           pdf_url?: string | null
           show_on_homepage?: boolean
           sort_order?: number
@@ -512,6 +514,7 @@ export type Database = {
           linked_item_id?: string | null
           name_ar?: string
           name_en?: string
+          open_in_new_tab?: boolean
           pdf_url?: string | null
           show_on_homepage?: boolean
           sort_order?: number
