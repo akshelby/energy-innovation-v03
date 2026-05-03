@@ -70,9 +70,19 @@ export default function WhyChooseUsSection() {
                     style={{ clipPath: "polygon(100% 0, 0 0, 100% 100%)" }}
                     aria-hidden="true"
                   />
-                  <span className="absolute top-2.5 right-3.5 z-10 text-white text-sm font-black tracking-wider select-none">
-                    {reason.num}
-                  </span>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2.5}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                    className="absolute top-2 right-2 z-10 w-5 h-5 text-white animate-corner-arrow group-hover:[animation-duration:0.9s]"
+                  >
+                    <line x1="7" y1="17" x2="17" y2="7" />
+                    <polyline points="8 7 17 7 17 16" />
+                  </svg>
 
                   {/* Subtle backdrop number watermark */}
                   <span
