@@ -205,7 +205,11 @@ const IMAGE_FOLDERS = [
 ];
 
 async function apiCall(path: string, method: string, password: string, body?: unknown) {
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${ANON_KEY}`,
+    apikey: ANON_KEY,
+  };
   if (password) headers["x-admin-password"] = password;
   const res = await fetch(`${FUNCTION_URL}/${path}`, {
     method,
