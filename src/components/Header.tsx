@@ -382,7 +382,7 @@ export default function Header() {
                             const isOpen = expandedCategories.has(cat.key);
                             const num = String(idx + 1).padStart(2, "0");
                             return (
-                              <li key={cat.key} className={`group/cat relative overflow-hidden rounded-2xl transition-all duration-300 ${isOpen ? 'bg-gradient-to-br from-accent/10 via-card to-card ring-1 ring-accent/20' : 'hover:bg-muted/40'}`}>
+                              <li key={cat.key} className={`group/cat relative overflow-hidden rounded-2xl transition-all duration-300 ${isOpen ? 'bg-gradient-to-br from-accent/10 via-card to-card ring-1 ring-accent/20' : 'hover:bg-red-500/5 hover:ring-1 hover:ring-red-500/20'}`}>
                                 {isOpen && (
                                   <span className="absolute inset-y-3 left-0 w-[2px] rounded-full bg-red-500/60" />
                                 )}
@@ -392,14 +392,14 @@ export default function Header() {
                                   className="relative w-full flex items-center justify-between gap-3 px-3.5 py-3 text-start"
                                 >
                                   <span className="flex items-center gap-3 min-w-0">
-                                    <span className={`shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-xl text-[11px] font-black tabular-nums tracking-tight transition-all duration-300 ${isOpen ? 'bg-gradient-to-br from-red-500 to-accent text-white shadow-lg shadow-red-500/30' : 'bg-muted text-muted-foreground group-hover/cat:bg-accent/10 group-hover/cat:text-accent'}`}>
+                                    <span className={`shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-xl text-[11px] font-black tabular-nums tracking-tight transition-all duration-300 ${isOpen ? 'bg-gradient-to-br from-red-500 to-accent text-white shadow-lg shadow-red-500/30' : 'bg-muted text-muted-foreground group-hover/cat:bg-red-500/15 group-hover/cat:text-red-500'}`}>
                                       {num}
                                     </span>
-                                    <span className={`text-[13px] font-bold uppercase tracking-wide truncate transition-colors ${isOpen ? 'text-foreground' : 'text-card-foreground group-hover/cat:text-foreground'}`}>
+                                    <span className={`text-[13px] font-bold uppercase tracking-wide truncate transition-colors ${isOpen ? 'text-foreground' : 'text-card-foreground group-hover/cat:text-red-500'}`}>
                                       {language === "ar" ? cat.label_ar : cat.label_en}
                                     </span>
                                   </span>
-                                  <span className={`shrink-0 inline-flex items-center justify-center w-7 h-7 rounded-full transition-all duration-300 ${isOpen ? 'bg-red-500/15 text-red-500 rotate-180' : 'text-muted-foreground group-hover/cat:bg-muted group-hover/cat:text-accent'}`}>
+                                  <span className={`shrink-0 inline-flex items-center justify-center w-7 h-7 rounded-full transition-all duration-300 ${isOpen ? 'bg-red-500/15 text-red-500 rotate-180' : 'text-muted-foreground group-hover/cat:bg-red-500/15 group-hover/cat:text-red-500'}`}>
                                     <ChevronDown className="w-3.5 h-3.5" />
                                   </span>
                                 </button>
