@@ -48,6 +48,25 @@ export default function Header() {
   const [productCategories, setProductCategories] = useState<CategoryItem[]>([]);
   const [expandedParents, setExpandedParents] = useState<Set<string>>(new Set());
   const [expandedMobileParents, setExpandedMobileParents] = useState<Set<string>>(new Set());
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
+  const [expandedMobileCategories, setExpandedMobileCategories] = useState<Set<string>>(new Set());
+
+  const toggleCategory = (key: string) => {
+    setExpandedCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+  const toggleMobileCategory = (key: string) => {
+    setExpandedMobileCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
   const [mobileLogoSize, setMobileLogoSize] = useState<number>(() => {
     try { return parseInt(localStorage.getItem("ei_mobile_logo_size") || "") || 40; } catch { return 40; }
   });
@@ -210,9 +229,7 @@ export default function Header() {
 
   const isAr = language === "ar";
 
-  // Split categories into rows for mega menu
-  const row1 = categoriesWithItems.slice(0, 3);
-  const row2 = categoriesWithItems.slice(3);
+  // (categories rendered progressively on click)
 
   // Render a single item (parent or leaf) for desktop mega menu
   const renderDesktopItem = (pi: ProductItem) => {
@@ -343,28 +360,30 @@ export default function Header() {
                 </button>
 
                 {item.hasDropdown && productsOpen && categoriesWithItems.length > 0 && (
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2" style={{ width: "750px" }}>
-                    <div className="bg-card rounded-2xl shadow-xl border border-border p-6 animate-slide-down max-h-[70vh] overflow-y-auto mega-menu-scroll">
-                      {row1.length > 0 && (
-                        <div className="grid grid-cols-3 gap-x-8 gap-y-6">
-                          {row1.map((cat) => (
-                            <div key={cat.key}>
-                              <h4 className="text-sm font-bold uppercase tracking-wider text-accent mb-3">{language === "ar" ? cat.label_ar : cat.label_en}</h4>
-                              <ul className="space-y-1.5">{cat.items.map((pi) => renderDesktopItem(pi))}</ul>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      {row2.length > 0 && (
-                        <div className="grid grid-cols-3 gap-x-8 mt-6">
-                          {row2.map((cat) => (
-                            <div key={cat.key}>
-                              <h4 className="text-sm font-bold uppercase tracking-wider text-accent mb-3">{language === "ar" ? cat.label_ar : cat.label_en}</h4>
-                              <ul className="space-y-1.5">{cat.items.map((pi) => renderDesktopItem(pi))}</ul>
-                            </div>
-                          ))}
-                        </div>
-                      )}
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2" style={{ width: "420px" }}>
+                    <div className="bg-card rounded-2xl shadow-xl border border-border p-4 animate-slide-down max-h-[70vh] overflow-y-auto mega-menu-scroll">
+                      <ul className="space-y-1">
+                        {categoriesWithItems.map((cat) => {
+                          const isOpen = expandedCategories.has(cat.key);
+                          return (
+                            <li key={cat.key}>
+                              <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); toggleCategory(cat.key); }}
+                                className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-bold uppercase tracking-wider text-accent hover:bg-accent/10 transition-colors text-start"
+                              >
+                                <span>{language === "ar" ? cat.label_ar : cat.label_en}</span>
+                                <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                              </button>
+                              {isOpen && (
+                                <ul className="mt-1 ml-2 pl-3 border-l-2 border-accent/20 space-y-1">
+                                  {cat.items.map((pi) => renderDesktopItem(pi))}
+                                </ul>
+                              )}
+                            </li>
+                          );
+                        })}
+                      </ul>
                     </div>
                   </div>
                 )}
@@ -424,15 +443,26 @@ export default function Header() {
                         <ChevronDown className={`w-4 h-4 transition-transform ${mobileProductsOpen ? 'rotate-180' : ''}`} />
                       </button>
                       {mobileProductsOpen && (
-                        <div className="ml-4 mt-1 space-y-3 pb-2">
-                          {categoriesWithItems.map((cat) => (
-                            <div key={cat.key}>
-                              <h4 className="text-sm font-bold uppercase tracking-wider text-accent px-4 mb-1">
-                                {language === "ar" ? cat.label_ar : cat.label_en}
-                              </h4>
-                              {cat.items.map((pi) => renderMobileItem(pi))}
-                            </div>
-                          ))}
+                        <div className="ml-2 mt-1 space-y-1 pb-2">
+                          {categoriesWithItems.map((cat) => {
+                            const isOpen = expandedMobileCategories.has(cat.key);
+                            return (
+                              <div key={cat.key}>
+                                <button
+                                  onClick={() => toggleMobileCategory(cat.key)}
+                                  className="w-full flex items-center justify-between px-4 py-2 text-sm font-bold uppercase tracking-wider text-accent hover:bg-accent/10 rounded-lg transition-colors text-start"
+                                >
+                                  <span>{language === "ar" ? cat.label_ar : cat.label_en}</span>
+                                  <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                                </button>
+                                {isOpen && (
+                                  <div className="ml-2 pl-2 border-l-2 border-accent/20 mt-1">
+                                    {cat.items.map((pi) => renderMobileItem(pi))}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
                         </div>
                       )}
                     </>
