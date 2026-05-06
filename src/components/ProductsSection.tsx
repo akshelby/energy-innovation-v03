@@ -8,6 +8,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import StickyCardStack from "@/components/StickyCardStack";
 import { supabase } from "@/integrations/supabase/client";
 import PdfViewerDialog from "@/components/PdfViewerDialog";
+import { useOpenInNewTab, openProductLink } from "@/hooks/useOpenInNewTab";
 import { ArrowUpRight, ChevronDown } from "lucide-react";
 import {
   Flame, DoorOpen, Droplets, Wind, Truck, Shield, Zap, Factory,
