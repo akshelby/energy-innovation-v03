@@ -200,11 +200,11 @@ export default function Footer() {
                   <button
                     onClick={() => {
                       if (product.linked_item_id) {
-                        window.open(`/products/item/${product.linked_item_id}`, "_blank", "noopener,noreferrer");
+                        openProductLink(`/products/item/${product.linked_item_id}`, openNewTab, navigate);
                       } else if (product.pdf_url && !product.category_key) {
                         window.open(product.pdf_url, "_blank", "noopener,noreferrer");
                       } else {
-                        window.open(`/products/${product.id}`, "_blank", "noopener,noreferrer");
+                        openProductLink(`/products/${product.id}`, openNewTab, navigate);
                       }
                     }}
                     className="text-sm text-black/80 hover:text-destructive hover:translate-x-1 rtl:hover:-translate-x-1 transition-all duration-200 text-start inline-block"
