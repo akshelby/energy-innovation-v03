@@ -360,28 +360,30 @@ export default function Header() {
                 </button>
 
                 {item.hasDropdown && productsOpen && categoriesWithItems.length > 0 && (
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2" style={{ width: "750px" }}>
-                    <div className="bg-card rounded-2xl shadow-xl border border-border p-6 animate-slide-down max-h-[70vh] overflow-y-auto mega-menu-scroll">
-                      {row1.length > 0 && (
-                        <div className="grid grid-cols-3 gap-x-8 gap-y-6">
-                          {row1.map((cat) => (
-                            <div key={cat.key}>
-                              <h4 className="text-sm font-bold uppercase tracking-wider text-accent mb-3">{language === "ar" ? cat.label_ar : cat.label_en}</h4>
-                              <ul className="space-y-1.5">{cat.items.map((pi) => renderDesktopItem(pi))}</ul>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      {row2.length > 0 && (
-                        <div className="grid grid-cols-3 gap-x-8 mt-6">
-                          {row2.map((cat) => (
-                            <div key={cat.key}>
-                              <h4 className="text-sm font-bold uppercase tracking-wider text-accent mb-3">{language === "ar" ? cat.label_ar : cat.label_en}</h4>
-                              <ul className="space-y-1.5">{cat.items.map((pi) => renderDesktopItem(pi))}</ul>
-                            </div>
-                          ))}
-                        </div>
-                      )}
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2" style={{ width: "420px" }}>
+                    <div className="bg-card rounded-2xl shadow-xl border border-border p-4 animate-slide-down max-h-[70vh] overflow-y-auto mega-menu-scroll">
+                      <ul className="space-y-1">
+                        {categoriesWithItems.map((cat) => {
+                          const isOpen = expandedCategories.has(cat.key);
+                          return (
+                            <li key={cat.key}>
+                              <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); toggleCategory(cat.key); }}
+                                className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-bold uppercase tracking-wider text-accent hover:bg-accent/10 transition-colors text-start"
+                              >
+                                <span>{language === "ar" ? cat.label_ar : cat.label_en}</span>
+                                <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                              </button>
+                              {isOpen && (
+                                <ul className="mt-1 ml-2 pl-3 border-l-2 border-accent/20 space-y-1">
+                                  {cat.items.map((pi) => renderDesktopItem(pi))}
+                                </ul>
+                              )}
+                            </li>
+                          );
+                        })}
+                      </ul>
                     </div>
                   </div>
                 )}
