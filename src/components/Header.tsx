@@ -248,7 +248,7 @@ export default function Header() {
             <span className="flex-1">{isAr ? pi.name_ar : pi.name_en}</span>
           </button>
           {isExpanded && (
-            <ul className="ml-3 mt-0.5 pl-3 border-l border-accent/30 space-y-0.5 animate-fade-in">
+            <ul className="ml-3 mt-0.5 pl-3 border-l border-accent/15 space-y-0.5 animate-fade-in">
               {children.map((child) => {
                 const grandChildren = getChildren(child.id);
                 if (grandChildren.length > 0) {
