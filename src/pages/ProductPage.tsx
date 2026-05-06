@@ -29,6 +29,7 @@ interface ProductItem {
   is_active: boolean;
   has_page: boolean;
   image_url?: string | null;
+}
 
 interface ProductPage {
   id: string;
