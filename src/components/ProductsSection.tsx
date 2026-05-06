@@ -201,13 +201,16 @@ export default function ProductsSection() {
 
                   {product.image_url ? (
                     <img
-                      src={getResizedUrl(product.image_url, 640)}
+                      src={getResizedUrl(product.image_url, 480, 70)}
+                      srcSet={`${getResizedUrl(product.image_url, 320, 65)} 320w, ${getResizedUrl(product.image_url, 480, 70)} 480w, ${getResizedUrl(product.image_url, 768, 72)} 768w`}
+                      sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 30vw"
                       alt={isAr ? product.name_ar : product.name_en}
-                      width={640}
-                      height={480}
+                      width={480}
+                      height={360}
                       className="relative w-full h-full object-cover transition-all duration-500 group-hover:scale-105 opacity-0"
                       loading={i < 2 ? "eager" : "lazy"}
                       decoding={i < 2 ? "sync" : "async"}
+                      fetchPriority={i < 2 ? "high" : "auto"}
                       onLoad={(e) => {
                         (e.target as HTMLImageElement).classList.remove("opacity-0");
                         (e.target as HTMLImageElement).classList.add("opacity-100");
