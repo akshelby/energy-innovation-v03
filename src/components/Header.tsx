@@ -242,9 +242,9 @@ export default function Header() {
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); toggleExpanded(pi.id); }}
-            className="group w-full flex items-center gap-2 text-[13px] font-semibold text-card-foreground hover:text-red-500 px-2.5 py-1.5 rounded-md transition-all bg-transparent border-0 cursor-pointer text-start"
+            className={`group w-full flex items-center gap-2 text-[13px] font-semibold hover:text-red-500 hover:bg-red-500/10 active:bg-red-500/20 px-2.5 py-1.5 rounded-md transition-all border-0 cursor-pointer text-start ${isExpanded ? 'bg-red-500/10 text-red-500' : 'bg-transparent text-card-foreground'}`}
           >
-            <ChevronRight className={`w-3 h-3 shrink-0 text-muted-foreground group-hover:text-red-500 transition-transform duration-300 ${isExpanded ? 'rotate-90' : ''} ${isRTL ? 'rotate-180' : ''}`} />
+            <ChevronRight className={`w-3 h-3 shrink-0 group-hover:text-red-500 transition-transform duration-300 ${isExpanded ? 'rotate-90 text-red-500' : 'text-muted-foreground'} ${isRTL ? 'rotate-180' : ''}`} />
             <span className="flex-1">{isAr ? pi.name_ar : pi.name_en}</span>
           </button>
           {isExpanded && (
@@ -259,7 +259,7 @@ export default function Header() {
                     <button
                       type="button"
                       onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleItemClick(child); }}
-                      className="group w-full flex items-center gap-2 text-[12.5px] font-medium text-muted-foreground hover:text-red-500 px-2.5 py-1.5 rounded-md transition-all bg-transparent border-0 cursor-pointer text-start"
+                      className="group w-full flex items-center gap-2 text-[12.5px] font-medium text-muted-foreground hover:text-red-500 hover:bg-red-500/10 active:bg-red-500/20 px-2.5 py-1.5 rounded-md transition-all bg-transparent border-0 cursor-pointer text-start"
                     >
                       <span className="block w-1 h-1 rounded-full bg-muted-foreground/40 group-hover:bg-red-500 transition-colors" />
                       {isAr ? child.name_ar : child.name_en}
@@ -278,7 +278,7 @@ export default function Header() {
         <button
           type="button"
           onClick={(e) => { e.preventDefault(); handleItemClick(pi); }}
-          className="group w-full flex items-center gap-2 text-[13px] font-semibold text-card-foreground hover:text-red-500 px-2.5 py-1.5 rounded-md transition-all bg-transparent border-0 cursor-pointer text-start"
+          className="group w-full flex items-center gap-2 text-[13px] font-semibold text-card-foreground hover:text-red-500 hover:bg-red-500/10 active:bg-red-500/20 px-2.5 py-1.5 rounded-md transition-all bg-transparent border-0 cursor-pointer text-start"
         >
           <span className="block w-1 h-1 rounded-full bg-accent/50 group-hover:bg-red-500 transition-colors" />
           {isAr ? pi.name_ar : pi.name_en}
@@ -297,7 +297,7 @@ export default function Header() {
         <div key={pi.id}>
           <button
             onClick={() => toggleMobileExpanded(pi.id)}
-            className="w-full text-start px-4 py-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors flex items-center justify-between"
+            className={`w-full text-start px-4 py-1.5 text-sm font-semibold hover:text-red-500 hover:bg-red-500/10 active:bg-red-500/20 rounded-md transition-colors flex items-center justify-between ${isExpanded ? 'bg-red-500/10 text-red-500' : 'text-muted-foreground'}`}
           >
             {isAr ? pi.name_ar : pi.name_en}
             <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
@@ -308,7 +308,7 @@ export default function Header() {
                 <button
                   key={child.id}
                   onClick={() => handleItemClick(child)}
-                  className="w-full text-start px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  className="w-full text-start px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-red-500 hover:bg-red-500/10 active:bg-red-500/20 rounded-md transition-colors"
                 >
                   {isAr ? child.name_ar : child.name_en}
                 </button>
@@ -323,7 +323,7 @@ export default function Header() {
       <button
         key={pi.id}
         onClick={() => handleItemClick(pi)}
-        className="w-full text-start px-4 py-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
+        className="w-full text-start px-4 py-1.5 text-sm font-semibold text-muted-foreground hover:text-red-500 hover:bg-red-500/10 active:bg-red-500/20 rounded-md transition-colors"
       >
         {isAr ? pi.name_ar : pi.name_en}
       </button>
