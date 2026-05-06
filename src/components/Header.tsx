@@ -248,7 +248,7 @@ export default function Header() {
             <span className="flex-1">{isAr ? pi.name_ar : pi.name_en}</span>
           </button>
           {isExpanded && (
-            <ul className="ml-3 mt-0.5 pl-3 border-l border-accent/30 space-y-0.5 animate-fade-in">
+            <ul className="ml-3 mt-0.5 pl-3 border-l border-accent/15 space-y-0.5 animate-fade-in">
               {children.map((child) => {
                 const grandChildren = getChildren(child.id);
                 if (grandChildren.length > 0) {
@@ -384,7 +384,7 @@ export default function Header() {
                             return (
                               <li key={cat.key} className={`group/cat relative overflow-hidden rounded-2xl transition-all duration-300 ${isOpen ? 'bg-gradient-to-br from-accent/10 via-card to-card ring-1 ring-accent/20' : 'hover:bg-muted/40'}`}>
                                 {isOpen && (
-                                  <span className="absolute inset-y-2 left-0 w-[3px] rounded-full bg-gradient-to-b from-red-500 via-accent to-red-500" />
+                                  <span className="absolute inset-y-3 left-0 w-[2px] rounded-full bg-red-500/60" />
                                 )}
                                 <button
                                   type="button"
@@ -405,7 +405,7 @@ export default function Header() {
                                 </button>
                                 {isOpen && (
                                   <div className="px-3 pb-3 animate-fade-in">
-                                    <ul className="ml-11 pl-4 border-l border-dashed border-accent/30 space-y-0.5">
+                                    <ul className="ml-11 pl-4 border-l border-accent/15 space-y-0.5">
                                       {cat.items.map((pi) => renderDesktopItem(pi))}
                                     </ul>
                                   </div>
