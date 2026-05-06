@@ -6,6 +6,7 @@ import { useBranding } from "@/contexts/BrandingContext";
 import { supabase } from "@/integrations/supabase/client";
 import { getCached, setCache } from "@/lib/cache";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useOpenInNewTab, openProductLink } from "@/hooks/useOpenInNewTab";
 
 interface SocialLinks {
   linkedin: string;
@@ -28,6 +29,7 @@ const ADDRESS_KEYS = ["footer.address_1_heading", "footer.address_1_body", "foot
 export default function Footer() {
   const { t, language } = useLanguage();
   const { logoUrl, brandName, logoSize, ready: brandReady } = useBranding();
+  const openNewTab = useOpenInNewTab();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -198,11 +200,11 @@ export default function Footer() {
                   <button
                     onClick={() => {
                       if (product.linked_item_id) {
-                        window.open(`/products/item/${product.linked_item_id}`, "_blank", "noopener,noreferrer");
+                        openProductLink(`/products/item/${product.linked_item_id}`, openNewTab, navigate);
                       } else if (product.pdf_url && !product.category_key) {
                         window.open(product.pdf_url, "_blank", "noopener,noreferrer");
                       } else {
-                        window.open(`/products/${product.id}`, "_blank", "noopener,noreferrer");
+                        openProductLink(`/products/${product.id}`, openNewTab, navigate);
                       }
                     }}
                     className="text-sm text-black/80 hover:text-destructive hover:translate-x-1 rtl:hover:-translate-x-1 transition-all duration-200 text-start inline-block"

@@ -441,22 +441,7 @@ export default function ProductTreeEditor({ password, isViewer }: Props) {
           </label>
         </div>
 
-        {/* Open in new tab toggle */}
-        <div className="flex items-start gap-3 p-3 rounded-xl border border-border bg-secondary/30">
-          <input
-            id="open_in_new_tab"
-            type="checkbox"
-            checked={editingItem.open_in_new_tab !== false}
-            onChange={(e) => setEditingItem({ ...editingItem, open_in_new_tab: e.target.checked })}
-            className="w-4 h-4 mt-0.5 accent-primary cursor-pointer"
-          />
-          <label htmlFor="open_in_new_tab" className="cursor-pointer flex-1">
-            <span className="text-sm font-semibold text-foreground">↗ Open product page in a new tab</span>
-            <p className="text-[11px] text-muted-foreground mt-0.5">
-              When on, clicking this item on the homepage opens its product page in a new browser tab. Turn off to open in the same tab.
-            </p>
-          </label>
-        </div>
+        {/* Open-in-new-tab is now controlled globally in Branding → "Open product links in new tab" */}
 
         <div className="flex gap-2 pt-2">
           <Button onClick={handleSaveItem} disabled={loading || !editingItem.name_en} className="gradient-accent text-accent-foreground rounded-xl border-0">

@@ -387,6 +387,7 @@ export default function Admin() {
   const [linkedinUrl, setLinkedinUrl] = useState("");
   const [linkedinActive, setLinkedinActive] = useState(false);
   const [imageOptimization, setImageOptimization] = useState(false);
+  const [productsOpenInNewTab, setProductsOpenInNewTab] = useState(true);
 
   // SEO state
   const [seoDescription, setSeoDescription] = useState({ en: "", ar: "" });
@@ -802,6 +803,9 @@ export default function Admin() {
 
       const imgOptEntry = data.find((d: ContentItem) => d.content_key === "settings.image_optimization");
       setImageOptimization(imgOptEntry?.value_en === "true");
+
+      const newTabEntry = data.find((d: ContentItem) => d.content_key === "settings.products_open_in_new_tab");
+      setProductsOpenInNewTab(newTabEntry ? newTabEntry.value_en !== "false" : true);
 
       // Load hero visibility toggles
       const visKeys = ["hero.show_headline", "hero.show_subtext", "hero.show_explore_btn", "hero.show_contact_btn", "hero.show_arrows", "hero.show_dots"];
@@ -2096,7 +2100,40 @@ export default function Admin() {
                     className="w-5 h-5 accent-primary"
                   />
                 </label>
+            </div>
+
+            {/* Products Open In New Tab Toggle (global) */}
+            <div className="md:col-span-2 bg-card border border-border rounded-2xl p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-foreground">↗ Open product links in new tab</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Global setting. When ON, every product link across the site (homepage cards, footer, sub-product pages) opens in a new browser tab. Turn OFF to open in the same tab.
+                  </p>
+                </div>
+                <label className="flex items-center gap-2 cursor-pointer shrink-0 ml-4">
+                  <span className="text-sm text-muted-foreground">{productsOpenInNewTab ? "On" : "Off"}</span>
+                  <input
+                    type="checkbox"
+                    checked={productsOpenInNewTab}
+                    onChange={async (e) => {
+                      const val = e.target.checked;
+                      setProductsOpenInNewTab(val);
+                      try {
+                        await apiCall("content", "POST", storedPassword, {
+                          content_key: "settings.products_open_in_new_tab",
+                          value_en: String(val),
+                          value_ar: String(val),
+                        });
+                        try { localStorage.setItem("ei_products_new_tab", String(val)); } catch {}
+                        toast.success(val ? "Product links will open in new tab" : "Product links will open in same tab");
+                      } catch (err: any) { toast.error(err.message); }
+                    }}
+                    className="w-5 h-5 accent-primary"
+                  />
+                </label>
               </div>
+            </div>
             </div>
 
             {/* Bulk WebP Conversion */}
