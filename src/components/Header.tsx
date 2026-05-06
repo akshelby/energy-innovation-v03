@@ -382,7 +382,7 @@ export default function Header() {
                             const isOpen = expandedCategories.has(cat.key);
                             const num = String(idx + 1).padStart(2, "0");
                             return (
-                              <li key={cat.key} className={`group/cat relative overflow-hidden rounded-2xl transition-all duration-300 ${isOpen ? 'bg-gradient-to-br from-accent/10 via-card to-card ring-1 ring-accent/20' : 'hover:bg-muted/40'}`}>
+                              <li key={cat.key} className={`group/cat relative overflow-hidden rounded-2xl transition-all duration-300 ${isOpen ? 'bg-gradient-to-br from-accent/10 via-card to-card ring-1 ring-accent/20' : 'hover:bg-red-500/5 hover:ring-1 hover:ring-red-500/20'}`}>
                                 {isOpen && (
                                   <span className="absolute inset-y-3 left-0 w-[2px] rounded-full bg-red-500/60" />
                                 )}
