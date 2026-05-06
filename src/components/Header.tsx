@@ -242,13 +242,13 @@ export default function Header() {
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); toggleExpanded(pi.id); }}
-            className="text-[13.5px] font-semibold text-card-foreground hover:bg-accent/25 hover:text-red-500 px-2 py-1 rounded transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer w-full text-start"
+            className="group w-full flex items-center gap-2 text-[13px] font-semibold text-card-foreground hover:text-red-500 px-2.5 py-1.5 rounded-md transition-all bg-transparent border-0 cursor-pointer text-start"
           >
-            <ChevronRight className={`w-3 h-3 shrink-0 transition-transform ${isExpanded ? 'rotate-90' : ''} ${isRTL ? 'rotate-180' : ''}`} />
-            {isAr ? pi.name_ar : pi.name_en}
+            <ChevronRight className={`w-3 h-3 shrink-0 text-muted-foreground group-hover:text-red-500 transition-transform duration-300 ${isExpanded ? 'rotate-90' : ''} ${isRTL ? 'rotate-180' : ''}`} />
+            <span className="flex-1">{isAr ? pi.name_ar : pi.name_en}</span>
           </button>
           {isExpanded && (
-            <ul className="ml-4 mt-1 space-y-1 border-l-2 border-accent/20 pl-2">
+            <ul className="ml-3 mt-0.5 pl-3 border-l border-accent/30 space-y-0.5 animate-fade-in">
               {children.map((child) => {
                 const grandChildren = getChildren(child.id);
                 if (grandChildren.length > 0) {
@@ -259,8 +259,9 @@ export default function Header() {
                     <button
                       type="button"
                       onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleItemClick(child); }}
-                      className="text-[12.5px] font-medium text-muted-foreground hover:text-red-500 hover:bg-accent/15 px-2 py-1 rounded transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer w-full text-start"
+                      className="group w-full flex items-center gap-2 text-[12.5px] font-medium text-muted-foreground hover:text-red-500 px-2.5 py-1.5 rounded-md transition-all bg-transparent border-0 cursor-pointer text-start"
                     >
+                      <span className="block w-1 h-1 rounded-full bg-muted-foreground/40 group-hover:bg-red-500 transition-colors" />
                       {isAr ? child.name_ar : child.name_en}
                     </button>
                   </li>
@@ -277,8 +278,9 @@ export default function Header() {
         <button
           type="button"
           onClick={(e) => { e.preventDefault(); handleItemClick(pi); }}
-          className="text-[13.5px] font-semibold text-card-foreground hover:bg-accent/25 hover:text-red-500 px-2 py-1 rounded transition-colors flex items-center gap-1 group bg-transparent border-0 cursor-pointer w-full text-start"
+          className="group w-full flex items-center gap-2 text-[13px] font-semibold text-card-foreground hover:text-red-500 px-2.5 py-1.5 rounded-md transition-all bg-transparent border-0 cursor-pointer text-start"
         >
+          <span className="block w-1 h-1 rounded-full bg-accent/50 group-hover:bg-red-500 transition-colors" />
           {isAr ? pi.name_ar : pi.name_en}
         </button>
       </li>
