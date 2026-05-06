@@ -38,13 +38,18 @@ const resolvePreviewUrl = (url: string | null | undefined): string => {
 };
 
 const TRANSLATE_URL = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/translate`;
+const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 async function translateTexts(texts: Record<string, string>): Promise<Record<string, string>> {
   const nonEmpty = Object.fromEntries(Object.entries(texts).filter(([_, v]) => v && v.trim()));
   if (Object.keys(nonEmpty).length === 0) return {};
   const res = await fetch(TRANSLATE_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${ANON_KEY}`,
+      apikey: ANON_KEY,
+    },
     body: JSON.stringify({ texts: nonEmpty }),
   });
   const data = await res.json();
@@ -200,7 +205,11 @@ const IMAGE_FOLDERS = [
 ];
 
 async function apiCall(path: string, method: string, password: string, body?: unknown) {
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${ANON_KEY}`,
+    apikey: ANON_KEY,
+  };
   if (password) headers["x-admin-password"] = password;
   const res = await fetch(`${FUNCTION_URL}/${path}`, {
     method,
