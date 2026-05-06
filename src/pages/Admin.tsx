@@ -387,6 +387,7 @@ export default function Admin() {
   const [linkedinUrl, setLinkedinUrl] = useState("");
   const [linkedinActive, setLinkedinActive] = useState(false);
   const [imageOptimization, setImageOptimization] = useState(false);
+  const [productsOpenInNewTab, setProductsOpenInNewTab] = useState(true);
 
   // SEO state
   const [seoDescription, setSeoDescription] = useState({ en: "", ar: "" });
