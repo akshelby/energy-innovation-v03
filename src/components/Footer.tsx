@@ -29,6 +29,7 @@ const ADDRESS_KEYS = ["footer.address_1_heading", "footer.address_1_body", "foot
 export default function Footer() {
   const { t, language } = useLanguage();
   const { logoUrl, brandName, logoSize, ready: brandReady } = useBranding();
+  const openNewTab = useOpenInNewTab();
   const location = useLocation();
   const navigate = useNavigate();
 
