@@ -360,23 +360,27 @@ export default function Header() {
                 </button>
 
                 {item.hasDropdown && productsOpen && categoriesWithItems.length > 0 && (
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2" style={{ width: "420px" }}>
-                    <div className="bg-card rounded-2xl shadow-xl border border-border p-4 animate-slide-down max-h-[70vh] overflow-y-auto mega-menu-scroll">
-                      <ul className="space-y-1">
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2" style={{ width: "440px" }}>
+                    <div className="relative bg-card/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-border/60 p-2 animate-slide-down max-h-[75vh] overflow-y-auto mega-menu-scroll">
+                      <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-red-500/60 to-transparent rounded-t-2xl" />
+                      <ul className="divide-y divide-border/40">
                         {categoriesWithItems.map((cat) => {
                           const isOpen = expandedCategories.has(cat.key);
                           return (
-                            <li key={cat.key}>
+                            <li key={cat.key} className={`rounded-xl transition-colors ${isOpen ? 'bg-accent/5' : ''}`}>
                               <button
                                 type="button"
                                 onClick={(e) => { e.stopPropagation(); toggleCategory(cat.key); }}
-                                className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-bold uppercase tracking-wider text-accent hover:bg-accent/10 transition-colors text-start"
+                                className={`group w-full flex items-center justify-between px-4 py-3 rounded-xl text-[13px] font-bold uppercase tracking-wider transition-all text-start ${isOpen ? 'text-accent' : 'text-card-foreground hover:text-accent'} hover:bg-accent/10`}
                               >
-                                <span>{language === "ar" ? cat.label_ar : cat.label_en}</span>
-                                <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                                <span className="flex items-center gap-2.5">
+                                  <span className={`block w-1.5 h-1.5 rounded-full transition-all ${isOpen ? 'bg-red-500 scale-125' : 'bg-accent/40 group-hover:bg-red-500'}`} />
+                                  {language === "ar" ? cat.label_ar : cat.label_en}
+                                </span>
+                                <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isOpen ? 'rotate-180 text-red-500' : 'text-muted-foreground group-hover:text-accent'}`} />
                               </button>
                               {isOpen && (
-                                <ul className="mt-1 ml-2 pl-3 border-l-2 border-accent/20 space-y-1">
+                                <ul className="ml-5 pl-4 border-l-2 border-red-500/40 my-2 space-y-0.5 animate-fade-in">
                                   {cat.items.map((pi) => renderDesktopItem(pi))}
                                 </ul>
                               )}
