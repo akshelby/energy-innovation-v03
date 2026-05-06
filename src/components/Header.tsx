@@ -229,9 +229,7 @@ export default function Header() {
 
   const isAr = language === "ar";
 
-  // Split categories into rows for mega menu
-  const row1 = categoriesWithItems.slice(0, 3);
-  const row2 = categoriesWithItems.slice(3);
+  // (categories rendered progressively on click)
 
   // Render a single item (parent or leaf) for desktop mega menu
   const renderDesktopItem = (pi: ProductItem) => {
