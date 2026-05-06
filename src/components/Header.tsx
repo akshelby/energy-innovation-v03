@@ -48,6 +48,25 @@ export default function Header() {
   const [productCategories, setProductCategories] = useState<CategoryItem[]>([]);
   const [expandedParents, setExpandedParents] = useState<Set<string>>(new Set());
   const [expandedMobileParents, setExpandedMobileParents] = useState<Set<string>>(new Set());
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
+  const [expandedMobileCategories, setExpandedMobileCategories] = useState<Set<string>>(new Set());
+
+  const toggleCategory = (key: string) => {
+    setExpandedCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+  const toggleMobileCategory = (key: string) => {
+    setExpandedMobileCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
   const [mobileLogoSize, setMobileLogoSize] = useState<number>(() => {
     try { return parseInt(localStorage.getItem("ei_mobile_logo_size") || "") || 40; } catch { return 40; }
   });
