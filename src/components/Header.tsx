@@ -395,7 +395,7 @@ export default function Header() {
                                     <span className={`shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-xl text-[11px] font-black tabular-nums tracking-tight transition-all duration-300 ${isOpen ? 'bg-gradient-to-br from-red-500 to-accent text-white shadow-lg shadow-red-500/30' : 'bg-muted text-muted-foreground group-hover/cat:bg-red-500/15 group-hover/cat:text-red-500'}`}>
                                       {num}
                                     </span>
-                                    <span className={`text-[13px] font-bold uppercase tracking-wide truncate transition-colors ${isOpen ? 'text-foreground' : 'text-card-foreground group-hover/cat:text-red-500'}`}>
+                                    <span className={`text-[13px] font-bold uppercase tracking-wide truncate transition-colors ${isOpen ? 'text-foreground' : 'text-card-foreground'}`}>
                                       {language === "ar" ? cat.label_ar : cat.label_en}
                                     </span>
                                   </span>
