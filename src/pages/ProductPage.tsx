@@ -300,6 +300,14 @@ export default function ProductPageView() {
                     </div>
                   )}
                 </>
+              ) : item.image_url ? (
+                <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-muted border border-border">
+                  <img
+                    src={item.image_url}
+                    alt={productName}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               ) : (
                 <div className="aspect-[4/3] rounded-2xl bg-muted border border-border flex items-center justify-center">
                   <span className="text-muted-foreground">{isAr ? "لا توجد صور" : "No images available"}</span>
