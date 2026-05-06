@@ -62,6 +62,7 @@ export default function ProductsSection() {
   const [pdfOpen, setPdfOpen] = useState(false);
   const [pdfSrc, setPdfSrc] = useState("");
   const isMobile = useIsMobile();
+  const openNewTab = useOpenInNewTab();
   const [expanded, setExpanded] = useState(false);
   const showToggle = isMobile;
   const isCollapsed = showToggle && !expanded;
