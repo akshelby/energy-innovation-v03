@@ -443,15 +443,26 @@ export default function Header() {
                         <ChevronDown className={`w-4 h-4 transition-transform ${mobileProductsOpen ? 'rotate-180' : ''}`} />
                       </button>
                       {mobileProductsOpen && (
-                        <div className="ml-4 mt-1 space-y-3 pb-2">
-                          {categoriesWithItems.map((cat) => (
-                            <div key={cat.key}>
-                              <h4 className="text-sm font-bold uppercase tracking-wider text-accent px-4 mb-1">
-                                {language === "ar" ? cat.label_ar : cat.label_en}
-                              </h4>
-                              {cat.items.map((pi) => renderMobileItem(pi))}
-                            </div>
-                          ))}
+                        <div className="ml-2 mt-1 space-y-1 pb-2">
+                          {categoriesWithItems.map((cat) => {
+                            const isOpen = expandedMobileCategories.has(cat.key);
+                            return (
+                              <div key={cat.key}>
+                                <button
+                                  onClick={() => toggleMobileCategory(cat.key)}
+                                  className="w-full flex items-center justify-between px-4 py-2 text-sm font-bold uppercase tracking-wider text-accent hover:bg-accent/10 rounded-lg transition-colors text-start"
+                                >
+                                  <span>{language === "ar" ? cat.label_ar : cat.label_en}</span>
+                                  <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                                </button>
+                                {isOpen && (
+                                  <div className="ml-2 pl-2 border-l-2 border-accent/20 mt-1">
+                                    {cat.items.map((pi) => renderMobileItem(pi))}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
                         </div>
                       )}
                     </>
