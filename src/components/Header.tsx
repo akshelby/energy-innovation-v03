@@ -362,34 +362,59 @@ export default function Header() {
                 </button>
 
                 {item.hasDropdown && productsOpen && categoriesWithItems.length > 0 && (
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2" style={{ width: "440px" }}>
-                    <div className="relative bg-card/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-border/60 p-2 animate-slide-down max-h-[75vh] overflow-y-auto mega-menu-scroll">
-                      <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-red-500/60 to-transparent rounded-t-2xl" />
-                      <ul className="divide-y divide-border/40">
-                        {categoriesWithItems.map((cat) => {
-                          const isOpen = expandedCategories.has(cat.key);
-                          return (
-                            <li key={cat.key} className={`rounded-xl transition-colors ${isOpen ? 'bg-accent/5' : ''}`}>
-                              <button
-                                type="button"
-                                onClick={(e) => { e.stopPropagation(); toggleCategory(cat.key); }}
-                                className={`group w-full flex items-center justify-between px-4 py-3 rounded-xl text-[13px] font-bold uppercase tracking-wider transition-all text-start ${isOpen ? 'text-accent' : 'text-card-foreground hover:text-accent'} hover:bg-accent/10`}
-                              >
-                                <span className="flex items-center gap-2.5">
-                                  <span className={`block w-1.5 h-1.5 rounded-full transition-all ${isOpen ? 'bg-red-500 scale-125' : 'bg-accent/40 group-hover:bg-red-500'}`} />
-                                  {language === "ar" ? cat.label_ar : cat.label_en}
-                                </span>
-                                <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isOpen ? 'rotate-180 text-red-500' : 'text-muted-foreground group-hover:text-accent'}`} />
-                              </button>
-                              {isOpen && (
-                                <ul className="ml-5 pl-4 border-l-2 border-red-500/40 my-2 space-y-0.5 animate-fade-in">
-                                  {cat.items.map((pi) => renderDesktopItem(pi))}
-                                </ul>
-                              )}
-                            </li>
-                          );
-                        })}
-                      </ul>
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3" style={{ width: "480px" }}>
+                    {/* Outer gradient halo */}
+                    <div className="relative rounded-[24px] p-[1.5px] bg-[conic-gradient(from_120deg_at_50%_50%,#2BD8FF_0%,#A14BFF_25%,#FF4FCB_50%,#FF6A3D_75%,#2BD8FF_100%)] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.35)] animate-fade-in">
+                      <div className="relative bg-card/95 backdrop-blur-2xl rounded-[22px] p-3 max-h-[75vh] overflow-y-auto mega-menu-scroll">
+                        {/* Header pill */}
+                        <div className="flex items-center justify-between px-2 pb-2 mb-1">
+                          <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground">
+                            <span className="block w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                            Browse Catalog
+                          </span>
+                          <span className="text-[10px] font-bold text-muted-foreground/70">
+                            {categoriesWithItems.length} categories
+                          </span>
+                        </div>
+
+                        <ul className="space-y-1">
+                          {categoriesWithItems.map((cat, idx) => {
+                            const isOpen = expandedCategories.has(cat.key);
+                            const num = String(idx + 1).padStart(2, "0");
+                            return (
+                              <li key={cat.key} className={`group/cat relative overflow-hidden rounded-2xl transition-all duration-300 ${isOpen ? 'bg-gradient-to-br from-accent/10 via-card to-card ring-1 ring-accent/20' : 'hover:bg-muted/40'}`}>
+                                {isOpen && (
+                                  <span className="absolute inset-y-2 left-0 w-[3px] rounded-full bg-gradient-to-b from-red-500 via-accent to-red-500" />
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={(e) => { e.stopPropagation(); toggleCategory(cat.key); }}
+                                  className="relative w-full flex items-center justify-between gap-3 px-3.5 py-3 text-start"
+                                >
+                                  <span className="flex items-center gap-3 min-w-0">
+                                    <span className={`shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-xl text-[11px] font-black tabular-nums tracking-tight transition-all duration-300 ${isOpen ? 'bg-gradient-to-br from-red-500 to-accent text-white shadow-lg shadow-red-500/30' : 'bg-muted text-muted-foreground group-hover/cat:bg-accent/10 group-hover/cat:text-accent'}`}>
+                                      {num}
+                                    </span>
+                                    <span className={`text-[13px] font-bold uppercase tracking-wide truncate transition-colors ${isOpen ? 'text-foreground' : 'text-card-foreground group-hover/cat:text-foreground'}`}>
+                                      {language === "ar" ? cat.label_ar : cat.label_en}
+                                    </span>
+                                  </span>
+                                  <span className={`shrink-0 inline-flex items-center justify-center w-7 h-7 rounded-full transition-all duration-300 ${isOpen ? 'bg-red-500/15 text-red-500 rotate-180' : 'text-muted-foreground group-hover/cat:bg-muted group-hover/cat:text-accent'}`}>
+                                    <ChevronDown className="w-3.5 h-3.5" />
+                                  </span>
+                                </button>
+                                {isOpen && (
+                                  <div className="px-3 pb-3 animate-fade-in">
+                                    <ul className="ml-11 pl-4 border-l border-dashed border-accent/30 space-y-0.5">
+                                      {cat.items.map((pi) => renderDesktopItem(pi))}
+                                    </ul>
+                                  </div>
+                                )}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 )}
