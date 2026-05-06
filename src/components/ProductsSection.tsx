@@ -183,11 +183,7 @@ export default function ProductsSection() {
                 className="scroll-reveal md:!opacity-100 md:!translate-y-0 group rounded-2xl cursor-pointer overflow-hidden bg-card border border-border hover:border-accent/20 transition-all duration-300 h-full flex flex-col"
                 style={{ transitionDelay: `${i * 80}ms` }}
                 onClick={() => {
-                  const newTab = product.open_in_new_tab !== false;
-                  const go = (url: string) => {
-                    if (newTab) window.open(url, "_blank", "noopener,noreferrer");
-                    else navigate(url);
-                  };
+                  const go = (url: string) => openProductLink(url, openNewTab, navigate);
                   if (product.linked_item_id) {
                     go(`/products/item/${product.linked_item_id}`);
                   } else if (product.pdf_url && !product.category_key) {
