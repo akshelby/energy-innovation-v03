@@ -804,6 +804,9 @@ export default function Admin() {
       const imgOptEntry = data.find((d: ContentItem) => d.content_key === "settings.image_optimization");
       setImageOptimization(imgOptEntry?.value_en === "true");
 
+      const newTabEntry = data.find((d: ContentItem) => d.content_key === "settings.products_open_in_new_tab");
+      setProductsOpenInNewTab(newTabEntry ? newTabEntry.value_en !== "false" : true);
+
       // Load hero visibility toggles
       const visKeys = ["hero.show_headline", "hero.show_subtext", "hero.show_explore_btn", "hero.show_contact_btn", "hero.show_arrows", "hero.show_dots"];
       const vis: Record<string, boolean> = {};
