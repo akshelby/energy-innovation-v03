@@ -9,10 +9,15 @@ import {
 } from "lucide-react";
 
 const PROJECT_ID = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 const FUNCTION_URL = `https://${PROJECT_ID}.supabase.co/functions/v1/admin-api`;
 
 async function apiCall(path: string, method: string, password: string, body?: unknown) {
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${ANON_KEY}`,
+    apikey: ANON_KEY,
+  };
   if (password) headers["x-admin-password"] = password;
   const res = await fetch(`${FUNCTION_URL}/${path}`, {
     method,
@@ -30,7 +35,11 @@ async function translateTexts(texts: Record<string, string>): Promise<Record<str
   if (Object.keys(nonEmpty).length === 0) return {};
   const res = await fetch(TRANSLATE_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${ANON_KEY}`,
+      apikey: ANON_KEY,
+    },
     body: JSON.stringify({ texts: nonEmpty }),
   });
   const data = await res.json();
