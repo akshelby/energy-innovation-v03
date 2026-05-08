@@ -88,6 +88,8 @@ export default function HeroSection() {
   });
 
   useEffect(() => {
+    // Purge legacy localStorage persistence so returning users don't see stale buttons/images
+    try { localStorage.removeItem("ei_hero_active_v1"); } catch {}
     async function fetchHeroImages() {
       const { data: contentRows } = await supabase
         .from("site_content")
