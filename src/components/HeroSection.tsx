@@ -65,24 +65,31 @@ const buildHeroImageUrl = (fileName: string, version?: string) => {
 export default function HeroSection() {
   const { t, contentLoaded } = useLanguage();
   const parallaxBg = useParallax(0.15);
+  // Only use sessionStorage cache (10-min TTL) for instant paint; localStorage persistence
+  // is intentionally NOT used as initial state because it can hold stale image lists or
+  // visibility flags that no longer match the admin/DB config, causing a flash of removed UI.
   const cachedHero = getCached<{ images: string[]; speed: number; visibility: Record<string, boolean> }>("hero");
-  const persistedHero = getPersistedHero();
-  const initialHero = (cachedHero?.images?.length ? cachedHero : persistedHero) || null;
+  const initialHero = cachedHero?.images?.length ? cachedHero : null;
   const [current, setCurrent] = useState(0);
   // Use local bundled webp as the very first paint when no cache exists — eliminates the network wait
   const [images, setImages] = useState<string[]>(initialHero?.images || [hero1Local]);
   const [heroReady, setHeroReady] = useState(true);
   const [speed, setSpeed] = useState(initialHero?.speed || 6000);
+  // CRITICAL: default all toggleable UI to FALSE before DB confirms. This prevents flashing
+  // buttons/arrows/dots that the admin may have disabled. Only the cached value (if fresh)
+  // can pre-fill, otherwise nothing renders until the live fetch completes a moment later.
   const [visibility, setVisibility] = useState<Record<string, boolean>>(initialHero?.visibility || {
-    "hero.show_headline": true,
-    "hero.show_subtext": true,
-    "hero.show_explore_btn": true,
-    "hero.show_contact_btn": true,
-    "hero.show_arrows": true,
-    "hero.show_dots": true,
+    "hero.show_headline": false,
+    "hero.show_subtext": false,
+    "hero.show_explore_btn": false,
+    "hero.show_contact_btn": false,
+    "hero.show_arrows": false,
+    "hero.show_dots": false,
   });
 
   useEffect(() => {
+    // Purge legacy localStorage persistence so returning users don't see stale buttons/images
+    try { localStorage.removeItem("ei_hero_active_v1"); } catch {}
     async function fetchHeroImages() {
       const { data: contentRows } = await supabase
         .from("site_content")
@@ -126,7 +133,6 @@ export default function HeroSection() {
         setImages(urls);
         setHeroReady(true);
         setCache("hero", { images: urls, speed: speed, visibility: vis });
-        setPersistedHero({ images: urls, speed, visibility: vis });
         // Prefetch remaining images in background
         urls.slice(1).forEach(preloadImage);
         return;
@@ -161,7 +167,6 @@ export default function HeroSection() {
         setImages(finalUrls);
         setHeroReady(true);
         setCache("hero", { images: finalUrls, speed: speed, visibility: vis });
-        if (finalUrls.length > 0) setPersistedHero({ images: finalUrls, speed, visibility: vis });
         finalUrls.slice(1).forEach(preloadImage);
         return;
       }
