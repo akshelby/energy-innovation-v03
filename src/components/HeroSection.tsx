@@ -209,7 +209,20 @@ export default function HeroSection() {
   };
 
   return (
-    <section id="home" className="relative h-screen w-full overflow-hidden bg-black">
+    <section id="home" className="relative h-screen w-full overflow-hidden bg-primary">
+      {/* Brand-tinted placeholder shown until the latest admin images are ready.
+          Intentionally image-free so it can never display a deleted hero image. */}
+      <div
+        aria-hidden
+        className={`absolute inset-0 transition-opacity duration-700 ${heroReady && images.length > 0 ? 'opacity-0' : 'opacity-100'}`}
+        style={{
+          background:
+            'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.85) 40%, hsl(var(--accent) / 0.25) 100%)',
+        }}
+      >
+        <div className="absolute inset-0 animate-pulse opacity-30"
+             style={{ background: 'radial-gradient(circle at 30% 40%, hsl(var(--primary-foreground) / 0.15), transparent 60%)' }} />
+      </div>
       <div ref={parallaxBg} className={`absolute inset-0 will-change-transform transition-opacity duration-500 ${heroReady ? 'opacity-100' : 'opacity-0'}`} style={{ top: "-10%", bottom: "-10%", height: "120%" }}>
         {images.map((img, i) => (
           <div
