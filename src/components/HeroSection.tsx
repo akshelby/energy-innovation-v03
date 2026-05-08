@@ -12,20 +12,24 @@ import { useParallax } from "@/hooks/useParallax";
 // Falling back to bundled assets caused deleted images (e.g. the blue robotic arms set)
 // to flash on first paint even after the admin removed them.
 const imageFilePattern = /\.\w+$/i;
-const PERSISTENT_HERO_KEY = "ei_hero_active_v1";
-const FIRST_HERO_FILENAME = "Double wall fire shutter.jpg";
 
-interface PersistedHero {
+// Persistent "last known admin state" cache. ALWAYS overwritten by the live DB fetch on
+// every mount, so the next visit's flash paint always reflects the most recent admin
+// changes (added/removed/replaced images, toggled UI, updated speed). Never used as a
+// long-lived default — only as a mirror of the last successful fetch.
+const HERO_LAST_KNOWN_KEY = "ei_hero_last_known_v2";
+
+interface HeroSnapshot {
   images: string[];
   speed: number;
   visibility: Record<string, boolean>;
 }
 
-function getPersistedHero(): PersistedHero | null {
+function getLastKnownHero(): HeroSnapshot | null {
   try {
-    const raw = localStorage.getItem(PERSISTENT_HERO_KEY);
+    const raw = localStorage.getItem(HERO_LAST_KNOWN_KEY);
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as PersistedHero;
+    const parsed = JSON.parse(raw) as HeroSnapshot;
     if (!parsed?.images?.length) return null;
     return parsed;
   } catch {
@@ -33,8 +37,8 @@ function getPersistedHero(): PersistedHero | null {
   }
 }
 
-function setPersistedHero(data: PersistedHero) {
-  try { localStorage.setItem(PERSISTENT_HERO_KEY, JSON.stringify(data)); } catch {}
+function setLastKnownHero(data: HeroSnapshot) {
+  try { localStorage.setItem(HERO_LAST_KNOWN_KEY, JSON.stringify(data)); } catch {}
 }
 
 const preloadImage = (src: string) =>
@@ -61,19 +65,15 @@ const buildHeroImageUrl = (fileName: string, version?: string) => {
 export default function HeroSection() {
   const { t, contentLoaded } = useLanguage();
   const parallaxBg = useParallax(0.15);
-  // Only use sessionStorage cache (10-min TTL) for instant paint; localStorage persistence
-  // is intentionally NOT used as initial state because it can hold stale image lists or
-  // visibility flags that no longer match the admin/DB config, causing a flash of removed UI.
-  const cachedHero = getCached<{ images: string[]; speed: number; visibility: Record<string, boolean> }>("hero");
-  const initialHero = cachedHero?.images?.length ? cachedHero : null;
+  // Initial paint priority: sessionStorage (this tab, fresh) → localStorage mirror of last
+  // confirmed DB state (always overwritten on each fetch, so it tracks admin changes) → empty.
+  const cachedHero = getCached<HeroSnapshot>("hero");
+  const lastKnown = !cachedHero?.images?.length ? getLastKnownHero() : null;
+  const initialHero: HeroSnapshot | null = cachedHero?.images?.length ? cachedHero : lastKnown;
   const [current, setCurrent] = useState(0);
-  // Start with NO images — never show bundled fallbacks. Black bg holds for ~200ms until DB responds.
   const [images, setImages] = useState<string[]>(initialHero?.images || []);
   const [heroReady, setHeroReady] = useState(!!initialHero);
   const [speed, setSpeed] = useState(initialHero?.speed || 6000);
-  // CRITICAL: default all toggleable UI to FALSE before DB confirms. This prevents flashing
-  // buttons/arrows/dots that the admin may have disabled. Only the cached value (if fresh)
-  // can pre-fill, otherwise nothing renders until the live fetch completes a moment later.
   const [visibility, setVisibility] = useState<Record<string, boolean>>(initialHero?.visibility || {
     "hero.show_headline": false,
     "hero.show_subtext": false,
@@ -84,7 +84,7 @@ export default function HeroSection() {
   });
 
   useEffect(() => {
-    // Purge legacy localStorage persistence so returning users don't see stale buttons/images
+    // Purge legacy v1 persistence so returning users don't see stale buttons/images
     try { localStorage.removeItem("ei_hero_active_v1"); } catch {}
     async function fetchHeroImages() {
       const { data: contentRows } = await supabase
@@ -110,9 +110,13 @@ export default function HeroSection() {
         }
       }
 
+      let nextSpeed = speed;
       if (speedEntry?.value_en) {
         const seconds = parseFloat(speedEntry.value_en);
-        if (seconds >= 1) setSpeed(seconds * 1000);
+        if (seconds >= 1) {
+          nextSpeed = seconds * 1000;
+          setSpeed(nextSpeed);
+        }
       }
 
       const visKeys = ["hero.show_headline", "hero.show_subtext", "hero.show_explore_btn", "hero.show_contact_btn", "hero.show_arrows", "hero.show_dots"];
@@ -123,13 +127,20 @@ export default function HeroSection() {
       });
       setVisibility(vis);
 
+      // Helper: persist the confirmed admin state to BOTH caches so next paint is instant + fresh
+      const persistSnapshot = (urls: string[]) => {
+        const snapshot: HeroSnapshot = { images: urls, speed: nextSpeed, visibility: vis };
+        setCache("hero", snapshot);
+        if (urls.length > 0) setLastKnownHero(snapshot);
+        else { try { localStorage.removeItem(HERO_LAST_KNOWN_KEY); } catch {} }
+      };
+
       if (activeList.length > 0) {
         const urls = activeList.map((fileName) => buildHeroImageUrl(fileName));
         setCurrent(0);
         setImages(urls);
         setHeroReady(true);
-        setCache("hero", { images: urls, speed: speed, visibility: vis });
-        // Prefetch remaining images in background
+        persistSnapshot(urls);
         urls.slice(1).forEach(preloadImage);
         return;
       }
@@ -158,20 +169,19 @@ export default function HeroSection() {
           buildHeroImageUrl(file.name, file.updated_at ?? file.created_at ?? undefined)
         );
 
-        // No local fallback — if storage is empty, hero stays empty until admin adds images.
         setCurrent(0);
         setImages(urls);
         setHeroReady(true);
-        setCache("hero", { images: urls, speed: speed, visibility: vis });
+        persistSnapshot(urls);
         urls.slice(1).forEach(preloadImage);
         return;
       }
 
-      // No images anywhere — render empty hero rather than stale bundled assets.
+      // Admin removed everything — clear all caches so no stale image ever flashes again.
       setCurrent(0);
       setImages([]);
       setHeroReady(true);
-      setCache("hero", { images: [], speed: speed, visibility: vis });
+      persistSnapshot([]);
     }
 
     fetchHeroImages();
