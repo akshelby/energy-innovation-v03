@@ -7,14 +7,10 @@ import { getStorageUrl } from "@/lib/storage";
 import { getCached, setCache } from "@/lib/cache";
 import { useParallax } from "@/hooks/useParallax";
 
-// Fallback local imports in case Supabase images aren't uploaded yet
-import hero1Local from "@/assets/hero-1.webp";
-import hero2Local from "@/assets/hero-2.webp";
-import hero3Local from "@/assets/hero-3.webp";
-import hero4Local from "@/assets/hero-4.webp";
-import hero5Local from "@/assets/hero-5.webp";
-
-const localImages = [hero1Local, hero2Local, hero3Local, hero4Local, hero5Local];
+// NOTE: Local hero fallbacks were removed permanently. The hero must only ever render
+// images that the admin has explicitly configured (via site_content / Supabase storage).
+// Falling back to bundled assets caused deleted images (e.g. the blue robotic arms set)
+// to flash on first paint even after the admin removed them.
 const imageFilePattern = /\.\w+$/i;
 const PERSISTENT_HERO_KEY = "ei_hero_active_v1";
 const FIRST_HERO_FILENAME = "Double wall fire shutter.jpg";
@@ -71,9 +67,9 @@ export default function HeroSection() {
   const cachedHero = getCached<{ images: string[]; speed: number; visibility: Record<string, boolean> }>("hero");
   const initialHero = cachedHero?.images?.length ? cachedHero : null;
   const [current, setCurrent] = useState(0);
-  // Use local bundled webp as the very first paint when no cache exists — eliminates the network wait
-  const [images, setImages] = useState<string[]>(initialHero?.images || [hero1Local]);
-  const [heroReady, setHeroReady] = useState(true);
+  // Start with NO images — never show bundled fallbacks. Black bg holds for ~200ms until DB responds.
+  const [images, setImages] = useState<string[]>(initialHero?.images || []);
+  const [heroReady, setHeroReady] = useState(!!initialHero);
   const [speed, setSpeed] = useState(initialHero?.speed || 6000);
   // CRITICAL: default all toggleable UI to FALSE before DB confirms. This prevents flashing
   // buttons/arrows/dots that the admin may have disabled. Only the cached value (if fresh)
@@ -162,19 +158,20 @@ export default function HeroSection() {
           buildHeroImageUrl(file.name, file.updated_at ?? file.created_at ?? undefined)
         );
 
-        const finalUrls = urls.length > 0 ? urls : activeList.length > 0 ? [] : localImages;
+        // No local fallback — if storage is empty, hero stays empty until admin adds images.
         setCurrent(0);
-        setImages(finalUrls);
+        setImages(urls);
         setHeroReady(true);
-        setCache("hero", { images: finalUrls, speed: speed, visibility: vis });
-        finalUrls.slice(1).forEach(preloadImage);
+        setCache("hero", { images: urls, speed: speed, visibility: vis });
+        urls.slice(1).forEach(preloadImage);
         return;
       }
 
+      // No images anywhere — render empty hero rather than stale bundled assets.
       setCurrent(0);
-      setImages(localImages);
+      setImages([]);
       setHeroReady(true);
-      setCache("hero", { images: localImages, speed: speed, visibility: vis });
+      setCache("hero", { images: [], speed: speed, visibility: vis });
     }
 
     fetchHeroImages();
