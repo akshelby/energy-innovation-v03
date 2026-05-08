@@ -22,18 +22,42 @@ const lazyWithRetry = <T,>(factory: () => Promise<T>) =>
     })
   );
 
-const ProductsSection = lazyWithRetry(() => import("@/components/ProductsSection"));
-const ServicesSection = lazyWithRetry(() => import("@/components/ServicesSection"));
-const CountriesSection = lazyWithRetry(() => import("@/components/CountriesSection"));
-const HighlightSection = lazyWithRetry(() => import("@/components/HighlightSection"));
-const WhyChooseUsSection = lazyWithRetry(() => import("@/components/WhyChooseUsSection"));
-const PartnersSection = lazyWithRetry(() => import("@/components/PartnersSection"));
-const ContactSection = lazyWithRetry(() => import("@/components/ContactSection"));
-const Footer = lazyWithRetry(() => import("@/components/Footer"));
-const FloatingButtons = lazyWithRetry(() => import("@/components/FloatingButtons"));
+// Factories kept separate so we can both lazy-render AND eagerly prefetch each chunk
+const productsImport = () => import("@/components/ProductsSection");
+const servicesImport = () => import("@/components/ServicesSection");
+const countriesImport = () => import("@/components/CountriesSection");
+const highlightImport = () => import("@/components/HighlightSection");
+const whyChooseImport = () => import("@/components/WhyChooseUsSection");
+const partnersImport = () => import("@/components/PartnersSection");
+const contactImport = () => import("@/components/ContactSection");
+const footerImport = () => import("@/components/Footer");
+const floatingImport = () => import("@/components/FloatingButtons");
+
+const ProductsSection = lazyWithRetry(productsImport);
+const ServicesSection = lazyWithRetry(servicesImport);
+const CountriesSection = lazyWithRetry(countriesImport);
+const HighlightSection = lazyWithRetry(highlightImport);
+const WhyChooseUsSection = lazyWithRetry(whyChooseImport);
+const PartnersSection = lazyWithRetry(partnersImport);
+const ContactSection = lazyWithRetry(contactImport);
+const Footer = lazyWithRetry(footerImport);
+const FloatingButtons = lazyWithRetry(floatingImport);
 
 const Index = () => {
-  useEffect(() => { loadImageOptimizationSetting(); }, []);
+  useEffect(() => {
+    loadImageOptimizationSetting();
+    // Kick off all below-fold chunk downloads in parallel right after first paint, so
+    // Products / Services / etc. are already cached by the time the user scrolls.
+    const prefetch = () => {
+      productsImport(); servicesImport(); countriesImport(); highlightImport();
+      whyChooseImport(); partnersImport(); contactImport(); footerImport(); floatingImport();
+    };
+    if ("requestIdleCallback" in window) {
+      (window as any).requestIdleCallback(prefetch, { timeout: 800 });
+    } else {
+      setTimeout(prefetch, 200);
+    }
+  }, []);
   return (
     <main className="min-h-screen">
       <SEOHead />
