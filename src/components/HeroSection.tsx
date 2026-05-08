@@ -133,7 +133,6 @@ export default function HeroSection() {
         setImages(urls);
         setHeroReady(true);
         setCache("hero", { images: urls, speed: speed, visibility: vis });
-        setPersistedHero({ images: urls, speed, visibility: vis });
         // Prefetch remaining images in background
         urls.slice(1).forEach(preloadImage);
         return;
