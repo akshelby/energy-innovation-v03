@@ -468,7 +468,7 @@ export default function Header() {
                                           <span className={`block w-1 h-1 rounded-full shrink-0 mt-2 ${isActive ? 'bg-red-500' : 'bg-accent/50 group-hover:bg-red-500'}`} />
                                           <span className="leading-snug break-words text-start">{isAr ? pi.name_ar : pi.name_en}</span>
                                         </span>
-                                        <ChevronRight className={`w-4 h-4 shrink-0 mt-0.5 transition-transform ${hasKids ? 'opacity-100' : 'opacity-40'} ${isActive ? 'text-red-500' : 'text-accent group-hover:text-red-500 group-hover:translate-x-0.5'} ${isRTL ? 'rotate-180' : ''}`} />
+                                        {hasKids && <ChevronRight className={`w-4 h-4 shrink-0 mt-0.5 ${isActive ? 'text-red-500' : 'text-accent group-hover:text-red-500'} ${isRTL ? 'rotate-180' : ''}`} />}
                                       </button>
                                     </li>
                                   );
