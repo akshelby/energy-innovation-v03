@@ -53,24 +53,49 @@ const Index = () => {
     productsImport(); servicesImport(); countriesImport(); highlightImport();
     whyChooseImport(); partnersImport(); contactImport(); footerImport(); floatingImport();
 
-    if (!getCached("partners_v1")) {
+    const preloadImages = (urls: (string | null | undefined)[], limit: number) => {
+      urls.filter(Boolean).slice(0, limit).forEach((href) => {
+        if (document.head.querySelector(`link[rel="preload"][href="${href}"]`)) return;
+        const link = document.createElement("link");
+        link.rel = "preload";
+        link.as = "image";
+        link.href = href as string;
+        link.fetchPriority = "high" as any;
+        document.head.appendChild(link);
+      });
+    };
+
+    const cachedPartners = getCached<any[]>("partners_v1");
+    if (cachedPartners) {
+      preloadImages(cachedPartners.map((p) => p.logo_url), 8);
+    } else {
       supabase
         .from("partners")
         .select("id, name_en, name_ar, logo_url, website_url, sort_order, is_active, logo_height")
         .eq("is_active", true)
         .order("sort_order", { ascending: true })
         .then(({ data, error }) => {
-          if (!error && data) setCache("partners_v1", data);
+          if (!error && data) {
+            setCache("partners_v1", data);
+            preloadImages(data.map((p: any) => p.logo_url), 8);
+          }
         });
     }
-    if (!getCached("countries_v1")) {
+
+    const cachedCountries = getCached<any[]>("countries_v1");
+    if (cachedCountries) {
+      preloadImages(cachedCountries.map((c) => c.flag_url), 12);
+    } else {
       supabase
         .from("countries")
         .select("id, name_en, name_ar, flag_url, country_code, sort_order, is_active")
         .eq("is_active", true)
         .order("sort_order", { ascending: true })
         .then(({ data, error }) => {
-          if (!error && data) setCache("countries_v1", data);
+          if (!error && data) {
+            setCache("countries_v1", data);
+            preloadImages(data.map((c: any) => c.flag_url), 12);
+          }
         });
     }
   }, []);
