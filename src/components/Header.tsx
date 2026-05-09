@@ -396,13 +396,15 @@ export default function Header() {
                       }
                     }
                   }
-                  const totalWidth = 280 + columns.length * 240;
+                  const CAT_W = 300;
+                  const COL_W = 280;
+                  const totalWidth = CAT_W + columns.length * COL_W;
                   return (
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3" style={{ width: `${totalWidth}px` }}>
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3" style={{ width: `${totalWidth}px`, maxWidth: '95vw' }}>
                       <div className="relative rounded-[24px] p-[1.5px] bg-[conic-gradient(from_120deg_at_50%_50%,#2BD8FF_0%,#A14BFF_25%,#FF4FCB_50%,#FF6A3D_75%,#2BD8FF_100%)] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.35)] animate-fade-in">
                         <div className="relative bg-card/95 backdrop-blur-2xl rounded-[22px] p-3 max-h-[75vh] overflow-hidden flex gap-2">
                           {/* Column 0: Categories */}
-                          <div className="w-[280px] shrink-0 overflow-y-auto mega-menu-scroll pr-1">
+                          <div className="shrink-0 overflow-y-auto mega-menu-scroll pr-1" style={{ width: `${CAT_W}px` }}>
                             <div className="flex items-center justify-between px-2 pb-2 mb-1">
                               <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground">
                                 <span className="block w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
@@ -425,11 +427,11 @@ export default function Header() {
                                       }}
                                       className={`w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl transition-all text-start ${isActive ? 'bg-gradient-to-br from-accent/10 via-card to-card ring-1 ring-accent/20' : 'hover:bg-red-500/5 hover:ring-1 hover:ring-red-500/20'}`}
                                     >
-                                      <span className="flex items-center gap-2.5 min-w-0">
+                                      <span className="flex items-start gap-2.5 min-w-0 flex-1">
                                         <span className={`shrink-0 inline-flex items-center justify-center w-7 h-7 rounded-lg text-[10px] font-black tabular-nums ${isActive ? 'bg-gradient-to-br from-red-500 to-accent text-white shadow-md shadow-red-500/30' : 'bg-muted text-muted-foreground'}`}>{num}</span>
-                                        <span className={`text-[12px] font-bold uppercase tracking-wide truncate ${isActive ? 'text-foreground' : 'text-card-foreground'}`}>{language === "ar" ? cat.label_ar : cat.label_en}</span>
+                                        <span className={`text-[12px] font-bold uppercase tracking-wide leading-tight break-words text-start ${isActive ? 'text-foreground' : 'text-card-foreground'}`}>{language === "ar" ? cat.label_ar : cat.label_en}</span>
                                       </span>
-                                      <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-colors ${isActive ? 'text-red-500' : 'text-muted-foreground'} ${isRTL ? 'rotate-180' : ''}`} />
+                                      <ChevronRight className={`w-4 h-4 shrink-0 mt-1 transition-colors ${isActive ? 'text-red-500' : 'text-muted-foreground'} ${isRTL ? 'rotate-180' : ''}`} />
                                     </button>
                                   </li>
                                 );
@@ -439,9 +441,9 @@ export default function Header() {
 
                           {/* Sub columns */}
                           {columns.map((col, colIdx) => (
-                            <div key={colIdx} className="w-[240px] shrink-0 overflow-y-auto mega-menu-scroll border-l border-accent/15 pl-2 animate-fade-in">
+                            <div key={colIdx} className="shrink-0 overflow-y-auto mega-menu-scroll border-l border-accent/15 pl-2 animate-fade-in" style={{ width: `${COL_W}px` }}>
                               <div className="px-2 pb-2 mb-1">
-                                <span className="text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground truncate block">{col.title}</span>
+                                <span className="text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground leading-tight break-words block">{col.title}</span>
                               </div>
                               <ul className="space-y-0.5">
                                 {col.items.map((pi) => {
@@ -460,13 +462,13 @@ export default function Header() {
                                             handleItemClick(pi);
                                           }
                                         }}
-                                        className={`group w-full flex items-center justify-between gap-2 text-[12.5px] font-semibold px-2.5 py-2 rounded-md transition-all text-start ${isActive ? 'bg-red-500/10 text-red-500' : 'text-card-foreground hover:text-red-500 hover:bg-red-500/10'}`}
+                                        className={`group w-full flex items-start justify-between gap-2 text-[12.5px] font-semibold px-2.5 py-2 rounded-md transition-all text-start ${isActive ? 'bg-red-500/10 text-red-500' : 'text-card-foreground hover:text-red-500 hover:bg-red-500/10'}`}
                                       >
-                                        <span className="flex items-center gap-2 min-w-0">
-                                          <span className={`block w-1 h-1 rounded-full shrink-0 ${isActive ? 'bg-red-500' : 'bg-accent/50 group-hover:bg-red-500'}`} />
-                                          <span className="truncate">{isAr ? pi.name_ar : pi.name_en}</span>
+                                        <span className="flex items-start gap-2 min-w-0 flex-1">
+                                          <span className={`block w-1 h-1 rounded-full shrink-0 mt-2 ${isActive ? 'bg-red-500' : 'bg-accent/50 group-hover:bg-red-500'}`} />
+                                          <span className="leading-snug break-words text-start">{isAr ? pi.name_ar : pi.name_en}</span>
                                         </span>
-                                        {hasKids && <ChevronRight className={`w-3 h-3 shrink-0 ${isRTL ? 'rotate-180' : ''}`} />}
+                                        {hasKids && <ChevronRight className={`w-4 h-4 shrink-0 mt-0.5 ${isActive ? 'text-red-500' : 'text-accent group-hover:text-red-500'} ${isRTL ? 'rotate-180' : ''}`} />}
                                       </button>
                                     </li>
                                   );
