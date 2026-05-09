@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import FloatingButtons from "@/components/FloatingButtons";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ArrowUpRight } from "lucide-react";
+import { useOpenInNewTab, openProductLink } from "@/hooks/useOpenInNewTab";
 
 interface Product {
   id: string;
