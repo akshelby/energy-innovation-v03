@@ -50,6 +50,16 @@ export default function Header() {
   const [expandedMobileParents, setExpandedMobileParents] = useState<Set<string>>(new Set());
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [expandedMobileCategories, setExpandedMobileCategories] = useState<Set<string>>(new Set());
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedItemPath, setSelectedItemPath] = useState<string[]>([]);
+
+  // Reset flyout when menu closes
+  useEffect(() => {
+    if (!productsOpen) {
+      setSelectedCategory(null);
+      setSelectedItemPath([]);
+    }
+  }, [productsOpen]);
 
   const toggleCategory = (key: string) => {
     setExpandedCategories((prev) => {
