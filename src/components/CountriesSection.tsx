@@ -46,6 +46,8 @@ export default function CountriesSection() {
 
   if (loaded && countries.length === 0) return null;
 
+  const showSkeleton = !loaded && countries.length === 0;
+
   // Repeat enough so a single copy is wider than any viewport (the wrap
   // logic in useSwipeableMarquee requires unit width > container width;
   // otherwise scrollLeft hits its max and the marquee freezes).
