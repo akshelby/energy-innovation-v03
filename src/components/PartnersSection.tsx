@@ -99,7 +99,13 @@ export default function PartnersSection() {
           }}
         >
           <div ref={trackRef} className="flex w-fit animate-none items-center gap-10 md:gap-20">
-            {(() => {
+            {showSkeleton
+              ? Array.from({ length: 8 }).map((_, i) => (
+                  <div key={`sk-${i}`} className="shrink-0 flex items-center justify-center">
+                    <div className="h-12 md:h-20 w-32 md:w-48 rounded-lg bg-muted animate-pulse" />
+                  </div>
+                ))
+              : (() => {
               const phBgRaw = t("partners.placeholder_bg");
               const phTextRaw = t("partners.placeholder_text");
               const phShapeRaw = t("partners.placeholder_shape");
