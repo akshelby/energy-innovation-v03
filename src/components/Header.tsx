@@ -155,6 +155,23 @@ export default function Header() {
     });
   };
 
+  // For leaf items: build the href so right-click "Open in new tab" works natively.
+  const getLeafHref = (item: ProductItem): string | null => {
+    const itemHasChildren = productItems.some((p) => p.parent_id === item.id);
+    if (itemHasChildren) return null;
+    if (item.pdf_url) return null; // pdf opens in dialog, not a route
+    return `/product/${item.id}`;
+  };
+
+  // Intercept left-click on a leaf anchor for SPA navigation.
+  // Allow modifier-clicks / middle-click / right-click to fall through to native behavior.
+  const handleLeafAnchorClick = (e: React.MouseEvent, item: ProductItem) => {
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    e.stopPropagation();
+    handleItemClick(item);
+  };
+
   const handleItemClick = (item: ProductItem) => {
     // Check children in memory instead of relying on stale has_page flag.
     // If it's a leaf (no children), go to detail page.
