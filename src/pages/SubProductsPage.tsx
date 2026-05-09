@@ -46,6 +46,7 @@ export default function SubProductsPage() {
   const { productId, itemId } = useParams<{ productId?: string; itemId?: string }>();
   const { language } = useLanguage();
   const navigate = useNavigate();
+  const openNewTab = useOpenInNewTab();
   const isAr = language === "ar";
 
   const [product, setProduct] = useState<Product | null>(null);
