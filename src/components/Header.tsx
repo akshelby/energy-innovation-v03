@@ -197,6 +197,11 @@ export default function Header() {
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
 
+  // Reset cascading path whenever desktop dropdown closes
+  useEffect(() => {
+    if (!productsOpen) setDesktopPath([]);
+  }, [productsOpen]);
+
   const navItems = [
     { label: t("nav.home"), href: "#home" },
     { label: t("nav.about"), href: "#about" },
