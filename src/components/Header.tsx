@@ -155,6 +155,23 @@ export default function Header() {
     });
   };
 
+  // For leaf items: build the href so right-click "Open in new tab" works natively.
+  const getLeafHref = (item: ProductItem): string | null => {
+    const itemHasChildren = productItems.some((p) => p.parent_id === item.id);
+    if (itemHasChildren) return null;
+    if (item.pdf_url) return null; // pdf opens in dialog, not a route
+    return `/product/${item.id}`;
+  };
+
+  // Intercept left-click on a leaf anchor for SPA navigation.
+  // Allow modifier-clicks / middle-click / right-click to fall through to native behavior.
+  const handleLeafAnchorClick = (e: React.MouseEvent, item: ProductItem) => {
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    e.stopPropagation();
+    handleItemClick(item);
+  };
+
   const handleItemClick = (item: ProductItem) => {
     // Check children in memory instead of relying on stale has_page flag.
     // If it's a leaf (no children), go to detail page.
@@ -264,16 +281,28 @@ export default function Header() {
                 if (grandChildren.length > 0) {
                   return renderDesktopItem(child);
                 }
+                const childHref = getLeafHref(child);
                 return (
                   <li key={child.id}>
-                    <button
-                      type="button"
-                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleItemClick(child); }}
-                      className="group w-full flex items-center gap-2 text-[12.5px] font-medium text-muted-foreground hover:text-red-500 hover:bg-red-500/10 active:bg-red-500/20 px-2.5 py-1.5 rounded-md transition-all bg-transparent border-0 cursor-pointer text-start"
-                    >
-                      <span className="block w-1 h-1 rounded-full bg-muted-foreground/40 group-hover:bg-red-500 transition-colors" />
-                      {isAr ? child.name_ar : child.name_en}
-                    </button>
+                    {childHref ? (
+                      <a
+                        href={childHref}
+                        onClick={(e) => handleLeafAnchorClick(e, child)}
+                        className="group w-full flex items-center gap-2 text-[12.5px] font-medium text-muted-foreground hover:text-red-500 hover:bg-red-500/10 active:bg-red-500/20 px-2.5 py-1.5 rounded-md transition-all bg-transparent border-0 cursor-pointer text-start"
+                      >
+                        <span className="block w-1 h-1 rounded-full bg-muted-foreground/40 group-hover:bg-red-500 transition-colors" />
+                        {isAr ? child.name_ar : child.name_en}
+                      </a>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleItemClick(child); }}
+                        className="group w-full flex items-center gap-2 text-[12.5px] font-medium text-muted-foreground hover:text-red-500 hover:bg-red-500/10 active:bg-red-500/20 px-2.5 py-1.5 rounded-md transition-all bg-transparent border-0 cursor-pointer text-start"
+                      >
+                        <span className="block w-1 h-1 rounded-full bg-muted-foreground/40 group-hover:bg-red-500 transition-colors" />
+                        {isAr ? child.name_ar : child.name_en}
+                      </button>
+                    )}
                   </li>
                 );
               })}
@@ -283,16 +312,25 @@ export default function Header() {
       );
     }
 
+    const leafHref = getLeafHref(pi);
+    const leafInner = (
+      <>
+        <span className="block w-1 h-1 rounded-full bg-accent/50 group-hover:bg-red-500 transition-colors" />
+        {isAr ? pi.name_ar : pi.name_en}
+      </>
+    );
+    const leafClass = "group w-full flex items-center gap-2 text-[13px] font-semibold text-card-foreground hover:text-red-500 hover:bg-red-500/10 active:bg-red-500/20 px-2.5 py-1.5 rounded-md transition-all bg-transparent border-0 cursor-pointer text-start";
     return (
       <li key={pi.id}>
-        <button
-          type="button"
-          onClick={(e) => { e.preventDefault(); handleItemClick(pi); }}
-          className="group w-full flex items-center gap-2 text-[13px] font-semibold text-card-foreground hover:text-red-500 hover:bg-red-500/10 active:bg-red-500/20 px-2.5 py-1.5 rounded-md transition-all bg-transparent border-0 cursor-pointer text-start"
-        >
-          <span className="block w-1 h-1 rounded-full bg-accent/50 group-hover:bg-red-500 transition-colors" />
-          {isAr ? pi.name_ar : pi.name_en}
-        </button>
+        {leafHref ? (
+          <a href={leafHref} onClick={(e) => handleLeafAnchorClick(e, pi)} className={leafClass}>
+            {leafInner}
+          </a>
+        ) : (
+          <button type="button" onClick={(e) => { e.preventDefault(); handleItemClick(pi); }} className={leafClass}>
+            {leafInner}
+          </button>
+        )}
       </li>
     );
   };
@@ -314,27 +352,33 @@ export default function Header() {
           </button>
           {isExpanded && (
             <div className="ml-4 border-l-2 border-accent/20 pl-2 mt-1 space-y-0.5">
-              {children.map((child) => (
-                <button
-                  key={child.id}
-                  onClick={() => handleItemClick(child)}
-                  className="w-full text-start px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-red-500 hover:bg-red-500/10 active:bg-red-500/20 rounded-md transition-colors"
-                >
-                  {isAr ? child.name_ar : child.name_en}
-                </button>
-              ))}
+              {children.map((child) => {
+                const childHref = getLeafHref(child);
+                const cls = "block w-full text-start px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-red-500 hover:bg-red-500/10 active:bg-red-500/20 rounded-md transition-colors";
+                return childHref ? (
+                  <a key={child.id} href={childHref} onClick={(e) => handleLeafAnchorClick(e, child)} className={cls}>
+                    {isAr ? child.name_ar : child.name_en}
+                  </a>
+                ) : (
+                  <button key={child.id} onClick={() => handleItemClick(child)} className={cls}>
+                    {isAr ? child.name_ar : child.name_en}
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
       );
     }
 
-    return (
-      <button
-        key={pi.id}
-        onClick={() => handleItemClick(pi)}
-        className="w-full text-start px-4 py-1.5 text-sm font-semibold text-muted-foreground hover:text-red-500 hover:bg-red-500/10 active:bg-red-500/20 rounded-md transition-colors"
-      >
+    const leafHref = getLeafHref(pi);
+    const cls = "block w-full text-start px-4 py-1.5 text-sm font-semibold text-muted-foreground hover:text-red-500 hover:bg-red-500/10 active:bg-red-500/20 rounded-md transition-colors";
+    return leafHref ? (
+      <a key={pi.id} href={leafHref} onClick={(e) => handleLeafAnchorClick(e, pi)} className={cls}>
+        {isAr ? pi.name_ar : pi.name_en}
+      </a>
+    ) : (
+      <button key={pi.id} onClick={() => handleItemClick(pi)} className={cls}>
         {isAr ? pi.name_ar : pi.name_en}
       </button>
     );
@@ -450,26 +494,43 @@ export default function Header() {
                                   const children = getChildren(pi.id);
                                   const hasKids = hasChildren(pi.id, false);
                                   const isActive = col.activeId === pi.id;
+                                  const leafHref = !hasKids ? getLeafHref(pi) : null;
+                                  const sharedClass = `group w-full flex items-start justify-between gap-2 text-[12.5px] font-semibold px-2.5 py-2 rounded-md transition-all text-start ${isActive ? 'bg-red-500/10 text-red-500' : 'text-card-foreground hover:text-red-500 hover:bg-red-500/10'}`;
+                                  const inner = (
+                                    <>
+                                      <span className="flex items-start gap-2 min-w-0 flex-1">
+                                        <span className={`block w-1 h-1 rounded-full shrink-0 mt-2 ${isActive ? 'bg-red-500' : 'bg-accent/50 group-hover:bg-red-500'}`} />
+                                        <span className="leading-snug break-words text-start">{isAr ? pi.name_ar : pi.name_en}</span>
+                                      </span>
+                                      {hasKids && <ChevronRight className={`w-4 h-4 shrink-0 mt-0.5 ${isActive ? 'text-red-500' : 'text-accent group-hover:text-red-500'} ${isRTL ? 'rotate-180' : ''}`} />}
+                                    </>
+                                  );
                                   return (
                                     <li key={pi.id}>
-                                      <button
-                                        type="button"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          if (hasKids) {
-                                            setSelectedItemPath((prev) => [...prev.slice(0, colIdx), pi.id]);
-                                          } else {
-                                            handleItemClick(pi);
-                                          }
-                                        }}
-                                        className={`group w-full flex items-start justify-between gap-2 text-[12.5px] font-semibold px-2.5 py-2 rounded-md transition-all text-start ${isActive ? 'bg-red-500/10 text-red-500' : 'text-card-foreground hover:text-red-500 hover:bg-red-500/10'}`}
-                                      >
-                                        <span className="flex items-start gap-2 min-w-0 flex-1">
-                                          <span className={`block w-1 h-1 rounded-full shrink-0 mt-2 ${isActive ? 'bg-red-500' : 'bg-accent/50 group-hover:bg-red-500'}`} />
-                                          <span className="leading-snug break-words text-start">{isAr ? pi.name_ar : pi.name_en}</span>
-                                        </span>
-                                        {hasKids && <ChevronRight className={`w-4 h-4 shrink-0 mt-0.5 ${isActive ? 'text-red-500' : 'text-accent group-hover:text-red-500'} ${isRTL ? 'rotate-180' : ''}`} />}
-                                      </button>
+                                      {leafHref ? (
+                                        <a
+                                          href={leafHref}
+                                          onClick={(e) => handleLeafAnchorClick(e, pi)}
+                                          className={sharedClass}
+                                        >
+                                          {inner}
+                                        </a>
+                                      ) : (
+                                        <button
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (hasKids) {
+                                              setSelectedItemPath((prev) => [...prev.slice(0, colIdx), pi.id]);
+                                            } else {
+                                              handleItemClick(pi);
+                                            }
+                                          }}
+                                          className={sharedClass}
+                                        >
+                                          {inner}
+                                        </button>
+                                      )}
                                     </li>
                                   );
                                 })}
