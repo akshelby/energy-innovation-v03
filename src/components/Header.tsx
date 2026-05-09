@@ -135,7 +135,7 @@ export default function Header() {
     productItems.filter((item) => item.parent_id === parentId && item.is_active !== false);
 
   const hasChildren = (parentId: string) =>
-    productItems.some((item) => item.parent_id === parentId);
+    productItems.some((item) => item.parent_id === parentId && item.is_active !== false);
 
   const toggleExpanded = (id: string) => {
     setExpandedParents((prev) => {
@@ -448,7 +448,7 @@ export default function Header() {
                               <ul className="space-y-0.5">
                                 {col.items.map((pi) => {
                                   const children = getChildren(pi.id);
-                                  const hasKids = children.length > 0 || hasChildren(pi.id) || pi.has_page === true;
+                                  const hasKids = children.length > 0 || hasChildren(pi.id);
                                   const isActive = col.activeId === pi.id;
                                   return (
                                     <li key={pi.id}>
