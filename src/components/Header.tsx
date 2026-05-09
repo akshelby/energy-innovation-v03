@@ -371,12 +371,14 @@ export default function Header() {
       );
     }
 
-    return (
-      <button
-        key={pi.id}
-        onClick={() => handleItemClick(pi)}
-        className="w-full text-start px-4 py-1.5 text-sm font-semibold text-muted-foreground hover:text-red-500 hover:bg-red-500/10 active:bg-red-500/20 rounded-md transition-colors"
-      >
+    const leafHref = getLeafHref(pi);
+    const cls = "block w-full text-start px-4 py-1.5 text-sm font-semibold text-muted-foreground hover:text-red-500 hover:bg-red-500/10 active:bg-red-500/20 rounded-md transition-colors";
+    return leafHref ? (
+      <a key={pi.id} href={leafHref} onClick={(e) => handleLeafAnchorClick(e, pi)} className={cls}>
+        {isAr ? pi.name_ar : pi.name_en}
+      </a>
+    ) : (
+      <button key={pi.id} onClick={() => handleItemClick(pi)} className={cls}>
         {isAr ? pi.name_ar : pi.name_en}
       </button>
     );
