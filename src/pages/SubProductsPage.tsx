@@ -391,7 +391,7 @@ export default function SubProductsPage() {
                   if (!href) return;
                   if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || (e as any).button === 1) return;
                   e.preventDefault();
-                  navigate(href);
+                  openProductLink(href, openNewTab, navigate);
                 };
                 const cls = `group bg-card rounded-2xl border border-border overflow-hidden transition-all duration-300 hover:border-destructive/30 hover:shadow-lg ${
                   isClickable ? "cursor-pointer" : ""
