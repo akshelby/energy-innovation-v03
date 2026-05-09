@@ -409,17 +409,27 @@ export default function Header() {
                       title,
                       entries: entryItems.map((pi) => {
                         const childCount = getChildren(pi.id).length;
+                        const openNext = () => {
+                          if (childCount > 0) {
+                            setDesktopPath((prev) => {
+                              const base = prev.slice(0, nextDepth);
+                              if (prev[nextDepth] === pi.id) return prev;
+                              return [...base, pi.id];
+                            });
+                          } else {
+                            // Trim deeper columns when hovering a leaf
+                            setDesktopPath((prev) => prev.slice(0, nextDepth));
+                          }
+                        };
                         return {
                           id: pi.id,
                           label: isAr ? pi.name_ar : pi.name_en,
                           hasNext: childCount > 0,
                           selected: desktopPath[nextDepth] === pi.id,
+                          onHover: openNext,
                           onClick: () => {
-                            if (childCount > 0) {
-                              setDesktopPath([...desktopPath.slice(0, nextDepth), pi.id]);
-                            } else {
-                              handleItemClick(pi);
-                            }
+                            if (childCount > 0) openNext();
+                            else handleItemClick(pi);
                           },
                         };
                       }),
