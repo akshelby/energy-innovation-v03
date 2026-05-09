@@ -312,16 +312,25 @@ export default function Header() {
       );
     }
 
+    const leafHref = getLeafHref(pi);
+    const leafInner = (
+      <>
+        <span className="block w-1 h-1 rounded-full bg-accent/50 group-hover:bg-red-500 transition-colors" />
+        {isAr ? pi.name_ar : pi.name_en}
+      </>
+    );
+    const leafClass = "group w-full flex items-center gap-2 text-[13px] font-semibold text-card-foreground hover:text-red-500 hover:bg-red-500/10 active:bg-red-500/20 px-2.5 py-1.5 rounded-md transition-all bg-transparent border-0 cursor-pointer text-start";
     return (
       <li key={pi.id}>
-        <button
-          type="button"
-          onClick={(e) => { e.preventDefault(); handleItemClick(pi); }}
-          className="group w-full flex items-center gap-2 text-[13px] font-semibold text-card-foreground hover:text-red-500 hover:bg-red-500/10 active:bg-red-500/20 px-2.5 py-1.5 rounded-md transition-all bg-transparent border-0 cursor-pointer text-start"
-        >
-          <span className="block w-1 h-1 rounded-full bg-accent/50 group-hover:bg-red-500 transition-colors" />
-          {isAr ? pi.name_ar : pi.name_en}
-        </button>
+        {leafHref ? (
+          <a href={leafHref} onClick={(e) => handleLeafAnchorClick(e, pi)} className={leafClass}>
+            {leafInner}
+          </a>
+        ) : (
+          <button type="button" onClick={(e) => { e.preventDefault(); handleItemClick(pi); }} className={leafClass}>
+            {leafInner}
+          </button>
+        )}
       </li>
     );
   };
