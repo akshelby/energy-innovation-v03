@@ -281,16 +281,28 @@ export default function Header() {
                 if (grandChildren.length > 0) {
                   return renderDesktopItem(child);
                 }
+                const childHref = getLeafHref(child);
                 return (
                   <li key={child.id}>
-                    <button
-                      type="button"
-                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleItemClick(child); }}
-                      className="group w-full flex items-center gap-2 text-[12.5px] font-medium text-muted-foreground hover:text-red-500 hover:bg-red-500/10 active:bg-red-500/20 px-2.5 py-1.5 rounded-md transition-all bg-transparent border-0 cursor-pointer text-start"
-                    >
-                      <span className="block w-1 h-1 rounded-full bg-muted-foreground/40 group-hover:bg-red-500 transition-colors" />
-                      {isAr ? child.name_ar : child.name_en}
-                    </button>
+                    {childHref ? (
+                      <a
+                        href={childHref}
+                        onClick={(e) => handleLeafAnchorClick(e, child)}
+                        className="group w-full flex items-center gap-2 text-[12.5px] font-medium text-muted-foreground hover:text-red-500 hover:bg-red-500/10 active:bg-red-500/20 px-2.5 py-1.5 rounded-md transition-all bg-transparent border-0 cursor-pointer text-start"
+                      >
+                        <span className="block w-1 h-1 rounded-full bg-muted-foreground/40 group-hover:bg-red-500 transition-colors" />
+                        {isAr ? child.name_ar : child.name_en}
+                      </a>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleItemClick(child); }}
+                        className="group w-full flex items-center gap-2 text-[12.5px] font-medium text-muted-foreground hover:text-red-500 hover:bg-red-500/10 active:bg-red-500/20 px-2.5 py-1.5 rounded-md transition-all bg-transparent border-0 cursor-pointer text-start"
+                      >
+                        <span className="block w-1 h-1 rounded-full bg-muted-foreground/40 group-hover:bg-red-500 transition-colors" />
+                        {isAr ? child.name_ar : child.name_en}
+                      </button>
+                    )}
                   </li>
                 );
               })}
