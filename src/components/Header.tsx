@@ -441,7 +441,7 @@ export default function Header() {
                   const totalWidth = Math.min(cols.length, 4) * colWidth + 24;
 
                   return (
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3" style={{ width: `${totalWidth}px` }}>
+                    <div className={`absolute top-full pt-3 ${isRTL ? 'right-0' : 'left-0'}`} style={{ width: `${totalWidth}px` }}>
                       <div className="relative rounded-[24px] p-[1.5px] bg-[conic-gradient(from_120deg_at_50%_50%,#2BD8FF_0%,#A14BFF_25%,#FF4FCB_50%,#FF6A3D_75%,#2BD8FF_100%)] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.35)] animate-fade-in">
                         <div className="relative bg-card/95 backdrop-blur-2xl rounded-[22px] p-2">
                           <div className="flex items-center justify-between px-3 pt-2 pb-2">
