@@ -380,23 +380,27 @@ export default function SubProductsPage() {
                 const isContainer = item.hasChildren;
                 const hasDetailPage = !isContainer && item.pageActive === true;
                 const isClickable = isContainer || hasDetailPage;
+                const href = isContainer
+                  ? `/products/item/${item.id}`
+                  : hasDetailPage
+                    ? `/product/${item.id}`
+                    : null;
+                const handleClick = (e: React.MouseEvent) => {
+                  if (!href) return;
+                  if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || (e as any).button === 1) return;
+                  e.preventDefault();
+                  navigate(href);
+                };
+                const cls = `group bg-card rounded-2xl border border-border overflow-hidden transition-all duration-300 hover:border-destructive/30 hover:shadow-lg ${
+                  isClickable ? "cursor-pointer" : ""
+                }`;
+                const Wrapper: any = href ? "a" : "div";
+                const wrapperProps: any = href
+                  ? { href, onClick: handleClick, className: cls + " no-underline text-inherit block" }
+                  : { className: cls };
 
                 return (
-                  <div
-                    key={item.id}
-                    onClick={() => {
-                      // Prefer drilling into children when present (matches Header behavior).
-                      // Only navigate to the detail page when this item is a leaf.
-                      if (item.hasChildren) {
-                        navigate(`/products/item/${item.id}`);
-                      } else if (hasDetailPage) {
-                        navigate(`/product/${item.id}`);
-                      }
-                    }}
-                    className={`group bg-card rounded-2xl border border-border overflow-hidden transition-all duration-300 hover:border-destructive/30 hover:shadow-lg ${
-                      isClickable ? "cursor-pointer" : ""
-                    }`}
-                  >
+                  <Wrapper key={item.id} {...wrapperProps}>
                     {/* Image */}
                     <div className="relative aspect-[4/3] overflow-hidden bg-muted">
                       {item.image_url ? (
