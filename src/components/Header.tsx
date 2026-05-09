@@ -448,7 +448,7 @@ export default function Header() {
                               <ul className="space-y-0.5">
                                 {col.items.map((pi) => {
                                   const children = getChildren(pi.id);
-                                  const hasKids = children.length > 0 || hasChildren(pi.id);
+                                  const hasKids = children.length > 0 || hasChildren(pi.id) || pi.has_page === true;
                                   const isActive = col.activeId === pi.id;
                                   return (
                                     <li key={pi.id}>
