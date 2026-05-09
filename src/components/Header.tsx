@@ -467,26 +467,43 @@ export default function Header() {
                                   const children = getChildren(pi.id);
                                   const hasKids = hasChildren(pi.id, false);
                                   const isActive = col.activeId === pi.id;
+                                  const leafHref = !hasKids ? getLeafHref(pi) : null;
+                                  const sharedClass = `group w-full flex items-start justify-between gap-2 text-[12.5px] font-semibold px-2.5 py-2 rounded-md transition-all text-start ${isActive ? 'bg-red-500/10 text-red-500' : 'text-card-foreground hover:text-red-500 hover:bg-red-500/10'}`;
+                                  const inner = (
+                                    <>
+                                      <span className="flex items-start gap-2 min-w-0 flex-1">
+                                        <span className={`block w-1 h-1 rounded-full shrink-0 mt-2 ${isActive ? 'bg-red-500' : 'bg-accent/50 group-hover:bg-red-500'}`} />
+                                        <span className="leading-snug break-words text-start">{isAr ? pi.name_ar : pi.name_en}</span>
+                                      </span>
+                                      {hasKids && <ChevronRight className={`w-4 h-4 shrink-0 mt-0.5 ${isActive ? 'text-red-500' : 'text-accent group-hover:text-red-500'} ${isRTL ? 'rotate-180' : ''}`} />}
+                                    </>
+                                  );
                                   return (
                                     <li key={pi.id}>
-                                      <button
-                                        type="button"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          if (hasKids) {
-                                            setSelectedItemPath((prev) => [...prev.slice(0, colIdx), pi.id]);
-                                          } else {
-                                            handleItemClick(pi);
-                                          }
-                                        }}
-                                        className={`group w-full flex items-start justify-between gap-2 text-[12.5px] font-semibold px-2.5 py-2 rounded-md transition-all text-start ${isActive ? 'bg-red-500/10 text-red-500' : 'text-card-foreground hover:text-red-500 hover:bg-red-500/10'}`}
-                                      >
-                                        <span className="flex items-start gap-2 min-w-0 flex-1">
-                                          <span className={`block w-1 h-1 rounded-full shrink-0 mt-2 ${isActive ? 'bg-red-500' : 'bg-accent/50 group-hover:bg-red-500'}`} />
-                                          <span className="leading-snug break-words text-start">{isAr ? pi.name_ar : pi.name_en}</span>
-                                        </span>
-                                        {hasKids && <ChevronRight className={`w-4 h-4 shrink-0 mt-0.5 ${isActive ? 'text-red-500' : 'text-accent group-hover:text-red-500'} ${isRTL ? 'rotate-180' : ''}`} />}
-                                      </button>
+                                      {leafHref ? (
+                                        <a
+                                          href={leafHref}
+                                          onClick={(e) => handleLeafAnchorClick(e, pi)}
+                                          className={sharedClass}
+                                        >
+                                          {inner}
+                                        </a>
+                                      ) : (
+                                        <button
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (hasKids) {
+                                              setSelectedItemPath((prev) => [...prev.slice(0, colIdx), pi.id]);
+                                            } else {
+                                              handleItemClick(pi);
+                                            }
+                                          }}
+                                          className={sharedClass}
+                                        >
+                                          {inner}
+                                        </button>
+                                      )}
                                     </li>
                                   );
                                 })}
