@@ -477,7 +477,7 @@ export default function Header() {
                                       >
                                         <span className="flex-1 truncate">{entry.label}</span>
                                         {entry.hasNext && (
-                                          <ChevronRight className={`w-3.5 h-3.5 shrink-0 ${entry.selected ? 'text-red-500' : 'text-muted-foreground group-hover:text-red-500'} ${isRTL ? 'rotate-180' : ''}`} />
+                                          <ChevronRight className={`w-3.5 h-3.5 shrink-0 text-muted-foreground ${isRTL ? 'rotate-180' : ''}`} />
                                         )}
                                       </button>
                                     </li>
