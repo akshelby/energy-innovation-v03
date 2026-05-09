@@ -177,28 +177,30 @@ export default function ProductsSection() {
           {products.map((product, i) => {
             const isCustomIcon = product.icon?.startsWith("http") || product.icon?.startsWith("/") || product.icon?.startsWith("data:");
             const Icon = !isCustomIcon ? (iconMap[product.icon] || Flame) : null;
-            return (
-              <div
-                key={i}
-                className="scroll-reveal md:!opacity-100 md:!translate-y-0 group rounded-2xl cursor-pointer overflow-hidden bg-card border border-border hover:border-accent/20 transition-all duration-300 h-full flex flex-col"
-                style={{ transitionDelay: `${i * 80}ms` }}
-                onClick={() => {
-                  const go = (url: string) => openProductLink(url, openNewTab, navigate);
-                  if (product.linked_item_id) {
-                    go(`/products/item/${product.linked_item_id}`);
-                  } else if (product.pdf_url && !product.category_key) {
-                    setPdfSrc(product.pdf_url);
-                    setPdfOpen(true);
-                  } else {
-                    go(`/products/${product.id}`);
-                  }
-                }}
-              >
+            const href = product.linked_item_id
+              ? `/products/item/${product.linked_item_id}`
+              : (product.pdf_url && !product.category_key)
+                ? null
+                : `/products/${product.id}`;
+            const cardClass = "scroll-reveal md:!opacity-100 md:!translate-y-0 group rounded-2xl cursor-pointer overflow-hidden bg-card border border-border hover:border-accent/20 transition-all duration-300 h-full flex flex-col";
+            const handleClick = (e: React.MouseEvent) => {
+              // Allow modifier-clicks / middle-click to fall through to native behavior on anchors
+              if (href && (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || (e as any).button === 1)) return;
+              e.preventDefault();
+              if (product.linked_item_id) {
+                openProductLink(`/products/item/${product.linked_item_id}`, openNewTab, navigate);
+              } else if (product.pdf_url && !product.category_key) {
+                setPdfSrc(product.pdf_url);
+                setPdfOpen(true);
+              } else {
+                openProductLink(`/products/${product.id}`, openNewTab, navigate);
+              }
+            };
+            const cardInner = (
+              <>
                 {/* Image area */}
                 <div className="relative aspect-[16/10] md:aspect-[4/3] md:flex-none min-h-0 overflow-hidden bg-muted">
-                  {/* Shimmer skeleton shown until image loads */}
                   <div className="absolute inset-0 bg-muted animate-pulse" />
-
                   {product.image_url ? (
                     <img
                       src={getResizedUrl(product.image_url, 480, 70)}
@@ -211,6 +213,7 @@ export default function ProductsSection() {
                       loading={i < 2 ? "eager" : "lazy"}
                       decoding={i < 2 ? "sync" : "async"}
                       fetchPriority={i < 2 ? "high" : "auto"}
+                      draggable={false}
                       onLoad={(e) => {
                         (e.target as HTMLImageElement).classList.remove("opacity-0");
                         (e.target as HTMLImageElement).classList.add("opacity-100");
@@ -219,14 +222,12 @@ export default function ProductsSection() {
                   ) : (
                     <div className="relative w-full h-full flex items-center justify-center">
                       {isCustomIcon ? (
-                        <img src={product.icon} alt="" className="w-12 h-12 object-contain opacity-30" />
+                        <img src={product.icon} alt="" className="w-12 h-12 object-contain opacity-30" draggable={false} />
                       ) : Icon ? (
                         <Icon className="w-12 h-12 text-muted-foreground/30" />
                       ) : null}
                     </div>
                   )}
-
-                  {/* Tag */}
                   {(isAr ? product.tag_ar : product.tag_en) && (
                     <span className="absolute top-3 right-3 text-[11px] font-bold uppercase tracking-widest bg-foreground/75 text-background px-3 py-1.5 rounded-full backdrop-blur-md shadow-sm z-10">
                       {isAr ? product.tag_ar : product.tag_en}
@@ -250,6 +251,26 @@ export default function ProductsSection() {
                     </div>
                   </div>
                 </div>
+              </>
+            );
+            return href ? (
+              <a
+                key={i}
+                href={href}
+                onClick={handleClick}
+                className={cardClass + " no-underline text-inherit"}
+                style={{ transitionDelay: `${i * 80}ms` }}
+              >
+                {cardInner}
+              </a>
+            ) : (
+              <div
+                key={i}
+                className={cardClass}
+                style={{ transitionDelay: `${i * 80}ms` }}
+                onClick={handleClick}
+              >
+                {cardInner}
               </div>
             );
           })}
