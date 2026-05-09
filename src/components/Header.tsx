@@ -50,6 +50,8 @@ export default function Header() {
   const [expandedMobileParents, setExpandedMobileParents] = useState<Set<string>>(new Set());
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [expandedMobileCategories, setExpandedMobileCategories] = useState<Set<string>>(new Set());
+  // Desktop cascading mega-menu path: [categoryKey, itemId, itemId, ...]
+  const [desktopPath, setDesktopPath] = useState<string[]>([]);
 
   const toggleCategory = (key: string) => {
     setExpandedCategories((prev) => {
