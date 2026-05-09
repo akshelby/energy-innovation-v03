@@ -102,7 +102,14 @@ export default function CountriesSection() {
           }}
         >
           <div ref={trackRef} className="flex w-fit animate-none items-center gap-10 md:gap-16">
-            {loop.map((c, i) => {
+            {showSkeleton
+              ? Array.from({ length: 12 }).map((_, i) => (
+                  <div key={`sk-${i}`} className="shrink-0 flex flex-col items-center justify-center gap-3">
+                    <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-muted animate-pulse" />
+                    <div className="h-4 w-16 rounded bg-muted animate-pulse" />
+                  </div>
+                ))
+              : loop.map((c, i) => {
               const name = language === "ar" ? c.name_ar || c.name_en : c.name_en;
               return (
                 <div
