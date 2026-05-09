@@ -408,7 +408,7 @@ export default function Header() {
                       key: id,
                       title,
                       entries: entryItems.map((pi) => {
-                        const childCount = productItems.filter((p) => p.parent_id === pi.id).length;
+                        const childCount = getChildren(pi.id).length;
                         return {
                           id: pi.id,
                           label: isAr ? pi.name_ar : pi.name_en,
