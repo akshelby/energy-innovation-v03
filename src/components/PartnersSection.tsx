@@ -117,7 +117,8 @@ export default function PartnersSection() {
                     <img
                       src={p.logo_url}
                       alt={name}
-                      loading="lazy"
+                      loading={i < partners.length ? "eager" : "lazy"}
+                      decoding="async"
                       className="h-full w-auto max-w-[40vw] md:max-w-[260px] object-contain opacity-80 hover:opacity-100 transition-all duration-300"
                     />
                   </div>

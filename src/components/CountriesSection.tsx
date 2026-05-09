@@ -112,7 +112,8 @@ export default function CountriesSection() {
                       <img
                         src={c.flag_url}
                         alt={name}
-                        loading="lazy"
+                        loading={i < countries.length ? "eager" : "lazy"}
+                        decoding="async"
                         className="w-full h-full object-cover"
                       />
                     ) : (
