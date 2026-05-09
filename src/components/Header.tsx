@@ -370,7 +370,7 @@ export default function Header() {
 
                 {item.hasDropdown && productsOpen && categoriesWithItems.length > 0 && (() => {
                   // Build cascading columns based on desktopPath
-                  type Col = { key: string; title?: string; entries: { id: string; label: string; hasNext: boolean; onClick: () => void; selected: boolean }[] };
+                  type Col = { key: string; title?: string; entries: { id: string; label: string; hasNext: boolean; onClick: () => void; onHover?: () => void; selected: boolean }[] };
                   const cols: Col[] = [];
 
                   // Column 0: categories
@@ -382,6 +382,7 @@ export default function Header() {
                       label: isAr ? cat.label_ar : cat.label_en,
                       hasNext: cat.items.length > 0,
                       selected: desktopPath[0] === cat.key,
+                      onHover: () => setDesktopPath((prev) => (prev[0] === cat.key ? prev : [cat.key])),
                       onClick: () => setDesktopPath([cat.key]),
                     })),
                   });
