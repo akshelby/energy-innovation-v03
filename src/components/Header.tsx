@@ -50,6 +50,16 @@ export default function Header() {
   const [expandedMobileParents, setExpandedMobileParents] = useState<Set<string>>(new Set());
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [expandedMobileCategories, setExpandedMobileCategories] = useState<Set<string>>(new Set());
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedItemPath, setSelectedItemPath] = useState<string[]>([]);
+
+  // Reset flyout when menu closes
+  useEffect(() => {
+    if (!productsOpen) {
+      setSelectedCategory(null);
+      setSelectedItemPath([]);
+    }
+  }, [productsOpen]);
 
   const toggleCategory = (key: string) => {
     setExpandedCategories((prev) => {
@@ -361,63 +371,114 @@ export default function Header() {
                   {item.hasDropdown && <ChevronDown className="w-3.5 h-3.5" />}
                 </button>
 
-                {item.hasDropdown && productsOpen && categoriesWithItems.length > 0 && (
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3" style={{ width: "480px" }}>
-                    {/* Outer gradient halo */}
-                    <div className="relative rounded-[24px] p-[1.5px] bg-[conic-gradient(from_120deg_at_50%_50%,#2BD8FF_0%,#A14BFF_25%,#FF4FCB_50%,#FF6A3D_75%,#2BD8FF_100%)] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.35)] animate-fade-in">
-                      <div className="relative bg-card/95 backdrop-blur-2xl rounded-[22px] p-3 max-h-[75vh] overflow-y-auto mega-menu-scroll">
-                        {/* Header pill */}
-                        <div className="flex items-center justify-between px-2 pb-2 mb-1">
-                          <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground">
-                            <span className="block w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                            Browse Catalog
-                          </span>
-                          <span className="text-[10px] font-bold text-muted-foreground/70">
-                            {categoriesWithItems.length} categories
-                          </span>
-                        </div>
+                {item.hasDropdown && productsOpen && categoriesWithItems.length > 0 && (() => {
+                  // Build columns dynamically based on selection
+                  const columns: Array<{ title: string; items: ProductItem[]; depth: number; activeId?: string | null }> = [];
+                  if (selectedCategory) {
+                    const cat = categoriesWithItems.find((c) => c.key === selectedCategory);
+                    if (cat) {
+                      columns.push({
+                        title: language === "ar" ? cat.label_ar : cat.label_en,
+                        items: cat.items,
+                        depth: 0,
+                        activeId: selectedItemPath[0] ?? null,
+                      });
+                      for (let i = 0; i < selectedItemPath.length; i++) {
+                        const parent = productItems.find((p) => p.id === selectedItemPath[i]);
+                        const children = getChildren(selectedItemPath[i]);
+                        if (children.length === 0) break;
+                        columns.push({
+                          title: parent ? (isAr ? parent.name_ar : parent.name_en) : "",
+                          items: children,
+                          depth: i + 1,
+                          activeId: selectedItemPath[i + 1] ?? null,
+                        });
+                      }
+                    }
+                  }
+                  const totalWidth = 280 + columns.length * 240;
+                  return (
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3" style={{ width: `${totalWidth}px` }}>
+                      <div className="relative rounded-[24px] p-[1.5px] bg-[conic-gradient(from_120deg_at_50%_50%,#2BD8FF_0%,#A14BFF_25%,#FF4FCB_50%,#FF6A3D_75%,#2BD8FF_100%)] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.35)] animate-fade-in">
+                        <div className="relative bg-card/95 backdrop-blur-2xl rounded-[22px] p-3 max-h-[75vh] overflow-hidden flex gap-2">
+                          {/* Column 0: Categories */}
+                          <div className="w-[280px] shrink-0 overflow-y-auto mega-menu-scroll pr-1">
+                            <div className="flex items-center justify-between px-2 pb-2 mb-1">
+                              <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground">
+                                <span className="block w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                                Browse Catalog
+                              </span>
+                              <span className="text-[10px] font-bold text-muted-foreground/70">{categoriesWithItems.length}</span>
+                            </div>
+                            <ul className="space-y-1">
+                              {categoriesWithItems.map((cat, idx) => {
+                                const isActive = selectedCategory === cat.key;
+                                const num = String(idx + 1).padStart(2, "0");
+                                return (
+                                  <li key={cat.key}>
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedCategory(cat.key);
+                                        setSelectedItemPath([]);
+                                      }}
+                                      className={`w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl transition-all text-start ${isActive ? 'bg-gradient-to-br from-accent/10 via-card to-card ring-1 ring-accent/20' : 'hover:bg-red-500/5 hover:ring-1 hover:ring-red-500/20'}`}
+                                    >
+                                      <span className="flex items-center gap-2.5 min-w-0">
+                                        <span className={`shrink-0 inline-flex items-center justify-center w-7 h-7 rounded-lg text-[10px] font-black tabular-nums ${isActive ? 'bg-gradient-to-br from-red-500 to-accent text-white shadow-md shadow-red-500/30' : 'bg-muted text-muted-foreground'}`}>{num}</span>
+                                        <span className={`text-[12px] font-bold uppercase tracking-wide truncate ${isActive ? 'text-foreground' : 'text-card-foreground'}`}>{language === "ar" ? cat.label_ar : cat.label_en}</span>
+                                      </span>
+                                      <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-colors ${isActive ? 'text-red-500' : 'text-muted-foreground'} ${isRTL ? 'rotate-180' : ''}`} />
+                                    </button>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          </div>
 
-                        <ul className="space-y-1">
-                          {categoriesWithItems.map((cat, idx) => {
-                            const isOpen = expandedCategories.has(cat.key);
-                            const num = String(idx + 1).padStart(2, "0");
-                            return (
-                              <li key={cat.key} className={`group/cat relative overflow-hidden rounded-2xl transition-all duration-300 ${isOpen ? 'bg-gradient-to-br from-accent/10 via-card to-card ring-1 ring-accent/20' : 'hover:bg-red-500/5 hover:ring-1 hover:ring-red-500/20'}`}>
-                                {isOpen && (
-                                  <span className="absolute inset-y-3 left-0 w-[2px] rounded-full bg-red-500/60" />
-                                )}
-                                <button
-                                  type="button"
-                                  onClick={(e) => { e.stopPropagation(); toggleCategory(cat.key); }}
-                                  className="relative w-full flex items-center justify-between gap-3 px-3.5 py-3 text-start"
-                                >
-                                  <span className="flex items-center gap-3 min-w-0">
-                                    <span className={`shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-xl text-[11px] font-black tabular-nums tracking-tight transition-all duration-300 ${isOpen ? 'bg-gradient-to-br from-red-500 to-accent text-white shadow-lg shadow-red-500/30' : 'bg-muted text-muted-foreground group-hover/cat:bg-red-500/15 group-hover/cat:text-red-500'}`}>
-                                      {num}
-                                    </span>
-                                    <span className={`text-[13px] font-bold uppercase tracking-wide truncate transition-colors ${isOpen ? 'text-foreground' : 'text-card-foreground'}`}>
-                                      {language === "ar" ? cat.label_ar : cat.label_en}
-                                    </span>
-                                  </span>
-                                  <span className={`shrink-0 inline-flex items-center justify-center w-7 h-7 rounded-full transition-all duration-300 ${isOpen ? 'bg-red-500/15 text-red-500 rotate-180' : 'text-muted-foreground group-hover/cat:bg-red-500/15 group-hover/cat:text-red-500'}`}>
-                                    <ChevronDown className="w-3.5 h-3.5" />
-                                  </span>
-                                </button>
-                                {isOpen && (
-                                  <div className="px-3 pb-3 animate-fade-in">
-                                    <ul className="ml-11 pl-4 border-l border-accent/15 space-y-0.5">
-                                      {cat.items.map((pi) => renderDesktopItem(pi))}
-                                    </ul>
-                                  </div>
-                                )}
-                              </li>
-                            );
-                          })}
-                        </ul>
+                          {/* Sub columns */}
+                          {columns.map((col, colIdx) => (
+                            <div key={colIdx} className="w-[240px] shrink-0 overflow-y-auto mega-menu-scroll border-l border-accent/15 pl-2 animate-fade-in">
+                              <div className="px-2 pb-2 mb-1">
+                                <span className="text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground truncate block">{col.title}</span>
+                              </div>
+                              <ul className="space-y-0.5">
+                                {col.items.map((pi) => {
+                                  const children = getChildren(pi.id);
+                                  const hasKids = children.length > 0;
+                                  const isActive = col.activeId === pi.id;
+                                  return (
+                                    <li key={pi.id}>
+                                      <button
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          if (hasKids) {
+                                            setSelectedItemPath((prev) => [...prev.slice(0, colIdx), pi.id]);
+                                          } else {
+                                            handleItemClick(pi);
+                                          }
+                                        }}
+                                        className={`group w-full flex items-center justify-between gap-2 text-[12.5px] font-semibold px-2.5 py-2 rounded-md transition-all text-start ${isActive ? 'bg-red-500/10 text-red-500' : 'text-card-foreground hover:text-red-500 hover:bg-red-500/10'}`}
+                                      >
+                                        <span className="flex items-center gap-2 min-w-0">
+                                          <span className={`block w-1 h-1 rounded-full shrink-0 ${isActive ? 'bg-red-500' : 'bg-accent/50 group-hover:bg-red-500'}`} />
+                                          <span className="truncate">{isAr ? pi.name_ar : pi.name_en}</span>
+                                        </span>
+                                        {hasKids && <ChevronRight className={`w-3 h-3 shrink-0 ${isRTL ? 'rotate-180' : ''}`} />}
+                                      </button>
+                                    </li>
+                                  );
+                                })}
+                              </ul>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
               </div>
             ))}
           </nav>
