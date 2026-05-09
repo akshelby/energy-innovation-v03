@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import FloatingButtons from "@/components/FloatingButtons";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ArrowUpRight } from "lucide-react";
+import { useOpenInNewTab, openProductLink } from "@/hooks/useOpenInNewTab";
 
 interface Product {
   id: string;
@@ -45,6 +46,7 @@ export default function SubProductsPage() {
   const { productId, itemId } = useParams<{ productId?: string; itemId?: string }>();
   const { language } = useLanguage();
   const navigate = useNavigate();
+  const openNewTab = useOpenInNewTab();
   const isAr = language === "ar";
 
   const [product, setProduct] = useState<Product | null>(null);
@@ -389,7 +391,7 @@ export default function SubProductsPage() {
                   if (!href) return;
                   if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || (e as any).button === 1) return;
                   e.preventDefault();
-                  navigate(href);
+                  openProductLink(href, openNewTab, navigate);
                 };
                 const cls = `group bg-card rounded-2xl border border-border overflow-hidden transition-all duration-300 hover:border-destructive/30 hover:shadow-lg ${
                   isClickable ? "cursor-pointer" : ""
