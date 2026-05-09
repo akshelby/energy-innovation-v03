@@ -50,6 +50,8 @@ export default function Header() {
   const [expandedMobileParents, setExpandedMobileParents] = useState<Set<string>>(new Set());
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [expandedMobileCategories, setExpandedMobileCategories] = useState<Set<string>>(new Set());
+  // Desktop cascading mega-menu path: [categoryKey, itemId, itemId, ...]
+  const [desktopPath, setDesktopPath] = useState<string[]>([]);
 
   const toggleCategory = (key: string) => {
     setExpandedCategories((prev) => {
@@ -194,6 +196,11 @@ export default function Header() {
     }
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
+
+  // Reset cascading path whenever desktop dropdown closes
+  useEffect(() => {
+    if (!productsOpen) setDesktopPath([]);
+  }, [productsOpen]);
 
   const navItems = [
     { label: t("nav.home"), href: "#home" },
@@ -361,63 +368,116 @@ export default function Header() {
                   {item.hasDropdown && <ChevronDown className="w-3.5 h-3.5" />}
                 </button>
 
-                {item.hasDropdown && productsOpen && categoriesWithItems.length > 0 && (
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3" style={{ width: "480px" }}>
-                    {/* Outer gradient halo */}
-                    <div className="relative rounded-[24px] p-[1.5px] bg-[conic-gradient(from_120deg_at_50%_50%,#2BD8FF_0%,#A14BFF_25%,#FF4FCB_50%,#FF6A3D_75%,#2BD8FF_100%)] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.35)] animate-fade-in">
-                      <div className="relative bg-card/95 backdrop-blur-2xl rounded-[22px] p-3 max-h-[75vh] overflow-y-auto mega-menu-scroll">
-                        {/* Header pill */}
-                        <div className="flex items-center justify-between px-2 pb-2 mb-1">
-                          <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground">
-                            <span className="block w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                            Browse Catalog
-                          </span>
-                          <span className="text-[10px] font-bold text-muted-foreground/70">
-                            {categoriesWithItems.length} categories
-                          </span>
-                        </div>
+                {item.hasDropdown && productsOpen && categoriesWithItems.length > 0 && (() => {
+                  // Build cascading columns based on desktopPath
+                  type Col = { key: string; title?: string; entries: { id: string; label: string; hasNext: boolean; onClick: () => void; selected: boolean }[] };
+                  const cols: Col[] = [];
 
-                        <ul className="space-y-1">
-                          {categoriesWithItems.map((cat, idx) => {
-                            const isOpen = expandedCategories.has(cat.key);
-                            const num = String(idx + 1).padStart(2, "0");
-                            return (
-                              <li key={cat.key} className={`group/cat relative overflow-hidden rounded-2xl transition-all duration-300 ${isOpen ? 'bg-gradient-to-br from-accent/10 via-card to-card ring-1 ring-accent/20' : 'hover:bg-red-500/5 hover:ring-1 hover:ring-red-500/20'}`}>
-                                {isOpen && (
-                                  <span className="absolute inset-y-3 left-0 w-[2px] rounded-full bg-red-500/60" />
-                                )}
-                                <button
-                                  type="button"
-                                  onClick={(e) => { e.stopPropagation(); toggleCategory(cat.key); }}
-                                  className="relative w-full flex items-center justify-between gap-3 px-3.5 py-3 text-start"
-                                >
-                                  <span className="flex items-center gap-3 min-w-0">
-                                    <span className={`shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-xl text-[11px] font-black tabular-nums tracking-tight transition-all duration-300 ${isOpen ? 'bg-gradient-to-br from-red-500 to-accent text-white shadow-lg shadow-red-500/30' : 'bg-muted text-muted-foreground group-hover/cat:bg-red-500/15 group-hover/cat:text-red-500'}`}>
-                                      {num}
-                                    </span>
-                                    <span className={`text-[13px] font-bold uppercase tracking-wide truncate transition-colors ${isOpen ? 'text-foreground' : 'text-card-foreground'}`}>
-                                      {language === "ar" ? cat.label_ar : cat.label_en}
-                                    </span>
-                                  </span>
-                                  <span className={`shrink-0 inline-flex items-center justify-center w-7 h-7 rounded-full transition-all duration-300 ${isOpen ? 'bg-red-500/15 text-red-500 rotate-180' : 'text-muted-foreground group-hover/cat:bg-red-500/15 group-hover/cat:text-red-500'}`}>
-                                    <ChevronDown className="w-3.5 h-3.5" />
-                                  </span>
-                                </button>
-                                {isOpen && (
-                                  <div className="px-3 pb-3 animate-fade-in">
-                                    <ul className="ml-11 pl-4 border-l border-accent/15 space-y-0.5">
-                                      {cat.items.map((pi) => renderDesktopItem(pi))}
-                                    </ul>
+                  // Column 0: categories
+                  cols.push({
+                    key: "__cats__",
+                    title: isAr ? "التصنيفات" : "Categories",
+                    entries: categoriesWithItems.map((cat) => ({
+                      id: cat.key,
+                      label: isAr ? cat.label_ar : cat.label_en,
+                      hasNext: cat.items.length > 0,
+                      selected: desktopPath[0] === cat.key,
+                      onClick: () => setDesktopPath([cat.key]),
+                    })),
+                  });
+
+                  // Subsequent columns
+                  for (let depth = 0; depth < desktopPath.length; depth++) {
+                    const id = desktopPath[depth];
+                    let entryItems: ProductItem[] = [];
+                    let title = "";
+                    if (depth === 0) {
+                      const cat = categoriesWithItems.find((c) => c.key === id);
+                      if (!cat) break;
+                      entryItems = cat.items;
+                      title = isAr ? cat.label_ar : cat.label_en;
+                    } else {
+                      const parent = productItems.find((p) => p.id === id);
+                      if (!parent) break;
+                      entryItems = getChildren(id);
+                      title = isAr ? parent.name_ar : parent.name_en;
+                    }
+                    if (entryItems.length === 0) break;
+                    const nextDepth = depth + 1;
+                    cols.push({
+                      key: id,
+                      title,
+                      entries: entryItems.map((pi) => {
+                        const childCount = productItems.filter((p) => p.parent_id === pi.id).length;
+                        return {
+                          id: pi.id,
+                          label: isAr ? pi.name_ar : pi.name_en,
+                          hasNext: childCount > 0,
+                          selected: desktopPath[nextDepth] === pi.id,
+                          onClick: () => {
+                            if (childCount > 0) {
+                              setDesktopPath([...desktopPath.slice(0, nextDepth), pi.id]);
+                            } else {
+                              handleItemClick(pi);
+                            }
+                          },
+                        };
+                      }),
+                    });
+                  }
+
+                  const colWidth = 240;
+                  const totalWidth = Math.min(cols.length, 4) * colWidth + 24;
+
+                  return (
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3" style={{ width: `${totalWidth}px` }}>
+                      <div className="relative rounded-[24px] p-[1.5px] bg-[conic-gradient(from_120deg_at_50%_50%,#2BD8FF_0%,#A14BFF_25%,#FF4FCB_50%,#FF6A3D_75%,#2BD8FF_100%)] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.35)] animate-fade-in">
+                        <div className="relative bg-card/95 backdrop-blur-2xl rounded-[22px] p-2">
+                          <div className="flex items-center justify-between px-3 pt-2 pb-2">
+                            <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground">
+                              <span className="block w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                              Browse Catalog
+                            </span>
+                            <span className="text-[10px] font-bold text-muted-foreground/70">
+                              {categoriesWithItems.length} categories
+                            </span>
+                          </div>
+                          <div className="flex overflow-x-auto mega-menu-scroll" style={{ maxHeight: "70vh" }}>
+                            {cols.map((col, ci) => (
+                              <div
+                                key={col.key + ci}
+                                className={`shrink-0 ${ci > 0 ? 'border-s border-border/60' : ''}`}
+                                style={{ width: `${colWidth}px` }}
+                              >
+                                {col.title && (
+                                  <div className="px-3 pt-1 pb-2 text-[10px] font-black uppercase tracking-[0.14em] text-muted-foreground/80 truncate">
+                                    {col.title}
                                   </div>
                                 )}
-                              </li>
-                            );
-                          })}
-                        </ul>
+                                <ul className="px-1.5 pb-2 space-y-0.5 overflow-y-auto" style={{ maxHeight: "60vh" }}>
+                                  {col.entries.map((entry) => (
+                                    <li key={entry.id}>
+                                      <button
+                                        type="button"
+                                        onClick={(e) => { e.stopPropagation(); entry.onClick(); }}
+                                        className={`group w-full flex items-center justify-between gap-2 text-[13px] font-semibold px-2.5 py-2 rounded-md transition-all border-0 cursor-pointer text-start ${entry.selected ? 'bg-red-500/15 text-red-500' : 'text-card-foreground hover:text-red-500 hover:bg-red-500/10'}`}
+                                      >
+                                        <span className="flex-1 truncate">{entry.label}</span>
+                                        {entry.hasNext && (
+                                          <ChevronRight className={`w-3.5 h-3.5 shrink-0 ${entry.selected ? 'text-red-500' : 'text-muted-foreground group-hover:text-red-500'} ${isRTL ? 'rotate-180' : ''}`} />
+                                        )}
+                                      </button>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
               </div>
             ))}
           </nav>
