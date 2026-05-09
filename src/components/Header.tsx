@@ -352,15 +352,19 @@ export default function Header() {
           </button>
           {isExpanded && (
             <div className="ml-4 border-l-2 border-accent/20 pl-2 mt-1 space-y-0.5">
-              {children.map((child) => (
-                <button
-                  key={child.id}
-                  onClick={() => handleItemClick(child)}
-                  className="w-full text-start px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-red-500 hover:bg-red-500/10 active:bg-red-500/20 rounded-md transition-colors"
-                >
-                  {isAr ? child.name_ar : child.name_en}
-                </button>
-              ))}
+              {children.map((child) => {
+                const childHref = getLeafHref(child);
+                const cls = "block w-full text-start px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-red-500 hover:bg-red-500/10 active:bg-red-500/20 rounded-md transition-colors";
+                return childHref ? (
+                  <a key={child.id} href={childHref} onClick={(e) => handleLeafAnchorClick(e, child)} className={cls}>
+                    {isAr ? child.name_ar : child.name_en}
+                  </a>
+                ) : (
+                  <button key={child.id} onClick={() => handleItemClick(child)} className={cls}>
+                    {isAr ? child.name_ar : child.name_en}
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
