@@ -470,6 +470,8 @@ export default function Header() {
                                     <li key={entry.id}>
                                       <button
                                         type="button"
+                                        onMouseEnter={() => entry.onHover?.()}
+                                        onFocus={() => entry.onHover?.()}
                                         onClick={(e) => { e.stopPropagation(); entry.onClick(); }}
                                         className={`group w-full flex items-center justify-between gap-2 text-[13px] font-semibold px-2.5 py-2 rounded-md transition-all border-0 cursor-pointer text-start ${entry.selected ? 'bg-red-500/15 text-red-500' : 'text-card-foreground hover:text-red-500 hover:bg-red-500/10'}`}
                                       >
