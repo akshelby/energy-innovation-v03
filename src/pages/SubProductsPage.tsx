@@ -455,7 +455,7 @@ export default function SubProductsPage() {
                         </div>
                       )}
                     </div>
-                  </div>
+                  </Wrapper>
                 );
               })}
             </div>
