@@ -48,45 +48,30 @@ const FloatingButtons = lazyWithRetry(floatingImport);
 const Index = () => {
   useEffect(() => {
     loadImageOptimizationSetting();
-    // Kick off all below-fold chunk downloads in parallel right after first paint, so
-    // Products / Services / etc. are already cached by the time the user scrolls.
-    const prefetch = () => {
-      productsImport(); servicesImport(); countriesImport(); highlightImport();
-      whyChooseImport(); partnersImport(); contactImport(); footerImport(); floatingImport();
-    };
-    if ("requestIdleCallback" in window) {
-      (window as any).requestIdleCallback(prefetch, { timeout: 800 });
-    } else {
-      setTimeout(prefetch, 200);
+    // Fire all below-fold chunk downloads + data fetches IMMEDIATELY (no idle wait)
+    // so every section is ready the moment the user scrolls.
+    productsImport(); servicesImport(); countriesImport(); highlightImport();
+    whyChooseImport(); partnersImport(); contactImport(); footerImport(); floatingImport();
+
+    if (!getCached("partners_v1")) {
+      supabase
+        .from("partners")
+        .select("id, name_en, name_ar, logo_url, website_url, sort_order, is_active, logo_height")
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true })
+        .then(({ data, error }) => {
+          if (!error && data) setCache("partners_v1", data);
+        });
     }
-    // Warm partners + countries data caches in parallel so those sections
-    // render instantly once the user scrolls (avoids lazy-chunk + fetch waterfall).
-    const warmData = () => {
-      if (!getCached("partners_v1")) {
-        supabase
-          .from("partners")
-          .select("id, name_en, name_ar, logo_url, website_url, sort_order, is_active, logo_height")
-          .eq("is_active", true)
-          .order("sort_order", { ascending: true })
-          .then(({ data, error }) => {
-            if (!error && data) setCache("partners_v1", data);
-          });
-      }
-      if (!getCached("countries_v1")) {
-        supabase
-          .from("countries")
-          .select("id, name_en, name_ar, flag_url, country_code, sort_order, is_active")
-          .eq("is_active", true)
-          .order("sort_order", { ascending: true })
-          .then(({ data, error }) => {
-            if (!error && data) setCache("countries_v1", data);
-          });
-      }
-    };
-    if ("requestIdleCallback" in window) {
-      (window as any).requestIdleCallback(warmData, { timeout: 1200 });
-    } else {
-      setTimeout(warmData, 400);
+    if (!getCached("countries_v1")) {
+      supabase
+        .from("countries")
+        .select("id, name_en, name_ar, flag_url, country_code, sort_order, is_active")
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true })
+        .then(({ data, error }) => {
+          if (!error && data) setCache("countries_v1", data);
+        });
     }
   }, []);
   return (
